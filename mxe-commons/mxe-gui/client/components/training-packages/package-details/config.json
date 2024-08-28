@@ -1,0 +1,8 @@
+{
+  "script": "package-details/PackageDetails",
+  "id": "PackageDetails",
+  "data": {},
+  "dependencies": {
+    "@eui/lit-component": "0.7.2"
+  }
+}

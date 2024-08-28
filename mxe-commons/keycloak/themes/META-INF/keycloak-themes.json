@@ -1,0 +1,6 @@
+{
+    "themes": [{
+        "name" : "mxe",
+        "types": [ "login" ]
+    }]
+}

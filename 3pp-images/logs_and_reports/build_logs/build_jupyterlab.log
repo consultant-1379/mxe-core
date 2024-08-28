@@ -1,0 +1,1055 @@
++ set -e
+++ pwd
++ CWD=/home/emataru/2.5/mxe-core
++ case "$(uname -s)" in
+++ uname -s
+++ readlink -f /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab/build_image.sh
++ SCRIPT=/mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab/build_image.sh
+++ dirname /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab/build_image.sh
++ BASEDIR=/mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab
+++ dirname /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab
++ MODULEROOT=/mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images
++ source /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/base_image.sh
+++ export LATEST_DATE_TAG=20230412
+++ LATEST_DATE_TAG=20230412
+++ export BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:focal-20230412
+++ BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:focal-20230412
+++ export MINICONDA_VERSION=4.7.12
+++ MINICONDA_VERSION=4.7.12
+++ export S2I_MINICONDA_DOWNLOAD_VERSION=4.10.3
+++ S2I_MINICONDA_DOWNLOAD_VERSION=4.10.3
+++ export MINICONDA_UBUNTU_IMAGE=armdocker.rnd.ericsson.se/proj-mxe/continuumio/miniconda3:4.7.12-ubuntu-20230412
+++ MINICONDA_UBUNTU_IMAGE=armdocker.rnd.ericsson.se/proj-mxe/continuumio/miniconda3:4.7.12-ubuntu-20230412
+++ export SELDON_JAVA_RUNTIME_IMAGE_SOURCE=openjdk
+++ SELDON_JAVA_RUNTIME_IMAGE_SOURCE=openjdk
+++ export SELDON_JAVA_RUNTIME_IMAGE_VERSION=8u141-jdk
+++ SELDON_JAVA_RUNTIME_IMAGE_VERSION=8u141-jdk
+++ export SELDON_JAVA_BUILD_IMAGE_SOURCE=seldonio/core-builder
+++ SELDON_JAVA_BUILD_IMAGE_SOURCE=seldonio/core-builder
+++ export SELDON_JAVA_BUILD_IMAGE_VERSION=0.4
+++ SELDON_JAVA_BUILD_IMAGE_VERSION=0.4
+++ export LATEST_ALPINE_TAG=3.17.3
+++ LATEST_ALPINE_TAG=3.17.3
+++ export PYTHON_ALPINE_TAG=3.9.16-alpine3.17
+++ PYTHON_ALPINE_TAG=3.9.16-alpine3.17
+++ export ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
+++ ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
++ MXE_VERSION=2.5
++ BUILD_NUMBER=1
++ BASE_NOTEBOOK_VERSION=lab-3.3.4
++ BASE_NOTEBOOK_IMAGE=jupyter/base-notebook:lab-3.3.4
++ UPSTREAM_VERSION=1.2.0
++ RAW_UPSTREAM_DOCKERFILE=https://raw.githubusercontent.com/jupyterhub/zero-to-jupyterhub-k8s/1.2.0/images/singleuser-sample/Dockerfile
++ RAW_UPSTREAM_REQUIREMENTS=https://raw.githubusercontent.com/jupyterhub/zero-to-jupyterhub-k8s/1.2.0/images/singleuser-sample/requirements.txt
++ IMAGE=armdocker.rnd.ericsson.se/proj-mxe/jupyterhub/k8s-singleuser-sample:1.2.0-2.5-1
++ BASE_NOTEBOOK_VERSION_IN_SRC=latest
++ SRC_BASE_NOTEBOOK_IMAGE=jupyter/base-notebook:latest
++ curl -Lo /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab/Dockerfile https://raw.githubusercontent.com/jupyterhub/zero-to-jupyterhub-k8s/1.2.0/images/singleuser-sample/Dockerfile
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100  1247  100  1247    0     0   4635      0 --:--:-- --:--:-- --:--:--  4635
++ curl -Lo /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab/requirements.txt https://raw.githubusercontent.com/jupyterhub/zero-to-jupyterhub-k8s/1.2.0/images/singleuser-sample/requirements.txt
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   138  100   138    0     0    530      0 --:--:-- --:--:-- --:--:--   530
++ sed -i s#jupyter/base-notebook:latest#jupyter/base-notebook:lab-3.3.4#g /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab/Dockerfile
++ sed -i '/COPY requirements.txt / i RUN conda install nodejs==16.13.0' /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab/Dockerfile
++ sed -i '/COPY requirements.txt / i RUN npm install -g npm@8.3.0 configurable-http-proxy@4.5.1' /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab/Dockerfile
++ sed -i '/USER $NB_USER/ i RUN wget http://pki.ericsson.se/CertData/EGADIssuingCA3.crt -O /usr/local/share/ca-certificates/EGADIssuingCA3.crt && wget http://pki.ericsson.se/CertData/EGADRootCA.crt -O /usr/local/share/ca-certificates/EGADRootCA.crt ' /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab/Dockerfile
++ sed -i '/USER $NB_USER/ i RUN update-ca-certificates' /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab/Dockerfile
++ DOCKER_BUILDKIT=1
++ docker build -t armdocker.rnd.ericsson.se/proj-mxe/jupyterhub/k8s-singleuser-sample:1.2.0-2.5-1 --build-arg 'PIP_OVERRIDES=jupyterhub==2.2.2 nbgitpuller==0.10.2  mako==1.2.2' -f /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab/Dockerfile /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab
+#1 [internal] load .dockerignore
+#1 transferring context: 2B done
+#1 DONE 0.2s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.63kB done
+#2 DONE 0.3s
+
+#3 [internal] load metadata for docker.io/jupyter/base-notebook:lab-3.3.4
+#3 DONE 1.9s
+
+#4 [internal] load build context
+#4 DONE 0.0s
+
+#5 [ 1/10] FROM docker.io/jupyter/base-notebook:lab-3.3.4@sha256:b27766fe8a291b3d135d5678d6e0297a066c60650f482ccdc10a6c8e6b219665
+#5 resolve docker.io/jupyter/base-notebook:lab-3.3.4@sha256:b27766fe8a291b3d135d5678d6e0297a066c60650f482ccdc10a6c8e6b219665
+#5 resolve docker.io/jupyter/base-notebook:lab-3.3.4@sha256:b27766fe8a291b3d135d5678d6e0297a066c60650f482ccdc10a6c8e6b219665 0.1s done
+#5 ...
+
+#4 [internal] load build context
+#4 transferring context: 183B done
+#4 DONE 0.2s
+
+#5 [ 1/10] FROM docker.io/jupyter/base-notebook:lab-3.3.4@sha256:b27766fe8a291b3d135d5678d6e0297a066c60650f482ccdc10a6c8e6b219665
+#5 sha256:9288915018bce9d69c19c718789ec4d5fc482e900f8ac4cee0db762a08c5b4fc 0B / 35.16MB 0.2s
+#5 sha256:302537aac0b032b190166acedb2fc05e3d27dfef4d8d0fee155f2e3de57a8027 10.18kB / 10.18kB done
+#5 sha256:b27766fe8a291b3d135d5678d6e0297a066c60650f482ccdc10a6c8e6b219665 743B / 743B done
+#5 sha256:d5fd17ec1767521cf97f61568096bfc9a7cd9c2d149576a7b43930c5a97062b0 0B / 28.57MB 0.2s
+#5 sha256:883747f01692dd3b14ed51f77a82b85f73867f80e4e91f8328a4a21688efb665 3.23kB / 3.23kB done
+#5 sha256:ad895732ee5cd9523935692ece65d438c11f826c25b7ed6e0a7c0dc7e58d9cb7 0B / 683B 0.2s
+#5 sha256:d5fd17ec1767521cf97f61568096bfc9a7cd9c2d149576a7b43930c5a97062b0 8.39MB / 28.57MB 0.3s
+#5 sha256:d5fd17ec1767521cf97f61568096bfc9a7cd9c2d149576a7b43930c5a97062b0 22.02MB / 28.57MB 0.4s
+#5 sha256:d5fd17ec1767521cf97f61568096bfc9a7cd9c2d149576a7b43930c5a97062b0 28.57MB / 28.57MB 0.6s
+#5 sha256:ad895732ee5cd9523935692ece65d438c11f826c25b7ed6e0a7c0dc7e58d9cb7 683B / 683B 0.6s
+#5 sha256:d5fd17ec1767521cf97f61568096bfc9a7cd9c2d149576a7b43930c5a97062b0 28.57MB / 28.57MB 0.6s done
+#5 sha256:ad895732ee5cd9523935692ece65d438c11f826c25b7ed6e0a7c0dc7e58d9cb7 683B / 683B 0.6s done
+#5 extracting sha256:d5fd17ec1767521cf97f61568096bfc9a7cd9c2d149576a7b43930c5a97062b0
+#5 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 0B / 32B 0.7s
+#5 sha256:7b053b0d567d22bef37bc9be26cff5305d6f0b7570cded52f7c2de580f1d1b2f 0B / 1.92kB 0.8s
+#5 sha256:9288915018bce9d69c19c718789ec4d5fc482e900f8ac4cee0db762a08c5b4fc 3.15MB / 35.16MB 0.9s
+#5 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 32B / 32B 0.8s done
+#5 sha256:577d6f3bb6f4f76ebfe966a31ebb38d49623b957451346d246297a5c3f78008c 0B / 4.54kB 0.9s
+#5 sha256:9288915018bce9d69c19c718789ec4d5fc482e900f8ac4cee0db762a08c5b4fc 11.53MB / 35.16MB 1.1s
+#5 sha256:9288915018bce9d69c19c718789ec4d5fc482e900f8ac4cee0db762a08c5b4fc 18.87MB / 35.16MB 1.2s
+#5 sha256:577d6f3bb6f4f76ebfe966a31ebb38d49623b957451346d246297a5c3f78008c 4.54kB / 4.54kB 1.1s done
+#5 sha256:1d18b5a5f242679310606ea503c8b6935921edfd7f101e6a51cf423f668cc9ee 0B / 162B 1.2s
+#5 sha256:9288915018bce9d69c19c718789ec4d5fc482e900f8ac4cee0db762a08c5b4fc 31.44MB / 35.16MB 1.3s
+#5 extracting sha256:d5fd17ec1767521cf97f61568096bfc9a7cd9c2d149576a7b43930c5a97062b0 0.6s done
+#5 sha256:9288915018bce9d69c19c718789ec4d5fc482e900f8ac4cee0db762a08c5b4fc 35.16MB / 35.16MB 1.4s
+#5 sha256:9288915018bce9d69c19c718789ec4d5fc482e900f8ac4cee0db762a08c5b4fc 35.16MB / 35.16MB 1.4s done
+#5 sha256:1d18b5a5f242679310606ea503c8b6935921edfd7f101e6a51cf423f668cc9ee 162B / 162B 1.4s done
+#5 extracting sha256:9288915018bce9d69c19c718789ec4d5fc482e900f8ac4cee0db762a08c5b4fc
+#5 sha256:ffc9ad0a0b36f251310371046655a87e90e32abfa6cdd02278499a759fa73e8c 0B / 287B 1.6s
+#5 sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 0B / 176.76MB 1.6s
+#5 sha256:7b053b0d567d22bef37bc9be26cff5305d6f0b7570cded52f7c2de580f1d1b2f 1.92kB / 1.92kB 1.6s done
+#5 sha256:e9036ae1aec3aa4c2f1d1518b58d8f154efd4d848adb82e52a601c9e00560fce 0B / 4.53kB 1.8s
+#5 sha256:ffc9ad0a0b36f251310371046655a87e90e32abfa6cdd02278499a759fa73e8c 287B / 287B 1.7s done
+#5 sha256:8016e50184c6b14bf1e020c204a88ecfd7903a9927bd5d4e38bc897702dcdcdb 0B / 995B 1.9s
+#5 sha256:e9036ae1aec3aa4c2f1d1518b58d8f154efd4d848adb82e52a601c9e00560fce 4.53kB / 4.53kB 1.9s done
+#5 sha256:8016e50184c6b14bf1e020c204a88ecfd7903a9927bd5d4e38bc897702dcdcdb 995B / 995B 2.1s
+#5 sha256:55f4c93ee7b85902bd822cd0d5d5e673a649eaccb3480c0032f958f52f99210a 0B / 1.08kB 2.1s
+#5 sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 12.58MB / 176.76MB 2.3s
+#5 sha256:8016e50184c6b14bf1e020c204a88ecfd7903a9927bd5d4e38bc897702dcdcdb 995B / 995B 2.3s done
+#5 extracting sha256:9288915018bce9d69c19c718789ec4d5fc482e900f8ac4cee0db762a08c5b4fc 0.9s done
+#5 sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 28.31MB / 176.76MB 2.5s
+#5 sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 42.99MB / 176.76MB 2.7s
+#5 sha256:55f4c93ee7b85902bd822cd0d5d5e673a649eaccb3480c0032f958f52f99210a 1.08kB / 1.08kB 2.7s
+#5 sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 56.62MB / 176.76MB 2.9s
+#5 sha256:55f4c93ee7b85902bd822cd0d5d5e673a649eaccb3480c0032f958f52f99210a 1.08kB / 1.08kB 2.8s done
+#5 extracting sha256:ad895732ee5cd9523935692ece65d438c11f826c25b7ed6e0a7c0dc7e58d9cb7
+#5 extracting sha256:ad895732ee5cd9523935692ece65d438c11f826c25b7ed6e0a7c0dc7e58d9cb7 done
+#5 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1
+#5 sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 80.74MB / 176.76MB 3.2s
+#5 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 done
+#5 sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 92.27MB / 176.76MB 3.3s
+#5 extracting sha256:7b053b0d567d22bef37bc9be26cff5305d6f0b7570cded52f7c2de580f1d1b2f done
+#5 sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 104.86MB / 176.76MB 3.5s
+#5 extracting sha256:577d6f3bb6f4f76ebfe966a31ebb38d49623b957451346d246297a5c3f78008c done
+#5 sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 118.49MB / 176.76MB 3.6s
+#5 sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 130.02MB / 176.76MB 3.7s
+#5 sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 152.49MB / 176.76MB 3.9s
+#5 extracting sha256:1d18b5a5f242679310606ea503c8b6935921edfd7f101e6a51cf423f668cc9ee done
+#5 sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 164.63MB / 176.76MB 4.0s
+#5 extracting sha256:ffc9ad0a0b36f251310371046655a87e90e32abfa6cdd02278499a759fa73e8c done
+#5 sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 175.11MB / 176.76MB 4.1s
+#5 sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 176.76MB / 176.76MB 4.3s done
+#5 extracting sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 0.1s
+#5 extracting sha256:75f3e04b1547eb7bec99fe0349f965a5bf0cdc08a9f3d7c64c35e23d2d4f5c04 4.8s done
+#5 extracting sha256:e9036ae1aec3aa4c2f1d1518b58d8f154efd4d848adb82e52a601c9e00560fce done
+#5 extracting sha256:8016e50184c6b14bf1e020c204a88ecfd7903a9927bd5d4e38bc897702dcdcdb
+#5 extracting sha256:8016e50184c6b14bf1e020c204a88ecfd7903a9927bd5d4e38bc897702dcdcdb done
+#5 extracting sha256:55f4c93ee7b85902bd822cd0d5d5e673a649eaccb3480c0032f958f52f99210a done
+#5 DONE 11.9s
+
+#6 [ 2/10] RUN apt-get update  && apt-get upgrade -y  && apt-get install -y --no-install-recommends         dnsutils         git         iputils-ping  && rm -rf /var/lib/apt/lists/*
+#6 0.450 Get:1 http://security.ubuntu.com/ubuntu focal-security InRelease [114 kB]
+#6 0.598 Get:2 http://archive.ubuntu.com/ubuntu focal InRelease [265 kB]
+#6 0.710 Get:3 http://security.ubuntu.com/ubuntu focal-security/main amd64 Packages [2,629 kB]
+#6 0.948 Get:4 http://security.ubuntu.com/ubuntu focal-security/universe amd64 Packages [1,033 kB]
+#6 0.985 Get:5 http://security.ubuntu.com/ubuntu focal-security/restricted amd64 Packages [2,139 kB]
+#6 1.083 Get:6 http://security.ubuntu.com/ubuntu focal-security/multiverse amd64 Packages [28.5 kB]
+#6 1.222 Get:7 http://archive.ubuntu.com/ubuntu focal-updates InRelease [114 kB]
+#6 1.370 Get:8 http://archive.ubuntu.com/ubuntu focal-backports InRelease [108 kB]
+#6 1.517 Get:9 http://archive.ubuntu.com/ubuntu focal/multiverse amd64 Packages [177 kB]
+#6 1.573 Get:10 http://archive.ubuntu.com/ubuntu focal/restricted amd64 Packages [33.4 kB]
+#6 1.584 Get:11 http://archive.ubuntu.com/ubuntu focal/main amd64 Packages [1,275 kB]
+#6 1.835 Get:12 http://archive.ubuntu.com/ubuntu focal/universe amd64 Packages [11.3 MB]
+#6 2.661 Get:13 http://archive.ubuntu.com/ubuntu focal-updates/universe amd64 Packages [1,329 kB]
+#6 2.740 Get:14 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 Packages [3,111 kB]
+#6 2.960 Get:15 http://archive.ubuntu.com/ubuntu focal-updates/restricted amd64 Packages [2,277 kB]
+#6 3.120 Get:16 http://archive.ubuntu.com/ubuntu focal-updates/multiverse amd64 Packages [31.2 kB]
+#6 3.349 Get:17 http://archive.ubuntu.com/ubuntu focal-backports/universe amd64 Packages [28.6 kB]
+#6 3.614 Get:18 http://archive.ubuntu.com/ubuntu focal-backports/main amd64 Packages [55.2 kB]
+#6 3.764 Fetched 26.1 MB in 3s (7,664 kB/s)
+#6 3.764 Reading package lists...
+#6 4.801 Reading package lists...
+#6 5.751 Building dependency tree...
+#6 5.930 Reading state information...
+#6 5.952 Calculating upgrade...
+#6 6.247 The following packages will be upgraded:
+#6 6.247   apt base-files ca-certificates dpkg e2fsprogs gpgv libapt-pkg6.0 libc-bin
+#6 6.247   libc6 libcom-err2 libext2fs2 libgmp10 libgnutls30 libpam-modules
+#6 6.247   libpam-modules-bin libpam-runtime libpam0g libpcre2-8-0 libpcre3 libss2
+#6 6.247   libssl1.1 libsystemd0 libudev1 locales login logsave openssl passwd
+#6 6.247   perl-base sudo tar zlib1g
+#6 6.343 32 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+#6 6.343 Need to get 19.2 MB of archives.
+#6 6.343 After this operation, 24.6 kB of additional disk space will be used.
+#6 6.343 Get:1 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libc6 amd64 2.31-0ubuntu9.9 [2,722 kB]
+#6 6.681 Get:2 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 base-files amd64 11ubuntu5.7 [60.4 kB]
+#6 6.682 Get:3 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 tar amd64 1.30+dfsg-7ubuntu0.20.04.3 [240 kB]
+#6 6.686 Get:4 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 dpkg amd64 1.19.7ubuntu3.2 [1,128 kB]
+#6 6.699 Get:5 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 login amd64 1:4.8.1-1ubuntu5.20.04.4 [221 kB]
+#6 6.720 Get:6 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 perl-base amd64 5.30.0-9ubuntu0.3 [1,514 kB]
+#6 6.738 Get:7 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 locales all 2.31-0ubuntu9.9 [3,869 kB]
+#6 6.840 Get:8 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libc-bin amd64 2.31-0ubuntu9.9 [633 kB]
+#6 6.847 Get:9 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libsystemd0 amd64 245.4-4ubuntu3.21 [268 kB]
+#6 6.850 Get:10 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libudev1 amd64 245.4-4ubuntu3.21 [75.9 kB]
+#6 6.868 Get:11 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 zlib1g amd64 1:1.2.11.dfsg-2ubuntu1.5 [54.2 kB]
+#6 6.946 Get:12 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libapt-pkg6.0 amd64 2.0.9 [839 kB]
+#6 7.219 Get:13 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 gpgv amd64 2.2.19-3ubuntu2.2 [200 kB]
+#6 7.225 Get:14 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libgmp10 amd64 2:6.2.0+dfsg-4ubuntu0.1 [241 kB]
+#6 7.233 Get:15 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libgnutls30 amd64 3.6.13-2ubuntu1.8 [829 kB]
+#6 7.270 Get:16 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 apt amd64 2.0.9 [1,294 kB]
+#6 7.302 Get:17 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libpam0g amd64 1.3.1-5ubuntu4.6 [55.3 kB]
+#6 7.303 Get:18 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libpam-modules-bin amd64 1.3.1-5ubuntu4.6 [41.2 kB]
+#6 7.304 Get:19 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libpam-modules amd64 1.3.1-5ubuntu4.6 [260 kB]
+#6 7.309 Get:20 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 logsave amd64 1.45.5-2ubuntu1.1 [10.2 kB]
+#6 7.310 Get:21 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libext2fs2 amd64 1.45.5-2ubuntu1.1 [183 kB]
+#6 7.314 Get:22 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 e2fsprogs amd64 1.45.5-2ubuntu1.1 [527 kB]
+#6 7.407 Get:23 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libpam-runtime all 1.3.1-5ubuntu4.6 [37.3 kB]
+#6 7.503 Get:24 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libpcre2-8-0 amd64 10.34-7ubuntu0.1 [198 kB]
+#6 7.606 Get:25 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libpcre3 amd64 2:8.39-12ubuntu0.1 [232 kB]
+#6 7.648 Get:26 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 passwd amd64 1:4.8.1-1ubuntu5.20.04.4 [799 kB]
+#6 7.704 Get:27 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libcom-err2 amd64 1.45.5-2ubuntu1.1 [9,548 B]
+#6 7.704 Get:28 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libss2 amd64 1.45.5-2ubuntu1.1 [11.3 kB]
+#6 7.705 Get:29 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libssl1.1 amd64 1.1.1f-1ubuntu2.17 [1,322 kB]
+#6 7.745 Get:30 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 openssl amd64 1.1.1f-1ubuntu2.17 [622 kB]
+#6 7.756 Get:31 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 ca-certificates all 20211016ubuntu0.20.04.1 [141 kB]
+#6 7.763 Get:32 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 sudo amd64 1.8.31-1ubuntu1.5 [515 kB]
+#6 7.932 debconf: delaying package configuration, since apt-utils is not installed
+#6 8.034 Fetched 19.2 MB in 2s (12.6 MB/s)
+#6 8.193 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5393 files and directories currently installed.)
+#6 8.199 Preparing to unpack .../libc6_2.31-0ubuntu9.9_amd64.deb ...
+#6 8.406 Unpacking libc6:amd64 (2.31-0ubuntu9.9) over (2.31-0ubuntu9.7) ...
+#6 12.06 Setting up libc6:amd64 (2.31-0ubuntu9.9) ...
+#6 13.45 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5393 files and directories currently installed.)
+#6 13.46 Preparing to unpack .../base-files_11ubuntu5.7_amd64.deb ...
+#6 13.51 Unpacking base-files (11ubuntu5.7) over (11ubuntu5.5) ...
+#6 13.93 Setting up base-files (11ubuntu5.7) ...
+#6 14.00 Installing new version of config file /etc/issue ...
+#6 14.02 Installing new version of config file /etc/issue.net ...
+#6 14.05 Installing new version of config file /etc/lsb-release ...
+#6 14.41 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5393 files and directories currently installed.)
+#6 14.42 Preparing to unpack .../tar_1.30+dfsg-7ubuntu0.20.04.3_amd64.deb ...
+#6 14.46 Unpacking tar (1.30+dfsg-7ubuntu0.20.04.3) over (1.30+dfsg-7ubuntu0.20.04.2) ...
+#6 14.67 Setting up tar (1.30+dfsg-7ubuntu0.20.04.3) ...
+#6 14.82 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5393 files and directories currently installed.)
+#6 14.82 Preparing to unpack .../dpkg_1.19.7ubuntu3.2_amd64.deb ...
+#6 14.87 Unpacking dpkg (1.19.7ubuntu3.2) over (1.19.7ubuntu3) ...
+#6 15.34 Setting up dpkg (1.19.7ubuntu3.2) ...
+#6 15.63 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5393 files and directories currently installed.)
+#6 15.64 Preparing to unpack .../login_1%3a4.8.1-1ubuntu5.20.04.4_amd64.deb ...
+#6 15.73 Unpacking login (1:4.8.1-1ubuntu5.20.04.4) over (1:4.8.1-1ubuntu5.20.04.1) ...
+#6 15.96 Setting up login (1:4.8.1-1ubuntu5.20.04.4) ...
+#6 16.20 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5393 files and directories currently installed.)
+#6 16.21 Preparing to unpack .../perl-base_5.30.0-9ubuntu0.3_amd64.deb ...
+#6 16.27 Unpacking perl-base (5.30.0-9ubuntu0.3) over (5.30.0-9ubuntu0.2) ...
+#6 23.73 Setting up perl-base (5.30.0-9ubuntu0.3) ...
+#6 23.94 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5393 files and directories currently installed.)
+#6 23.94 Preparing to unpack .../locales_2.31-0ubuntu9.9_all.deb ...
+#6 24.00 Unpacking locales (2.31-0ubuntu9.9) over (2.31-0ubuntu9.7) ...
+#6 33.02 Preparing to unpack .../libc-bin_2.31-0ubuntu9.9_amd64.deb ...
+#6 33.07 Unpacking libc-bin (2.31-0ubuntu9.9) over (2.31-0ubuntu9.7) ...
+#6 33.65 Setting up libc-bin (2.31-0ubuntu9.9) ...
+#6 33.90 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5393 files and directories currently installed.)
+#6 33.91 Preparing to unpack .../libsystemd0_245.4-4ubuntu3.21_amd64.deb ...
+#6 33.96 Unpacking libsystemd0:amd64 (245.4-4ubuntu3.21) over (245.4-4ubuntu3.16) ...
+#6 34.14 Setting up libsystemd0:amd64 (245.4-4ubuntu3.21) ...
+#6 34.30 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5393 files and directories currently installed.)
+#6 34.30 Preparing to unpack .../libudev1_245.4-4ubuntu3.21_amd64.deb ...
+#6 34.41 Unpacking libudev1:amd64 (245.4-4ubuntu3.21) over (245.4-4ubuntu3.16) ...
+#6 34.57 Setting up libudev1:amd64 (245.4-4ubuntu3.21) ...
+#6 34.69 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5393 files and directories currently installed.)
+#6 34.70 Preparing to unpack .../zlib1g_1%3a1.2.11.dfsg-2ubuntu1.5_amd64.deb ...
+#6 34.74 Unpacking zlib1g:amd64 (1:1.2.11.dfsg-2ubuntu1.5) over (1:1.2.11.dfsg-2ubuntu1.3) ...
+#6 34.98 Setting up zlib1g:amd64 (1:1.2.11.dfsg-2ubuntu1.5) ...
+#6 35.13 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5393 files and directories currently installed.)
+#6 35.13 Preparing to unpack .../libapt-pkg6.0_2.0.9_amd64.deb ...
+#6 35.18 Unpacking libapt-pkg6.0:amd64 (2.0.9) over (2.0.6) ...
+#6 35.42 Setting up libapt-pkg6.0:amd64 (2.0.9) ...
+#6 35.54 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5393 files and directories currently installed.)
+#6 35.54 Preparing to unpack .../gpgv_2.2.19-3ubuntu2.2_amd64.deb ...
+#6 35.59 Unpacking gpgv (2.2.19-3ubuntu2.2) over (2.2.19-3ubuntu2.1) ...
+#6 35.75 Setting up gpgv (2.2.19-3ubuntu2.2) ...
+#6 35.88 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5393 files and directories currently installed.)
+#6 35.88 Preparing to unpack .../libgmp10_2%3a6.2.0+dfsg-4ubuntu0.1_amd64.deb ...
+#6 35.93 Unpacking libgmp10:amd64 (2:6.2.0+dfsg-4ubuntu0.1) over (2:6.2.0+dfsg-4) ...
+#6 36.09 Setting up libgmp10:amd64 (2:6.2.0+dfsg-4ubuntu0.1) ...
+#6 36.22 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5393 files and directories currently installed.)
+#6 36.22 Preparing to unpack .../libgnutls30_3.6.13-2ubuntu1.8_amd64.deb ...
+#6 36.26 Unpacking libgnutls30:amd64 (3.6.13-2ubuntu1.8) over (3.6.13-2ubuntu1.6) ...
+#6 36.52 Setting up libgnutls30:amd64 (3.6.13-2ubuntu1.8) ...
+#6 36.68 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5393 files and directories currently installed.)
+#6 36.69 Preparing to unpack .../archives/apt_2.0.9_amd64.deb ...
+#6 36.79 Unpacking apt (2.0.9) over (2.0.6) ...
+#6 37.38 Setting up apt (2.0.9) ...
+#6 37.52 Removing obsolete conffile /etc/kernel/postinst.d/apt-auto-removal ...
+#6 37.90 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5392 files and directories currently installed.)
+#6 37.90 Preparing to unpack .../libpam0g_1.3.1-5ubuntu4.6_amd64.deb ...
+#6 37.95 Unpacking libpam0g:amd64 (1.3.1-5ubuntu4.6) over (1.3.1-5ubuntu4.3) ...
+#6 38.14 Setting up libpam0g:amd64 (1.3.1-5ubuntu4.6) ...
+#6 38.32 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5392 files and directories currently installed.)
+#6 38.33 Preparing to unpack .../libpam-modules-bin_1.3.1-5ubuntu4.6_amd64.deb ...
+#6 38.37 Unpacking libpam-modules-bin (1.3.1-5ubuntu4.6) over (1.3.1-5ubuntu4.3) ...
+#6 38.65 Setting up libpam-modules-bin (1.3.1-5ubuntu4.6) ...
+#6 38.82 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5392 files and directories currently installed.)
+#6 38.83 Preparing to unpack .../libpam-modules_1.3.1-5ubuntu4.6_amd64.deb ...
+#6 38.96 Unpacking libpam-modules:amd64 (1.3.1-5ubuntu4.6) over (1.3.1-5ubuntu4.3) ...
+#6 39.66 Setting up libpam-modules:amd64 (1.3.1-5ubuntu4.6) ...
+#6 40.05 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5392 files and directories currently installed.)
+#6 40.06 Preparing to unpack .../logsave_1.45.5-2ubuntu1.1_amd64.deb ...
+#6 40.11 Unpacking logsave (1.45.5-2ubuntu1.1) over (1.45.5-2ubuntu1) ...
+#6 40.30 Preparing to unpack .../libext2fs2_1.45.5-2ubuntu1.1_amd64.deb ...
+#6 40.34 Unpacking libext2fs2:amd64 (1.45.5-2ubuntu1.1) over (1.45.5-2ubuntu1) ...
+#6 40.54 Setting up libext2fs2:amd64 (1.45.5-2ubuntu1.1) ...
+#6 40.69 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5392 files and directories currently installed.)
+#6 40.70 Preparing to unpack .../e2fsprogs_1.45.5-2ubuntu1.1_amd64.deb ...
+#6 40.76 Unpacking e2fsprogs (1.45.5-2ubuntu1.1) over (1.45.5-2ubuntu1) ...
+#6 41.33 Preparing to unpack .../libpam-runtime_1.3.1-5ubuntu4.6_all.deb ...
+#6 41.38 Unpacking libpam-runtime (1.3.1-5ubuntu4.6) over (1.3.1-5ubuntu4.3) ...
+#6 41.74 Setting up libpam-runtime (1.3.1-5ubuntu4.6) ...
+#6 42.15 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5392 files and directories currently installed.)
+#6 42.15 Preparing to unpack .../libpcre2-8-0_10.34-7ubuntu0.1_amd64.deb ...
+#6 42.19 Unpacking libpcre2-8-0:amd64 (10.34-7ubuntu0.1) over (10.34-7) ...
+#6 42.39 Setting up libpcre2-8-0:amd64 (10.34-7ubuntu0.1) ...
+#6 42.55 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5392 files and directories currently installed.)
+#6 42.55 Preparing to unpack .../libpcre3_2%3a8.39-12ubuntu0.1_amd64.deb ...
+#6 42.59 Unpacking libpcre3:amd64 (2:8.39-12ubuntu0.1) over (2:8.39-12build1) ...
+#6 42.81 Setting up libpcre3:amd64 (2:8.39-12ubuntu0.1) ...
+#6 42.97 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5392 files and directories currently installed.)
+#6 42.97 Preparing to unpack .../passwd_1%3a4.8.1-1ubuntu5.20.04.4_amd64.deb ...
+#6 43.04 Unpacking passwd (1:4.8.1-1ubuntu5.20.04.4) over (1:4.8.1-1ubuntu5.20.04.1) ...
+#6 43.49 Setting up passwd (1:4.8.1-1ubuntu5.20.04.4) ...
+#6 43.78 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5392 files and directories currently installed.)
+#6 43.78 Preparing to unpack .../0-libcom-err2_1.45.5-2ubuntu1.1_amd64.deb ...
+#6 43.83 Unpacking libcom-err2:amd64 (1.45.5-2ubuntu1.1) over (1.45.5-2ubuntu1) ...
+#6 44.00 Preparing to unpack .../1-libss2_1.45.5-2ubuntu1.1_amd64.deb ...
+#6 44.04 Unpacking libss2:amd64 (1.45.5-2ubuntu1.1) over (1.45.5-2ubuntu1) ...
+#6 44.24 Preparing to unpack .../2-libssl1.1_1.1.1f-1ubuntu2.17_amd64.deb ...
+#6 44.29 Unpacking libssl1.1:amd64 (1.1.1f-1ubuntu2.17) over (1.1.1f-1ubuntu2.12) ...
+#6 44.73 Preparing to unpack .../3-openssl_1.1.1f-1ubuntu2.17_amd64.deb ...
+#6 44.79 Unpacking openssl (1.1.1f-1ubuntu2.17) over (1.1.1f-1ubuntu2.12) ...
+#6 45.06 Preparing to unpack .../4-ca-certificates_20211016ubuntu0.20.04.1_all.deb ...
+#6 45.13 Unpacking ca-certificates (20211016ubuntu0.20.04.1) over (20210119~20.04.2) ...
+#6 46.72 Preparing to unpack .../5-sudo_1.8.31-1ubuntu1.5_amd64.deb ...
+#6 46.79 Unpacking sudo (1.8.31-1ubuntu1.5) over (1.8.31-1ubuntu1.2) ...
+#6 47.20 Setting up libssl1.1:amd64 (1.1.1f-1ubuntu2.17) ...
+#6 47.35 Setting up libcom-err2:amd64 (1.45.5-2ubuntu1.1) ...
+#6 47.40 Setting up locales (2.31-0ubuntu9.9) ...
+#6 48.08 Generating locales (this might take a while)...
+#6 48.10   en_US.UTF-8... done
+#6 49.81 Generation complete.
+#6 49.87 Setting up libss2:amd64 (1.45.5-2ubuntu1.1) ...
+#6 49.91 Setting up sudo (1.8.31-1ubuntu1.5) ...
+#6 50.02 Setting up logsave (1.45.5-2ubuntu1.1) ...
+#6 50.08 Setting up openssl (1.1.1f-1ubuntu2.17) ...
+#6 50.15 Setting up e2fsprogs (1.45.5-2ubuntu1.1) ...
+#6 50.47 Setting up ca-certificates (20211016ubuntu0.20.04.1) ...
+#6 51.91 Updating certificates in /etc/ssl/certs...
+#6 52.61 rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+#6 52.61 7 added, 11 removed; done.
+#6 52.72 Processing triggers for libc-bin (2.31-0ubuntu9.9) ...
+#6 52.79 Processing triggers for ca-certificates (20211016ubuntu0.20.04.1) ...
+#6 52.81 Updating certificates in /etc/ssl/certs...
+#6 53.29 0 added, 0 removed; done.
+#6 53.29 Running hooks in /etc/ca-certificates/update.d...
+#6 53.29 done.
+#6 53.40 Reading package lists...
+#6 54.32 Building dependency tree...
+#6 54.49 Reading state information...
+#6 54.65 The following additional packages will be installed:
+#6 54.65   bind9-dnsutils bind9-host bind9-libs git-man libasn1-8-heimdal libbrotli1
+#6 54.65   libbsd0 libcap2 libcap2-bin libcurl3-gnutls libedit2 liberror-perl libexpat1
+#6 54.65   libgdbm-compat4 libgdbm6 libgssapi-krb5-2 libgssapi3-heimdal
+#6 54.65   libhcrypto4-heimdal libheimbase1-heimdal libheimntlm0-heimdal
+#6 54.65   libhx509-5-heimdal libicu66 libjson-c4 libk5crypto3 libkeyutils1
+#6 54.65   libkrb5-26-heimdal libkrb5-3 libkrb5support0 libldap-2.4-2 libldap-common
+#6 54.65   liblmdb0 libmaxminddb0 libnghttp2-14 libperl5.30 libroken18-heimdal librtmp1
+#6 54.65   libsasl2-2 libsasl2-modules-db libsqlite3-0 libssh-4 libuv1 libwind0-heimdal
+#6 54.65   libxml2 perl perl-modules-5.30 tzdata
+#6 54.65 Suggested packages:
+#6 54.65   gettext-base git-daemon-run | git-daemon-sysvinit git-doc git-el git-email
+#6 54.65   git-gui gitk gitweb git-cvs git-mediawiki git-svn gdbm-l10n krb5-doc
+#6 54.65   krb5-user mmdb-bin perl-doc libterm-readline-gnu-perl
+#6 54.65   | libterm-readline-perl-perl make libb-debug-perl liblocale-codes-perl
+#6 54.65 Recommended packages:
+#6 54.65   patch less ssh-client libpam-cap krb5-locales libsasl2-modules netbase
+#6 54.76 The following NEW packages will be installed:
+#6 54.76   bind9-dnsutils bind9-host bind9-libs dnsutils git git-man iputils-ping
+#6 54.76   libasn1-8-heimdal libbrotli1 libbsd0 libcap2 libcap2-bin libcurl3-gnutls
+#6 54.76   libedit2 liberror-perl libexpat1 libgdbm-compat4 libgdbm6 libgssapi-krb5-2
+#6 54.76   libgssapi3-heimdal libhcrypto4-heimdal libheimbase1-heimdal
+#6 54.76   libheimntlm0-heimdal libhx509-5-heimdal libicu66 libjson-c4 libk5crypto3
+#6 54.76   libkeyutils1 libkrb5-26-heimdal libkrb5-3 libkrb5support0 libldap-2.4-2
+#6 54.76   libldap-common liblmdb0 libmaxminddb0 libnghttp2-14 libperl5.30
+#6 54.76   libroken18-heimdal librtmp1 libsasl2-2 libsasl2-modules-db libsqlite3-0
+#6 54.76   libssh-4 libuv1 libwind0-heimdal libxml2 perl perl-modules-5.30 tzdata
+#6 55.02 0 upgraded, 49 newly installed, 0 to remove and 0 not upgraded.
+#6 55.02 Need to get 26.6 MB of archives.
+#6 55.02 After this operation, 140 MB of additional disk space will be used.
+#6 55.02 Get:1 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 perl-modules-5.30 all 5.30.0-9ubuntu0.3 [2,739 kB]
+#6 56.02 Get:2 http://archive.ubuntu.com/ubuntu focal/main amd64 libgdbm6 amd64 1.18.1-5 [27.4 kB]
+#6 56.02 Get:3 http://archive.ubuntu.com/ubuntu focal/main amd64 libgdbm-compat4 amd64 1.18.1-5 [6,244 B]
+#6 56.02 Get:4 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libperl5.30 amd64 5.30.0-9ubuntu0.3 [3,951 kB]
+#6 56.27 Get:5 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 perl amd64 5.30.0-9ubuntu0.3 [224 kB]
+#6 56.27 Get:6 http://archive.ubuntu.com/ubuntu focal/main amd64 libcap2 amd64 1:2.32-1 [15.9 kB]
+#6 56.27 Get:7 http://archive.ubuntu.com/ubuntu focal/main amd64 libcap2-bin amd64 1:2.32-1 [26.2 kB]
+#6 56.27 Get:8 http://archive.ubuntu.com/ubuntu focal/main amd64 iputils-ping amd64 3:20190709-3 [40.1 kB]
+#6 56.27 Get:9 http://archive.ubuntu.com/ubuntu focal/main amd64 libbsd0 amd64 0.10.0-1 [45.4 kB]
+#6 56.28 Get:10 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libexpat1 amd64 2.2.9-1ubuntu0.6 [74.6 kB]
+#6 56.28 Get:11 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 tzdata all 2023c-0ubuntu0.20.04.0 [287 kB]
+#6 56.51 Get:12 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libicu66 amd64 66.1-2ubuntu2.1 [8,515 kB]
+#6 57.93 Get:13 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libjson-c4 amd64 0.13.1+dfsg-7ubuntu0.3 [29.3 kB]
+#6 57.93 Get:14 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libsqlite3-0 amd64 3.31.1-4ubuntu0.5 [549 kB]
+#6 57.97 Get:15 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libxml2 amd64 2.9.10+dfsg-5ubuntu0.20.04.6 [640 kB]
+#6 58.01 Get:16 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libkrb5support0 amd64 1.17-6ubuntu4.3 [31.1 kB]
+#6 58.01 Get:17 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libk5crypto3 amd64 1.17-6ubuntu4.3 [80.2 kB]
+#6 58.02 Get:18 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libkeyutils1 amd64 1.6-6ubuntu1.1 [10.3 kB]
+#6 58.02 Get:19 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libkrb5-3 amd64 1.17-6ubuntu4.3 [330 kB]
+#6 58.04 Get:20 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libgssapi-krb5-2 amd64 1.17-6ubuntu4.3 [121 kB]
+#6 58.05 Get:21 http://archive.ubuntu.com/ubuntu focal/main amd64 liblmdb0 amd64 0.9.24-1 [44.6 kB]
+#6 58.06 Get:22 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libmaxminddb0 amd64 1.4.2-0ubuntu1.20.04.1 [26.2 kB]
+#6 58.28 Get:23 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libuv1 amd64 1.34.2-1ubuntu1.3 [80.8 kB]
+#6 58.70 Get:24 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 bind9-libs amd64 1:9.16.1-0ubuntu2.14 [1,109 kB]
+#6 59.18 Get:25 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 bind9-host amd64 1:9.16.1-0ubuntu2.14 [43.0 kB]
+#6 59.18 Get:26 http://archive.ubuntu.com/ubuntu focal/main amd64 libedit2 amd64 3.1-20191231-1 [87.0 kB]
+#6 59.20 Get:27 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 bind9-dnsutils amd64 1:9.16.1-0ubuntu2.14 [134 kB]
+#6 59.21 Get:28 http://archive.ubuntu.com/ubuntu focal-updates/universe amd64 dnsutils all 1:9.16.1-0ubuntu2.14 [2,748 B]
+#6 59.21 Get:29 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libbrotli1 amd64 1.0.7-6ubuntu0.1 [267 kB]
+#6 59.24 Get:30 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libroken18-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [42.5 kB]
+#6 59.25 Get:31 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libasn1-8-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [181 kB]
+#6 59.26 Get:32 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libheimbase1-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [30.4 kB]
+#6 59.26 Get:33 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libhcrypto4-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [88.1 kB]
+#6 59.49 Get:34 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libwind0-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [47.7 kB]
+#6 59.84 Get:35 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libhx509-5-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [107 kB]
+#6 60.00 Get:36 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libkrb5-26-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [207 kB]
+#6 60.16 Get:37 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libheimntlm0-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [15.1 kB]
+#6 60.17 Get:38 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libgssapi3-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [96.5 kB]
+#6 60.21 Get:39 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libsasl2-modules-db amd64 2.1.27+dfsg-2ubuntu0.1 [14.7 kB]
+#6 60.21 Get:40 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libsasl2-2 amd64 2.1.27+dfsg-2ubuntu0.1 [49.3 kB]
+#6 60.23 Get:41 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libldap-common all 2.4.49+dfsg-2ubuntu1.9 [16.6 kB]
+#6 60.23 Get:42 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libldap-2.4-2 amd64 2.4.49+dfsg-2ubuntu1.9 [155 kB]
+#6 60.27 Get:43 http://archive.ubuntu.com/ubuntu focal/main amd64 libnghttp2-14 amd64 1.40.0-1build1 [78.7 kB]
+#6 60.29 Get:44 http://archive.ubuntu.com/ubuntu focal/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2build1 [54.9 kB]
+#6 60.52 Get:45 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libssh-4 amd64 0.9.3-2ubuntu2.2 [170 kB]
+#6 61.07 Get:46 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libcurl3-gnutls amd64 7.68.0-1ubuntu2.18 [233 kB]
+#6 61.20 Get:47 http://archive.ubuntu.com/ubuntu focal/main amd64 liberror-perl all 0.17029-1 [26.5 kB]
+#6 61.21 Get:48 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 git-man all 1:2.25.1-1ubuntu3.10 [887 kB]
+#6 61.42 Get:49 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 git amd64 1:2.25.1-1ubuntu3.10 [4,534 kB]
+#6 61.88 debconf: delaying package configuration, since apt-utils is not installed
+#6 61.91 Fetched 26.6 MB in 7s (3,800 kB/s)
+#6 61.95 Selecting previously unselected package perl-modules-5.30.
+#6 61.95 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5388 files and directories currently installed.)
+#6 61.96 Preparing to unpack .../00-perl-modules-5.30_5.30.0-9ubuntu0.3_all.deb ...
+#6 61.98 Unpacking perl-modules-5.30 (5.30.0-9ubuntu0.3) ...
+#6 62.44 Selecting previously unselected package libgdbm6:amd64.
+#6 62.44 Preparing to unpack .../01-libgdbm6_1.18.1-5_amd64.deb ...
+#6 62.48 Unpacking libgdbm6:amd64 (1.18.1-5) ...
+#6 62.59 Selecting previously unselected package libgdbm-compat4:amd64.
+#6 62.60 Preparing to unpack .../02-libgdbm-compat4_1.18.1-5_amd64.deb ...
+#6 62.61 Unpacking libgdbm-compat4:amd64 (1.18.1-5) ...
+#6 62.74 Selecting previously unselected package libperl5.30:amd64.
+#6 62.74 Preparing to unpack .../03-libperl5.30_5.30.0-9ubuntu0.3_amd64.deb ...
+#6 62.75 Unpacking libperl5.30:amd64 (5.30.0-9ubuntu0.3) ...
+#6 63.37 Selecting previously unselected package perl.
+#6 63.37 Preparing to unpack .../04-perl_5.30.0-9ubuntu0.3_amd64.deb ...
+#6 63.39 Unpacking perl (5.30.0-9ubuntu0.3) ...
+#6 63.55 Selecting previously unselected package libcap2:amd64.
+#6 63.55 Preparing to unpack .../05-libcap2_1%3a2.32-1_amd64.deb ...
+#6 63.57 Unpacking libcap2:amd64 (1:2.32-1) ...
+#6 63.65 Selecting previously unselected package libcap2-bin.
+#6 63.65 Preparing to unpack .../06-libcap2-bin_1%3a2.32-1_amd64.deb ...
+#6 63.67 Unpacking libcap2-bin (1:2.32-1) ...
+#6 63.80 Selecting previously unselected package iputils-ping.
+#6 63.80 Preparing to unpack .../07-iputils-ping_3%3a20190709-3_amd64.deb ...
+#6 63.83 Unpacking iputils-ping (3:20190709-3) ...
+#6 63.93 Selecting previously unselected package libbsd0:amd64.
+#6 63.93 Preparing to unpack .../08-libbsd0_0.10.0-1_amd64.deb ...
+#6 63.94 Unpacking libbsd0:amd64 (0.10.0-1) ...
+#6 64.07 Selecting previously unselected package libexpat1:amd64.
+#6 64.07 Preparing to unpack .../09-libexpat1_2.2.9-1ubuntu0.6_amd64.deb ...
+#6 64.08 Unpacking libexpat1:amd64 (2.2.9-1ubuntu0.6) ...
+#6 64.23 Selecting previously unselected package tzdata.
+#6 64.23 Preparing to unpack .../10-tzdata_2023c-0ubuntu0.20.04.0_all.deb ...
+#6 64.25 Unpacking tzdata (2023c-0ubuntu0.20.04.0) ...
+#6 64.56 Selecting previously unselected package libicu66:amd64.
+#6 64.56 Preparing to unpack .../11-libicu66_66.1-2ubuntu2.1_amd64.deb ...
+#6 64.57 Unpacking libicu66:amd64 (66.1-2ubuntu2.1) ...
+#6 65.49 Selecting previously unselected package libjson-c4:amd64.
+#6 65.49 Preparing to unpack .../12-libjson-c4_0.13.1+dfsg-7ubuntu0.3_amd64.deb ...
+#6 65.51 Unpacking libjson-c4:amd64 (0.13.1+dfsg-7ubuntu0.3) ...
+#6 65.62 Selecting previously unselected package libsqlite3-0:amd64.
+#6 65.62 Preparing to unpack .../13-libsqlite3-0_3.31.1-4ubuntu0.5_amd64.deb ...
+#6 65.64 Unpacking libsqlite3-0:amd64 (3.31.1-4ubuntu0.5) ...
+#6 65.81 Selecting previously unselected package libxml2:amd64.
+#6 65.81 Preparing to unpack .../14-libxml2_2.9.10+dfsg-5ubuntu0.20.04.6_amd64.deb ...
+#6 65.82 Unpacking libxml2:amd64 (2.9.10+dfsg-5ubuntu0.20.04.6) ...
+#6 65.99 Selecting previously unselected package libkrb5support0:amd64.
+#6 66.00 Preparing to unpack .../15-libkrb5support0_1.17-6ubuntu4.3_amd64.deb ...
+#6 66.03 Unpacking libkrb5support0:amd64 (1.17-6ubuntu4.3) ...
+#6 66.15 Selecting previously unselected package libk5crypto3:amd64.
+#6 66.15 Preparing to unpack .../16-libk5crypto3_1.17-6ubuntu4.3_amd64.deb ...
+#6 66.16 Unpacking libk5crypto3:amd64 (1.17-6ubuntu4.3) ...
+#6 66.29 Selecting previously unselected package libkeyutils1:amd64.
+#6 66.29 Preparing to unpack .../17-libkeyutils1_1.6-6ubuntu1.1_amd64.deb ...
+#6 66.32 Unpacking libkeyutils1:amd64 (1.6-6ubuntu1.1) ...
+#6 66.45 Selecting previously unselected package libkrb5-3:amd64.
+#6 66.45 Preparing to unpack .../18-libkrb5-3_1.17-6ubuntu4.3_amd64.deb ...
+#6 66.46 Unpacking libkrb5-3:amd64 (1.17-6ubuntu4.3) ...
+#6 66.63 Selecting previously unselected package libgssapi-krb5-2:amd64.
+#6 66.64 Preparing to unpack .../19-libgssapi-krb5-2_1.17-6ubuntu4.3_amd64.deb ...
+#6 66.66 Unpacking libgssapi-krb5-2:amd64 (1.17-6ubuntu4.3) ...
+#6 66.80 Selecting previously unselected package liblmdb0:amd64.
+#6 66.80 Preparing to unpack .../20-liblmdb0_0.9.24-1_amd64.deb ...
+#6 66.82 Unpacking liblmdb0:amd64 (0.9.24-1) ...
+#6 66.98 Selecting previously unselected package libmaxminddb0:amd64.
+#6 66.98 Preparing to unpack .../21-libmaxminddb0_1.4.2-0ubuntu1.20.04.1_amd64.deb ...
+#6 67.00 Unpacking libmaxminddb0:amd64 (1.4.2-0ubuntu1.20.04.1) ...
+#6 67.12 Selecting previously unselected package libuv1:amd64.
+#6 67.12 Preparing to unpack .../22-libuv1_1.34.2-1ubuntu1.3_amd64.deb ...
+#6 67.14 Unpacking libuv1:amd64 (1.34.2-1ubuntu1.3) ...
+#6 67.26 Selecting previously unselected package bind9-libs:amd64.
+#6 67.26 Preparing to unpack .../23-bind9-libs_1%3a9.16.1-0ubuntu2.14_amd64.deb ...
+#6 67.28 Unpacking bind9-libs:amd64 (1:9.16.1-0ubuntu2.14) ...
+#6 67.48 Selecting previously unselected package bind9-host.
+#6 67.48 Preparing to unpack .../24-bind9-host_1%3a9.16.1-0ubuntu2.14_amd64.deb ...
+#6 67.50 Unpacking bind9-host (1:9.16.1-0ubuntu2.14) ...
+#6 67.63 Selecting previously unselected package libedit2:amd64.
+#6 67.63 Preparing to unpack .../25-libedit2_3.1-20191231-1_amd64.deb ...
+#6 67.64 Unpacking libedit2:amd64 (3.1-20191231-1) ...
+#6 67.74 Selecting previously unselected package bind9-dnsutils.
+#6 67.74 Preparing to unpack .../26-bind9-dnsutils_1%3a9.16.1-0ubuntu2.14_amd64.deb ...
+#6 67.76 Unpacking bind9-dnsutils (1:9.16.1-0ubuntu2.14) ...
+#6 67.85 Selecting previously unselected package dnsutils.
+#6 67.86 Preparing to unpack .../27-dnsutils_1%3a9.16.1-0ubuntu2.14_all.deb ...
+#6 67.87 Unpacking dnsutils (1:9.16.1-0ubuntu2.14) ...
+#6 67.99 Selecting previously unselected package libbrotli1:amd64.
+#6 67.99 Preparing to unpack .../28-libbrotli1_1.0.7-6ubuntu0.1_amd64.deb ...
+#6 68.00 Unpacking libbrotli1:amd64 (1.0.7-6ubuntu0.1) ...
+#6 68.17 Selecting previously unselected package libroken18-heimdal:amd64.
+#6 68.17 Preparing to unpack .../29-libroken18-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#6 68.18 Unpacking libroken18-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 68.32 Selecting previously unselected package libasn1-8-heimdal:amd64.
+#6 68.33 Preparing to unpack .../30-libasn1-8-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#6 68.34 Unpacking libasn1-8-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 68.48 Selecting previously unselected package libheimbase1-heimdal:amd64.
+#6 68.48 Preparing to unpack .../31-libheimbase1-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#6 68.50 Unpacking libheimbase1-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 68.69 Selecting previously unselected package libhcrypto4-heimdal:amd64.
+#6 68.69 Preparing to unpack .../32-libhcrypto4-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#6 68.72 Unpacking libhcrypto4-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 68.85 Selecting previously unselected package libwind0-heimdal:amd64.
+#6 68.85 Preparing to unpack .../33-libwind0-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#6 68.87 Unpacking libwind0-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 68.99 Selecting previously unselected package libhx509-5-heimdal:amd64.
+#6 68.99 Preparing to unpack .../34-libhx509-5-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#6 69.02 Unpacking libhx509-5-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 69.14 Selecting previously unselected package libkrb5-26-heimdal:amd64.
+#6 69.14 Preparing to unpack .../35-libkrb5-26-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#6 69.15 Unpacking libkrb5-26-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 69.31 Selecting previously unselected package libheimntlm0-heimdal:amd64.
+#6 69.32 Preparing to unpack .../36-libheimntlm0-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#6 69.33 Unpacking libheimntlm0-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 69.48 Selecting previously unselected package libgssapi3-heimdal:amd64.
+#6 69.48 Preparing to unpack .../37-libgssapi3-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#6 69.52 Unpacking libgssapi3-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 69.60 Selecting previously unselected package libsasl2-modules-db:amd64.
+#6 69.60 Preparing to unpack .../38-libsasl2-modules-db_2.1.27+dfsg-2ubuntu0.1_amd64.deb ...
+#6 69.62 Unpacking libsasl2-modules-db:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#6 69.74 Selecting previously unselected package libsasl2-2:amd64.
+#6 69.74 Preparing to unpack .../39-libsasl2-2_2.1.27+dfsg-2ubuntu0.1_amd64.deb ...
+#6 69.75 Unpacking libsasl2-2:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#6 69.85 Selecting previously unselected package libldap-common.
+#6 69.85 Preparing to unpack .../40-libldap-common_2.4.49+dfsg-2ubuntu1.9_all.deb ...
+#6 69.87 Unpacking libldap-common (2.4.49+dfsg-2ubuntu1.9) ...
+#6 70.00 Selecting previously unselected package libldap-2.4-2:amd64.
+#6 70.00 Preparing to unpack .../41-libldap-2.4-2_2.4.49+dfsg-2ubuntu1.9_amd64.deb ...
+#6 70.01 Unpacking libldap-2.4-2:amd64 (2.4.49+dfsg-2ubuntu1.9) ...
+#6 70.15 Selecting previously unselected package libnghttp2-14:amd64.
+#6 70.15 Preparing to unpack .../42-libnghttp2-14_1.40.0-1build1_amd64.deb ...
+#6 70.21 Unpacking libnghttp2-14:amd64 (1.40.0-1build1) ...
+#6 70.40 Selecting previously unselected package librtmp1:amd64.
+#6 70.40 Preparing to unpack .../43-librtmp1_2.4+20151223.gitfa8646d.1-2build1_amd64.deb ...
+#6 70.41 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build1) ...
+#6 70.59 Selecting previously unselected package libssh-4:amd64.
+#6 70.59 Preparing to unpack .../44-libssh-4_0.9.3-2ubuntu2.2_amd64.deb ...
+#6 70.61 Unpacking libssh-4:amd64 (0.9.3-2ubuntu2.2) ...
+#6 70.76 Selecting previously unselected package libcurl3-gnutls:amd64.
+#6 70.76 Preparing to unpack .../45-libcurl3-gnutls_7.68.0-1ubuntu2.18_amd64.deb ...
+#6 70.77 Unpacking libcurl3-gnutls:amd64 (7.68.0-1ubuntu2.18) ...
+#6 70.94 Selecting previously unselected package liberror-perl.
+#6 70.94 Preparing to unpack .../46-liberror-perl_0.17029-1_all.deb ...
+#6 70.96 Unpacking liberror-perl (0.17029-1) ...
+#6 71.07 Selecting previously unselected package git-man.
+#6 71.07 Preparing to unpack .../47-git-man_1%3a2.25.1-1ubuntu3.10_all.deb ...
+#6 71.08 Unpacking git-man (1:2.25.1-1ubuntu3.10) ...
+#6 71.32 Selecting previously unselected package git.
+#6 71.32 Preparing to unpack .../48-git_1%3a2.25.1-1ubuntu3.10_amd64.deb ...
+#6 71.36 Unpacking git (1:2.25.1-1ubuntu3.10) ...
+#6 71.96 Setting up libexpat1:amd64 (2.2.9-1ubuntu0.6) ...
+#6 72.00 Setting up liblmdb0:amd64 (0.9.24-1) ...
+#6 72.04 Setting up libkeyutils1:amd64 (1.6-6ubuntu1.1) ...
+#6 72.08 Setting up perl-modules-5.30 (5.30.0-9ubuntu0.3) ...
+#6 72.12 Setting up libmaxminddb0:amd64 (1.4.2-0ubuntu1.20.04.1) ...
+#6 72.17 Setting up libbrotli1:amd64 (1.0.7-6ubuntu0.1) ...
+#6 72.22 Setting up libsqlite3-0:amd64 (3.31.1-4ubuntu0.5) ...
+#6 72.25 Setting up libnghttp2-14:amd64 (1.40.0-1build1) ...
+#6 72.29 Setting up libldap-common (2.4.49+dfsg-2ubuntu1.9) ...
+#6 72.34 Setting up libcap2:amd64 (1:2.32-1) ...
+#6 72.37 Setting up libkrb5support0:amd64 (1.17-6ubuntu4.3) ...
+#6 72.41 Setting up libsasl2-modules-db:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#6 72.45 Setting up tzdata (2023c-0ubuntu0.20.04.0) ...
+#6 72.56 
+#6 72.56 Current default time zone: 'Etc/UTC'
+#6 72.56 Local time is now:      Mon Apr 24 07:08:25 UTC 2023.
+#6 72.56 Universal Time is now:  Mon Apr 24 07:08:25 UTC 2023.
+#6 72.56 Run 'dpkg-reconfigure tzdata' if you wish to change it.
+#6 72.56 
+#6 72.63 Setting up libcap2-bin (1:2.32-1) ...
+#6 72.66 Setting up libuv1:amd64 (1.34.2-1ubuntu1.3) ...
+#6 72.72 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build1) ...
+#6 72.77 Setting up libk5crypto3:amd64 (1.17-6ubuntu4.3) ...
+#6 72.81 Setting up libsasl2-2:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#6 72.86 Setting up libroken18-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 72.90 Setting up git-man (1:2.25.1-1ubuntu3.10) ...
+#6 72.95 Setting up libkrb5-3:amd64 (1.17-6ubuntu4.3) ...
+#6 73.00 Setting up libjson-c4:amd64 (0.13.1+dfsg-7ubuntu0.3) ...
+#6 73.05 Setting up libbsd0:amd64 (0.10.0-1) ...
+#6 73.11 Setting up iputils-ping (3:20190709-3) ...
+#6 73.17 Setting up libheimbase1-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 73.23 Setting up libgdbm6:amd64 (1.18.1-5) ...
+#6 73.27 Setting up libicu66:amd64 (66.1-2ubuntu2.1) ...
+#6 73.32 Setting up libasn1-8-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 73.38 Setting up libedit2:amd64 (3.1-20191231-1) ...
+#6 73.43 Setting up libhcrypto4-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 73.47 Setting up libwind0-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 73.51 Setting up libgssapi-krb5-2:amd64 (1.17-6ubuntu4.3) ...
+#6 73.55 Setting up libgdbm-compat4:amd64 (1.18.1-5) ...
+#6 73.60 Setting up libssh-4:amd64 (0.9.3-2ubuntu2.2) ...
+#6 73.64 Setting up libperl5.30:amd64 (5.30.0-9ubuntu0.3) ...
+#6 73.73 Setting up libxml2:amd64 (2.9.10+dfsg-5ubuntu0.20.04.6) ...
+#6 73.77 Setting up bind9-libs:amd64 (1:9.16.1-0ubuntu2.14) ...
+#6 73.81 Setting up libhx509-5-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 73.87 Setting up perl (5.30.0-9ubuntu0.3) ...
+#6 73.94 Setting up bind9-host (1:9.16.1-0ubuntu2.14) ...
+#6 73.98 Setting up libkrb5-26-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 74.06 Setting up libheimntlm0-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 74.10 Setting up liberror-perl (0.17029-1) ...
+#6 74.16 Setting up libgssapi3-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#6 74.22 Setting up bind9-dnsutils (1:9.16.1-0ubuntu2.14) ...
+#6 74.28 Setting up libldap-2.4-2:amd64 (2.4.49+dfsg-2ubuntu1.9) ...
+#6 74.32 Setting up libcurl3-gnutls:amd64 (7.68.0-1ubuntu2.18) ...
+#6 74.40 Setting up dnsutils (1:9.16.1-0ubuntu2.14) ...
+#6 74.49 Setting up git (1:2.25.1-1ubuntu3.10) ...
+#6 74.60 Processing triggers for libc-bin (2.31-0ubuntu9.9) ...
+#6 DONE 75.3s
+
+#7 [ 3/10] RUN wget http://pki.ericsson.se/CertData/EGADIssuingCA3.crt -O /usr/local/share/ca-certificates/EGADIssuingCA3.crt && wget http://pki.ericsson.se/CertData/EGADRootCA.crt -O /usr/local/share/ca-certificates/EGADRootCA.crt
+#7 0.470 --2023-04-24 07:08:28--  http://pki.ericsson.se/CertData/EGADIssuingCA3.crt
+#7 0.470 Resolving pki.ericsson.se (pki.ericsson.se)... 153.88.74.76, 153.88.74.78
+#7 0.480 Connecting to pki.ericsson.se (pki.ericsson.se)|153.88.74.76|:80... connected.
+#7 0.488 HTTP request sent, awaiting response... 200 OK
+#7 0.495 Length: 2358 (2.3K) [application/x-x509-ca-cert]
+#7 0.495 Saving to: ‘/usr/local/share/ca-certificates/EGADIssuingCA3.crt’
+#7 0.495 
+#7 0.495      0K ..                                                    100%  417M=0s
+#7 0.496 
+#7 0.496 2023-04-24 07:08:28 (417 MB/s) - ‘/usr/local/share/ca-certificates/EGADIssuingCA3.crt’ saved [2358/2358]
+#7 0.496 
+#7 0.498 --2023-04-24 07:08:28--  http://pki.ericsson.se/CertData/EGADRootCA.crt
+#7 0.499 Resolving pki.ericsson.se (pki.ericsson.se)... 153.88.74.78, 153.88.74.76
+#7 0.501 Connecting to pki.ericsson.se (pki.ericsson.se)|153.88.74.78|:80... connected.
+#7 0.509 HTTP request sent, awaiting response... 200 OK
+#7 0.517 Length: 2004 (2.0K) [application/x-x509-ca-cert]
+#7 0.517 Saving to: ‘/usr/local/share/ca-certificates/EGADRootCA.crt’
+#7 0.517 
+#7 0.517      0K .                                                     100%  328M=0s
+#7 0.517 
+#7 0.517 2023-04-24 07:08:28 (328 MB/s) - ‘/usr/local/share/ca-certificates/EGADRootCA.crt’ saved [2004/2004]
+#7 0.517 
+#7 DONE 0.6s
+
+#8 [ 4/10] RUN update-ca-certificates
+#8 0.515 Updating certificates in /etc/ssl/certs...
+#8 1.239 rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+#8 1.246 2 added, 0 removed; done.
+#8 1.246 Running hooks in /etc/ca-certificates/update.d...
+#8 1.247 done.
+#8 DONE 1.4s
+
+#9 [ 5/10] RUN conda install nodejs==16.13.0
+#9 1.428 Collecting package metadata (current_repodata.json): ...working... done
+#9 15.50 Solving environment: ...working... failed with initial frozen solve. Retrying with flexible solve.
+#9 15.50 Collecting package metadata (repodata.json): ...working... done
+#9 88.45 Solving environment: ...working... done
+#9 144.2 
+#9 144.2 
+#9 144.2 ==> WARNING: A newer version of conda exists. <==
+#9 144.2   current version: 4.12.0
+#9 144.2   latest version: 23.3.1
+#9 144.2 
+#9 144.2 Please update conda by running
+#9 144.2 
+#9 144.2     $ conda update -n base conda
+#9 144.2 
+#9 144.2 
+#9 144.2 
+#9 144.2 ## Package Plan ##
+#9 144.2 
+#9 144.2   environment location: /opt/conda
+#9 144.2 
+#9 144.2   added / updated specs:
+#9 144.2     - nodejs==16.13.0
+#9 144.2 
+#9 144.2 
+#9 144.2 The following packages will be downloaded:
+#9 144.2 
+#9 144.2     package                    |            build
+#9 144.2     ---------------------------|-----------------
+#9 144.2     ca-certificates-2022.12.7  |       ha878542_0         143 KB  conda-forge
+#9 144.2     certifi-2022.12.7          |     pyhd8ed1ab_0         147 KB  conda-forge
+#9 144.2     configurable-http-proxy-4.5.0|node16_h3b247e2_2         1.8 MB  conda-forge
+#9 144.2     icu-69.1                   |       h9c3ff4c_0        13.2 MB  conda-forge
+#9 144.2     libuv-1.42.0               |       h7f98852_0         1.0 MB  conda-forge
+#9 144.2     libxml2-2.9.12             |       h885dcf4_1         760 KB  conda-forge
+#9 144.2     nodejs-16.13.0             |       h8ca31f7_2        15.2 MB  conda-forge
+#9 144.2     openssl-1.1.1o             |       h166bdaf_0         2.1 MB  conda-forge
+#9 144.2     ------------------------------------------------------------
+#9 144.2                                            Total:        34.4 MB
+#9 144.2 
+#9 144.2 The following packages will be UPDATED:
+#9 144.2 
+#9 144.2   ca-certificates                      2021.10.8-ha878542_0 --> 2022.12.7-ha878542_0
+#9 144.2   certifi            conda-forge/linux-64::certifi-2021.10~ --> conda-forge/noarch::certifi-2022.12.7-pyhd8ed1ab_0
+#9 144.2   openssl                                 1.1.1n-h166bdaf_0 --> 1.1.1o-h166bdaf_0
+#9 144.2 
+#9 144.2 The following packages will be DOWNGRADED:
+#9 144.2 
+#9 144.2   configurable-http~                4.5.1-node17_h7e777a6_1 --> 4.5.0-node16_h3b247e2_2
+#9 144.2   icu                                       70.1-h27087fc_0 --> 69.1-h9c3ff4c_0
+#9 144.2   libuv                                   1.43.0-h7f98852_0 --> 1.42.0-h7f98852_0
+#9 144.2   libxml2                                 2.9.14-h22db469_0 --> 2.9.12-h885dcf4_1
+#9 144.2   nodejs                                  17.9.0-h96d913c_0 --> 16.13.0-h8ca31f7_2
+#9 144.2 
+#9 144.2 
+#9 144.2 Proceed ([y]/n)? 
+#9 144.2 
+#9 144.2 Downloading and Extracting Packages
+#9 144.2 ca-certificates-2022 | 143 KB    |            |   0% ca-certificates-2022 | 143 KB    | ########## | 100% 
+#9 144.3 libuv-1.42.0         | 1.0 MB    |            |   0% libuv-1.42.0         | 1.0 MB    | 1          |   2% libuv-1.42.0         | 1.0 MB    | ########## | 100% libuv-1.42.0         | 1.0 MB    | ########## | 100% 
+#9 144.6 libxml2-2.9.12       | 760 KB    |            |   0% libxml2-2.9.12       | 760 KB    | ########## | 100% libxml2-2.9.12       | 760 KB    | ########## | 100% 
+#9 144.7 icu-69.1             | 13.2 MB   |            |   0% icu-69.1             | 13.2 MB   | ####1      |  42% icu-69.1             | 13.2 MB   | ########## | 100% icu-69.1             | 13.2 MB   | ########## | 100% 
+#9 146.8 openssl-1.1.1o       | 2.1 MB    |            |   0% openssl-1.1.1o       | 2.1 MB    | ########## | 100% openssl-1.1.1o       | 2.1 MB    | ########## | 100% 
+#9 147.2 certifi-2022.12.7    | 147 KB    |            |   0% certifi-2022.12.7    | 147 KB    | ########## | 100% 
+#9 147.2 configurable-http-pr | 1.8 MB    |            |   0% configurable-http-pr | 1.8 MB    |            |   1% configurable-http-pr | 1.8 MB    | #2         |  12% configurable-http-pr | 1.8 MB    | ###5       |  35% configurable-http-pr | 1.8 MB    | #######5   |  75% configurable-http-pr | 1.8 MB    | ########## | 100% configurable-http-pr | 1.8 MB    | ########## | 100% 
+#9 148.1 nodejs-16.13.0       | 15.2 MB   |            |   0% nodejs-16.13.0       | 15.2 MB   |            |   0% nodejs-16.13.0       | 15.2 MB   | 3          |   3% nodejs-16.13.0       | 15.2 MB   | 8          |   8% nodejs-16.13.0       | 15.2 MB   | #8         |  18% nodejs-16.13.0       | 15.2 MB   | ###3       |  34% nodejs-16.13.0       | 15.2 MB   | #####5     |  56% nodejs-16.13.0       | 15.2 MB   | ########## | 100% nodejs-16.13.0       | 15.2 MB   | ########## | 100% 
+#9 151.7 Preparing transaction: ...working... done
+#9 151.8 Verifying transaction: ...working... done
+#9 152.1 Executing transaction: ...working... done
+#9 DONE 199.8s
+
+#10 [ 6/10] RUN npm install -g npm@8.3.0 configurable-http-proxy@4.5.1
+#10 38.07 
+#10 38.07 added 2 packages, removed 17 packages, changed 62 packages, and audited 255 packages in 37s
+#10 38.07 
+#10 38.07 12 packages are looking for funding
+#10 38.07   run `npm fund` for details
+#10 38.08 
+#10 38.08 4 high severity vulnerabilities
+#10 38.08 
+#10 38.08 To address issues that do not require attention, run:
+#10 38.08   npm audit fix
+#10 38.08 
+#10 38.08 To address all issues, run:
+#10 38.08   npm audit fix --force
+#10 38.08 
+#10 38.08 Run `npm audit` for details.
+#10 38.08 npm notice 
+#10 38.08 npm notice New major version of npm available! 8.1.0 -> 9.6.5
+#10 38.08 npm notice Changelog: <https://github.com/npm/cli/releases/tag/v9.6.5>
+#10 38.08 npm notice Run `npm install -g npm@9.6.5` to update!
+#10 38.08 npm notice 
+#10 DONE 38.6s
+
+#11 [ 7/10] COPY requirements.txt /tmp/requirements.txt
+#11 DONE 0.2s
+
+#12 [ 8/10] RUN python -m pip install --no-cache-dir     -r /tmp/requirements.txt
+#12 0.993 Collecting jupyterhub==1.4.2
+#12 1.143   Downloading jupyterhub-1.4.2-py3-none-any.whl (3.6 MB)
+#12 1.588      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.6/3.6 MB 8.1 MB/s eta 0:00:00
+#12 1.728 Collecting nbgitpuller==0.10.1
+#12 1.738   Downloading nbgitpuller-0.10.1-py2.py3-none-any.whl (15 kB)
+#12 1.753 Requirement already satisfied: certipy>=0.1.2 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (0.1.3)
+#12 1.753 Requirement already satisfied: python-dateutil in /opt/conda/lib/python3.9/site-packages (from jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (2.8.2)
+#12 1.754 Requirement already satisfied: prometheus-client>=0.4.0 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (0.14.1)
+#12 1.755 Requirement already satisfied: requests in /opt/conda/lib/python3.9/site-packages (from jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (2.27.1)
+#12 1.755 Requirement already satisfied: oauthlib>=3.0 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (3.2.0)
+#12 1.756 Requirement already satisfied: pamela in /opt/conda/lib/python3.9/site-packages (from jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (1.0.0)
+#12 1.757 Requirement already satisfied: tornado>=5.1 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (6.1)
+#12 1.758 Requirement already satisfied: traitlets>=4.3.2 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (5.1.1)
+#12 1.759 Requirement already satisfied: jupyter-telemetry>=0.1.0 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (0.1.0)
+#12 1.760 Requirement already satisfied: SQLAlchemy>=1.1 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (1.4.36)
+#12 1.760 Requirement already satisfied: entrypoints in /opt/conda/lib/python3.9/site-packages (from jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (0.4)
+#12 1.761 Requirement already satisfied: alembic>=1.4 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (1.7.7)
+#12 1.762 Requirement already satisfied: jinja2>=2.11.0 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (3.1.1)
+#12 1.763 Requirement already satisfied: async-generator>=1.9 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (1.10)
+#12 1.766 Requirement already satisfied: notebook>=5.5.0 in /opt/conda/lib/python3.9/site-packages (from nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (6.4.11)
+#12 1.771 Requirement already satisfied: Mako in /opt/conda/lib/python3.9/site-packages (from alembic>=1.4->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (1.2.0)
+#12 1.775 Requirement already satisfied: pyopenssl in /opt/conda/lib/python3.9/site-packages (from certipy>=0.1.2->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (22.0.0)
+#12 1.778 Requirement already satisfied: MarkupSafe>=2.0 in /opt/conda/lib/python3.9/site-packages (from jinja2>=2.11.0->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (2.1.1)
+#12 1.782 Requirement already satisfied: python-json-logger in /opt/conda/lib/python3.9/site-packages (from jupyter-telemetry>=0.1.0->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (2.0.1)
+#12 1.783 Requirement already satisfied: ruamel.yaml in /opt/conda/lib/python3.9/site-packages (from jupyter-telemetry>=0.1.0->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (0.17.21)
+#12 1.783 Requirement already satisfied: jsonschema in /opt/conda/lib/python3.9/site-packages (from jupyter-telemetry>=0.1.0->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (4.4.0)
+#12 1.805 Requirement already satisfied: ipykernel in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (6.13.0)
+#12 1.806 Requirement already satisfied: Send2Trash>=1.8.0 in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (1.8.0)
+#12 1.806 Requirement already satisfied: nbformat in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (5.3.0)
+#12 1.807 Requirement already satisfied: argon2-cffi in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (21.3.0)
+#12 1.808 Requirement already satisfied: pyzmq>=17 in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (22.3.0)
+#12 1.809 Requirement already satisfied: jupyter-client>=5.3.4 in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (7.3.0)
+#12 1.809 Requirement already satisfied: ipython-genutils in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.2.0)
+#12 1.810 Requirement already satisfied: terminado>=0.8.3 in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.13.3)
+#12 1.811 Requirement already satisfied: nbconvert>=5 in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (6.5.0)
+#12 1.812 Requirement already satisfied: jupyter-core>=4.6.1 in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (4.9.2)
+#12 1.812 Requirement already satisfied: nest-asyncio>=1.5 in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (1.5.5)
+#12 1.894 Requirement already satisfied: greenlet!=0.4.17 in /opt/conda/lib/python3.9/site-packages (from SQLAlchemy>=1.1->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (1.1.2)
+#12 1.903 Requirement already satisfied: six>=1.5 in /opt/conda/lib/python3.9/site-packages (from python-dateutil->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (1.16.0)
+#12 1.917 Requirement already satisfied: urllib3<1.27,>=1.21.1 in /opt/conda/lib/python3.9/site-packages (from requests->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (1.26.9)
+#12 1.919 Requirement already satisfied: idna<4,>=2.5 in /opt/conda/lib/python3.9/site-packages (from requests->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (3.3)
+#12 1.920 Requirement already satisfied: charset-normalizer~=2.0.0 in /opt/conda/lib/python3.9/site-packages (from requests->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (2.0.12)
+#12 1.921 Requirement already satisfied: certifi>=2017.4.17 in /opt/conda/lib/python3.9/site-packages (from requests->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (2022.12.7)
+#12 2.005 Requirement already satisfied: jupyterlab-pygments in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.2.2)
+#12 2.005 Requirement already satisfied: pygments>=2.4.1 in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (2.12.0)
+#12 2.006 Requirement already satisfied: pandocfilters>=1.4.1 in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (1.5.0)
+#12 2.007 Requirement already satisfied: defusedxml in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.7.1)
+#12 2.007 Requirement already satisfied: bleach in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (5.0.0)
+#12 2.008 Requirement already satisfied: mistune<2,>=0.8.1 in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.8.4)
+#12 2.009 Requirement already satisfied: beautifulsoup4 in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (4.11.1)
+#12 2.010 Requirement already satisfied: nbclient>=0.5.0 in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.6.0)
+#12 2.010 Requirement already satisfied: tinycss2 in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (1.1.1)
+#12 2.011 Requirement already satisfied: packaging in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (21.3)
+#12 2.019 Requirement already satisfied: fastjsonschema in /opt/conda/lib/python3.9/site-packages (from nbformat->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (2.15.3)
+#12 2.040 Requirement already satisfied: attrs>=17.4.0 in /opt/conda/lib/python3.9/site-packages (from jsonschema->jupyter-telemetry>=0.1.0->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (21.4.0)
+#12 2.041 Requirement already satisfied: pyrsistent!=0.17.0,!=0.17.1,!=0.17.2,>=0.14.0 in /opt/conda/lib/python3.9/site-packages (from jsonschema->jupyter-telemetry>=0.1.0->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (0.18.1)
+#12 2.065 Requirement already satisfied: ptyprocess in /opt/conda/lib/python3.9/site-packages (from terminado>=0.8.3->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.7.0)
+#12 2.100 Requirement already satisfied: argon2-cffi-bindings in /opt/conda/lib/python3.9/site-packages (from argon2-cffi->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (21.2.0)
+#12 2.114 Requirement already satisfied: matplotlib-inline>=0.1 in /opt/conda/lib/python3.9/site-packages (from ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.1.3)
+#12 2.115 Requirement already satisfied: ipython>=7.23.1 in /opt/conda/lib/python3.9/site-packages (from ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (8.3.0)
+#12 2.115 Requirement already satisfied: psutil in /opt/conda/lib/python3.9/site-packages (from ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (5.9.0)
+#12 2.116 Requirement already satisfied: debugpy>=1.0 in /opt/conda/lib/python3.9/site-packages (from ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (1.6.0)
+#12 2.135 Requirement already satisfied: cryptography>=35.0 in /opt/conda/lib/python3.9/site-packages (from pyopenssl->certipy>=0.1.2->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (36.0.2)
+#12 2.146 Requirement already satisfied: ruamel.yaml.clib>=0.2.6 in /opt/conda/lib/python3.9/site-packages (from ruamel.yaml->jupyter-telemetry>=0.1.0->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (0.2.6)
+#12 2.199 Requirement already satisfied: cffi>=1.12 in /opt/conda/lib/python3.9/site-packages (from cryptography>=35.0->pyopenssl->certipy>=0.1.2->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (1.15.0)
+#12 2.249 Requirement already satisfied: jedi>=0.16 in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.18.1)
+#12 2.249 Requirement already satisfied: setuptools>=18.5 in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (62.1.0)
+#12 2.251 Requirement already satisfied: prompt-toolkit!=3.0.0,!=3.0.1,<3.1.0,>=2.0.0 in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (3.0.29)
+#12 2.252 Requirement already satisfied: pexpect>4.3 in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (4.8.0)
+#12 2.253 Requirement already satisfied: decorator in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (5.1.1)
+#12 2.253 Requirement already satisfied: stack-data in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.2.0)
+#12 2.254 Requirement already satisfied: pickleshare in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.7.5)
+#12 2.254 Requirement already satisfied: backcall in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.2.0)
+#12 2.313 Requirement already satisfied: soupsieve>1.2 in /opt/conda/lib/python3.9/site-packages (from beautifulsoup4->nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (2.3.1)
+#12 2.330 Requirement already satisfied: webencodings in /opt/conda/lib/python3.9/site-packages (from bleach->nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.5.1)
+#12 2.354 Requirement already satisfied: pyparsing!=3.0.5,>=2.0.2 in /opt/conda/lib/python3.9/site-packages (from packaging->nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (3.0.8)
+#12 2.384 Requirement already satisfied: pycparser in /opt/conda/lib/python3.9/site-packages (from cffi>=1.12->cryptography>=35.0->pyopenssl->certipy>=0.1.2->jupyterhub==1.4.2->-r /tmp/requirements.txt (line 4)) (2.21)
+#12 2.395 Requirement already satisfied: parso<0.9.0,>=0.8.0 in /opt/conda/lib/python3.9/site-packages (from jedi>=0.16->ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.8.3)
+#12 2.405 Requirement already satisfied: wcwidth in /opt/conda/lib/python3.9/site-packages (from prompt-toolkit!=3.0.0,!=3.0.1,<3.1.0,>=2.0.0->ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.2.5)
+#12 2.441 Requirement already satisfied: executing in /opt/conda/lib/python3.9/site-packages (from stack-data->ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.8.3)
+#12 2.442 Requirement already satisfied: pure-eval in /opt/conda/lib/python3.9/site-packages (from stack-data->ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (0.2.2)
+#12 2.442 Requirement already satisfied: asttokens in /opt/conda/lib/python3.9/site-packages (from stack-data->ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.1->-r /tmp/requirements.txt (line 5)) (2.0.5)
+#12 2.686 Installing collected packages: jupyterhub, nbgitpuller
+#12 2.686   Attempting uninstall: jupyterhub
+#12 2.687     Found existing installation: jupyterhub 2.2.2
+#12 2.797     Uninstalling jupyterhub-2.2.2:
+#12 2.978       Successfully uninstalled jupyterhub-2.2.2
+#12 3.543 Successfully installed jupyterhub-1.4.2 nbgitpuller-0.10.1
+#12 DONE 4.0s
+
+#13 [ 9/10] RUN if [[ -n "jupyterhub==2.2.2 nbgitpuller==0.10.2  mako==1.2.2" ]]; then         pip install --no-cache-dir jupyterhub==2.2.2 nbgitpuller==0.10.2  mako==1.2.2;     fi
+#13 0.999 Collecting jupyterhub==2.2.2
+#13 1.039   Downloading jupyterhub-2.2.2-py3-none-any.whl (3.7 MB)
+#13 1.086      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.7/3.7 MB 84.8 MB/s eta 0:00:00
+#13 1.130 Collecting nbgitpuller==0.10.2
+#13 1.140   Downloading nbgitpuller-0.10.2-py2.py3-none-any.whl (15 kB)
+#13 1.172 Collecting mako==1.2.2
+#13 1.181   Downloading Mako-1.2.2-py3-none-any.whl (78 kB)
+#13 1.184      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 78.7/78.7 KB 217.9 MB/s eta 0:00:00
+#13 1.199 Requirement already satisfied: alembic>=1.4 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==2.2.2) (1.7.7)
+#13 1.200 Requirement already satisfied: certipy>=0.1.2 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==2.2.2) (0.1.3)
+#13 1.201 Requirement already satisfied: async-generator>=1.9 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==2.2.2) (1.10)
+#13 1.201 Requirement already satisfied: jinja2>=2.11.0 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==2.2.2) (3.1.1)
+#13 1.202 Requirement already satisfied: entrypoints in /opt/conda/lib/python3.9/site-packages (from jupyterhub==2.2.2) (0.4)
+#13 1.202 Requirement already satisfied: python-dateutil in /opt/conda/lib/python3.9/site-packages (from jupyterhub==2.2.2) (2.8.2)
+#13 1.203 Requirement already satisfied: SQLAlchemy>=1.1 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==2.2.2) (1.4.36)
+#13 1.204 Requirement already satisfied: traitlets>=4.3.2 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==2.2.2) (5.1.1)
+#13 1.205 Requirement already satisfied: pamela in /opt/conda/lib/python3.9/site-packages (from jupyterhub==2.2.2) (1.0.0)
+#13 1.205 Requirement already satisfied: requests in /opt/conda/lib/python3.9/site-packages (from jupyterhub==2.2.2) (2.27.1)
+#13 1.206 Requirement already satisfied: jupyter-telemetry>=0.1.0 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==2.2.2) (0.1.0)
+#13 1.207 Requirement already satisfied: packaging in /opt/conda/lib/python3.9/site-packages (from jupyterhub==2.2.2) (21.3)
+#13 1.207 Requirement already satisfied: tornado>=5.1 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==2.2.2) (6.1)
+#13 1.208 Requirement already satisfied: prometheus-client>=0.4.0 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==2.2.2) (0.14.1)
+#13 1.209 Requirement already satisfied: oauthlib>=3.0 in /opt/conda/lib/python3.9/site-packages (from jupyterhub==2.2.2) (3.2.0)
+#13 1.212 Requirement already satisfied: notebook>=5.5.0 in /opt/conda/lib/python3.9/site-packages (from nbgitpuller==0.10.2) (6.4.11)
+#13 1.218 Requirement already satisfied: MarkupSafe>=0.9.2 in /opt/conda/lib/python3.9/site-packages (from mako==1.2.2) (2.1.1)
+#13 1.227 Requirement already satisfied: pyopenssl in /opt/conda/lib/python3.9/site-packages (from certipy>=0.1.2->jupyterhub==2.2.2) (22.0.0)
+#13 1.233 Requirement already satisfied: ruamel.yaml in /opt/conda/lib/python3.9/site-packages (from jupyter-telemetry>=0.1.0->jupyterhub==2.2.2) (0.17.21)
+#13 1.234 Requirement already satisfied: jsonschema in /opt/conda/lib/python3.9/site-packages (from jupyter-telemetry>=0.1.0->jupyterhub==2.2.2) (4.4.0)
+#13 1.234 Requirement already satisfied: python-json-logger in /opt/conda/lib/python3.9/site-packages (from jupyter-telemetry>=0.1.0->jupyterhub==2.2.2) (2.0.1)
+#13 1.258 Requirement already satisfied: pyzmq>=17 in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.2) (22.3.0)
+#13 1.259 Requirement already satisfied: nest-asyncio>=1.5 in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.2) (1.5.5)
+#13 1.260 Requirement already satisfied: ipykernel in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.2) (6.13.0)
+#13 1.260 Requirement already satisfied: jupyter-core>=4.6.1 in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.2) (4.9.2)
+#13 1.261 Requirement already satisfied: nbformat in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.2) (5.3.0)
+#13 1.261 Requirement already satisfied: Send2Trash>=1.8.0 in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.2) (1.8.0)
+#13 1.262 Requirement already satisfied: terminado>=0.8.3 in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.2) (0.13.3)
+#13 1.263 Requirement already satisfied: ipython-genutils in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.2) (0.2.0)
+#13 1.264 Requirement already satisfied: jupyter-client>=5.3.4 in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.2) (7.3.0)
+#13 1.264 Requirement already satisfied: nbconvert>=5 in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.2) (6.5.0)
+#13 1.265 Requirement already satisfied: argon2-cffi in /opt/conda/lib/python3.9/site-packages (from notebook>=5.5.0->nbgitpuller==0.10.2) (21.3.0)
+#13 1.346 Requirement already satisfied: greenlet!=0.4.17 in /opt/conda/lib/python3.9/site-packages (from SQLAlchemy>=1.1->jupyterhub==2.2.2) (1.1.2)
+#13 1.354 Requirement already satisfied: pyparsing!=3.0.5,>=2.0.2 in /opt/conda/lib/python3.9/site-packages (from packaging->jupyterhub==2.2.2) (3.0.8)
+#13 1.359 Requirement already satisfied: six>=1.5 in /opt/conda/lib/python3.9/site-packages (from python-dateutil->jupyterhub==2.2.2) (1.16.0)
+#13 1.374 Requirement already satisfied: urllib3<1.27,>=1.21.1 in /opt/conda/lib/python3.9/site-packages (from requests->jupyterhub==2.2.2) (1.26.9)
+#13 1.375 Requirement already satisfied: charset-normalizer~=2.0.0 in /opt/conda/lib/python3.9/site-packages (from requests->jupyterhub==2.2.2) (2.0.12)
+#13 1.377 Requirement already satisfied: idna<4,>=2.5 in /opt/conda/lib/python3.9/site-packages (from requests->jupyterhub==2.2.2) (3.3)
+#13 1.377 Requirement already satisfied: certifi>=2017.4.17 in /opt/conda/lib/python3.9/site-packages (from requests->jupyterhub==2.2.2) (2022.12.7)
+#13 1.461 Requirement already satisfied: nbclient>=0.5.0 in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.2) (0.6.0)
+#13 1.462 Requirement already satisfied: mistune<2,>=0.8.1 in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.2) (0.8.4)
+#13 1.462 Requirement already satisfied: beautifulsoup4 in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.2) (4.11.1)
+#13 1.463 Requirement already satisfied: bleach in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.2) (5.0.0)
+#13 1.463 Requirement already satisfied: pandocfilters>=1.4.1 in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.2) (1.5.0)
+#13 1.464 Requirement already satisfied: tinycss2 in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.2) (1.1.1)
+#13 1.465 Requirement already satisfied: jupyterlab-pygments in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.2) (0.2.2)
+#13 1.466 Requirement already satisfied: pygments>=2.4.1 in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.2) (2.12.0)
+#13 1.466 Requirement already satisfied: defusedxml in /opt/conda/lib/python3.9/site-packages (from nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.2) (0.7.1)
+#13 1.475 Requirement already satisfied: fastjsonschema in /opt/conda/lib/python3.9/site-packages (from nbformat->notebook>=5.5.0->nbgitpuller==0.10.2) (2.15.3)
+#13 1.496 Requirement already satisfied: attrs>=17.4.0 in /opt/conda/lib/python3.9/site-packages (from jsonschema->jupyter-telemetry>=0.1.0->jupyterhub==2.2.2) (21.4.0)
+#13 1.496 Requirement already satisfied: pyrsistent!=0.17.0,!=0.17.1,!=0.17.2,>=0.14.0 in /opt/conda/lib/python3.9/site-packages (from jsonschema->jupyter-telemetry>=0.1.0->jupyterhub==2.2.2) (0.18.1)
+#13 1.526 Requirement already satisfied: ptyprocess in /opt/conda/lib/python3.9/site-packages (from terminado>=0.8.3->notebook>=5.5.0->nbgitpuller==0.10.2) (0.7.0)
+#13 1.561 Requirement already satisfied: argon2-cffi-bindings in /opt/conda/lib/python3.9/site-packages (from argon2-cffi->notebook>=5.5.0->nbgitpuller==0.10.2) (21.2.0)
+#13 1.575 Requirement already satisfied: debugpy>=1.0 in /opt/conda/lib/python3.9/site-packages (from ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (1.6.0)
+#13 1.576 Requirement already satisfied: psutil in /opt/conda/lib/python3.9/site-packages (from ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (5.9.0)
+#13 1.577 Requirement already satisfied: matplotlib-inline>=0.1 in /opt/conda/lib/python3.9/site-packages (from ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (0.1.3)
+#13 1.578 Requirement already satisfied: ipython>=7.23.1 in /opt/conda/lib/python3.9/site-packages (from ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (8.3.0)
+#13 1.589 Requirement already satisfied: cryptography>=35.0 in /opt/conda/lib/python3.9/site-packages (from pyopenssl->certipy>=0.1.2->jupyterhub==2.2.2) (36.0.2)
+#13 1.601 Requirement already satisfied: ruamel.yaml.clib>=0.2.6 in /opt/conda/lib/python3.9/site-packages (from ruamel.yaml->jupyter-telemetry>=0.1.0->jupyterhub==2.2.2) (0.2.6)
+#13 1.655 Requirement already satisfied: cffi>=1.12 in /opt/conda/lib/python3.9/site-packages (from cryptography>=35.0->pyopenssl->certipy>=0.1.2->jupyterhub==2.2.2) (1.15.0)
+#13 1.706 Requirement already satisfied: pexpect>4.3 in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (4.8.0)
+#13 1.707 Requirement already satisfied: pickleshare in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (0.7.5)
+#13 1.707 Requirement already satisfied: backcall in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (0.2.0)
+#13 1.708 Requirement already satisfied: setuptools>=18.5 in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (62.1.0)
+#13 1.709 Requirement already satisfied: stack-data in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (0.2.0)
+#13 1.709 Requirement already satisfied: prompt-toolkit!=3.0.0,!=3.0.1,<3.1.0,>=2.0.0 in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (3.0.29)
+#13 1.710 Requirement already satisfied: decorator in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (5.1.1)
+#13 1.711 Requirement already satisfied: jedi>=0.16 in /opt/conda/lib/python3.9/site-packages (from ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (0.18.1)
+#13 1.772 Requirement already satisfied: soupsieve>1.2 in /opt/conda/lib/python3.9/site-packages (from beautifulsoup4->nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.2) (2.3.1)
+#13 1.789 Requirement already satisfied: webencodings in /opt/conda/lib/python3.9/site-packages (from bleach->nbconvert>=5->notebook>=5.5.0->nbgitpuller==0.10.2) (0.5.1)
+#13 1.838 Requirement already satisfied: pycparser in /opt/conda/lib/python3.9/site-packages (from cffi>=1.12->cryptography>=35.0->pyopenssl->certipy>=0.1.2->jupyterhub==2.2.2) (2.21)
+#13 1.849 Requirement already satisfied: parso<0.9.0,>=0.8.0 in /opt/conda/lib/python3.9/site-packages (from jedi>=0.16->ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (0.8.3)
+#13 1.859 Requirement already satisfied: wcwidth in /opt/conda/lib/python3.9/site-packages (from prompt-toolkit!=3.0.0,!=3.0.1,<3.1.0,>=2.0.0->ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (0.2.5)
+#13 1.890 Requirement already satisfied: asttokens in /opt/conda/lib/python3.9/site-packages (from stack-data->ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (2.0.5)
+#13 1.891 Requirement already satisfied: executing in /opt/conda/lib/python3.9/site-packages (from stack-data->ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (0.8.3)
+#13 1.891 Requirement already satisfied: pure-eval in /opt/conda/lib/python3.9/site-packages (from stack-data->ipython>=7.23.1->ipykernel->notebook>=5.5.0->nbgitpuller==0.10.2) (0.2.2)
+#13 2.144 Installing collected packages: mako, jupyterhub, nbgitpuller
+#13 2.144   Attempting uninstall: mako
+#13 2.145     Found existing installation: Mako 1.2.0
+#13 2.161     Uninstalling Mako-1.2.0:
+#13 2.194       Successfully uninstalled Mako-1.2.0
+#13 2.274   Attempting uninstall: jupyterhub
+#13 2.275     Found existing installation: jupyterhub 1.4.2
+#13 2.401     Uninstalling jupyterhub-1.4.2:
+#13 2.601       Successfully uninstalled jupyterhub-1.4.2
+#13 3.103   Attempting uninstall: nbgitpuller
+#13 3.104     Found existing installation: nbgitpuller 0.10.1
+#13 3.110     Uninstalling nbgitpuller-0.10.1:
+#13 3.142       Successfully uninstalled nbgitpuller-0.10.1
+#13 3.201 Successfully installed jupyterhub-2.2.2 mako-1.2.2 nbgitpuller-0.10.2
+#13 DONE 3.6s
+
+#14 [10/10] RUN jupyter serverextension enable --py nbgitpuller --sys-prefix
+#14 0.823 Enabling: nbgitpuller
+#14 0.823 - Writing config: /opt/conda/etc/jupyter
+#14 0.823     - Validating...
+#14 0.823       nbgitpuller 0.10.2 [32mOK[0m
+#14 DONE 1.0s
+
+#15 exporting to image
+#15 exporting layers
+#15 exporting layers 4.7s done
+#15 writing image sha256:0b60de38e01e5b4a705ffaa324a09ea21c4539c57dc5c000621bdf090e931810 0.0s done
+#15 naming to armdocker.rnd.ericsson.se/proj-mxe/jupyterhub/k8s-singleuser-sample:1.2.0-2.5-1
+#15 naming to armdocker.rnd.ericsson.se/proj-mxe/jupyterhub/k8s-singleuser-sample:1.2.0-2.5-1 0.0s done
+#15 DONE 4.7s
++ buildStatus=0
++ [[ 0 == 0 ]]
++ docker push armdocker.rnd.ericsson.se/proj-mxe/jupyterhub/k8s-singleuser-sample:1.2.0-2.5-1
+The push refers to repository [armdocker.rnd.ericsson.se/proj-mxe/jupyterhub/k8s-singleuser-sample]
+8c90f3ab93fb: Preparing
+be7f96e60df4: Preparing
+440cbf090435: Preparing
+afc9fcade1db: Preparing
+ee41a63c6667: Preparing
+8206cdbb9c70: Preparing
+46ef93027a83: Preparing
+fdea96f9063d: Preparing
+cc1a55ac381f: Preparing
+5f70bf18a086: Preparing
+4bb2b0907b5e: Preparing
+dd03c30d470c: Preparing
+1f717b561542: Preparing
+6c3ae715e51a: Preparing
+5f70bf18a086: Preparing
+ebf0f5a5ba44: Preparing
+ab39c4915a29: Preparing
+f66360a606a8: Preparing
+671ac41fbd35: Preparing
+5f70bf18a086: Preparing
+c4e81ea0dcf8: Preparing
+92c20bf0f0ca: Preparing
+bf8cedc62fb3: Preparing
+ab39c4915a29: Waiting
+cc1a55ac381f: Waiting
+f66360a606a8: Waiting
+671ac41fbd35: Waiting
+c4e81ea0dcf8: Waiting
+92c20bf0f0ca: Waiting
+bf8cedc62fb3: Waiting
+8206cdbb9c70: Waiting
+dd03c30d470c: Waiting
+1f717b561542: Waiting
+fdea96f9063d: Waiting
+46ef93027a83: Waiting
+ebf0f5a5ba44: Waiting
+6c3ae715e51a: Waiting
+5f70bf18a086: Waiting
+8c90f3ab93fb: Pushed
+440cbf090435: Pushed
+afc9fcade1db: Pushed
+be7f96e60df4: Pushed
+46ef93027a83: Pushed
+fdea96f9063d: Pushed
+5f70bf18a086: Layer already exists
+ee41a63c6667: Pushed
+4bb2b0907b5e: Layer already exists
+dd03c30d470c: Layer already exists
+1f717b561542: Layer already exists
+ebf0f5a5ba44: Layer already exists
+6c3ae715e51a: Layer already exists
+ab39c4915a29: Layer already exists
+f66360a606a8: Layer already exists
+671ac41fbd35: Layer already exists
+bf8cedc62fb3: Layer already exists
+c4e81ea0dcf8: Layer already exists
+92c20bf0f0ca: Layer already exists
+cc1a55ac381f: Pushed
+8206cdbb9c70: Pushed
+1.2.0-2.5-1: digest: sha256:921ec217882ce55b7167ffadefb062907eff87a048f7d1940f67ae4cf06af997 size: 5123
++ pushed=0
++ [[ 0 == 0 ]]
++ cleanup
++ [[ -f /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab/Dockerfile ]]
++ rm -rf /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab/Dockerfile
++ rm -rf /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/jupyterlab/requirements.txt

@@ -1,0 +1,24 @@
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: {{ include "mxe-commons.post-install-hook-istio-req-authn-name" . | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "post-install-hook-istio-req-authn"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-commons.post-install-hook-istio-req-authn-name" . | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "6"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: ingress-controller
+      app.kubernetes.io/name: eric-mxe-ingress-controller
+  {{- include "mxe-commons.istio-req-authn-jwt-rules" . | nindent 2 }}

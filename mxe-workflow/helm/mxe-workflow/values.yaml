@@ -1,0 +1,310 @@
+# Default values for mxe.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# DR-D1121-011 - Includes global vales of sub-charts
+global:
+  registry:
+    url: "armdocker.rnd.ericsson.se"
+    pullSecret:
+    imagePullPolicy: IfNotPresent
+    repoPath:
+  mxeApiTlsSecretName:
+  mxeApiHostname:
+  mxeDisableDefaultIngressControllerUse: false
+  mxeClusterDomain: cluster.local
+  security:
+    tls:
+      enabled: true
+  mtls:
+    auto:
+  multiTenancy:
+    enabled:
+  meshConfig:
+    accessLogFile:
+  serviceMesh:
+    enabled: true
+    egress:
+      ca:
+        secretName: egress-ca-secret
+        caCertsPath: /etc/istio/egress-ca-certs/
+        caCertificates: ca.crt
+        genSecretName: eric-sec-sip-tls-trusted-root-cert
+        readonly: true
+      lcmRegistry:
+        enabled: true
+        serviceName: eric-lcm-container-registry-registry
+        secretName: egress-lcm-secret
+        certsPath: /etc/istio/lcm/egress-certs/
+        genSecretName: eric-lcm-container-registry-client-cert
+        clientCertificate: clicert.pem
+        privateKey: cliprivkey.pem
+        optional: true
+        readonly: true
+        tlsMode: MUTUAL
+      iam:
+        enabled: true
+        serviceName: eric-sec-access-mgmt-http
+        secretName: egress-secret
+        certsPath: /etc/istio/egress-certs/
+        genSecretName: eric-sec-access-mgmt-iam-int-client-cert
+        clientCertificate: clicert.pem
+        privateKey: cliprivkey.pem
+        optional: true
+        readonly: true
+        tlsMode: MUTUAL
+        certificateCN: adp-iam-aa-client
+        caIssuer: eric-sec-access-mgmt-iam-client-ca
+      pmServer:
+        enabled: true
+        serviceName: eric-pm-server
+        caIssuer: eric-pm-server-query-ca
+        secretName: egress-pm-secret
+        certsPath: /etc/istio/pm/egress-certs/
+        genSecretName: eric-pm-server-query-cert
+        clientCertificate: clicert.pem
+        privateKey: cliprivkey.pem
+        optional: true
+        readonly: true
+      postgres:
+        serviceName: eric-data-document-database-pg
+        caIssuer: eric-data-document-database-pg-client-ca
+        clientCertificate: clicert.pem
+        privateKey: cliprivkey.pem
+  labels: {}
+  annotations: {}
+
+
+productInfo:
+# R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+# To automate it when packaging the helm chart rstate can be generated
+# and below value replaced with correct R-State
+  rstate:
+
+dockerRegistry:
+  ingressEnabled: true
+  nameOverride:
+  fullHostOverride:
+  portOverride:
+
+argoexecBuild:
+  nameOverride: "mxe-workflow-argoexec-build"
+  mergedDockerConfigSecretName: mxe-pull-secret
+  images:
+    name: "mxe/eric-mxe-argoexec-packager"
+    tag: "VERSION"
+    pullPolicy: IfNotPresent
+    argoRegistry:
+    argoRepository: argoexec
+    argoTag: v3.4.9-cbos-6.14.0-10
+  installerDockerRegistry:
+    caSecretName:
+      
+argo-workflows:
+  images:
+    pullPolicy: Always
+  enabled: true
+  controller:
+    workflowNamespaces: []
+    image:
+      repository: workflow-controller
+      tag: v3.4.9-cbos-6.14.0-10
+    parallelism: 10
+    archive: false
+    podLabels:
+      app.kubernetes.io/part-of: "mxe"
+    extraEnv:
+      - name: LEADER_ELECTION_IDENTITY
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: metadata.name
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              topologyKey: "kubernetes.io/hostname"
+              labelSelector:
+                matchExpressions:
+                  - key: "app.kubernetes.io/part-of"
+                    operator: "In"
+                    values:
+                      - "mxe"
+                  - key: "app.kubernetes.io/name"
+                    operator: "In"
+                    values:
+                      - "argo-workflows-workflow-controller"
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+        ephemeral-storage: 50Mi
+      limits:
+        cpu: 100m
+        memory: 1Gi
+        ephemeral-storage: 100Mi 
+    workflowDefaults:
+      spec:
+        securityContext:
+          runAsNonRoot: true
+  mainContainer:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+    resources:
+      requests:
+        memory: 100Mi
+        cpu: 50m
+        ephemeral-storage: 50Mi
+      limits:
+        memory: 1Gi
+        cpu: 100m
+        ephemeral-storage: 250Mi
+  server:
+    name: argo-server
+    image:
+      repository: argocli
+      tag: v3.4.9-cbos-6.14.0-10
+    servicePortName: http
+    serviceAccount:
+      create: true
+    baseHref: /argo/
+    ingress:
+      enabled: false
+    podLabels:
+      app.kubernetes.io/part-of: "mxe"
+    podAnnotations:
+      sidecar.istio.io/inject: "false"
+      sidecar.istio.io/rewriteAppHTTPProbers: "false"
+    extraArgs:
+      - '--auth-mode'
+      - 'server'
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              topologyKey: "kubernetes.io/hostname"
+              labelSelector:
+                matchExpressions:
+                  - key: "app.kubernetes.io/part-of"
+                    operator: "In"
+                    values:
+                      - "mxe"
+                  - key: "app.kubernetes.io/name"
+                    operator: "In"
+                    values:
+                      - "argo-workflows-argo-server"
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+        ephemeral-storage: 50Mi
+      limits:
+        cpu: 100m
+        memory: 1Gi
+        ephemeral-storage: 100Mi 
+
+    clusterWorkflowTemplates:
+        # Give the server permissions to edit ClusterWorkflowTemplates.
+        enableEditing: true
+  executor:
+    image:
+      repository: argoexec
+      tag: v3.4.9-cbos-6.14.0-10
+    env:
+      - name: SSL_CERT_FILE
+        value: /usr/local/share/ca-certificates/sip-tls-root-ca.crt
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+    resources:
+      requests:
+        memory: 100Mi
+        cpu: 50m
+        ephemeral-storage: 50Mi
+      limits:
+        memory: 512Mi
+        cpu: 100m
+        ephemeral-storage: 500Mi
+
+  artifactRepository:
+    s3:
+      accessKeySecret:
+        name: eric-mxe-argo-minio-secret
+        key: accesskey
+      secretKeySecret:
+        name: eric-mxe-argo-minio-secret
+        key: secretkey
+      endpoint: eric-data-object-storage-mn:9000
+      bucket: mxe-argo-artifacts
+      insecure: true
+
+imageCredentials:
+  registry: 
+    url:
+    pullSecret:
+  repoPath:
+  argoexecBuild:
+    repoPath: "REPO_PATH"
+
+spark-operator:
+  enabled: true
+  image:
+    repository: armdocker.rnd.ericsson.se/proj-mxe/spark/spark-operator
+    tag: "6.14.0-10-1.1.27-01"
+  serviceAccounts:
+    spark:
+      create: true
+      name: eric-mxe-spark-jobs-service-account
+  webhook:
+    enable: true
+  volumes: []
+  volumeMounts: []
+
+eric-mxe-argo:
+  resources:
+    minioCli:
+      limits:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+  appArmorProfile:
+    type: runtime/default
+
+eric-mxe-spark:
+  resources:
+    kubernetesModifier:
+      limits:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+  appArmorProfile:
+    type: runtime/default
+
+# DR-D1123-127 -  ADP services shall define AppArmor profile
+appArmorProfile:
+  type: runtime/default
+  localhostProfile:
+
+# DR-D1123-128 - ADP services shall define Seccomp profile
+seccompProfile:
+  type: RuntimeDefault
+  localhostProfile:

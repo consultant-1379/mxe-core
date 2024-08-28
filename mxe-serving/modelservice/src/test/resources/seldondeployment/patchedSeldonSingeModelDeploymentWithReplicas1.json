@@ -1,0 +1,251 @@
+{
+  "apiVersion":"machinelearning.seldon.io/v1",
+  "kind":"SeldonDeployment",
+  "metadata":{
+    "clusterName":"",
+    "creationTimestamp":"2019-03-04T22:14:35Z",
+    "generation":1.0,
+    "labels":{
+      "app":"seldon",
+      "mxe/component":"iot-model-a",
+      "mxe/version":"0.0.1beta",
+      "mxe/deploymenttype":"model",
+      "mxe/createdbyuserid":"1234-5678-9012",
+      "mxe/createdbyusername":"mxe-user"
+    },
+    "name":"iot-model-a",
+    "namespace":"mxe",
+    "selfLink":"/apis/machinelearning.seldon.io/v1/namespaces/mxe/seldondeployments/iot-model-a",
+    "uid":"e4f6e1cf-3eca-11e9-b4a8-0050569a0898"
+  },
+  "spec":{
+    "annotations":{
+      "deployment_version":"v1",
+      "project_name":"iot-model-a",
+      "seldon.io/rest-read-timeout": "0"
+    },
+    "name":"iot-model-a",
+    "predictors":[
+      {
+        "annotations":{
+          "predictor_version":"v1"
+        },
+        "componentSpecs":[
+          {
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/part-of": "mxe",
+                "app.kubernetes.io/component": "model-service-instance",
+                "app.kubernetes.io/instance": "alma",
+                "mxe.ericsson.com/model-service-component": "model"
+              }
+            },
+            "spec":{
+              "containers":[
+                {
+                  "image":"vmx-eea166.ete.ka.sw.ericsson.se:32222/iot/machine-detection-a-model:0.0.1",
+                  "livenessProbe":{
+                    "failureThreshold":6,
+                    "tcpSocket":{
+                      "port":"http"
+                    },
+                    "initialDelaySeconds":10,
+                    "periodSeconds":10,
+                    "successThreshold":1,
+                    "timeoutSeconds":1
+                  },
+                  "name":"model",
+                  "readinessProbe":{
+                    "failureThreshold":6,
+                    "tcpSocket":{
+                      "port":"http"
+                    },
+                    "initialDelaySeconds":10,
+                    "periodSeconds":10,
+                    "successThreshold":1,
+                    "timeoutSeconds":1
+                  },
+                  "volumeMounts":[
+
+                  ],
+                  "env": []
+                }
+              ],
+              "imagePullSecrets":[
+
+              ],
+              "terminationGracePeriodSeconds":1,
+              "volumes":[
+
+              ],
+              "affinity": {
+                "podAntiAffinity": {
+                  "preferredDuringSchedulingIgnoredDuringExecution": [
+                    {
+                      "weight": 75,
+                      "podAffinityTerm": {
+                        "topologyKey": "kubernetes.io/hostname",
+                        "labelSelector": {
+                          "matchExpressions": [
+                            {
+                              "key": "app.kubernetes.io/part-of",
+                              "operator": "In",
+                              "values": ["mxe"]
+                            },
+                            {
+                              "key": "app.kubernetes.io/component",
+                              "operator": "In",
+                              "values": ["model-service-instance"]
+                            },
+                            {
+                              "key": "app.kubernetes.io/instance",
+                              "operator": "In",
+                              "values": ["alma"]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "weight": 25,
+                      "podAffinityTerm": {
+                        "topologyKey": "kubernetes.io/hostname",
+                        "labelSelector": {
+                          "matchExpressions": [
+                            {
+                              "key": "app.kubernetes.io/part-of",
+                              "operator": "In",
+                              "values": ["mxe"]
+                            },
+                            {
+                              "key": "app.kubernetes.io/component",
+                              "operator": "In",
+                              "values": ["model-service-instance"]
+                            },
+                            {
+                              "key": "app.kubernetes.io/instance",
+                              "operator": "NotIn",
+                              "values": ["alma"]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "weight": 50,
+                      "podAffinityTerm": {
+                        "topologyKey": "kubernetes.io/hostname",
+                        "labelSelector": {
+                          "matchExpressions": [
+                            {
+                              "key": "app.kubernetes.io/part-of",
+                              "operator": "In",
+                              "values": ["mxe"]
+                            },
+                            {
+                              "key": "app.kubernetes.io/component",
+                              "operator": "In",
+                              "values": ["trainer"]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "weight": 50,
+                      "podAffinityTerm": {
+                        "topologyKey": "kubernetes.io/hostname",
+                        "labelSelector": {
+                          "matchExpressions": [
+                            {
+                              "key": "app.kubernetes.io/part-of",
+                              "operator": "In",
+                              "values": ["mxe"]
+                            },
+                            {
+                              "key": "app.kubernetes.io/component",
+                              "operator": "In",
+                              "values": ["packager"]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "weight": 10,
+                      "podAffinityTerm": {
+                        "topologyKey": "kubernetes.io/hostname",
+                        "labelSelector": {
+                          "matchExpressions": [
+                            {
+                              "key": "app.kubernetes.io/part-of",
+                              "operator": "In",
+                              "values": ["mxe"]
+                            },
+                            {
+                              "key": "app.kubernetes.io/component",
+                              "operator": "In",
+                              "values": ["gatekeeper"]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "weight": 10,
+                      "podAffinityTerm": {
+                        "topologyKey": "kubernetes.io/hostname",
+                        "labelSelector": {
+                          "matchExpressions": [
+                            {
+                              "key": "app.kubernetes.io/part-of",
+                              "operator": "In",
+                              "values": ["mxe"]
+                            },
+                            {
+                              "key": "app.kubernetes.io/component",
+                              "operator": "In",
+                              "values": ["ingress-controller"]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "weight": 5,
+                      "podAffinityTerm": {
+                        "topologyKey": "kubernetes.io/hostname",
+                        "labelSelector": {
+                          "matchExpressions": [
+                            {
+                              "key": "app",
+                              "operator": "In",
+                              "values": ["nginx-ingress"]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "graph":{
+          "children":[
+
+          ],
+          "endpoint":{
+            "type":"REST"
+          },
+          "name":"model",
+          "type":"MODEL",
+          "implementation":"UNKNOWN_IMPLEMENTATION"
+        },
+        "name":"main",
+        "replicas":1
+      }
+    ]
+  }
+}

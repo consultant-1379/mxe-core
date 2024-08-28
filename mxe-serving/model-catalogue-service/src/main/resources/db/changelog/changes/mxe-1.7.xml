@@ -1,0 +1,52 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:appdba="http://www.datical.net/xml/ns/appdba"
+                   xmlns:datical="http://www.datical.net/xml/ns/datical"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet author="ethasas" id="models-add-signed-by-public-key">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="models" columnName="signed_by_public_key"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="models">
+            <column name="signed_by_public_key" type="TEXT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="ethasas" id="models-add-signed-by-name">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="models" columnName="signed_by_name"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="models">
+            <column name="signed_by_name" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <!-- changeSet author="ethasas" id="training-package-add-signed-by-public-key">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="training_packages" columnName="signed_by_public_key"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="training_packages">
+            <column name="signed_by_public_key" type="TEXT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="ethasas" id="training-package-add-signed-by-name">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="training_packages" columnName="signed_by_name"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="training_packages">
+            <column name="signed_by_name" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet-->
+
+</databaseChangeLog>

@@ -1,0 +1,37 @@
+{
+  "apiVersion": "machinelearning.seldon.io/v1",
+  "kind": "<SELDON_DEPLOYMENT_KIND>",
+  "metadata": {
+    "labels": {
+      "mxe/createdbyuserid": "<MXE_CREATEDBY_USERID>",
+      "mxe/createdbyusername": "<MXE_CREATEDBY_USERNAME>",
+      "app": "seldon",
+      "mxe/component": "mxe-modeldeployment",
+      "mxe/deploymenttype": "<MXE_DEPLOYMENT_TYPE>",
+      "mxe/templateversion": "0.4",
+    },
+    "name": "<MXE_MODELDEPLOYMENT_NAME>",
+    "namespace": "<MXE_MODELDEPLOYMENT_NAMESPACE>"
+  },
+  "spec": {
+    "annotations": {
+      "deployment_version": "v1",
+      "project_name": "<MXE_MODELDEPLOYMENT_NAME>",
+      "seldon.io/rest-read-timeout": "0"
+    },
+    "name": "<MXE_MODELDEPLOYMENT_NAME>",
+    "predictors": [
+      {
+        "annotations": {
+          "predictor_version": "v1"
+        },
+        "componentSpecs": [
+          <MXE_DEPLOYMENT_COMPONENT_SPECS>
+        ],
+        "graph": <MXE_DEPLOYMENT_GRAPH>,
+        "name": "main",
+        "replicas": <MXE_REPLICAS>
+      }
+    ]
+  }
+}

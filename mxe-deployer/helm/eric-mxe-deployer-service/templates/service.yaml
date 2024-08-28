@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "eric-mxe-deployer-service.name" . }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: eric-mxe-deployer-service"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-deployer-service.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-deployer-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-deployer-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-deployer-service.annotations" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- if .Values.global }}
+  {{- if .Values.global.internalIPFamily }}
+  ipFamilies: [ {{ .Values.global.internalIPFamily | quote }} ]
+  {{- end }}
+  {{- end }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 7543
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: "eric-mxe-deployer-service"
+    app.kubernetes.io/component: "eric-mxe-deployer-service"  
+    {{- include "eric-mxe-deployer-service.selectorLabels" . | nindent 4 }}
+

@@ -1,0 +1,23 @@
+{{- $repo := (include "eric-mxe-model-training-service.setImageRepo" (list . .Values.imageCredentials.modelBase.registry.url .Values.imageCredentials.modelBase.repoPath "modelBase")) -}}
+{{- $imageName := (index .Values "images" "modelBase" "name") -}}
+{{- $imageTag := (index .Values "images" "modelBase" "tag") -}}
+FROM "{{ $repo }}{{ $imageName }}:{{ $imageTag }}"
+ARG TRAINING_SCRIPT_DIR
+ARG PYPISERVICE_HOST
+ARG PYPISERVICE_URL
+ARG OFFLINE=0
+
+COPY $TRAINING_SCRIPT_DIR /tmp/package
+COPY ./init-train.sh /
+
+RUN if [ "$OFFLINE" = 1 ]; then \
+      pip install --no-user -t /home/mxe/python3.8/site-packages --no-cache-dir  -r /tmp/package/requirements.txt --trusted-host $PYPISERVICE_HOST --index-url $PYPISERVICE_URL; \
+    else \
+      pip install --no-user -t /home/mxe/python3.8/site-packages --no-cache-dir -r /tmp/package/requirements.txt --trusted-host $PYPISERVICE_HOST --extra-index-url $PYPISERVICE_URL; \
+    fi
+
+ENV PYTHONPATH=/home/mxe/python3.8/site-packages:/usr/local/lib/python3.8/site-packages
+
+WORKDIR /tmp
+
+ENTRYPOINT ["/bin/bash","-c","/init-train.sh"]

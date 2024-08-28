@@ -1,0 +1,475 @@
+def onlyDocModified = true
+def onlyGuiModified = true
+def runTestSuite = true  
+def SLAVE_NODE = null
+
+node(label: 'mxe-core') {
+    stage('Nominating build node') {
+        SLAVE_NODE = "${NODE_NAME}"
+        echo "Executing build on ${SLAVE_NODE}"
+    }
+}
+
+pipeline {
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '200', artifactNumToKeepStr: '30'))
+    }
+
+    agent {
+        node {
+            label "${SLAVE_NODE}"
+        }
+    }
+
+    environment {
+        GIT_AUTHOR_NAME = "mxecifunc"
+        GIT_AUTHOR_EMAIL = "PDLMMECIMM@pdl.internal.ericsson.com"
+        GIT_COMMITTER_NAME = "${USER}"
+        GIT_COMMITTER_EMAIL = "${GIT_AUTHOR_EMAIL}"
+        GIT_SSH_COMMAND = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GSSAPIAuthentication=no -o PubKeyAuthentication=yes"
+        GERRIT_CREDENTIALS_ID = 'gerrit-http-password-mxecifunc'
+        //GOCACHE = "${WORKSPACE}/gocache"
+        //GOPATH = "${WORKSPACE}/gopath"
+        GOPATH = "${WORKSPACE}/.bob/gopath"
+        CREDENTIALS_SERO_ARTIFACTORY = credentials('mxecifunc-passwd')
+        SERO_ARTIFACTORY_REPO_USER = "${env.CREDENTIALS_SERO_ARTIFACTORY_USR}"
+        SERO_ARTIFACTORY_REPO_PASS = "${env.CREDENTIALS_SERO_ARTIFACTORY_PSW}"
+        // $HOME/.docker for local runs, otherwise set to Jenkins workspace
+        DOCKER_CONFIG="$WORKSPACE"
+    }
+
+    stages {
+        stage('Environment info') {
+            steps {
+                sh 'printenv | sort'
+            }
+        }
+
+        stage('Commit message check') {
+            steps {
+                script {
+                    def final commitMessage = new String(env.GERRIT_CHANGE_COMMIT_MESSAGE.decodeBase64())
+                    if (commitMessage ==~ /(?ms)((Revert)|(\[MEE\-[0-9]+\])|(\[MXE\-[0-9]+\])|(\[MXESUP\-[0-9]+\])|(\[NoJira\]))+\s\S.*/) {
+                        gerritReview labels: ['Commit-Message': 1]
+                    } else {
+                        def final message = 'Commit message check has failed'
+                        def final link = 'https://confluence.lmera.ericsson.se/display/MXE/Code+review+WoW'
+                        addWarningBadge text: message, link: link
+                        addShortText text: 'malformed commit-msg', link: link, border: 0
+                        gerritReview labels: ['Commit-Message': -1], message: message + ', see ' + link
+                    }
+                }
+            }
+        }
+
+        stage('Prepare') {
+            steps {
+                sshagent(credentials: ['ssh-key-mxecifunc']) {
+                    sh 'git clean -xdff'
+                    sh 'git submodule sync'
+                    sh 'git submodule update --init --recursive'
+
+                    sh './bob/bob clean'
+                }
+                script {
+                    final String modifiedFilesStr = sh script: 'git diff-tree --no-commit-id --name-only -r `git rev-parse HEAD`', returnStdout: true
+                    println modifiedFilesStr
+                    def modifiedFiles = modifiedFilesStr.split('\\R')
+                    // Setting flags based on files modified : it refers to each element in the list modifiedFiles
+                    onlyDocModified = modifiedFiles.every{ it.startsWith("doc/") }
+                    onlyGuiModified = modifiedFiles.every{ it.startsWith("mxe-commons/mxe-gui/") }
+                    onlyVAChanges = modifiedFiles.every{ it.contains('JenkinsFileVA') || it.contains('ruleset2.0-va.yaml') || it.startsWith('mxe-sec-utils') }
+
+                    println "onlyDocModified : "+ onlyDocModified
+                    println "onlyGuiModified : "+ onlyGuiModified
+                    println "onlyVAChanges   : "+ onlyVAChanges
+
+                    if (onlyDocModified || onlyVAChanges) {
+                        gerritReview labels: ['Code-Format': 1]
+                        gerritReview labels: ['System-Test': 1]
+                    }
+                    if (onlyGuiModified) {
+                        gerritReview labels: ['System-Test': 1]
+                    }
+                }
+            }
+        }
+
+        stage('Init') {
+            steps {
+                sh './bob/bob init'
+                sh './bob/bob generate-requirements'
+                sh './bob/bob init-dev'
+                script {
+                    currentBuild.description = readFile('.bob/var.version')
+                    gerritReview labels: [:], message: 'Build version: ' + currentBuild.description
+                    withCredentials([file(credentialsId: 'ARM_DOCKER_CONFIG', variable: 'DOCKER_CONFIG_FILE')]) {
+                        writeFile file: 'config.json', text: readFile(DOCKER_CONFIG_FILE)
+                    }
+                }
+            }
+        }
+
+        stage('Generate docs') {
+            steps {
+                sh './bob/bob generate-docs'
+                archiveArtifacts 'build/doc/**/*'
+            }
+        }
+
+        stage('Lint') {
+            when { expression { !onlyDocModified  && !onlyVAChanges } }
+            steps {
+                parallel(
+                        'markdownlint': {
+                            sh './bob/bob lint:markdownlint'
+                        },
+                        'helmlint-model-service': {
+                            sh './bob/bob lint:helmlint-model-service'
+                        },
+                        'helmlint-model-catalogue-service': {
+                            sh './bob/bob lint:helmlint-model-catalogue-service'
+                        },
+                        'helmlint-model-training-service': {
+                            sh './bob/bob lint:helmlint-model-training-service'
+                        },
+                        'helmlint-author-service': {
+                            sh './bob/bob lint:helmlint-author-service'
+                        },
+                        'helmlint-default-backend': {
+                            sh './bob/bob lint:helmlint-default-backend'
+                        },
+                        'helmlint-integration-chart': {
+                            sh './bob/bob lint:helmlint-integration-chart'
+                        },
+                        'helmlint-gui': {
+                            sh './bob/bob lint:helmlint-gui'
+                        },
+                        'helmlint-meshgw-ingress': {
+                            sh './bob/bob lint:helmlint-meshgw-ingress'
+                        },
+                        'helmlint-argo': {
+                            sh './bob/bob lint:helmlint-argo'
+                        },
+                        'helmlint-prometheus': {
+                            sh './bob/bob lint:helmlint-prometheus'
+                        },
+                        'helmlint-mxe-commons-upgrade-jobs': {
+                            sh './bob/bob lint:helmlint-mxe-commons-upgrade-jobs'
+                        },
+                        'helmlint-mxe-serving-upgrade-jobs': {
+                            sh './bob/bob lint:helmlint-mxe-serving-upgrade-jobs'
+                        },
+                        'helmlint-serving-pre-upgrade-job': {
+                            sh './bob/bob lint:helmlint-serving-pre-upgrade-job'
+                        },
+                        'helmlint-training-pre-upgrade-job': {
+                            sh './bob/bob lint:helmlint-training-pre-upgrade-job'
+                        },
+                        'helmlint-commons-pre-upgrade-job': {
+                            sh './bob/bob lint:helmlint-commons-pre-upgrade-job'
+                        },
+                        'helmlint-gatekeeper': {
+                            sh './bob/bob lint:helmlint-gatekeeper'
+                        },
+                        'helmlint-seldon-service-account': {
+                            sh './bob/bob lint:helmlint-seldon-service-account'
+                        },
+                        'helmlint-pypiserver': {
+                            sh './bob/bob lint:helmlint-pypiserver'
+                        },
+                        'npmlint-gui': {
+                            sh './bob/bob lint:npmlint-gui'
+                        },
+                        'helmlint-deployment-manager': {
+                            sh './bob/bob lint:helmlint-dm-server'
+                        },
+                        'helmlint-dm-integration-chart': {
+                            sh './bob/bob lint:helmlint-dm-integration-chart'
+                        },
+                        'helmlint-mxe-training': {
+                            sh './bob/bob lint:helmlint-mxe-training'
+                        },
+                        'helmlint-mxe-workflow': {
+                            sh './bob/bob lint:helmlint-mxe-workflow'
+                        },
+                        'helmlint-mxe-exploration': {
+                            sh './bob/bob lint:helmlint-mxe-exploration'
+                        },
+                        'helmlint-mxe-serving': {
+                            sh './bob/bob lint:helmlint-mxe-serving'
+                        },
+                        'Code format check': {
+                            script {
+                                if (checkCodeFormat("backend-services")) {
+                                    gerritReview labels: ['Code-Format': 1]
+                                }
+                            }
+                        },
+                )
+            }
+        }
+
+        stage('Build source code') {
+            when { expression { !onlyDocModified && !onlyVAChanges } }
+            stages {
+                stage("Parallel Build CLI"){
+                    steps {
+                        parallel(
+                            'cli-go-linux': {
+                                sh './bob/bob go-linux-build'
+                            },
+                            'cli-go-windows':{
+                                sh './bob/bob go-windows-build'
+                            },
+                            "cli-go-macos":{
+                                sh './bob/bob go-macos-build'
+                            },
+                            "cli-go-mxe-generate":{
+                                    sh './bob/bob go-linux-build-mxe-generate'
+                            }
+                        )
+                    }
+                }
+
+                stage("Parallel Build Source"){
+                    steps {
+                        parallel(
+                            'backend-java': {
+                                sh './bob/bob build-java-backend'
+                            },
+                            'gui-nodejs': {
+                                sh './bob/bob build:gui'
+                            },
+                            'keycloak-gatekeeper-go': {
+                                sh './bob/bob build:keycloak-gatekeeper'
+                            },
+                            'jupyterhub-extension' : {
+                                sh './bob/bob build:mxe-jupyter-hub-extension'
+                            }
+                        )
+                    }
+                }
+
+                stage("Archive artifacts"){
+                    steps {
+                        sh './bob/bob build:make-essentials-zip'
+                        script {
+                            archiveArtifacts 'cli/bin/*/mxe-cli-*'
+                            archiveArtifacts 'essentials/mxe-essentials*.zip'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Lock slave') {
+            when {
+                expression { !onlyDocModified && !onlyVAChanges }
+                beforeOptions true
+            }
+            options {
+                lock(resource: "${SLAVE_NODE}")
+            }
+            stages {
+                stage('Build Docker images') {
+                    steps {
+                        parallel(
+                                'modelservice': {
+                                    sh './bob/bob image:modelservice'
+                                },
+                                'model-catalogue-service': {
+                                    sh './bob/bob image:model-catalogue-service'
+                                },
+                                'model-training-service': {
+                                    sh './bob/bob image:model-training-service'
+                                },
+                                'pre-upgrade-job': {
+                                    sh './bob/bob image:pre-upgrade-job'
+                                },
+                                'default-backend': {
+                                    sh './bob/bob image:default-backend'
+                                },
+                                'db-init': {
+                                    sh './bob/bob image:db-init'
+                                },
+                                'gui': {
+                                    sh './bob/bob image:gui'
+                                },
+                                'mxe-jupyterlab': {
+                                    sh './bob/bob image:eric-mxe-jupyterlab'
+                                },
+                                'kubernetes-modifier': {
+                                    sh './bob/bob image:kubernetes-modifier'
+                                },
+                                'keycloak-init': {
+                                    sh './bob/bob image:keycloak-init'
+                                },
+                                'keycloak-gatekeeper': {
+                                    sh './bob/bob image:keycloak-gatekeeper'
+                                },
+                                'jupyterhub': {
+                                    sh './bob/bob image:eric-mxe-jupyterhub'
+                                },
+                                'configurable-http-proxy': {
+                                    sh './bob/bob image:eric-mxe-chp'
+                                },
+                                'author-service': {
+                                    sh './bob/bob image:author-service'
+                                },
+                                'kafka-pyconsumer': {
+                                    sh './bob/bob image:kafka-pyconsumer'
+                                },
+                                'deployment-manager':{
+                                    sh './bob/bob image:deployment-manager'
+                                },
+                                'deployment-manager-init':{
+                                    sh './bob/bob image:mxe-deployer-init'
+                                },
+                                'packager':{
+                                    sh './bob/bob image:build-packager'
+                                },
+                                'model-base':{
+                                    sh './bob/bob image:build-model-base'
+                                },
+                                'mxe-cli-image':{
+                                    sh './bob/bob image:build-mxe-cli-image'
+                                }
+                        )
+                    }
+                }
+
+                stage('Publish local') {
+                    steps {
+                        withCredentials([
+                                string(credentialsId: 'arm-api-token-mxecifunc', variable: 'API_TOKEN'),
+                                file(credentialsId: 'helm-credentials', variable: 'HELM_REPO_CREDENTIALS'),
+                        ]) {
+                            sh './bob/bob publish-local'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Lock k8s cluster') {
+            when {
+                expression { !onlyDocModified && !onlyGuiModified && !onlyVAChanges && runTestSuite }
+                beforeOptions true
+            }
+            options {
+                lock(resource: null, label: 'bob-ci-test', quantity: 1, variable: 'SYSTEM')
+            }
+            environment{
+                KUBECONFIG=credentials("kubeconfig-${env.SYSTEM}")
+                MXESECRETS=credentials("mxek8ssecrets-${env.SYSTEM}")
+                TESTMXEENDPOINT=credentials("secure-mxeendpoint-${env.SYSTEM}")
+                TESTDEPLOYERENDPOINT=credentials("secure-deployerendpoint-${env.SYSTEM}")
+                TESTDEPLOYERAUTHENDPOINT=credentials("secure-oauthendpoint-${env.SYSTEM}")
+                GITOPS_REPO=credentials("secure-gitopsrepoendpoint-${env.SYSTEM}")
+            }
+            stages {
+                stage("Print Cluster Info") {
+                    steps {
+                        echo "Target kubernetes system: ${env.SYSTEM}"
+                        sh './bob/bob test-cluster:print-info'
+                    }
+                }
+                stage('Install Helm Charts'){
+                    steps{
+                        sh './bob/bob install-helm-charts'
+                    }
+                }
+                stage('Deploy MXE Serving Application'){
+                    steps{
+                        sh './bob/bob install-mxe-serving-package'
+                    }
+                }                
+                stage('Deploy MXE Optional Applications'){
+                    steps {
+                        parallel(
+                                'mxe-worklow': {
+                                    sh './bob/bob install-optional-packages:mxe-workflow'
+                                },
+                                'mxe-training': {
+                                    sh './bob/bob install-optional-packages:mxe-training'
+                                },
+                                'mxe-exploration': {
+                                    sh './bob/bob install-optional-packages:mxe-exploration'
+                                }
+                        )
+                    }
+                }
+                stage('System test') {
+                    steps {
+                        sh './bob/bob -d validate-images'
+                        archiveArtifacts artifacts: 'images/mxe-images.json'
+                        sh './bob/bob -d test-master'
+                    }
+                }   
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'mxe-test-reports/**/*.*', allowEmptyArchive: true
+                    publishHTML(target: [
+                            allowMissing         : true,
+                            alwaysLinkToLastBuild: false,
+                            keepAll              : true,
+                            reportDir            : 'mxe-test-reports',
+                            reportFiles          : '*/report.html',
+                            reportName           : "MXE Test Report"
+                    ])
+                    
+                }
+                success {
+                    gerritReview labels: ['System-Test': 1]
+                }
+                unsuccessful {
+                    gerritReview labels: ['System-Test': -1]
+                    withCredentials([
+                            file(credentialsId: 'kubeconfig-' + env.SYSTEM, variable: 'KUBECONFIG'),
+                    ]) {
+                        catchError {
+                            sh "./bob/bob collect-k8s-logs || true"
+                            archiveArtifacts allowEmptyArchive: true, artifacts: "k8s-logs/*"
+                            sh './bob/bob mxe-cleanup'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                if (!onlyVAChanges && !onlyDocModified && runTestSuite ) {
+                    junit '''mxe-serving/modelservice/target/surefire-reports/TEST-*.xml,
+                            mxe-serving/model-catalogue-service/target/surefire-reports/TEST-*.xml,
+                            mxe-training/model-training-service/target/surefire-reports/TEST-*.xml,
+                            cli/test-output/TEST-*.xml'''
+                }
+            }
+        }
+    }
+}
+
+def checkCodeFormat(String... projects) {
+    final def pattern = /(?ms).*(Successfully formatted:)\s*([1-9]{1}[0-9]*)\sfile\(s\).*/
+    final String CODESTYLE_WIKI_LINK = 'https://confluence.lmera.ericsson.se/display/MXE/Code+style'
+    final String message = 'Code format check has failed in [%s] project, see ' + CODESTYLE_WIKI_LINK
+    boolean codeFormatPassed = true
+
+    for (p in projects) {
+        final String project = p
+        final String log = sh script: "./bob/bob codeformat:${project}".toString(), returnStdout: true
+        println log
+        if (log ==~ pattern) {
+            addWarningBadge text: message, link: CODESTYLE_WIKI_LINK
+            addShortText text: "${project} codeformat".toString(), link: CODESTYLE_WIKI_LINK, border: 0
+            gerritReview labels: ['Code-Format': -1], message: String.format(message, project)
+            codeFormatPassed = false
+        }
+    }
+    return codeFormatPassed
+}

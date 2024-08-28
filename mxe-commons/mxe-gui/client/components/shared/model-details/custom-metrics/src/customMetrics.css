@@ -1,0 +1,114 @@
+:host {
+  width: calc(100vw - 136px);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  margin: 0 -6px 8px;
+  background: var(--card-color-background, var(--card-color-background, #fafafa));
+  position: relative;
+}
+
+.container {
+  display: flex;
+}
+
+.loader-overlay {
+  /*position: absolute;*/
+  /*top: 0;*/
+  /*bottom: 0;*/
+  /*right: 0;*/
+  /*left: 0;*/
+  z-index: 500;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  min-height: 734px;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.centered-text {
+  text-align: center;
+  margin: 0 -24px;
+  background: var(--card-color-background, var(--card-color-background, #fafafa));
+  min-height: 265px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  opacity: 0.8;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.left-side {
+  min-width: 250px;
+}
+
+.left-side,
+.right-side {
+  display: flex;
+  flex-direction: column;
+}
+
+.right-side {
+  margin-left: 48px;
+  margin-top: 16px;
+  width: 100%;
+  max-width: calc(100% - 300px);
+}
+
+.chart {
+  width: 100%;
+  overflow: hidden;
+}
+
+.chart::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background: transparent;
+}
+.chart::-webkit-scrollbar-corner {
+  background: transparent;
+}
+.chart::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+}
+
+.title {
+  opacity: 0.8;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text);
+}
+
+.subtitle {
+  opacity: 0.8;
+  font-size: 14px;
+  line-height: 1.43;
+  color: var(--blue);
+  margin-left: 16px;
+}
+
+.range-selector {
+  display: flex;
+  align-items: center;
+  max-width: 250px;
+  margin-bottom: 24px;
+}
+
+.range-selector .interval {
+  margin-left: 16px;
+}
+
+.range-selector .title {
+  margin: 0;
+}
+
+.center {
+  text-align: center;
+  margin: 0 auto;
+}

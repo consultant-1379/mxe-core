@@ -1,0 +1,11 @@
+productName: "MXE"
+productNumber: "CXD 101 0235"
+
+images:
+  minio-cli:
+    productName: "MXE"
+    productNumber: "CXD 101 0235"
+    registry:  "armdocker.rnd.ericsson.se"
+    repoPath: "proj-mxe"
+    name: "minio/mc"
+    tag: "RELEASE.2024-04-18T16-45-29Z-ubuntu-20240405"

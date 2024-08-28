@@ -1,0 +1,109 @@
+[
+  {
+    "name": "img-abtest",
+    "createdByUserId": "user-img-abtest",
+    "createdByUserName": "username-img-abtest",
+    "type": "static",
+    "created": "2019-03-02T20:58:13Z",
+    "status": "creating",
+    "message": null,
+    "replicas": 1,
+    "autoScaling": null,
+    "models": [
+      {
+        "id": "Image Recognition VGG16",
+        "version": "0.0.1",
+        "endpointType": "REST",
+        "weight": 0.3
+      },
+      {
+        "id": "Image Recognition Inception3",
+        "version": "0.0.1",
+        "endpointType": "REST",
+        "weight": 0.7
+      }
+    ]
+  },
+  {
+    "name": "img-mab",
+    "type": "dynamic",
+    "created": "2019-03-02T20:58:21Z",
+    "status": "error",
+    "message": "Failed to create deployment img-mab",
+    "replicas": 1,
+    "autoScaling": null,
+    "models": [
+      {
+        "id": "Image Recognition VGG16",
+        "version": "0.0.1",
+        "endpointType": "REST",
+        "weight": null
+      },
+      {
+        "id": "Image Recognition Inception3",
+        "version": "0.0.1",
+        "endpointType": "REST",
+        "weight": null
+      }
+    ],
+    "createdByUserId": "user-img-mab",
+    "createdByUserName": "username-img-mab"
+  },
+  {
+    "name": "iot-model-a",
+    "type": "model",
+    "created": "2019-03-04T22:14:35Z",
+    "status": "running",
+    "message": null,
+    "replicas": 1,
+    "autoScaling": null,
+    "models": [
+      {
+        "endpointType": "REST",
+        "weight": null,
+        "id": "IoT model A",
+        "version": "0.0.1"
+      }
+    ],
+    "createdByUserId": null,
+    "createdByUserName": null
+  },
+  {
+    "name": "iot-model-b",
+    "replicas": 1,
+    "autoScaling": null,
+    "created": "2019-03-04T22:14:55Z",
+    "status": "running",
+    "message": null,
+    "models": [
+      {
+        "id": "IoT model B",
+        "version": "0.0.1",
+        "endpointType": "REST",
+        "weight": null
+      }
+    ],
+    "type": "model",
+    "createdByUserId": null,
+    "createdByUserName": null
+  },
+  {
+    "name": "production-model-img",
+    "type": "model",
+    "created": "2019-03-12T15:49:39Z",
+    "status": "running",
+    "message": null,
+    "replicas": 1,
+    "autoScaling": null,
+    "models": [
+      {
+        "id": "Image Recognition VGG16",
+        "version": "0.0.1",
+        "endpointType": "REST",
+        "weight": null
+      }
+    ],
+    "createdByUserId": null,
+    "createdByUserName": null
+  }
+]

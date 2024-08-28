@@ -1,0 +1,7 @@
+{{- $commitAuthorName := (index .Values "config" "git" "author" "name") -}}
+{{- $commitAuthorEmail := (index .Values "config" "git" "author" "email") -}}
+{{ printf "\n" }}
+authors:
+    - domain: {{ include "eric-mxe-deployer-service.gitopsRepoDomain" . }}
+      name: {{ $commitAuthorName }}
+      email: {{ $commitAuthorEmail }}

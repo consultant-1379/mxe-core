@@ -1,0 +1,9 @@
+dependencies:
+  - condition: argo-workflows.enabled
+    name: argo-workflows
+    repository: https://arm.seli.gic.ericsson.se/artifactory/proj-mxe-deps-helm/
+    version: 0.32.2
+  - condition: spark-operator.enabled
+    name: spark-operator
+    repository: https://arm.seli.gic.ericsson.se/artifactory/proj-mxe-deps-helm/
+    version: 1.1.27

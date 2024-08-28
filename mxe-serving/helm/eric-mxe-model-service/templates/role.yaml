@@ -1,0 +1,44 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "eric-mxe-model-service.role" . | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: model-service-role"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-model-service.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-model-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-model-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-model-service.annotations" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - "machinelearning.seldon.io"
+    resources:
+      - "seldondeployments"
+    verbs:
+      - "get"
+      - "list"
+      - "create"
+      - "delete"
+      - "patch"
+      - "update"
+  - apiGroups:
+      - ""
+    resources:
+      - "pods"
+    verbs:
+      - "list"
+  - apiGroups:
+      - ""
+    resources:
+      - "pods/log"
+    verbs:
+      - "get"
+  - apiGroups:
+      - "apps"
+    resources:
+      - "statefulsets"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"

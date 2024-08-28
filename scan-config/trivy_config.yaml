@@ -1,0 +1,2 @@
+report_dir : .bob/va-reports/trivy
+batch_size : 1

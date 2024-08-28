@@ -1,0 +1,31 @@
+---
+apiVersion: "machinelearning.seldon.io/v1"
+kind: "SeldonDeployment"
+metadata:
+  name: "tc11-gui-single-model-as-mem"
+spec:
+  predictors:
+  - name: "main"
+    annotations:
+      predictor_version: "v1"
+    graph:
+      name: "model"
+      type: "MODEL"
+      implementation: "UNKNOWN_IMPLEMENTATION"
+      endpoint:
+        type: "REST"
+      children: []
+    componentSpecs:
+    - spec:
+        containers:
+        - image: "sample.model1.gui.ext:4.1.1"
+          name: "model"
+          imagePullPolicy: Always
+      hpaSpec:
+        minReplicas: 1
+        maxReplicas: 3
+        metrics:
+        - type: "Resource"
+          resource:
+            name: "memory"
+            targetAverageValue: 1500Mi

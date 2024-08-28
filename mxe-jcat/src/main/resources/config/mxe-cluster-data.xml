@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="mxe-host-data.xml" />
+
+    <bean id="hahn081" class="com.ericsson.mxe.jcat.config.MxeCluster">
+        <property name="cliHost" ref="localLinux" />
+        <property name="endpoint" value="https://mxe.hahn081.rnd.gic.ericsson.se:443" />
+        <property name="mxeUser" ref="mxeUser" />
+    </bean>
+
+    <bean id="olah024" class="com.ericsson.mxe.jcat.config.MxeCluster">
+        <property name="cliHost" ref="localLinux" />
+        <property name="endpoint" value="https://mxe.olah024.rnd.gic.ericsson.se:443" />
+        <property name="mxeUser" ref="mxeUser" />
+    </bean>
+
+</beans>

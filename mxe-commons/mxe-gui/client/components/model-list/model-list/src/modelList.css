@@ -1,0 +1,17 @@
+/* style goes here */
+:host {
+  max-height: calc(100vh - 206px); /* 740px;*/
+}
+
+.model-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 24%));
+  grid-column-gap: 16px;
+  grid-row-gap: 16px;
+}
+
+@media screen and (max-width: 992px) {
+  .model-list {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}

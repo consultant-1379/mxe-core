@@ -1,0 +1,230 @@
+{{- $global := fromJson (include "eric-mxe-deployer-service.global" .) -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "eric-mxe-deployer-service.name" . }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: eric-mxe-deployer-service"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-deployer-service.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-deployer-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-deployer-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-deployer-service.annotations" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "eric-mxe-deployer-service.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/name: {{ include "eric-mxe-deployer-service.name" . | quote }}
+      app.kubernetes.io/component: "eric-mxe-deployer-service"
+  template:
+    metadata:
+      annotations:
+        {{- $prodInfo := include "eric-mxe-deployer-service.product-info" . | fromYaml -}}
+        {{- $annotations := include "eric-mxe-deployer-service.annotations" . | fromYaml -}}
+        {{- $secAnnotations := include "eric-mxe-deployer-service.security-annotations" . | fromYaml -}}
+        {{- $podAnn := .Values.podAnnotations -}}
+        {{- $prometheusAnn := include "eric-mxe-deployer-service.prometheus-annotations" . | fromYaml -}}
+        {{- include "eric-mxe-deployer-service.mergeAnnotations" (dict "location" .Template.Name "sources" (list $prodInfo $secAnnotations $podAnn $annotations $prometheusAnn)) | trim | nindent 8 }}
+      labels:
+        {{- $component := printf "%s" "app.kubernetes.io/component: eric-mxe-deployer-service"  | fromYaml -}}
+        {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-deployer-service.name" .)  | fromYaml -}}
+        {{- $istioLabels := include "eric-mxe-deployer-service.istio-sidecar-labels" . | fromYaml -}}
+        {{- $labels := include "eric-mxe-deployer-service.labels" . | fromYaml -}}
+        {{- include "eric-mxe-deployer-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $istioLabels $labels )) | trim | nindent 8 }}
+    spec:
+      {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "eric-mxe-deployer-service.topologySpreadConstraints" . | trim | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "eric-mxe-deployer-service.serviceaccount" . | quote }}
+      {{- include "eric-mxe-deployer-service.image-pull-secrets" . | nindent 6 }}
+      securityContext:
+        {{- $suppGroups := include "eric-mxe-deployer-service.podSecurityContext.supplementalGroups" . -}}
+        {{- if $suppGroups }}
+        supplementalGroups: {{ $suppGroups }}
+        {{- end }}
+      {{- if include "eric-mxe-deployer-service.podPriority" . }}
+      priorityClassName: {{- include "eric-mxe-deployer-service.podPriority" . | indent 2 }}
+      {{- end }}
+      initContainers:
+      {{- if .Values.isExtCA }}
+        - name: {{ printf "%s-%s" .Chart.Name "add-externalca" | trunc 63 | trimSuffix "-" }}
+          {{- with (index .Values "imageCredentials" "mxe-deployer") }}
+          image: "{{ include "eric-mxe-deployer-service.setImageRepo" (list $ .registry.url .repoPath "mxe-deployer") }}{{ index $.Values "images" "mxe-deployer" "name" }}:{{ index $.Values "images" "mxe-deployer" "tag" }}"
+          {{- end }}
+          imagePullPolicy: "{{ include "eric-mxe-deployer-service.registryImagePullPolicy" (list . (index  .Values "images" "mxe-deployer" "pullPolicy")) }}"   
+          {{- include "eric-mxe-deployer-service.initcontainer-security-context" . | nindent 10 }}
+          command:
+          - sh
+          - -c
+          - |
+          {{- include "eric-mxe-deployer-service.add-externalca-command" . | nindent 12 }}
+          volumeMounts:
+          {{- include "eric-mxe-deployer-service.add-externalca-volume-mounts" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources.addExternalCa | trim | nindent 12 }}
+      {{- end }}
+        - name: {{ printf "%s-%s" .Chart.Name "kubectl" | trunc 63 | trimSuffix "-" }}
+          {{- with (index .Values "imageCredentials" "kubernetes-modifier") }}
+          image: "{{ include "eric-mxe-deployer-service.setImageRepo" (list $ .registry.url .repoPath "kubernetes-modifier") }}{{ index $.Values "images" "kubernetes-modifier" "name" }}:{{ index $.Values "images" "kubernetes-modifier" "tag" }}"
+          {{- end }}
+          imagePullPolicy: "{{ include "eric-mxe-deployer-service.registryImagePullPolicy" (list . (index  .Values "images" "kubernetes-modifier" "pullPolicy")) }}"
+          {{- include "eric-mxe-deployer-service.initcontainer-security-context" . | nindent 10 }}
+          env:
+            - name: ARGOCD_SERVER_DEPLOYMENT_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: INTERNAL_GITOPS_REPO_ENABLED
+              value: {{ .Values.config.git.internal.enabled | quote }}
+            - name: ARGOCD_REDIS_HA_ENABLED
+              value: {{ .Values.config.argocd.redisHA.enabled | quote }}
+            - name: ARGOCD_REDIS_ENABLED
+              value: {{ .Values.config.argocd.redis.enabled | quote }}
+          resources:
+            {{- toYaml .Values.resources.kubernetesModifier | trim | nindent 12 }}
+          volumeMounts:
+            - mountPath: "/etc/kubernetes-run-script/"
+              name: init-config
+        - name: {{ printf "%s-%s" .Chart.Name "keycloak-init" | trunc 63 | trimSuffix "-" }}
+          {{- with (index .Values "imageCredentials" "mxe-deployer-init") }}
+          image: "{{ include "eric-mxe-deployer-service.setImageRepo" (list $ .registry.url .repoPath "mxe-deployer-init") }}{{ index $.Values "images" "mxe-deployer-init" "name" }}:{{ index $.Values "images" "mxe-deployer-init" "tag" }}"
+          {{- end }}
+          imagePullPolicy: "{{ include "eric-mxe-deployer-service.registryImagePullPolicy" (list . (index  .Values "images" "mxe-deployer-init" "pullPolicy")) }}"
+          {{- include "eric-mxe-deployer-service.initcontainer-security-context" . | nindent 10 }}
+          command: 
+            - ./mxe-deployer-init
+            - keycloak-realm 
+            - "--enabled={{ .Values.config.sso.enabled }}"
+            - --namespace 
+            - {{ include "eric-mxe-deployer-service.oauth-service-namespace" . | quote }}
+            - --deployer-namespace
+            - $(ARGOCD_SERVER_DEPLOYMENT_NAMESPACE)
+            - --keycloakRealmConfigFile
+            - /init/config/realmConfig.yaml
+            - --keycloakTokenConfigFile
+            - /init/config/oidcTokenConfig.yaml
+            - --argoCDOIDCConfigFile
+            - /init/config/oidcConfig.yaml
+            - --argoCDRBACConfigFile
+            - /init/config/rbacConfig.yaml
+            - "--enableLegacyWildFlySupport={{ .Values.config.sso.mxe.enableLegacyWildFlySupport }}"
+          env:
+            - name: ARGOCD_SERVER_DEPLOYMENT_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            {{- toYaml .Values.resources.keycloakDeployerInit | trim | nindent 12 }}
+          volumeMounts:
+            - mountPath: "/init/config/"
+              name: init-config
+            {{- include "eric-mxe-deployer-service.add-externalca-volume-mounts-maincontainer" . | nindent 12 }}
+        - name: {{ printf "%s-%s" .Chart.Name "argocd-repos-init" | trunc 63 | trimSuffix "-" }}
+          {{- with (index .Values "imageCredentials" "mxe-deployer-init") }}
+          image: "{{ include "eric-mxe-deployer-service.setImageRepo" (list $ .registry.url .repoPath "mxe-deployer-init") }}{{ index $.Values "images" "mxe-deployer-init" "name" }}:{{ index $.Values "images" "mxe-deployer-init" "tag" }}"
+          {{- end }}
+          imagePullPolicy: "{{ include "eric-mxe-deployer-service.registryImagePullPolicy" (list . (index  .Values "images" "mxe-deployer-init" "pullPolicy")) }}"
+          {{- include "eric-mxe-deployer-service.initcontainer-security-context" . | nindent 10 }}
+          command: 
+            - ./mxe-deployer-init
+            - repositories-init
+            - --deployer-namespace
+            - $(ARGOCD_SERVER_DEPLOYMENT_NAMESPACE)
+            - --repositoriesConfigFile
+            - /init/config/repositoriesConfig.yaml
+          env:
+            - name: ARGOCD_SERVER_DEPLOYMENT_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            {{- toYaml .Values.resources.argocdDeployerInit | trim | nindent 12 }}
+          volumeMounts:
+            - mountPath: "/init/config/"
+              name: init-config
+            {{- include "eric-mxe-deployer-service.add-externalca-volume-mounts-maincontainer" . | nindent 12 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- include "eric-mxe-deployer-service.container-security-context" . | nindent 10 }}
+            runAsUser: 1000
+          {{- with (index .Values "imageCredentials" "mxe-deployer") }}
+          image: "{{ include "eric-mxe-deployer-service.setImageRepo" (list $ .registry.url .repoPath "mxe-deployer") }}{{ index $.Values "images" "mxe-deployer" "name" }}:{{ index $.Values "images" "mxe-deployer" "tag" }}"
+          {{- end }}
+          imagePullPolicy: "{{ include "eric-mxe-deployer-service.registryImagePullPolicy" (list . (index  .Values "images" "mxe-deployer" "pullPolicy")) }}"       
+          command: 
+          - ./depmanager
+          - --namespace
+          - $(ARGOCD_SERVER_DEPLOYMENT_NAMESPACE)
+          {{- if .Values.debug.enabled }}
+          -- --debug 
+          -- true
+          {{- end }}
+          env: 
+            - name: DM_CONFIG_FILE
+              value: "/dm/app/config/dmconfig.yaml"
+            - name: COMMIT_AUTHORS_CONFIG_FILE
+              value: "/dm/app/commitauthors/config.yaml"
+            - name: ARGOCD_SERVER_DEPLOYMENT_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - name: http
+              containerPort: 7543
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 7543
+            initialDelaySeconds: {{ .Values.probes.deployerservice.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.deployerservice.readinessProbe.periodSeconds }}
+          livenessProbe:
+            tcpSocket:
+              port: 7543
+            initialDelaySeconds: {{ .Values.probes.deployerservice.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.deployerservice.livenessProbe.periodSeconds }}
+          resources:
+            {{- toYaml .Values.resources.deployerService | nindent 12 }}
+          volumeMounts:
+            - name: dm-config-volume
+              mountPath: "/dm/app/config/"
+            - name: commit-authors-config-volume
+              mountPath: "/dm/app/commitauthors/"
+            - mountPath: "/tmp"
+              name: dm-workspace
+            - mountPath: /app/config/ssh
+              name: ssh-known-hosts
+            - mountPath: /app/config/gpg/keys
+              name: gpg-keyring
+            {{- include "eric-mxe-deployer-service.add-externalca-volume-mounts-maincontainer" . | nindent 12 }}
+            {{- include "eric-mxe-deployer-service.pg-cert-volume-mounts" . | nindent 12 }}
+      {{- if (or .Values.nodeSelector $global.nodeSelector) }}
+      nodeSelector: {{- include "eric-mxe-deployer-service.nodeSelector" . | nindent 8 }}
+      {{- end }}
+      affinity:
+        {{- tpl (toYaml .Values.affinity) .  | nindent 8 }}
+      tolerations: {{ include "eric-mxe-deployer-service.merge-tolerations" (dict "root" . "podbasename" "eric-mxe-deployer-service") | nindent 8}}
+      volumes:
+        {{- include "eric-mxe-deployer-service.add-externalca-volumes" . | nindent 8 }}
+        {{- include "eric-mxe-deployer-service.pg-cert-volumes" . | nindent 8 }}
+        - name: dm-config-volume
+          configMap:
+            name: {{ include "eric-mxe-deployer-service.dm-configmap" . | quote }}
+        - name: commit-authors-config-volume
+          configMap:
+            name: {{ include "eric-mxe-deployer-service.authors-configmap" . | quote }}
+            items:
+              - key: authorsconfig.yaml
+                path: config.yaml
+        - name: init-config
+          configMap:
+            name: {{ include "eric-mxe-deployer-service.init-configmap" . | quote }}
+        - name: dm-workspace
+          emptyDir: {}
+        - name: ssh-known-hosts
+          configMap:
+            name: argocd-ssh-known-hosts-cm
+        - name: gpg-keyring
+          emptyDir: {}

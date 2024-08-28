@@ -1,0 +1,13 @@
+{{- $giteaAdminCreds := (index .Values "mxeGitea" "admin" "secret") -}}
+mxeGitopsRepo:
+  repo:
+    url: {{ include "mxe-gitea.gitOpsRepoURL" . }}
+  shouldCreate: true
+  private: false
+  gitAdminCredentials:
+    userNameSecret: 
+      name: {{ $giteaAdminCreds }}
+      key:  username
+    passwordSecret: 
+      name: {{ $giteaAdminCreds }}
+      key:  password

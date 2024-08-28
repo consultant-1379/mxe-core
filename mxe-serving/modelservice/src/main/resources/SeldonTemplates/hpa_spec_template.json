@@ -1,0 +1,7 @@
+"hpaSpec": {
+  "minReplicas": <AUTOSCALING_MIN_REPLICAS>,
+  "maxReplicas": <AUTOSCALING_MAX_REPLICAS>,
+  "metrics": [
+    <AUTOSCALING_METRICS>
+  ]
+}

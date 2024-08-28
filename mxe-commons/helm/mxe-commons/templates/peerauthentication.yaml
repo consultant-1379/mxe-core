@@ -1,0 +1,14 @@
+{{- if .Values.global.serviceMesh.enabled }}
+apiVersion: "security.istio.io/v1beta1"
+kind: "PeerAuthentication"
+metadata:
+  name: default-peer-authentication-policy
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  mtls:
+{{- if .Values.global.security.tls.enabled }}
+    mode: STRICT
+{{- else }}
+    mode: DISABLE
+{{- end }}
+{{- end }}

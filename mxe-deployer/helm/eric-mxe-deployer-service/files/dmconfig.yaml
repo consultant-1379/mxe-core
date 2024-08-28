@@ -1,0 +1,4 @@
+argocdServer:
+  clientOptions:
+    serverAddr: {{ include "eric-mxe-deployer-service.argocdserver" . }}
+    plainText: {{ include "eric-mxe-deployer-service.usePlaintext" . }}

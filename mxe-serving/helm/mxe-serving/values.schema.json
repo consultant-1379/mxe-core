@@ -1,0 +1,814 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "eric-mxe-model-catalogue-service": {
+            "type": "object",
+            "properties": {
+                "resources": {
+                    "type": "object",
+                    "properties": {
+                        "dbInit": {
+                            "type": "object",
+                            "properties": {
+                                "limits": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "requests": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "kubernetesModifier": {
+                            "type": "object",
+                            "properties": {
+                                "limits": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "requests": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "minioCli": {
+                            "type": "object",
+                            "properties": {
+                                "limits": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "requests": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "modelService": {
+                            "type": "object",
+                            "properties": {
+                                "limits": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "requests": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "eric-mxe-model-service": {
+            "type": "object",
+            "properties": {
+                "resources": {
+                    "type": "object",
+                    "properties": {
+                        "cacerts": {
+                            "type": "object",
+                            "properties": {
+                                "limits": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "requests": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "kubernetesModifier": {
+                            "type": "object",
+                            "properties": {
+                                "limits": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "requests": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "modelService": {
+                            "type": "object",
+                            "properties": {
+                                "limits": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "requests": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "eric-mxe-pre-upgrade-job": {
+            "type": "object",
+            "properties": {
+                "includeReleaseNameSelector": {
+                    "type": "boolean"
+                },
+                "nameOverride": {
+                    "type": "string"
+                },
+                "statusCheckInterval": {
+                    "type": "integer"
+                }
+            }
+        },
+        "eric-mxe-serving-upgrade-jobs": {
+            "type": "object",
+            "properties": {
+                "resources": {
+                    "type": "object",
+                    "properties": {
+                        "kubernetesModifier": {
+                            "type": "object",
+                            "properties": {
+                                "limits": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "requests": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cpu": {
+                                            "type": "string"
+                                        },
+                                        "ephemeral-storage": {
+                                            "type": "string"
+                                        },
+                                        "memory": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "global": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "object"
+                },
+                "fsGroup": {
+                    "type": "object",
+                    "properties": {
+                        "manual": {
+                            "type": "integer"
+                        },
+                        "namespace": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "internalIPFamily": {
+                    "oneOf": [
+                        { "type": "string"},
+                        { "type": "null" }
+                    ]
+                },
+                "internalRegistry": {
+                    "type": "object",
+                    "properties": {
+                        "password": {
+                            "type": "string"
+                        },
+                        "username": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "labels": {
+                    "type": "object"
+                },
+                "meshConfig": {
+                    "type": "object",
+                    "properties": {
+                        "accessLogFile": {
+                            "oneOf": [
+                                { "type": "string"},
+                                { "type": "null" }
+                            ]
+                        }
+                    }
+                },
+                "mtls": {
+                    "type": "object",
+                    "properties": {
+                        "auto": {
+                            "oneOf": [
+                                { "type": "boolean"},
+                                { "type": "null" }
+                            ]
+                        }
+                    }
+                },
+                "multiTenancy": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "oneOf": [
+                                { "type": "boolean"},
+                                { "type": "null" }
+                            ]
+                        }
+                    }
+                },
+                "mxeApiHostname": {
+                    "oneOf": [
+                        { "type": "string"},
+                        { "type": "null" }
+                    ]
+                },
+                "mxeApiTlsSecretName": {
+                    "oneOf": [
+                        { "type": "string"},
+                        { "type": "null" }
+                    ]
+                },
+                "mxeApiport": {
+                    "oneOf": [
+                        { "type": "integer"},
+                        { "type": "null" }
+                      ]
+                },
+                "mxeClusterDomain": {
+                    "type": "string"
+                },
+                "mxeDisableDefaultIngressControllerUse": {
+                    "type": "boolean"
+                },
+                "mxeIamCaSecretName": {
+                    "type": "string"
+                },
+                "mxeLogControlConfigMap": {
+                    "type": "string"
+                },
+                "mxeOauthApiHostname": {
+                    "oneOf": [
+                        { "type": "string"},
+                        { "type": "null" }
+                    ]
+                },
+                "mxePrometheusPath": {
+                    "type": "string"
+                },
+                "mxePrometheusPort": {
+                    "type": "string"
+                },
+                "mxePrometheusScrape": {
+                    "type": "string"
+                },
+                "nodeSelector": {
+                    "type": "object"
+                },
+                "pullSecret": {
+                    "oneOf": [
+                        { "type": "string"},
+                        { "type": "null" }
+                    ]
+                },
+                "registry": {
+                    "type": "object",
+                    "properties": {
+                        "imagePullPolicy": {
+                            "type": "string"
+                        },
+                        "pullSecret": {
+                            "oneOf": [
+                                { "type": "string"},
+                                { "type": "null" }
+                            ]
+                        },
+                        "repoPath": {
+                            "oneOf": [
+                                { "type": "string"},
+                                { "type": "null" }
+                              ]
+                        },
+                        "url": {
+                            "oneOf": [
+                                { "type": "string"},
+                                { "type": "null" }
+                            ]
+                        }
+                    }
+                },
+                "security": {
+                    "type": "object",
+                    "properties": {
+                        "tls": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                },
+                "serviceMesh": {
+                    "type": "object",
+                    "properties": {
+                        "annotations": {
+                            "type": "object",
+                            "properties": {
+                                "serviceMesh": {
+                                    "oneOf": [
+                                        { "type": "string"},
+                                        { "type": "null" }
+                                    ]
+                                }
+                            }
+                        },
+                        "egress": {
+                            "type": "object",
+                            "properties": {
+                                "ca": {
+                                    "type": "object",
+                                    "properties": {
+                                        "caCertificates": {
+                                            "type": "string"
+                                        },
+                                        "caCertsPath": {
+                                            "type": "string"
+                                        },
+                                        "genSecretName": {
+                                            "type": "string"
+                                        },
+                                        "readonly": {
+                                            "type": "boolean"
+                                        },
+                                        "secretName": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "iam": {
+                                    "type": "object",
+                                    "properties": {
+                                        "caIssuer": {
+                                            "type": "string"
+                                        },
+                                        "certificateCN": {
+                                            "type": "string"
+                                        },
+                                        "certsPath": {
+                                            "type": "string"
+                                        },
+                                        "clientCertificate": {
+                                            "type": "string"
+                                        },
+                                        "enabled": {
+                                            "type": "boolean"
+                                        },
+                                        "genSecretName": {
+                                            "type": "string"
+                                        },
+                                        "optional": {
+                                            "type": "boolean"
+                                        },
+                                        "privateKey": {
+                                            "type": "string"
+                                        },
+                                        "readonly": {
+                                            "type": "boolean"
+                                        },
+                                        "secretName": {
+                                            "type": "string"
+                                        },
+                                        "serviceName": {
+                                            "type": "string"
+                                        },
+                                        "tlsMode": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "lcmRegistry": {
+                                    "type": "object",
+                                    "properties": {
+                                        "certsPath": {
+                                            "type": "string"
+                                        },
+                                        "clientCertificate": {
+                                            "type": "string"
+                                        },
+                                        "enabled": {
+                                            "type": "boolean"
+                                        },
+                                        "genSecretName": {
+                                            "type": "string"
+                                        },
+                                        "optional": {
+                                            "type": "boolean"
+                                        },
+                                        "privateKey": {
+                                            "type": "string"
+                                        },
+                                        "readonly": {
+                                            "type": "boolean"
+                                        },
+                                        "secretName": {
+                                            "type": "string"
+                                        },
+                                        "serviceName": {
+                                            "type": "string"
+                                        },
+                                        "tlsMode": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "pmServer": {
+                                    "type": "object",
+                                    "properties": {
+                                        "caIssuer": {
+                                            "type": "string"
+                                        },
+                                        "certsPath": {
+                                            "type": "string"
+                                        },
+                                        "clientCertificate": {
+                                            "type": "string"
+                                        },
+                                        "enabled": {
+                                            "type": "boolean"
+                                        },
+                                        "genSecretName": {
+                                            "type": "string"
+                                        },
+                                        "optional": {
+                                            "type": "boolean"
+                                        },
+                                        "privateKey": {
+                                            "type": "string"
+                                        },
+                                        "readonly": {
+                                            "type": "boolean"
+                                        },
+                                        "secretName": {
+                                            "type": "string"
+                                        },
+                                        "serviceName": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "postgres": {
+                                    "type": "object",
+                                    "properties": {
+                                        "caIssuer": {
+                                            "type": "string"
+                                        },
+                                        "clientCertificate": {
+                                            "type": "string"
+                                        },
+                                        "privateKey": {
+                                            "type": "string"
+                                        },
+                                        "serviceName": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "enabled": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "imageCredentials": {
+            "type": "object",
+            "properties": {
+                "registry": {
+                    "type": "object",
+                    "properties": {
+                        "pullSecret": {
+                            "oneOf": [
+                                { "type": "string"},
+                                { "type": "null" }
+                            ]
+                        },
+                        "url": {
+                            "oneOf": [
+                                { "type": "string"},
+                                { "type": "null" }
+                            ]
+                        }
+                    }
+                },
+                "repoPath": {
+                    "oneOf": [
+                        { "type": "string"},
+                        { "type": "null" }
+                      ]
+                }
+            }
+        },
+        "labels": {
+            "type": "object"
+        },
+        "productInfo": {
+            "type": "object",
+            "properties": {
+                "rstate": {
+                    "oneOf": [
+                        { "type": "string"},
+                        { "type": "null" }
+                    ]
+                }
+            }
+        },
+        "seldon-core-analytics": {
+            "type": "object",
+            "properties": {
+                "nodeExporter": {
+                    "type": "object",
+                    "properties": {
+                        "port": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "seldon-core-operator": {
+            "type": "object",
+            "properties": {
+                "ambassador": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "crd": {
+                    "type": "object",
+                    "properties": {
+                        "create": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "defaultUserID": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "executor": {
+                    "type": "object",
+                    "properties": {
+                        "image": {
+                            "type": "object",
+                            "properties": {
+                                "pullPolicy": {
+                                    "anyOf": [
+                                        { "type": "string", "enum": ["Always","Never","IfNotPresent"] },
+                                        { "type": "null" }
+                                    ]
+                                },
+                                "registry": {
+                                    "type": "string"
+                                },
+                                "tag": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "serviceAccount": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "pullPolicy": {
+                            "anyOf": [
+                                { "type": "string", "enum": ["Always","Never","IfNotPresent"] },
+                                { "type": "null" }
+                            ]
+                        },
+                        "registry": {
+                            "type": "string"
+                        },
+                        "tag": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "istio": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "gateway": {
+                            "type": "string"
+                        },
+                        "tlsMode": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "managerCreateResources": {
+                    "type": "boolean"
+                },
+                "serviceAccount": {
+                    "type": "object",
+                    "properties": {
+                        "create": {
+                            "type": "boolean"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "terminationGracePeriodSeconds": {
+            "type": "integer"
+        },
+        "tolerations": {
+            "type": "array"
+        }
+    }
+}

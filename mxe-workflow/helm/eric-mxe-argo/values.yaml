@@ -1,0 +1,91 @@
+# Default values for eric-mxe-argo.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+enabled: true
+
+ingress:
+  enabled: true
+  hostname: null
+  secretName: null
+  ingressClass: eric-mxe-ingress-controller-class
+  annotationPrefix: null
+  defaultBackendFullNameOverride: null
+  defaultBackendNameOverride: null
+  owasp:
+    enabled: false
+
+service:
+  nameOverride: null
+  fullnameOverride: null
+
+minio:
+  url: http://eric-data-object-storage-mn:9000
+  httpsurl: https://eric-data-object-storage-mn:9000
+  adminSecretName: eric-data-object-storage-mn-secret
+  userSecretName:
+  bucket: mxe-argo-artifacts
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "-"
+
+nameOverride: null
+
+imageCredentials:
+  registry:
+    url:
+    pullSecret:
+  repoPath:
+  minio-cli:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+
+images:
+  minio-cli:
+    name: "minio/mc"
+    tag: "RELEASE.2024-04-18T16-45-29Z-ubuntu-20240405"
+# DR-D1121-011 - Present in Top Level Helm Chart Values.yaml
+# global:
+#   registry:
+#     url: "armdocker.rnd.ericsson.se"
+#     pullSecret:
+#   mxeApiTlsSecretName:
+#   mxeApiHostname:
+#   mxeDisableDefaultIngressControllerUse: false
+#   labels: {}
+#   annotations: {}
+
+
+resources:
+  minioCli:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+
+terminationGracePeriodSeconds: 30
+
+tolerations: []
+
+labels: {}
+annotations: {}
+
+# DR-D1123-127 -  ADP services shall define AppArmor profile
+appArmorProfile:
+  type: runtime/default
+  localhostProfile:
+
+# DR-D1123-128 - ADP services shall define Seccomp profile
+seccompProfile:
+  type: RuntimeDefault
+  localhostProfile:

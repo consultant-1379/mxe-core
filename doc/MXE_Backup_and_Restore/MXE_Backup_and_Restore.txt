@@ -1,0 +1,603 @@
+= Backup and Restore
+:author: Kristóf Nékám
+:signature: EKRINKM
+:department: BDGSJBAK
+:doc-name: USER GUIDE
+:doc-no: 1/1541-AVA 901 53
+:revnumber: PD1
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+[[Introduction]]
+== Introduction
+
+MXE offers the capability to perform back up and restore of various resources. This document describes how to perform backup and restore.
+
+[[Preparations]]
+== Preparations
+
+* Make sure that during restoration, the mxe-namespace and the mxe host address are the same as they were during backup
+* Make sure to collect all the files created during backup to one place on the cluster or outside the cluster. These files are kept during MXE cluster reinstallation.
+
+NOTE: The outputs of the backup commands are stored in the current working directory. Restore commands use files in the current working directory.
+
+WARNING: The following objects are not restored:
+
+* Jupyter notebooks
+* Flowfile, content and provenance repositories of flow deployments
+* Argo logs 
+
+[[BackupandRestoreDatabase]]
+== Backup and Restore Database
+
+[[BackupDatabase]]
+=== Backup Database
+
+*Prerequisites:*
+
+* Kubectl installed on the machine, where the backup file is to be stored, with the configuration necessary to access the cluster
+
+.*Create a backup:*
+. Set environment variable for reusability:
++
+....
+export NAMESPACE=<mxe-namespace>
+....
++
+. Create dump files of the `eric-data-document-database-pg-0` databases:
++
+....
+MODEL_CATALOGUE_SERVICE_ORIGINAL_DB=$(kubectl get pod -n "${NAMESPACE}" -o json -l app.kubernetes.io/part-of=mxe,app.kubernetes.io/component=model-catalogue-service | jq -r '.items[0].spec.containers | map(select(.name = "mxe-model-catalogue-service")) | .[0].env | map(select(.name == "POSTGRESQL_DB")) | .[0].value')
+AUTHOR_SERVICE_ORIGINAL_DB=$(kubectl get pod -n "${NAMESPACE}" -o json -l app.kubernetes.io/part-of=mxe,app.kubernetes.io/component=author-service | jq -r '.items[0].spec.containers | map(select(.name = "mxe-model-catalogue-service")) | .[0].env | map(select(.name == "POSTGRESQL_DB")) | .[0].value')
+
+kubectl exec eric-data-document-database-pg-0 -n "${NAMESPACE}" -- pg_dump -U postgres -d idam -f /root/db.idam.dump --disable-triggers --clean
+kubectl exec eric-data-document-database-pg-0 -n "${NAMESPACE}" -- pg_dump -U postgres -d "${MODEL_CATALOGUE_SERVICE_ORIGINAL_DB}" -f /root/db.model-catalogue-service.dump --disable-triggers --clean
+kubectl exec eric-data-document-database-pg-0 -n "${NAMESPACE}" -- pg_dump -U postgres -d "${AUTHOR_SERVICE_ORIGINAL_DB}" -f /root/db.author-service.dump --disable-triggers --clean
+....
++
+. Copy the dump files from the pod to the current directory:
++
+....
+kubectl cp "${NAMESPACE}/eric-data-document-database-pg-0:/root/db.idam.dump" .
+kubectl cp "${NAMESPACE}/eric-data-document-database-pg-0:/root/db.model-catalogue-service.dump" .
+kubectl cp "${NAMESPACE}/eric-data-document-database-pg-0:/root/db.author-service.dump" .
+....
++
+. Remove the dump files from the container:
++
+....
+kubectl exec eric-data-document-database-pg-0 -n ${NAMESPACE} -- rm -rf "/root/db.*.dump"
+....
+
+[[RestoreDatabase]]
+=== Restore Database
+
+*Prerequisites:*
+
+* MXE installed on a Kubernetes cluster
+* No model is onboarded
+* There is no ongoing onboard operation
+
+.*Create a backup:*
+. Set environment variable for reusability:
++
+....
+export NAMESPACE=<mxe-namespace>
+....
++
+. Copy database dump files to the `eric-data-document-database-pg-0` pod:
++
+....
+kubectl cp ./db.idam.dump ${NAMESPACE}/eric-data-document-database-pg-0:/root/db.idam.dump
+kubectl cp ./db.model-catalogue-service.dump ${NAMESPACE}/eric-data-document-database-pg-0:/root/db.model-catalogue-service.dump
+kubectl cp ./db.author-service.dump ${NAMESPACE}/eric-data-document-database-pg-0:/root/db.author-service.dump
+....
++
+. Restore the database from the dump files:
++
+....
+MODEL_CATALOGUE_SERVICE_DB=$(kubectl get pod -n "${NAMESPACE}" -o json -l app.kubernetes.io/part-of=mxe,app.kubernetes.io/component=model-catalogue-service | jq -r '.items[0].spec.containers | map(select(.name = "mxe-model-catalogue-service")) | .[0].env | map(select(.name == "POSTGRESQL_DB")) | .[0].value')
+AUTHOR_SERVICE_DB=$(kubectl get pod -n "${NAMESPACE}" -o json -l app.kubernetes.io/part-of=mxe,app.kubernetes.io/component=author-service | jq -r '.items[0].spec.containers | map(select(.name = "mxe-model-catalogue-service")) | .[0].env | map(select(.name == "POSTGRESQL_DB")) | .[0].value')
+
+kubectl exec eric-data-document-database-pg-0 -n ${NAMESPACE} -- psql -U postgres -d idam -f /root/db.idam.dump
+kubectl exec eric-data-document-database-pg-0 -n ${NAMESPACE} -- psql -U postgres -d ${MODEL_CATALOGUE_SERVICE_DB} -f /root/db.model-catalogue-service.dump
+kubectl exec eric-data-document-database-pg-0 -n ${NAMESPACE} -- psql -U postgres -d ${AUTHOR_SERVICE_DB} -f /root/db.author-service.dump
+....
++
+. Remove the dump files from the container:
++
+....
+kubectl exec eric-data-document-database-pg-0 -n ${NAMESPACE} -- rm -rf "/root/db.*.dump"
+....
+
+[[RestoreKeycloakClientsecret]]
+=== Restore Keycloak Client-secret
+
+After database restore, Gatekeeper's configuration does not match with Keycloak's, so a manual configuration update is needed.
+
+*Prerequisites:*
+
+* Keycloak administrator username and password
+* Kubectl and jq are installed
+* Cluster is accessible
+
+.*Restore keycloak client-secret:*
+. Set environment variable for reusability:
++
+....
+export NAMESPACE=<mxe-namespace>
+....
++
+NOTE: If the installation guide was followed, then `<mxe-namespace>` should be `mxe`.
++
+. Replace the client secret for Gatekeeper with the following script:
++
+....
+# Restart and wait for Keycloak
+kubectl delete pod -n ${NAMESPACE} -l app=eric-sec-access-mgmt
+kubectl rollout status -n ${NAMESPACE} statefulset/eric-sec-access-mgmt
+
+# Restart and wait for Gatekeeper
+kubectl delete pod -n ${NAMESPACE} -l "app.kubernetes.io/part-of=mxe,app.kubernetes.io/component=gatekeeper"
+kubectl rollout status -n ${NAMESPACE} deployment/eric-mxe-gatekeeper --watch
+....
+
+[[BackupandRestoreContainerRegistry]]
+== Backup and Restore Container Registry
+
+[[BackupContainerRegistry]]
+=== Backup Container Registry
+
+*Prerequisites:*
+
+* Backup of DB content is performed as described in <<BackupDatabase,Backup Database>>
+
+.*Backup container registry:*
+
+. Set environment variable for reusability:
++
+....
+export NAMESPACE=<mxe-namespace>
+....
++
+. Make tar package of the registry:
++
+....
+kubectl exec eric-lcm-container-registry-registry-0 -n ${NAMESPACE} -- tar -zcvC /var/lib/registry -f /tmp/registry-data.tgz .
+....
++
+. Copy the tar package from old container registry to the current working directory:
++
+....
+kubectl cp ${NAMESPACE}/eric-lcm-container-registry-registry-0:/tmp/registry-data.tgz .
+....
++
+. Remove the tar package from the container:
++
+....
+kubectl exec eric-lcm-container-registry-registry-0 -n ${NAMESPACE} -- rm /tmp/registry-data.tgz
+....
+
+[[RestoreContainerRegistry]]
+=== Restore Container Registry
+
+*Prerequisites:*
+
+* MXE installed on a Kubernetes cluster
+* No model is onboarded
+* There is no ongoing onboard operation
+* DB is restored from backup as described in <<RestoreDatabase,Restore Database>>
+
+.*Restore container registry:*
+
+. Set environment variable for reusability:
++
+....
+export NAMESPACE=<mxe-namespace>
+....
++
+. Copy the tar package from the current working directory to the new container registry:
++
+....
+kubectl cp registry-data.tgz ${NAMESPACE}/eric-lcm-container-registry-registry-0:/tmp/registry-data.tgz
+....
++
+. Remove existing data from registry:
++
+....
+kubectl exec eric-lcm-container-registry-registry-0 -n ${NAMESPACE} -- rm -rf "/var/lib/registry/*"
+....
++
+. Extract the tar archive to the registry directory:
++
+....
+kubectl exec eric-lcm-container-registry-registry-0 -n ${NAMESPACE} -- tar -zxvC /var/lib/registry -f /tmp/registry-data.tgz
+....
++
+. Remove the tar archive from the container:
++
+....
+kubectl exec eric-lcm-container-registry-registry-0 -n ${NAMESPACE} -- rm -rf /tmp/registry-data.tgz
+....
+
+[[BackupandRestoreModelServices]]
+== Backup and Restore Model Services
+
+[[BackupModelServices]]
+=== Backup Model Services
+
+*Prerequisites:*
+
+* Backup of DB content is performed as described in <<BackupDatabase,Backup Database>>
+* Backup of the container registry content is performed as described in <<BackupContainerRegistry,Backup Container Registry>>
+* A terminal where kubectl is installed and cluster is accessible
+
+.*Backup model services:*
+
+. Login to the terminal where kubectl is installed and cluster is accessible.
+. Set environment variable for reusability:
++
+....
+export NAMESPACE=<mxe-namespace>
+....
++
+. Export running model service configurations:
++
+....
+kubectl get SeldonDeployment -n ${NAMESPACE} -o yaml > ./ModelServicesBackup.yaml
+....
+
+[[RestoreModelServices]]
+=== Restore Model Services
+
+*Prerequisites:*
+
+* MXE installed on a Kubernetes cluster
+* DB is restored from backup as described in <<RestoreDatabase,Restore Database>>
+* Container registry is restored as described in <<RestoreContainerRegistry,Restore Container Registry>>
+* A terminal where kubectl is installed and cluster is accessible
+
+.*Restore model services:*
+
+. Login to the terminal where kubectl is installed and cluster is accessible.
+. Set environment variable for reusability:
++
+....
+export NAMESPACE=<mxe-namespace>
+....
++
+. Create model services:
++
+....
+kubectl apply -n ${NAMESPACE} -f ./ModelServicesBackup.yaml --validate=false
+....
+
+[[BackupandRestoreNiFiFlowsofRepositoryandDeployments]]
+== Backup and Restore NiFi Flows of Repository and Deployments
+
+[[BackupNiFiFlowsofRepositoryandDeployments]]
+=== Backup NiFi Flows of Repository and Deployments
+
+WARNING: Do not modify the result of the backup snippets otherwise the restore procedure will not work. Set only the backup location and the namespace where MXE is installed.
+
+WARNING: The current working directory is used as the backup location, and must not contain folders such as `nifi-flow-repository-backups` or `nifi-deployment-flow-backups`
+
+*Prerequisites:*
+
+* Minio client(`mc`) is installed: https://min.io/download[]
+* `jq` is installed: https://stedolan.github.io/jq/download/[]
+
+.*Backup flow repository:*
+
+. Set environment variable for reusability:
++
+....
+export NAMESPACE=<mxe-namespace>
+export MINIO_LOCAL_PORT=52674
+....
++
+. Execute the following snippet to back up all of the flows that are stored in the MXE flow repository:
++
+....
+export MINIO_SERVICE=eric-data-object-storage-mn
+export MINIO_ADMIN_SECRET_NAME=eric-data-object-storage-mn-secret
+
+kubectl port-forward -n "${NAMESPACE}" "service/${MINIO_SERVICE}" "${MINIO_LOCAL_PORT}:9000" &
+sleep 5
+
+MINIO_ACCESS_KEY=$(kubectl get secret -n "${NAMESPACE}" "${MINIO_ADMIN_SECRET_NAME}" -o json | jq -r '.data.accesskey' | base64 --decode --ignore-garbage)
+MINIO_SECRET_KEY=$(kubectl get secret -n "${NAMESPACE}" "${MINIO_ADMIN_SECRET_NAME}" -o json | jq -r '.data.secretkey' | base64 --decode --ignore-garbage)
+MINIO_BUCKET=$(kubectl get secret -n "${NAMESPACE}" -l app.kubernetes.io/component=nifi-service-service-minio-user-secret -o json | jq -r '.items[0].data.bucket' | base64 --decode --ignore-garbage)
+
+mc config host add flowrepository "http://127.0.0.1:${MINIO_LOCAL_PORT}" "${MINIO_ACCESS_KEY}" "${MINIO_SECRET_KEY}"
+
+mc cp -r -a "flowrepository/${MINIO_BUCKET}/" nifi-flow-repository-backups/
+
+mc config host rm flowrepository
+kill %1
+....
+
+.*Backup flow deployments:*
+
+. Set environment variable for reusability:
++
+....
+export NAMESPACE=<mxe-namespace>
+export MINIO_LOCAL_PORT=52674
+....
++
+. Execute the following snippet to backup the data of the flow deployments:
++
+....
+for deployment in $(kubectl get statefulsets --namespace=${NAMESPACE} -l 'app.kubernetes.io/component in (nifi), app.kubernetes.io/part-of in (mxe)' --no-headers --output=custom-columns=":metadata.labels['app\.kubernetes\.io/name']");
+do
+    printf "Backing up flow of Nifi deployment $deployment...";
+    replicas=$(kubectl get statefulset --namespace=${NAMESPACE} -l "app.kubernetes.io/name in (${deployment})" --output=json | jq -j '.items[].spec.replicas');
+    nifi_image=$(kubectl get statefulset --namespace=${NAMESPACE} -l "app.kubernetes.io/name in (${deployment})" --output=json | jq -r '.items[].spec.template.spec.containers[].image');
+    pod=$(kubectl get pods --namespace=${NAMESPACE} -l "app.kubernetes.io/name in (${deployment})" --no-headers --output=custom-columns=":metadata.name" | head -n 1);
+    base_filename=./nifi-deployment-flow-backups/mxe-flow-backup.nifi-deployment-backup-flow.$(date +"%s").${deployment}.${replicas}.xml.gz;
+    kubectl cp ${NAMESPACE}/${pod}:conf/flow.xml.gz ${base_filename};
+    echo ${nifi_image} >> ${base_filename}.image
+    printf " Done\n";
+done
+....
+
+[[RestoreNiFiFlowsofRepositoryandDeployments]]
+=== Restore NiFi Flows of Repository and Deployments
+
+*Prerequisites:*
+
+* MXE installed on a Kubernetes cluster
+* MXE command line utilities (`mxe-flow`) are available with proper version (matching the version of MXE installation) and they can interact with the MXE cluster
+* Minio client(`mc`) is installed: https://min.io/download[]
+* `jq` is installed: https://stedolan.github.io/jq/download/[]
+
+.*Restore flow repository:*
+
+. Set environment variable for reusability:
++
+....
+export NAMESPACE=<mxe-namespace>
+export MINIO_LOCAL_PORT=52674
+....
++
+. Execute the following snippet to restore the backup flows to repository:
++
+....
+export MINIO_SERVICE=eric-data-object-storage-mn
+export MINIO_ADMIN_SECRET_NAME=eric-data-object-storage-mn-secret
+
+kubectl port-forward -n "${NAMESPACE}" "service/${MINIO_SERVICE}" "${MINIO_LOCAL_PORT}:9000" &
+sleep 5
+
+MINIO_ACCESS_KEY=$(kubectl get secret -n "${NAMESPACE}" "${MINIO_ADMIN_SECRET_NAME}" -o json | jq -r '.data.accesskey' | base64 --decode --ignore-garbage)
+MINIO_SECRET_KEY=$(kubectl get secret -n "${NAMESPACE}" "${MINIO_ADMIN_SECRET_NAME}" -o json | jq -r '.data.secretkey' | base64 --decode --ignore-garbage)
+MINIO_BUCKET=$(kubectl get secret -n "${NAMESPACE}" -l app.kubernetes.io/component=nifi-service-service-minio-user-secret -o json | jq -r '.items[0].data.bucket' | base64 --decode --ignore-garbage)
+
+mc config host add flowrepository "http://127.0.0.1:${MINIO_LOCAL_PORT}" "${MINIO_ACCESS_KEY}" "${MINIO_SECRET_KEY}"
+
+mc cp -r -a nifi-flow-repository-backups/ "flowrepository/${MINIO_BUCKET}/"
+
+mc config host rm flowrepository
+kill %1
+....
+
+.*Restore flow deployments:*
+
+. Set the environment variable for re-usability:
++
+....
+export NAMESPACE=<mxe-namespace>
+export MINIO_LOCAL_PORT=52674
+....
++
+. Execute the following snippet to restore backup flow deployments to repository and start Nifi deployments:
++
+....
+export MINIO_SERVICE=eric-data-object-storage-mn
+export MINIO_ADMIN_SECRET_NAME=eric-data-object-storage-mn-secret
+
+kubectl port-forward -n "${NAMESPACE}" "service/${MINIO_SERVICE}" "${MINIO_LOCAL_PORT}:9000" &
+sleep 5
+
+MINIO_ACCESS_KEY=$(kubectl get secret -n "${NAMESPACE}" "${MINIO_ADMIN_SECRET_NAME}" -o json | jq -r '.data.accesskey' | base64 --decode --ignore-garbage)
+MINIO_SECRET_KEY=$(kubectl get secret -n "${NAMESPACE}" "${MINIO_ADMIN_SECRET_NAME}" -o json | jq -r '.data.secretkey' | base64 --decode --ignore-garbage)
+MINIO_BUCKET=$(kubectl get secret -n "${NAMESPACE}" -l app.kubernetes.io/component=nifi-service-service-minio-user-secret -o json | jq -r '.items[0].data.bucket' | base64 --decode --ignore-garbage)
+
+mc config host add flowrepository "http://127.0.0.1:${MINIO_LOCAL_PORT}" "${MINIO_ACCESS_KEY}" "${MINIO_SECRET_KEY}"
+
+for flow in $(ls -1 --ignore=\*.image ./nifi-deployment-flow-backups);
+do
+    deployment_name=$(cut --delimiter=. --fields=4 <<< "${flow}");
+    instances=$(cut --delimiter=. --fields=5 <<< "${flow}");
+    printf "Restoring flow of Nifi deployment to flow repository...";
+    mc cp -a ./nifi-deployment-flow-backups/${flow} "flowrepository/${MINIO_BUCKET}/${flow}"
+    printf " Done\n";
+    echo "Restoring Nifi deployment ${deployment_name} with ${instances} instances...";
+    nifi_image=$(head --lines=1 ./nifi-deployment-flow-backups/${flow}.image);
+    mxe-flow deploy --flow-name ${flow} --name ${deployment_name} --instances ${instances} --image ${nifi_image};
+    printf " Done\n";
+done
+
+mc config host rm flowrepository
+kill %1
+....
+
+[[BackupandRestoreTrainingJobResults]]
+== Backup and Restore Training Job Results
+
+[[BackupTrainingJobResults]]
+=== Backup Training Job Results
+
+WARNING: The current working directory is used as the backup location, and must not contain folders such as `training-job-results`.
+
+*Prerequisites:*
+
+* Minio client(`mc`) is installed: https://min.io/download[]
+* `jq` is installed: https://stedolan.github.io/jq/download/[]
+
+.*Backup training job results:*
+
+. Set environment variable for reusability:
++
+....
+export NAMESPACE=<mxe-namespace>
+export MINIO_LOCAL_PORT=52674
+....
++
+. Execute the following snippet to back up all of the flows that are stored in the MXE flow repository:
++
+....
+export MINIO_SERVICE=eric-data-object-storage-mn
+export MINIO_ADMIN_SECRET_NAME=eric-data-object-storage-mn-secret
+
+kubectl port-forward -n "${NAMESPACE}" "service/${MINIO_SERVICE}" "${MINIO_LOCAL_PORT}:9000" &
+sleep 5 
+
+MINIO_ACCESS_KEY=$(kubectl get secret -n "${NAMESPACE}" "${MINIO_ADMIN_SECRET_NAME}" -o json | jq -r '.data.accesskey' | base64 --decode --ignore-garbage)
+MINIO_SECRET_KEY=$(kubectl get secret -n "${NAMESPACE}" "${MINIO_ADMIN_SECRET_NAME}" -o json | jq -r '.data.secretkey' | base64 --decode --ignore-garbage)
+MINIO_BUCKET=$(kubectl get secret -n "${NAMESPACE}" -l app.kubernetes.io/component=model-catalogue-service-tjr-service-minio-user-secret -o json | jq -r '.items[0].data.bucket' | base64 --decode --ignore-garbage)
+
+mc config host add trainingjobresults "http://127.0.0.1:${MINIO_LOCAL_PORT}" "${MINIO_ACCESS_KEY}" "${MINIO_SECRET_KEY}"
+
+mc cp -r -a "trainingjobresults/${MINIO_BUCKET}/" training-job-result-backups/
+
+mc config host rm trainingjobresults
+kill %1
+....
+
+[[RestoreTrainingJobResults]]
+=== Restore Training Job Results
+
+*Prerequisites:*
+
+* MXE installed on a Kubernetes cluster
+* Minio client(`mc`) is installed: https://min.io/download[]
+* `jq` is installed: https://stedolan.github.io/jq/download/[]
+
+.*Restore training job results:*
+
+. Set environment variable for reusability:
++
+....
+export NAMESPACE=<mxe-namespace>
+....
++
+. Execute the following snippet to restore the backup flows to repository:
++
+....
+export MINIO_SERVICE=eric-data-object-storage-mn
+export MINIO_ADMIN_SECRET_NAME=eric-data-object-storage-mn-secret
+ 
+kubectl port-forward -n "${NAMESPACE}" "service/${MINIO_SERVICE}" "${MINIO_LOCAL_PORT}:9000" &
+sleep 5
+
+MINIO_ACCESS_KEY=$(kubectl get secret -n "${NAMESPACE}" "${MINIO_ADMIN_SECRET_NAME}" -o json | jq -r '.data.accesskey' | base64 --decode --ignore-garbage)
+MINIO_SECRET_KEY=$(kubectl get secret -n "${NAMESPACE}" "${MINIO_ADMIN_SECRET_NAME}" -o json | jq -r '.data.secretkey' | base64 --decode --ignore-garbage)
+MINIO_BUCKET=$(kubectl get secret -n "${NAMESPACE}" -l app.kubernetes.io/component=model-catalogue-service-tjr-service-minio-user-secret -o json | jq -r '.items[0].data.bucket' | base64 --decode --ignore-garbage)
+
+mc config host add trainingjobresults "http://127.0.0.1:${MINIO_LOCAL_PORT}" "${MINIO_ACCESS_KEY}" "${MINIO_SECRET_KEY}"
+
+mc cp -r -a training-job-result-backups/ "trainingjobresults/${MINIO_BUCKET}/"
+
+mc config host rm trainingjobresults
+kill %1
+....
+
+[[BackupandRestoreArgo]]
+== Backup and Restore Argo
+
+[[BackupArgo]]
+=== Backup Argo
+
+*Prerequisites:*
+
+* Minio client(`mc`) is installed: https://min.io/download[]
+* `jq` is installed: https://stedolan.github.io/jq/download/[]
+
+.*Backup argo:*
+
+. Set environment variable for reusability:
++
+....
+export NAMESPACE=<mxe-namespace>
+export MINIO_LOCAL_PORT=52674
+....
++
+. Execute the following snippet to back up all of the flows that are stored in the MXE flow repository:
++
+WARNING: The following code is designed for bash. If any other shell is used then, replace `mapfile` with the solution of the used shell.
+
+....
+export MINIO_SERVICE=eric-data-object-storage-mn
+export MINIO_ADMIN_SECRET_NAME=eric-data-object-storage-mn-secret
+export MINIO_ARGO_BUCKET=mxe-argo-artifacts
+
+kubectl port-forward -n "${NAMESPACE}" "service/${MINIO_SERVICE}" "${MINIO_LOCAL_PORT}:9000" &
+sleep 5
+
+MINIO_ACCESS_KEY=$(kubectl get secret -n "${NAMESPACE}" "${MINIO_ADMIN_SECRET_NAME}" -o json | jq -r '.data.accesskey' | base64 --decode --ignore-garbage)
+MINIO_SECRET_KEY=$(kubectl get secret -n "${NAMESPACE}" "${MINIO_ADMIN_SECRET_NAME}" -o json | jq -r '.data.secretkey' | base64 --decode --ignore-garbage)
+
+mc config host add argominiobackup "http://127.0.0.1:${MINIO_LOCAL_PORT}" "${MINIO_ACCESS_KEY}" "${MINIO_SECRET_KEY}"
+
+mapfile -t workflows < <(kubectl get workflows -n "${NAMESPACE}" -o json | jq -c -r '.items[]')
+
+for workflow in "${workflows[@]}";
+do
+    name=$(jq -r '.metadata.name' <<< "${workflow}")
+    mkdir -p "argo-backups/${name}"
+    kubectl get workflows -n "${NAMESPACE}" "${name}" -o yaml > "argo-backups/${name}/manifest.yaml"
+    mc cp -r -a "argominiobackup/${MINIO_ARGO_BUCKET}/${name}/" "argo-backups/${name}/artifacts/"
+
+    mapfile -t pods < <(kubectl get pods -n "${NAMESPACE}" -o json -l "workflows.argoproj.io/workflow=${name}" | jq -c -r '.items[]')
+
+    mkdir -p "argo-backups/${name}/logs"
+ 
+    for pod in "${pods[@]}";
+    do
+        pod_name=$(jq -r '.metadata.name' <<< "${pod}")
+       
+        kubectl logs -n "${NAMESPACE}" -c main "${pod_name}" > "argo-backups/${name}/logs/${pod_name}.log"
+    done
+done 
+
+mc config host rm argominiobackup
+kill %1
+....
+
+[[Restoreargo]]
+=== Restore Argo
+
+.*Restore argo:*
+
+. Set environment variable for reusability:
++
+....
+export NAMESPACE=<mxe-namespace>
+export MINIO_LOCAL_PORT=52674
+....
++
+. Execute the following snippet to restore the backup flows to repository:
++
+....
+export MINIO_SERVICE=eric-data-object-storage-mn
+export MINIO_ADMIN_SECRET_NAME=eric-data-object-storage-mn-secret
+export MINIO_ARGO_BUCKET=mxe-argo-artifacts
+
+kubectl port-forward -n "${NAMESPACE}" "service/${MINIO_SERVICE}" "${MINIO_LOCAL_PORT}:9000" &
+sleep 5
+
+MINIO_ACCESS_KEY=$(kubectl get secret -n "${NAMESPACE}" "${MINIO_ADMIN_SECRET_NAME}" -o json | jq -r '.data.accesskey' | base64 --decode --ignore-garbage)
+MINIO_SECRET_KEY=$(kubectl get secret -n "${NAMESPACE}" "${MINIO_ADMIN_SECRET_NAME}" -o json | jq -r '.data.secretkey' | base64 --decode --ignore-garbage)
+
+mc config host add argominiobackup "http://127.0.0.1:${MINIO_LOCAL_PORT}" "${MINIO_ACCESS_KEY}" "${MINIO_SECRET_KEY}"
+
+for workflow in $(ls -1 ./argo-backups);
+do
+    kubectl apply -f "argo-backups/${workflow}/manifest.yaml"
+    mc cp -r -a "argo-backups/${workflow}/artifacts/" "argominiobackup/${MINIO_ARGO_BUCKET}/${workflow}/"
+done
+....

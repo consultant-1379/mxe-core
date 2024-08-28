@@ -1,0 +1,56 @@
+spec:
+  template:
+    spec:
+      volumes:
+        - name: kubernetes-run-script
+          configMap:
+            name: ###CONFIG_MAP_NAME###
+            defaultMode: 420
+      containers:
+        - name: eric-mxe-gitea-certificate-sidecar
+          image: >-
+            ###IMAGE_NAME###
+          env:
+            - name: SOURCE
+              value: /pg-ssl/gitea/
+            - name: DESTINATION
+              value: /data/git/.postgresql
+            - name: RUN_COMMAND
+              value: >-
+                cp -f ${SOURCE}/clicert.pem  ${DESTINATION}/postgresql.crt;cp -f ${SOURCE}/cliprivkey.pem ${DESTINATION}/postgresql.key;chown -R 1000:1000 ${DESTINATION}/;chmod 400 ${DESTINATION}/*
+          resources:
+            limits:
+              ephemeral-storage: 100Mi
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              ephemeral-storage: 50Mi
+              memory: 200Mi
+          volumeMounts:
+            - name: gitea-pg-certificate
+              readOnly: true
+              mountPath: "/pg-ssl/gitea"
+            - name: kubernetes-run-script
+              readOnly: true
+              mountPath: /etc/kubernetes-run-script
+            - name: data
+              mountPath: /data
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+          securityContext:
+            capabilities:
+              add:
+                - chown
+                - dac_override
+                - fowner
+                - setgid
+                - setuid
+                - net_bind_service
+              drop:
+                - all
+            privileged: false
+            runAsUser: 1000
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false

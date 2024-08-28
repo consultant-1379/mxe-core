@@ -1,0 +1,15 @@
+/* style goes here */
+:host {
+  display: block;
+  margin-bottom: -24px;
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.button-wrapper .button {
+  margin-left: 8px;
+}

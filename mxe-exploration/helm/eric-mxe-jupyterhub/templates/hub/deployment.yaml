@@ -1,0 +1,220 @@
+{{- $global := fromJson (include "eric-mxe-jupyterhub.global" .) -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "eric-mxe-jupyterhub.hub-name" . | quote }}
+  labels:
+    app.kubernetes.io/component: "jupyterhub-hub"
+    app.kubernetes.io/name: {{ include "eric-mxe-jupyterhub.hub-name" . | quote }}
+    {{- include "eric-mxe-jupyterhub.labels" . | nindent 4 }}
+  annotations: {{ include "eric-mxe-jupyterhub.annotations" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: "mxe"
+      app.kubernetes.io/component: "jupyterhub-hub"
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+      {{- include "eric-mxe-jupyterhub.matchLabels" . | nindent 6 }}
+  strategy:
+    {{- .Values.hub.deploymentStrategy | toYaml | trimSuffix "\n" | nindent 4 }}
+  template:
+    metadata:
+      labels:
+        {{- $hubDeploymentLabels := include "eric-mxe-jupyterhub.hub-deployment-labels" . | fromYaml -}}
+        {{- $matchLabels := include "eric-mxe-jupyterhub.matchLabels" . | fromYaml -}}
+        {{- $istioLabels := include "eric-mxe-jupyterhub.istio-sidecar-labels" . | fromYaml -}}
+        {{- $labels := include "eric-mxe-jupyterhub.labels" . | fromYaml -}}
+        {{- $hubLabels := .Values.hub.labels -}}
+        {{- include "eric-mxe-jupyterhub.mergeLabels" (dict "location" .Template.Name "sources" (list $hubDeploymentLabels $matchLabels $istioLabels $hubLabels $labels )) | trim | nindent 8 }}
+      annotations:
+        {{- $annotations := include "eric-mxe-jupyterhub.annotations" . | fromYaml -}}
+        {{- $istioSCAnnotations := include "eric-mxe-jupyterhub.istio-sidecar-annotations" . | fromYaml -}}
+        {{- $deployAnnotations := include "eric-mxe-jupyterhub.hub-deployment-annotations" . | fromYaml -}}
+        {{- $hubAnnotations := .Values.hub.annotations -}}
+        {{- $prometheusAnn := include "eric-mxe-jupyterhub.prometheus-annotations" . | fromYaml -}}
+        {{- include "eric-mxe-jupyterhub.mergeAnnotations" (dict "location" .Template.Name "sources" (list $hubAnnotations  $deployAnnotations $istioSCAnnotations $annotations $prometheusAnn )) | trim | nindent 8 }}
+    spec:
+      {{- if (or .Values.nodeSelector .Values.hub.nodeSelector $global.nodeSelector) }}
+      nodeSelector: {{- include "eric-mxe-jupyterhub.hub-nodeSelector" . | nindent 8 }}
+      {{- end }}
+      {{- include "eric-mxe-jupyterhub.coreAffinity" . | nindent 6 }}
+      {{- if include "eric-mxe-jupyterhub.hub.podPriority" . }}
+      priorityClassName: {{- include "eric-mxe-jupyterhub.hub.podPriority" . | indent 2 }}
+      {{- end }}
+      volumes:
+        - name: usr-tmp
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: {{ include "eric-mxe-jupyterhub.hub-config-name" . | quote }}
+        - name: secret
+          secret:
+            secretName: {{ include "eric-mxe-jupyterhub.hub-secret-name" . | quote }}
+        {{- include "eric-mxe-jupyterhub-hub.pg-cert-volumes" . | nindent 8 }}  
+        {{- if .Values.hub.extraFiles }}
+        - name: files
+          secret:
+            secretName: {{ include "jupyterhub.hub.fullname" . }}
+            items:
+              {{- range $file_key, $file_details := .Values.hub.extraFiles }}
+              - key: {{ $file_key | quote }}
+                path: {{ $file_key | quote }}
+                {{- with $file_details.mode }}
+                mode: {{ . }}
+                {{- end }}
+              {{- end }}
+        {{- end }}
+        {{- with .Values.hub.extraVolumes }}
+        {{- . | toYaml | nindent 8 }}
+        {{- end }}
+        {{- if eq .Values.hub.db.type "sqlite-pvc" }}
+        - name: pvc
+          persistentVolumeClaim:
+            claimName: {{ include "eric-mxe-jupyterhub.hub-pvc-name" . | quote }}
+            
+        {{- end }}
+      {{- if .Values.rbac.enabled }}
+      serviceAccountName: {{ include "eric-mxe-jupyterhub.hub-service-account-name" . | quote }}
+      {{- end }} 
+      securityContext:
+        runAsUser: {{ .Values.hub.uid }}
+        fsGroup: {{ include "eric-mxe-jupyterhub.fsGroup.coordinated" . }}
+      {{- include "eric-mxe-jupyterhub.image-pull-secrets" . | nindent 6 }}
+      {{- with .Values.hub.initContainers }}
+      initContainers:
+        {{- . | toYaml | nindent 8 }}
+      {{- end }}
+      containers:
+        {{- with .Values.hub.extraContainers }}
+        {{- . | toYaml | nindent 8 }}
+        {{- end }}
+        - name: hub
+          {{- with .Values.imageCredentials.hub }}
+          image: "{{ include "eric-mxe-jupyterhub.setImageRepo" (list $ .registry.url .repoPath "hub") }}{{ $.Values.images.hub.name }}:{{ $.Values.images.hub.tag }}"
+          {{- end }}
+          command:
+            - jupyterhub
+            - --config
+            - /run/secrets/usr/local/etc/jupyterhub/jupyterhub_config.py
+            {{- if .Values.debug.enabled }}
+            - --debug
+            {{- end }}
+            {{- /*
+            We want to do automatic upgrades for sqlite-pvc by default, but
+            allow users to opt out of that if they want. Users using their own
+            db need to 'opt in' Go Templates treat nil and "" and false as
+            'false', making this code complex. We can probably make this a
+            one-liner, but doing combinations of boolean vars in go templates is
+            very inelegant & hard to reason about.
+            */}}
+            {{- $upgradeType := typeOf .Values.hub.db.upgrade }}
+            {{- if eq $upgradeType "bool" }}
+            {{- /* .Values.hub.db.upgrade has been explicitly set to true or false */}}
+            {{- if .Values.hub.db.upgrade }}
+            - --upgrade-db
+            {{- end }}
+            {{- else if eq $upgradeType "<nil>" }}
+            {{- /* .Values.hub.db.upgrade is nil */}}
+            {{- if eq .Values.hub.db.type "sqlite-pvc" }}
+            - --upgrade-db
+            {{- end }}
+            {{- end }}
+          {{- include "eric-mxe-jupyterhub.usercontainer-security-context" . | nindent 10 }}
+          volumeMounts:
+            - mountPath: /var/tmp
+              name: usr-tmp
+            - mountPath: /run/secrets/usr/local/etc/jupyterhub/jupyterhub_config.py
+              subPath: jupyterhub_config.py
+              name: config
+            - mountPath: /run/secrets/usr/local/etc/jupyterhub/z2jh.py
+              subPath: z2jh.py
+              name: config
+            - mountPath: /run/secrets/usr/local/etc/jupyterhub/config/
+              name: config
+            - mountPath: /run/secrets/usr/local/etc/jupyterhub/secret/
+              name: secret
+            {{- include "eric-mxe-jupyterhub.pg-cert-volume-mounts" . | nindent 12 }}
+            {{- range $file_key, $file_details := .Values.hub.extraFiles }}
+            - mountPath: {{ $file_details.mountPath }}
+              subPath: {{ $file_key | quote }}
+              name: files
+            {{- end }}
+            {{- with .Values.hub.extraVolumeMounts }}
+            {{- . | toYaml | nindent 12 }}
+            {{- end }}
+            {{- if eq .Values.hub.db.type "sqlite-pvc" }}
+            - mountPath: /home/eric-mxe-jupyterhub
+              name: pvc
+              {{- with .Values.hub.db.pvc.subPath }}
+              subPath: {{ . | quote }}
+              {{- end }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources.hub | trim | nindent 12 }}
+          imagePullPolicy: {{ include "eric-mxe-jupyterhub.registryImagePullPolicy" (list . (index .Values "imageCredentials" "hub" "registry" "imagePullPolicy")) }}
+          env:
+            - name: "HUB_SERVICE_HOST"
+              value: "$({{ include "eric-mxe-jupyterhub.env-hub-service-host" . }})"
+            - name: "HUB_SERVICE_PORT"
+              value: "$({{ include "eric-mxe-jupyterhub.env-hub-service-port" . }})"
+            - name: "PROXY_API_SERVICE_HOST"
+              value: "$({{ include "eric-mxe-jupyterhub.env-hub-proxy-api-service-host" . }})"
+            - name: "PROXY_API_SERVICE_PORT"
+              value: "$({{ include "eric-mxe-jupyterhub.env-hub-proxy-api-service-port" . }})"
+            - name: "PROXY_PUBLIC_SERVICE_HOST"
+              value: "$({{ include "eric-mxe-jupyterhub.env-hub-proxy-public-service-host" . }})"
+            - name: "PROXY_PUBLIC_SERVICE_PORT"
+              value: "$({{ include "eric-mxe-jupyterhub.env-hub-proxy-public-service-port" . }})"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: HELM_RELEASE_NAME
+              value: {{ .Release.Name | quote }}
+            {{- if .Values.hub.cookieSecret }}
+            - name: JPY_COOKIE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-jupyterhub.hub-secret-name" . | quote }}
+                  key: hub.cookie-secret
+            {{- end }}
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CONFIGPROXY_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-jupyterhub.hub-secret-name" . | quote }}
+                  key: hub.config.ConfigurableHTTPProxy.auth_token
+            {{- if .Values.auth.state.enabled }}
+            - name: JUPYTERHUB_CRYPT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-jupyterhub.hub-secret-name" . | quote }}
+                  key: auth.state.crypto-key
+            {{- end }}
+            {{- if .Values.hub.db.password }}
+            {{- if eq .Values.hub.db.type "mysql" }}
+            - name: MYSQL_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-jupyterhub.hub-secret-name" . | quote }}
+                  key: hub.db.password
+            {{- else if eq .Values.hub.db.type "postgres" }}
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-jupyterhub.hub-secret-name" . | quote }}
+                  key: hub.db.password
+            {{- end }}
+            {{- end }}
+            - name: PIP_USER
+              value: "true"
+            {{- with .Values.hub.extraEnv }}
+            {{- include "jupyterhub.extraEnv" . | nindent 12 }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: 8081
+      {{- include "eric-mxe-jupyterhub.tolerations" . | nindent 6 }}
+      tolerations: {{ include "eric-mxe-jupyterhub.merge-tolerations" (dict "root" . "podbasename" "hub") | nindent 6}}

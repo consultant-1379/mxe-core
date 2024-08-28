@@ -1,0 +1,39 @@
+{{- if not .Values.global.mxeDisableDefaultIngressControllerUse -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "{{- include "mxe-commons.keycloak-oauth-ingress-default.name" . -}}"
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "eric-sec-access-mgmt-oauth-default"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: "{{- include "mxe-commons.keycloak-oauth-ingress-default.name" . -}}"
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    nginx.ingress.kubernetes.io/session-cookie-expires: "36000"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "36000"
+    nginx.ingress.kubernetes.io/proxy-body-size: 20G
+    nginx.ingress.kubernetes.io/proxy-buffer-size: 8k
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    nginx.ingress.kubernetes.io/backend-protocol: {{ include "mxe-commons.mesh-ingress-gw-protocol" . | quote }}
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+spec:
+  ingressClassName: {{ index .Values "keycloak" "ingress" "clusterWideIngressClass" | quote }}
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "mxe-commons.mesh-ingress-gw-svc-name" . | quote }}
+                port:
+                  number: {{ include "mxe-commons.mesh-ingress-gw-port" . }}
+      host: {{ include "mxe-commons.oauth-api-host" . | quote }}
+  tls:
+    - secretName: {{ .Values.global.mxeOauthApiTlsSecretName }}
+      hosts:
+        - {{ include "mxe-commons.oauth-api-host" . | quote }}
+{{ end }}

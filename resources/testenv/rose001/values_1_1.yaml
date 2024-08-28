@@ -1,0 +1,127 @@
+# Set values for Helm charts of MXE
+# This is a YAML-formatted file.
+
+### DO NOT CHANGE ANCHORS! ###
+
+# These fields are all mandatory. Please set them/change them according to your desire.
+
+# The storage class which will be used by MXE to create persistent volumes
+storageClass: &storageClass erikube-rbd
+
+# The domain name by which MXE's api and gui will be accessible
+# This must be different from registryHostname
+apiHostname: &apiHostname rose001.rnd.gic.ericsson.se
+
+# The name of a secret which contains a tls for the given hostname of the api
+apiSecretName: &apiSecretName api-tls
+
+# The domain name by which MXE's internal Docker registry will be accessible by Docker engines on Kubernetes nodes
+# This must be different from apiHostname
+registryHostname: &registryHostname eric-lcm-container-registry-ingress.rose001.rnd.gic.ericsson.se
+
+# The name of a secret which contains a tls for the given hostname of the Docker registry
+registrySecretName: &registrySecretName docker-registry-tls-bundle
+
+# The port by which MXE's internal registry will be accessible by Docker engines on Kubernetes nodes
+registryExternalPort: &registryExternalPort 443
+
+# Whether MXE will be accessible through a default ingress controller already present on the Kubernetes cluster, or a new internal one which will be installed by MXE.
+# If this is set to true then registryExternalPort must be the same as internalIngressHttpsPort.
+disableDefaultIngressControllerUse: &disableDefaultIngressControllerUse false
+
+# The port on which MXE will be accessible if no default ingress controller is used.
+internalIngressHttpsPort: &internalIngressHttpsPort 32222
+
+### DO NOT MODIFY BELOW THIS LINE! Only modify below this line if you know what you're doing! ###
+
+global:
+  # To secure MXE's API endpoint, a certificate must be stored in a secret. This secret must be in the mxe namespace.
+  # The name of the secret can be given with the next key.
+  mxeApiTlsSecretName: *apiSecretName
+
+  # To secure MXE's API endpoint, a hostname must be defined, through which the endpoint will be reachable.
+  # This hostname can be given with the next key.
+  mxeApiHostname: *apiHostname
+
+  # To secure MXE's API endpoint, a certificate must be stored in a secret. This secret must be in the mxe namespace.
+  # The name of the secret can be given with the next key.
+  mxeRegistryTlsSecretName: *registrySecretName
+
+  # To secure MXE's API endpoint, a hostname must be defined, through which the endpoint will be reachable.
+  # This hostname can be given with the next key.
+  mxeRegistryHostname: *registryHostname
+
+  # By default, MXE uses a default ingress controller.
+  # To use an internal one change the next setting to false. The behaviour of this ingress controller can be modified under mxe-ingress-controller key.
+  mxeDisableDefaultIngressControllerUse: *disableDefaultIngressControllerUse
+  registryHostname: *registryHostname
+
+eric-mxe-package-source-repository:
+  # Package source repository can be disabled. In default case, a new instance is created.
+  # If disabled then please specify the how Model catalogue service can reach a package source repository with mxe-model-catalogue-service.modelRepository keys.
+  # enabled:
+
+  persistentVolumeClaim:
+    # Set Storage class for package source repository
+    # If this is not set, then the default storage class will be used
+    storageClassName: nfs-client
+
+# With the next part, settings for the ingress controller which will be used, when a default one won't be used, can be changed.
+mxe-ingress-controller:
+  service:
+    # Set MXE cluster's port on which it will be reachable when it's not secured with a certificate. Allowed ports are between 30000 and 32767.
+    # If this is not set, then a random port will be used
+    httpPort: 32111
+
+    # Set MXE cluster's port on which it will be reachable when it's secured with a certificate. Allowed ports are between 30000 and 32767.
+    # If this is not set, then a random port will be used
+    httpsPort: *internalIngressHttpsPort
+
+# The model service which starts models in the cluster
+mxe-model-service:
+  dockerRegistry:
+    # The host name of the internal Docker registry. This will be used by the used Kubernetes cluster to start stored models
+    externalHostname: *registryHostname
+
+    # The port of the internal Docker registry. If the default ingress controller is disabled, then this will be the same as the internal ingress controller's port
+    externalPort: *registryExternalPort
+
+# Documentation of Seldon core's options: https://github.com/SeldonIO/seldon-core/blob/v0.2.6/helm-charts/seldon-core/values.yaml
+# seldon-core:
+
+# Documentation of Seldon core analytics' options: https://github.com/SeldonIO/seldon-core/tree/v0.2.6/helm-charts/seldon-core-analytics
+seldon-core-analytics:
+  enabled: false
+  persistence:
+    claim:
+      storageClassName: nfs-client
+
+# Document of Document Database PG's options: http://calstore.internal.ericsson.com/elex?LI=EN/LZN7020476/2R*&FN=1_1531-CAV10116_2Uen.*.html&HT=id_sjxl
+eric-data-document-database-pg:
+  persistence:
+    # The storage class which is used by Document database as a main storage. By default it tries to use erikube-rbd, and NOT the default storage class.
+    storageClassName: *storageClass
+
+    backup:
+      # The storage class which is used by Document database for backup purposes. By default it tries to use erikube-rbd, and NOT the default storage class.
+      storageClassName: *storageClass
+
+# Documentation of Docker registry's options: http://calstore.internal.ericsson.com/elex?LI=EN/LZN7020497/1R*&FN=1_1531-CAV10168_1Uen.*.html&HT=id_775u
+eric-lcm-container-registry:
+  ingress:
+    # It's mandatory to give a hostname, by which the Docker container will be accessible to nodes in the cluster
+    host: *registryHostname
+
+    tls:
+      # For ingress, https is forced by default. This means that the registry will work as a secure registry.
+      # For insecure registry, the next line should be uncommented.
+      enabled: *disableDefaultIngressControllerUse
+
+      # The certificate for https must be stored in a kubernetes tls secret.
+      # In the next line, the name of the secret must be given, if tls is enabled.
+      secretName: *registrySecretName
+  registry:
+    volumes:
+      data:
+        # The storage class which is used to store images. By default it uses the default storage class. If there is no default storage class, and it's not specified, then pod creation will fail.
+        storageClass: *storageClass

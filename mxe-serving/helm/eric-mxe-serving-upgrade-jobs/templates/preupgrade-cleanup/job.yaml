@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "eric-mxe-serving-upgrade-jobs.preupgrade-cleanup-name" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: preupgrade-cleanup-job"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-serving-upgrade-jobs.labels" . | fromYaml -}}
+    {{- include "eric-mxe-serving-upgrade-jobs.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $hook := printf "%s" "helm.sh/hook: pre-upgrade"  | fromYaml -}}
+    {{- $hookDeletePolicy := printf "%s" "helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation"  | fromYaml -}}
+    {{- $hookWeight := include "eric-mxe-serving-upgrade-jobs.hook-weight" 5 | fromYaml -}}
+    {{- $annotations := include "eric-mxe-serving-upgrade-jobs.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-serving-upgrade-jobs.mergeAnnotations" (dict "location" .Template.Name "sources" (list $hook $hookDeletePolicy $hookWeight $annotations)) | trim | nindent 4 }}
+spec:
+  completions: 1
+  parallelism: 1
+  backoffLimit: 3
+  template:
+    metadata:
+      annotations:
+        {{- $securityAnn := include "eric-mxe-serving-upgrade-jobs.security-annotations-preupgrade-cleanup" . | fromYaml -}}
+        {{- $istioAnn := include "eric-mxe-serving-upgrade-jobs.istio-annotations" . | fromYaml -}}
+        {{- $annotations := include "eric-mxe-serving-upgrade-jobs.annotations" . | fromYaml -}}
+        {{- include "eric-mxe-serving-upgrade-jobs.mergeAnnotations" (dict "location" .Template.Name "sources" (list $securityAnn $istioAnn $annotations)) | trim | nindent 8 }}
+      labels:
+        {{- $labels := include "eric-mxe-serving-upgrade-jobs.labels" . | fromYaml -}}
+        {{- $istioLab := include "eric-mxe-serving-upgrade-jobs.istio-labels" . | fromYaml -}}
+        {{- include "eric-mxe-serving-upgrade-jobs.mergeLabels" (dict "location" .Template.Name "sources" (list $labels $istioLab )) | trim | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "eric-mxe-serving-upgrade-jobs.preupgrade-cleanup-service-account" . | quote }}
+      containers:
+        - name: preupgrade-cleanup-job
+          {{- with (index .Values "imageCredentials" "kubernetes-modifier") }}
+          image: "{{ include "eric-mxe-serving-upgrade-jobs.setImageRepo" (list $ .registry.url .repoPath "kubernetes-modifier") }}{{ index $.Values "images" "kubernetes-modifier" "name" }}:{{ index $.Values "images" "kubernetes-modifier" "tag" }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-serving-upgrade-jobs.registryImagePullPolicy" (list . (index .Values "imageCredentials" "kubernetes-modifier" "registry" "imagePullPolicy")) }}
+          volumeMounts:
+            - mountPath: "/etc/kubernetes-run-script/"
+              name: kubernetes-run-script
+          env:
+            - name: MODEL_CATALOGUE_SERVICE_DB_SECRET_NAME
+              value: {{ include "eric-mxe-serving-upgrade-jobs.preupgrade-cleanup-model-catalogue-service-db-secret-name" . | quote }}
+            - name: SELDON_VALIDATING_WEBHOOK_NAME
+              value: {{ include "eric-mxe-serving-upgrade-jobs.preupgrade-cleanup-seldon-validating-webhook-name" . | quote }}
+            - name: SELDON_MUTATING_WEBHOOK_NAME
+              value: {{ include "eric-mxe-serving-upgrade-jobs.preupgrade-cleanup-seldon-mutating-webhook-name" . | quote }}
+          resources:
+            {{- toYaml .Values.resources.kubernetesModifier | trim | nindent 12 }}
+          {{- include "eric-mxe-serving-upgrade-jobs.main-security-context" . | nindent 10 }}
+      {{ include "eric-mxe-serving-upgrade-jobs.tolerations" . | nindent 6 }}  
+      restartPolicy: Never
+      volumes:
+      - configMap:
+          name: {{ include "eric-mxe-serving-upgrade-jobs.preupgrade-cleanup-configmap" . | quote }}
+        name: kubernetes-run-script
+      {{- include "eric-mxe-serving-upgrade-jobs.image-pull-secrets" . | nindent 6 }}
+      tolerations: {{ include "eric-mxe-serving-upgrade-jobs.merge-tolerations" (dict "root" . "podbasename" "preupgrade-cleanup") | nindent 8}}

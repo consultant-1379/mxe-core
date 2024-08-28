@@ -1,0 +1,25 @@
+# Set values for mxe-apps helm chart
+# This is a YAML-formatted file.
+
+### DO NOT CHANGE ANCHORS! ###
+
+# These fields are all mandatory. Please set them/change them according to your desire.
+
+servingEnabled: &servingEnabled true
+exporationEnabled: &explorationEnabled true 
+trainingEnabled: &trainingEnabled true  
+workflowEnabled: &workflowEnabled true  
+
+### DO NOT MODIFY PARAMETERS BELOW THIS LINE! ###
+
+mxe-serving:
+  enabled: *servingEnabled
+
+mxe-exploration:
+  enabled: *explorationEnabled
+
+mxe-training:
+  enabled: *trainingEnabled 
+
+mxe-workflow:
+  enabled: *workflowEnabled

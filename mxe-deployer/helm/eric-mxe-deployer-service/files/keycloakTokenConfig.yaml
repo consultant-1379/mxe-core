@@ -1,0 +1,14 @@
+{{- $mxeApiHostURL := (include "eric-mxe-deployer-service.mxe-host" . ) -}}
+{{- $mxeRealmName := (index .Values "config" "sso" "mxe" "realmName")}}
+{{- $mxeAdminClientID := (index .Values "config" "sso" "mxe" "adminClientID")}}
+{{- $mxeAdminCredentialsSecret := (index .Values "config" "sso" "mxe" "adminSecret")}}
+hostname: {{ $mxeApiHostURL }}
+realm: {{ $mxeRealmName }}
+client_id: {{ $mxeAdminClientID }}
+usernameSecret:
+  name: {{ $mxeAdminCredentialsSecret }}
+  key: kcadminid
+passwordSecret:
+  name: {{ $mxeAdminCredentialsSecret }}
+  key: kcpasswd
+grant_type: password

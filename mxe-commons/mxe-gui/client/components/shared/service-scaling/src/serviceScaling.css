@@ -1,0 +1,60 @@
+/* style goes here */
+:host {
+  display: block;
+}
+
+.flex {
+  display: flex;
+}
+
+.center {
+  align-items: center;
+}
+
+eui-base-v0-combo-box {
+  margin-right: 5px;
+}
+
+eui-base-v0-radio-button,
+input {
+  padding: 5.5px;
+}
+
+.spacing-bottom {
+  margin-bottom: 5px;
+}
+
+.radio-buttons {
+  margin-right: 58px;
+}
+.manual-instances {
+  margin-right: 53px;
+}
+
+.target-metric {
+  margin-right: 32px;
+}
+
+.auto-instances {
+  margin-right: 23px;
+}
+
+.min-max {
+  margin-right: 8px;
+}
+
+#edit-auto-min-replicas {
+  margin-right: 34px;
+}
+
+.faded {
+  opacity: 0.7;
+}
+
+.disabled {
+  pointer-events: none;
+}
+
+.selected-metric {
+  margin-right: 5px;
+}

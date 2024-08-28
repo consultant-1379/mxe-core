@@ -1,0 +1,10 @@
+# MXE cluster details
+mxe_namespace = 'mxe'
+mxe_host = 'https://mxe.cech030.rnd.gic.ericsson.se'
+mxe_username = 'mxe-user'
+mxe_password = 'mxe-password'
+invalid_mxe_password = 'invalid-password'
+keycloak_url = 'https://mxe.cech030.rnd.gic.ericsson.se/auth/'
+keycloak_username = 'admin'
+keycloak_password = 'My-super-secret-pw123'
+oauth_api_host = 'https://oauth.cech030.rnd.gic.ericsson.se'

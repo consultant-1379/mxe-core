@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "eric-mxe-jupyterhub.proxy-service-api-name" . | quote }}
+  labels:
+    app.kubernetes.io/component: "jupyterhub-proxy-api-service"
+    app.kubernetes.io/name: {{ include "eric-mxe-jupyterhub.proxy-service-api-name" . | quote }}
+    {{- $_ := merge (dict "componentSuffix" "-api") . }}
+    {{- include "eric-mxe-jupyterhub.labels" $_ | nindent 4 }}
+  annotations: {{ include "eric-mxe-jupyterhub.annotations" . | nindent 4 }}
+spec:
+  type: {{ .Values.proxy.service.type }}
+  {{- if .Values.global }}
+  {{- if .Values.global.internalIPFamily }}
+  ipFamilies: [ {{ .Values.global.internalIPFamily | quote }} ]
+  {{- end }}
+  {{- end }}
+  selector:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "jupyterhub-proxy"
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    {{- include "eric-mxe-jupyterhub.matchLabels" . | nindent 4 }}
+  ports:
+    - protocol: TCP
+      port: 8001
+      targetPort: api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "eric-mxe-jupyterhub.proxy-service-public-name" . | quote }}
+  labels:
+    app.kubernetes.io/component: "jupyterhub-proxy-public-service"
+    app.kubernetes.io/name: {{ include "eric-mxe-jupyterhub.proxy-service-public-name" . | quote }}
+    {{- $_ := merge (dict "componentSuffix" "-public") . }}
+    {{- include "eric-mxe-jupyterhub.labels" $_ | nindent 4 }}
+    {{- with .Values.proxy.service.labels }}
+    {{- . | toYaml | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- with .Values.proxy.service.annotations }}
+    {{- . | toYaml | nindent 4 }}
+    {{- end }}
+    {{ include "eric-mxe-jupyterhub.annotations" . | nindent 4 }}
+spec:
+  selector:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "jupyterhub-proxy"
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    release: {{ .Release.Name }}
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8000 # TODO: upstream is http. Need to revisit
+      # allow proxy.service.nodePort for http
+      {{- with .Values.proxy.service.nodePorts.http }}
+      nodePort: {{ . }}
+      {{- end }}
+    {{- with .Values.proxy.service.extraPorts }}
+    {{- . | toYaml | nindent 4 }}
+    {{- end }}
+  type: {{ .Values.proxy.service.type }}
+  {{- if .Values.global }}
+  {{- if .Values.global.internalIPFamily }}
+  ipFamilies: [ {{ .Values.global.internalIPFamily | quote }} ]
+  {{- end }}
+  {{- end }}
+  {{- with .Values.proxy.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  {{- if eq .Values.proxy.service.type "LoadBalancer" }}
+  {{- with .Values.proxy.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- . | toYaml | nindent 4 }}
+  {{- end }}
+  {{- end }}

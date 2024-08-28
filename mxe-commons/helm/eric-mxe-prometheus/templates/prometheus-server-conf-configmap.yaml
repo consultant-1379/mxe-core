@@ -1,0 +1,463 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: {{ include "eric-mxe-prometheus.config-map-name" . | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-prometheus.config-map-name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-prometheus.labels" . | fromYaml -}}
+    {{- include "eric-mxe-prometheus.mergeLabels" (dict "location" .Template.Name "sources" (list $name $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-prometheus.annotations" . | nindent 4 }}
+data:
+  "prometheus.yml": |
+    global:
+      scrape_interval: 1s
+      scrape_timeout: 1s
+      evaluation_interval: 1s
+    scrape_configs:
+    - job_name: seldon-metrics
+    {{- if .Values.global.serviceMesh.enabled }}
+      scheme: https
+      tls_config:
+        ca_file: /etc/istio-certs/root-cert.pem
+        cert_file: /etc/istio-certs/cert-chain.pem
+        key_file: /etc/istio-certs/key.pem
+        insecure_skip_verify: true  # prometheus does not support secure naming.
+    {{- end }}
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+            - {{ .Release.Namespace | quote }}
+      relabel_configs:
+      - source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+        action: keep
+        regex: true
+      - source_labels:
+          - __meta_kubernetes_pod_labelpresent_seldon_app
+        action: keep
+        regex: true
+      - source_labels:
+          - __meta_kubernetes_pod_container_port_name
+        action: keep
+        regex: metrics(-.*)?
+      - source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_path
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels:
+          - __address__
+          - __meta_kubernetes_pod_annotation_prometheus_io_port
+        action: replace
+        regex: (.+):(?:\d+);(\d+)
+        replacement: ${1}:${2}
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels:
+          - __meta_kubernetes_namespace
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels:
+          - __meta_kubernetes_pod_name
+        action: replace
+        target_label: kubernetes_pod_name
+      metric_relabel_configs:
+      - source_labels: [ model_name ]
+        regex: (.+)
+        action: keep
+      - source_labels: [ __name__ ]
+        regex: (.+)
+        target_label: mxe_metric_name
+        replacement: '$1'
+    - job_name: kubernetes-spark-operator
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+      relabel_configs:
+      - source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+        action: keep
+        regex: true
+      - source_labels:
+          - __meta_kubernetes_pod_label_app_kubernetes_io_name
+        action: keep
+        regex: 'spark-operator'
+      - source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_path
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels:
+          - __address__
+          - __meta_kubernetes_pod_annotation_prometheus_io_port
+        action: replace
+        regex: (.+):(?:\d+);(\d+)
+        replacement: ${1}:${2}
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels:
+          - __meta_kubernetes_namespace
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels:
+          - __meta_kubernetes_pod_name
+        action: replace
+        target_label: kubernetes_pod_name
+      metric_relabel_configs:
+      - source_labels: [__name__ ]
+        regex: 'go_.*'
+        action: drop
+      - source_labels: [ __name__ ]
+        regex: 'spark_app.*'
+        action: keep
+    - job_name: kubernetes-spark-app
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+      relabel_configs:
+      - source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+        action: keep
+        regex: true
+      - source_labels:
+          - __meta_kubernetes_pod_labelpresent_sparkoperator_k8s_io_launched_by_spark_operator
+        action: keep
+        regex: true
+      - source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_path
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels:
+          - __address__
+          - __meta_kubernetes_pod_annotation_prometheus_io_port
+        action: replace
+        regex: (.+):(?:\d+);(\d+)
+        replacement: ${1}:${2}
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels:
+          - __meta_kubernetes_namespace
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels:
+          - __meta_kubernetes_pod_name
+        action: replace
+        target_label: kubernetes_pod_name
+      metric_relabel_configs:
+      - source_labels: [__name__ ]
+        regex: 'go_.*'
+        action: drop
+      - source_labels: [ __name__ ]
+        regex: 'spark_(driver|executor).*'
+        action: keep
+    - job_name: kubernetes-istio-envoy-stats-ingress-controller-rate-limit
+      metrics_path: /stats/prometheus
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+            - {{ .Release.Namespace | quote }}
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_container_port_name]
+        action: keep
+        regex: '.*-envoy-prom'
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:15090
+        target_label: __address__
+      - action: labeldrop
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: pod_name
+      - source_labels:
+          - __meta_kubernetes_pod_label_app_kubernetes_io_name
+        action: keep
+        regex: 'eric-mxe-ingress-controller'
+      metric_relabel_configs:
+      - source_labels: [ __name__ ]
+        regex: '.*http_local_rate_limit.*'
+        action: keep
+    {{- if .Values.global.serviceMesh.enabled }}
+    - job_name: 'envoy-stats'
+      metrics_path: /stats/prometheus
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+            - {{ .Release.Namespace | quote }}
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_container_port_name]
+        action: keep
+        regex: '.*-envoy-prom'
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:15090
+        target_label: __address__
+      - action: labeldrop
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: pod_name
+    - job_name: 'sm-controller'
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - {{ .Release.Namespace | quote }}
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: istiod;http-monitoring        
+    {{- end }}
+    - job_name: 'kubernetes-resources-exporter'
+      scheme: http
+      kubernetes_sd_configs:
+      - role: service
+        namespaces:
+          names:
+            - {{ .Release.Namespace | quote }}
+      relabel_configs:
+      - source_labels: [ __meta_kubernetes_service_label_app_kubernetes_io_component ]
+        action: keep
+        regex: kube-state-metrics-service
+      metric_relabel_configs:
+      - source_labels: [ __name__, resource, type ]
+        action: replace
+        regex: 'kube_resourcequota;limits.cpu;hard'
+        replacement: 'machine_cpu_cores'
+        target_label: __name__
+      - source_labels: [ __name__, resource, type ]
+        action: replace
+        regex: 'kube_resourcequota;limits.memory;hard'
+        replacement: 'machine_memory_bytes'
+        target_label: __name__
+      - source_labels: [ __name__, resource, type ]
+        action: replace
+        regex: 'kube_resourcequota;limits.cpu;used'
+        replacement: 'container_cpu_limit_usage'
+        target_label: __name__
+      - source_labels: [ __name__, resource, type ]
+        action: replace
+        regex: 'kube_resourcequota;limits.memory;used'
+        replacement: 'container_memory_working_set_bytes'
+        target_label: __name__
+      - source_labels: [ __name__, resource, type ]
+        action: replace
+        regex: 'kube_resourcequota;requests.storage;hard'
+        replacement: 'container_fs_limit_bytes'
+        target_label: __name__
+      - source_labels: [ __name__, resource, type ]
+        action: replace
+        regex: 'kube_resourcequota;requests.storage;used'
+        replacement: 'container_fs_usage_bytes'
+        target_label: __name__
+      - source_labels: [ __name__, resource, type ]
+        action: replace
+        regex: 'kube_resourcequota;limits.ephemeral-storage;hard'
+        replacement: 'container_fs_limit_bytes'
+        target_label: __name__
+      - source_labels: [ __name__, resource, type ]
+        action: replace
+        regex: 'kube_resourcequota;limits.ephemeral-storage;used'
+        replacement: 'container_fs_usage_bytes'
+        target_label: __name__
+      - source_labels: [ __name__ ]
+        regex: (container_memory_working_set_bytes|machine_memory_bytes|container_fs_limit_bytes|container_fs_usage_bytes|machine_cpu_cores|container_cpu_limit_usage)
+        action: keep
+      - source_labels: [ __name__ ]
+        regex: (container_fs_limit_bytes|container_fs_usage_bytes)
+        target_label: device
+        replacement: '/dev/sda0'
+        action: replace
+      - source_labels: [ ]
+        regex: (.*)
+        target_label: id
+        replacement: '/'
+        action: replace
+    - job_name: mxe-training-pod
+    {{- if .Values.global.serviceMesh.enabled }}
+      scheme: https
+      tls_config:
+        ca_file: /etc/istio-certs/root-cert.pem
+        cert_file: /etc/istio-certs/cert-chain.pem
+        key_file: /etc/istio-certs/key.pem
+        insecure_skip_verify: true  # prometheus does not support secure naming.
+    {{- end }}
+      scrape_interval: 1m
+      scrape_timeout: 1m
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+            - {{ .Release.Namespace | quote }}
+      relabel_configs:
+      - source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+        action: keep
+        regex: true
+      - source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_path
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels:
+          - __address__
+          - __meta_kubernetes_pod_annotation_prometheus_io_port
+        action: replace
+        regex: (.+):(?:\d+);(\d+)
+        replacement: ${1}:${2}
+        target_label: __address__
+      - source_labels:
+          - __meta_kubernetes_pod_label_app_kubernetes_io_component
+        action: keep
+        regex: model-training-service
+      - source_labels:
+          - __meta_kubernetes_pod_container_port_name
+        action: keep
+        regex: mgmt
+    - job_name: mxe-catalogue-pod
+    {{- if .Values.global.serviceMesh.enabled }}
+      scheme: https
+      tls_config:
+        ca_file: /etc/istio-certs/root-cert.pem
+        cert_file: /etc/istio-certs/cert-chain.pem
+        key_file: /etc/istio-certs/key.pem
+        insecure_skip_verify: true  # prometheus does not support secure naming.
+    {{- end }}
+      scrape_interval: 1m
+      scrape_timeout: 1m
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+            - {{ .Release.Namespace | quote }}
+      relabel_configs:
+      - source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+        action: keep
+        regex: true
+      - source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_path
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels:
+          - __address__
+          - __meta_kubernetes_pod_annotation_prometheus_io_port
+        action: replace
+        regex: (.+):(?:\d+);(\d+)
+        replacement: ${1}:${2}
+        target_label: __address__
+      - source_labels:
+          - __meta_kubernetes_pod_label_app_kubernetes_io_component
+        action: keep
+        regex: model-catalogue-service
+      - source_labels:
+          - __meta_kubernetes_pod_container_port_name
+        action: keep
+        regex: mgmt
+    - job_name: mxe-model-pod
+    {{- if .Values.global.serviceMesh.enabled }}
+      scheme: https
+      tls_config:
+        ca_file: /etc/istio-certs/root-cert.pem
+        cert_file: /etc/istio-certs/cert-chain.pem
+        key_file: /etc/istio-certs/key.pem
+        insecure_skip_verify: true  # prometheus does not support secure naming.
+    {{- end }}
+      scrape_interval: 1m
+      scrape_timeout: 1m
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+            - {{ .Release.Namespace | quote }}
+      relabel_configs:
+      - source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+        action: keep
+        regex: true
+      - source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_path
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels:
+          - __address__
+          - __meta_kubernetes_pod_annotation_prometheus_io_port
+        action: replace
+        regex: (.+):(?:\d+);(\d+)
+        replacement: ${1}:${2}
+        target_label: __address__
+      - source_labels:
+          - __meta_kubernetes_pod_label_app_kubernetes_io_component
+        action: keep
+        regex: model-service
+      - source_labels:
+          - __meta_kubernetes_pod_container_port_name
+        action: keep
+        regex: mgmt
+    - job_name: mxe-author-pod
+    {{- if .Values.global.serviceMesh.enabled }}
+      scheme: https
+      tls_config:
+        ca_file: /etc/istio-certs/root-cert.pem
+        cert_file: /etc/istio-certs/cert-chain.pem
+        key_file: /etc/istio-certs/key.pem
+        insecure_skip_verify: true  # prometheus does not support secure naming.
+    {{- end }}
+      scrape_interval: 1m
+      scrape_timeout: 1m
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+            - {{ .Release.Namespace | quote }}
+      relabel_configs:
+      - source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+        action: keep
+        regex: true
+      - source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_path
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels:
+          - __address__
+          - __meta_kubernetes_pod_annotation_prometheus_io_port
+        action: replace
+        regex: (.+):(?:\d+);(\d+)
+        replacement: ${1}:${2}
+        target_label: __address__
+      - source_labels:
+          - __meta_kubernetes_pod_label_app_kubernetes_io_component
+        action: keep
+        regex: author-service
+      - source_labels:
+          - __meta_kubernetes_pod_container_port_name
+        action: keep
+        regex: mgmt
+  {{- with $rules := ((.Files.Glob "files/prometheus/rules/*.rules").AsConfig | fromYaml) }}
+  {{- range $fileName, $body := $rules }}
+  {{ $fileName }}: |
+    {{- $body | nindent 4 }}
+  {{- end }}
+{{- end }}

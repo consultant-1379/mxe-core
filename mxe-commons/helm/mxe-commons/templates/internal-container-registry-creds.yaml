@@ -1,0 +1,23 @@
+# This secret stores the username and password for internal container registry
+# It would be mainly used for model-packager jobs to avoid hardcoding of credentials in the code
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "mxe-commons.internal-container-registry-secret-name" . | quote }}
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "mxe-internal-container-registry-secret"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-commons.internal-container-registry-secret-name" . | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+type: Opaque
+data:
+  # Define the username and password for the internal container registry, there would be added 
+  # benefit if secret is stored as .dockerconfigjson format, but it would complicate to
+  # parse and store the username and password in model catalogue service
+  username: {{ .Values.global.internalRegistry.username | b64enc | quote }}
+  password: {{ .Values.global.internalRegistry.password | b64enc | quote }}

@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "eric-mxe-gui.legal-warning-message" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: gatekeeper-template"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-gui.labels" . | fromYaml -}}
+    {{- include "eric-mxe-gui.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-gui.annotations" . | nindent 4 }}
+data:
+  message.txt: |-
+    {{- .Values.legalWarningMessage | nindent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "eric-mxe-gui.name" . }}-menu-config
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: menu-config"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-gui.labels" . | fromYaml -}}
+    {{- include "eric-mxe-gui.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+   {{- include "eric-mxe-gui.annotations" . | nindent 4 }}
+data:
+  config.menu.json: |
+{{ tpl (.Files.Get "files/config.menu.json") $ | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "eric-mxe-gui.name" . }}-options-config
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: options-config"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-gui.labels" . | fromYaml -}}
+    {{- include "eric-mxe-gui.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+   {{- include "eric-mxe-gui.annotations" . | nindent 4 }}
+data:
+  options.json: |
+{{ tpl (.Files.Get "files/options.json") $ | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "eric-mxe-gui.name" . }}-config
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: config"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-gui.labels" . | fromYaml -}}
+    {{- include "eric-mxe-gui.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+   {{- include "eric-mxe-gui.annotations" . | nindent 4 }}
+data:
+  config.json: |
+{{ tpl (.Files.Get "files/config.json") $ | indent 4 }}

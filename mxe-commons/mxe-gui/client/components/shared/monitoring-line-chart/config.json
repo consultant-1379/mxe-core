@@ -1,0 +1,7 @@
+{
+  "script": "monitoring-line-chart/MonitoringLineChart",
+  "id": "MonitoringLineChart",
+  "dependencies": {
+    "@eui/lit-component": "^0.9.0"
+  }
+}

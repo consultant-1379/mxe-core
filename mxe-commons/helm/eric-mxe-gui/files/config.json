@@ -1,0 +1,101 @@
+{
+  "debug": true,
+  "namespace": "MXE",
+  "menu": {
+    "menuConfig": "config/menu/config.menu.json",
+    "hideMenu": false,
+    "openMenu": false
+  },
+  "showBreadcrumbs": true,
+  "component": {
+    "componentsPath": "components/"
+  },
+  "app": {
+    "defaultApp": "dashboard",
+    "appsPath": "apps/"
+  },
+  "panel": {
+    "panelsPath": "panels/"
+  },
+  "i18n": {
+    "defaultLocale": "en-us",
+    "defaultDateLocale": "en-us",
+    "localeIds": ["en-us"],
+    "localeIdsRTL": [],
+    "localesPath": "locale/",
+    "localesType": "file"
+  },
+  "cache": {
+    "timeout": 1,
+    "maxAge": 2,
+    "autoClear": true
+  },
+  "router": {
+    "autoUrlDecode": true,
+    "appRoot": "/",
+    "autoRestVars": true,
+    "varPrefix": "!",
+    "mode": "hash",
+    "allowDirect": true,
+    "singleMode": false,
+    "routeMap": {
+      "dashboard": "dashboard",
+      "model-catalogue": "model-catalogue",
+      "model-list": "model-catalogue",
+      "model-services": "model-services",
+      "model-services/model-service-detail": "model-service-detail",
+      "model-catalogue/model-info": "model-info"{{ if not (eq .Values.mode "standalone") }},
+      "training-packages": "training-packages",
+      "model-training": "training-packages",
+      "training-jobs": "training-jobs",
+      "training-packages/training-package-detail": "training-package-detail",
+      "settings": "settings",
+      "notebooks": "notebooks"
+      {{ end }}
+    }
+  },
+  "ui": {
+    "breadCrumbClick": true,
+    "top": [
+      {
+        "id": "static-logo",
+        "type": "package",
+        "path": "logo",
+        "position": "left"
+      },
+      {
+        "id": "settings",
+        "type": "package",
+        "path": "settings-icon",
+        "position": "right"
+      }{{ if not (eq .Values.mode "standalone") }},
+      {
+        "id": "bt-user-icon",
+        "type": "package",
+        "path": "user-display",
+        "position": "right",
+        "action": "LOAD_SYSTEM_PANEL",
+        "payload": "user-settings-panel"
+      }
+      {{ end }}
+    ],
+    "left": {
+      "name": "left-menu-panel"
+    }
+  },
+  "authentication": {},
+  "plugin": {
+    "pluginsPath": "plugins/",
+    "plugins": [
+      { "name": "apps-handler" },
+      { "name": "authentication" },
+      { "name": "error-handler" },
+      { "name": "notifications" },
+      { "name": "loading" },
+      { "name": "options-handler" }
+    ]
+  },
+  "content": {
+    "padding": true
+  }
+}

@@ -1,0 +1,86 @@
+/* style goes here */
+:host {
+  display: block;
+}
+
+.combo-box-container {
+  background-color: var(--white);
+  padding: 12px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+
+  align-items: center;
+  align-content: stretch;
+  margin-bottom: 5px;
+}
+
+.combo-box-container eui-v0-icon {
+  margin-left: 8px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: normal;
+  padding-bottom: 8px;
+  padding-left: 12px;
+  color: var(--text);
+}
+
+#autocomplete {
+  color: var(--text);
+}
+
+#autocomplete .id {
+  font-weight: normal;
+  font-size: 16px;
+}
+
+#autocomplete .version {
+  font-weight: normal;
+  opacity: 0.8;
+}
+
+eui-base-v0-combo-box {
+  margin-right: 5px;
+}
+
+.icon:hover {
+  cursor: pointer;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.right {
+  display: flex;
+  margin-right: 41px;
+}
+
+.title.version {
+  margin-right: 90px;
+}
+
+.title.weight {
+  margin-left: 17px;
+  margin-right: 17px;
+}
+
+#weight {
+  color: var(--text, rgb(36, 36, 36));
+  font-size: 12px;
+  font-family: var(--font-main);
+  font-weight: 300;
+  background: var(--input-background, rgb(250, 250, 250));
+  border: 1px solid var(--input-border, rgb(200, 200, 200));
+  padding: 6px;
+  outline: 0;
+  margin-right: 4px;
+}
+
+#weight:disabled {
+  cursor: not-allowed;
+  background: var(--input-background-disabled, rgb(230, 230, 230));
+}

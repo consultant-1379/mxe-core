@@ -1,0 +1,97 @@
+{{- $global := fromJson (include "eric-mxe-jupyterhub.global" .) -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "eric-mxe-jupyterhub.proxy-name" . | quote }}
+  labels:
+    app.kubernetes.io/component: "jupyterhub-proxy"
+    app.kubernetes.io/name: {{ include "eric-mxe-jupyterhub.proxy-name" . | quote }}
+    {{- include "eric-mxe-jupyterhub.labels" . | nindent 4 }}
+  annotations: {{ include "eric-mxe-jupyterhub.annotations" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: "mxe"
+      app.kubernetes.io/component: "jupyterhub-proxy"
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+      {{- include "eric-mxe-jupyterhub.matchLabels" . | nindent 6 }}
+  strategy:
+    {{- .Values.proxy.deploymentStrategy | toYaml | nindent 4 }}
+  template:
+    metadata:
+      labels:
+        {{- $proxyDeploymentLabels := include "eric-mxe-jupyterhub.proxy-deployment-labels" . | fromYaml -}}
+        {{- $matchLabels := include "eric-mxe-jupyterhub.matchLabels" . | fromYaml -}}
+        {{- $labels := include "eric-mxe-jupyterhub.labels" . | fromYaml -}}
+        {{- $istioLabels := include "eric-mxe-jupyterhub.istio-sidecar-labels" . | fromYaml -}}
+        {{- $proxyLabels := .Values.proxy.labels -}}
+        {{- include "eric-mxe-jupyterhub.mergeLabels" (dict "location" .Template.Name "sources" (list $proxyDeploymentLabels $matchLabels $istioLabels $proxyLabels $labels )) | trim | nindent 8 }}
+      annotations:
+        {{- $annotations := include "eric-mxe-jupyterhub.annotations" . | fromYaml -}}
+        {{- $istioSCAnnotations := include "eric-mxe-jupyterhub.istio-sidecar-annotations" . | fromYaml -}}
+        {{- $deployAnnotations := include "eric-mxe-jupyterhub.proxy-deployment-annotations" . | fromYaml -}}
+        {{- $proxyAnnotations := .Values.proxy.annotations -}}
+        {{- $prometheusAnn := include "eric-mxe-jupyterhub.prometheus-annotations" . | fromYaml -}}
+        {{- include "eric-mxe-jupyterhub.mergeAnnotations" (dict "location" .Template.Name "sources" (list $proxyAnnotations $deployAnnotations $istioSCAnnotations $annotations $prometheusAnn )) | trim | nindent 8 }}
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- if (or .Values.nodeSelector .Values.proxy.chp.nodeSelector $global.nodeSelector) }}
+      nodeSelector: {{- include "eric-mxe-jupyterhub.proxy-nodeSelector" . | nindent 8 }}
+      {{- end }}
+      {{- include "eric-mxe-jupyterhub.coreAffinity" . | nindent 6 }}
+      {{- include "eric-mxe-jupyterhub.image-pull-secrets" . | nindent 6 }}
+      {{- if include "eric-mxe-jupyterhub.proxy.podPriority" . }}
+      priorityClassName: {{- include "eric-mxe-jupyterhub.proxy.podPriority" . | indent 2 }}
+      {{- end }}
+      volumes:
+        {{- include "eric-mxe-jupyterhub-proxy.pg-cert-volumes" . | nindent 8 }} 
+      containers:
+        - name: chp
+          {{- with .Values.imageCredentials.proxy }}
+          image: "{{ include "eric-mxe-jupyterhub.setImageRepo" (list $ .registry.url .repoPath "proxy") }}{{ $.Values.images.proxy.name }}:{{ $.Values.images.proxy.tag }}"
+          {{- end }}
+          command:
+            - configurable-http-proxy
+            - --ip=0.0.0.0
+            - --api-ip=0.0.0.0
+            - --api-port=8001
+            - --default-target=http://$({{ include "eric-mxe-jupyterhub.env-hub-service-host" . }}):$({{ include "eric-mxe-jupyterhub.env-hub-service-port" . }})
+            - --error-target=http://$({{ include "eric-mxe-jupyterhub.env-hub-service-host" . }}):$({{ include "eric-mxe-jupyterhub.env-hub-service-port" . }})/hub/error
+            - --port=8000
+            {{- if .Values.debug.enabled }}
+            - --log-level=debug
+            {{- end }}
+            {{- range .Values.proxy.chp.extraCommandLineFlags }}
+            - {{ tpl . $ }}
+            {{- end }}
+            {{- if .Values.global.serviceMesh.enabled }}
+            - --change-origin
+            - eric-mxe-jupyterhub-hub-service:8081
+            {{- end }}
+          {{- include "eric-mxe-jupyterhub.usercontainer-security-context" . | nindent 10 }}
+          resources:
+            {{- toYaml .Values.resources.proxy | trim | nindent 12 }}
+          volumeMounts:
+            {{- include "eric-mxe-jupyterhub.pg-cert-volume-mounts" . | nindent 12 }}
+          env:
+            - name: CONFIGPROXY_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  # NOTE: References the chart managed k8s Secret even if
+                  #       hub.existingSecret is specified to avoid using the
+                  #       lookup function on the user managed k8s Secret.
+                  name: {{ include "eric-mxe-jupyterhub.hub-secret-name" . | quote }}
+                  key: hub.config.ConfigurableHTTPProxy.auth_token
+            {{- with .Values.proxy.chp.extraEnv }}
+            {{- include "eric-mxe-jupyterhub.extraEnv" . | nindent 12 }}
+            {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-jupyterhub.registryImagePullPolicy" (list . (index .Values "imageCredentials" "proxy" "registry" "imagePullPolicy")) }}
+          ports:
+            - containerPort: 8000
+              name: proxy-public
+            - containerPort: 8001
+              name: api
+      {{- include "eric-mxe-jupyterhub.tolerations" . | nindent 6 }}
+      tolerations: {{ include "eric-mxe-jupyterhub.merge-tolerations" (dict "root" . "podbasename" "proxy") | nindent 6}}

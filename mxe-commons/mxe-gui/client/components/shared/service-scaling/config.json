@@ -1,0 +1,8 @@
+{
+  "script": "service-scaling/ServiceScaling",
+  "id": "ServiceScaling",
+  "data": {},
+  "dependencies": {
+    "@eui/lit-component": "0.8.x"
+  }
+}

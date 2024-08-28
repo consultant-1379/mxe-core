@@ -1,0 +1,11 @@
+productName: "MXE"
+productNumber: "CXD 101 0382"
+
+images:
+  pypiserver:
+    productName: "MXE"
+    productNumber: "CXD 101 0382"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "proj-mxe"
+    name: "pypiserver/pypiserver"
+    tag: "VERSION"

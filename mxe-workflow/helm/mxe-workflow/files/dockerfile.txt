@@ -1,0 +1,14 @@
+FROM {{ .Values.argoexecBuild.images.argoRegistry }}/{{ .Values.argoexecBuild.images.argoRepository }}:{{ .Values.argoexecBuild.images.argoTag }}
+
+ARG UID=8737
+
+USER root
+
+COPY ca.crt /usr/share/pki/trust/anchors/
+RUN update-ca-certificates
+
+RUN ls -lart /etc/ssl/certs/
+
+USER ${UID}
+
+ENTRYPOINT [ "argoexec" ]

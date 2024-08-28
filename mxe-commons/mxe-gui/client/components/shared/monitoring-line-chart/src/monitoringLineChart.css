@@ -1,0 +1,58 @@
+:host {
+  width: calc(100vw - 136px);
+  display: flex;
+  padding: 24px;
+  margin: 0 0 8px;
+  background: var(--card-color-background, var(--card-color-background, #fafafa));
+  position: relative;
+}
+
+.chart {
+  margin-left: 48px;
+  width: 100%;
+  max-width: calc(100% - 250px);
+  overflow: hidden;
+}
+
+.chart::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background: transparent;
+}
+.chart::-webkit-scrollbar-corner {
+  background: transparent;
+}
+.chart::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+}
+
+.left-side {
+  min-width: 250px;
+}
+
+.chart,
+.left-side {
+  display: flex;
+  flex-direction: column;
+}
+
+.chart .title {
+  opacity: 0.8;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text);
+}
+
+.chart .subtitle {
+  opacity: 0.6;
+}
+
+.center {
+  text-align: center;
+  margin: 0 auto;
+}
+
+.left-side .interval {
+  margin-top: auto;
+}

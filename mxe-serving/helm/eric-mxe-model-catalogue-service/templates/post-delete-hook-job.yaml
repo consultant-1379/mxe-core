@@ -1,0 +1,96 @@
+{{- $global := fromJson (include "eric-mxe-model-catalogue-service.global" .) -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "eric-mxe-model-catalogue-service.name" . }}-post-delete-hook
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: model-catalogue-service-post-delete-hook"  | fromYaml -}}
+    {{- $name := printf "%s: %s-%s" "app.kubernetes.io/name" (include "eric-mxe-model-catalogue-service.name" .) "post-delete-hook" | fromYaml -}}
+    {{- $labels := include "eric-mxe-model-catalogue-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-model-catalogue-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $hook := printf "%s" "helm.sh/hook: post-delete"  | fromYaml -}}
+    {{- $hookDeletePolicy := printf "%s" "helm.sh/hook-delete-policy: before-hook-creation"  | fromYaml -}}
+    {{- $hookWeight := include "eric-mxe-model-catalogue-service.hook-weight" 2 | fromYaml -}}
+    {{- $annotations := include "eric-mxe-model-catalogue-service.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-model-catalogue-service.mergeAnnotations" (dict "location" .Template.Name "sources" (list $hook $hookDeletePolicy $hookWeight $annotations)) | trim | nindent 4 }}
+spec:
+  completions: 1
+  parallelism: 1
+  backoffLimit: 3
+  template:
+    metadata:
+      annotations:
+        {{- $istioAnn := include "eric-mxe-model-catalogue-service.istio-annotations" . | fromYaml -}}
+        {{- $annotations := include "eric-mxe-model-catalogue-service.annotations" . | fromYaml -}}
+        {{- if .Values.appArmorProfile.type }}
+        {{- $appArmor := printf "%s: %s" "container.apparmor.security.beta.kubernetes.io/minio-post-delete-hook" .Values.appArmorProfile.type | fromYaml -}}
+        {{- include "eric-mxe-model-catalogue-service.mergeAnnotations" (dict "location" .Template.Name "sources" (list $istioAnn $appArmor $annotations)) | trim | nindent 8 }}
+        {{- else -}}
+        {{- include "eric-mxe-model-catalogue-service.mergeAnnotations" (dict "location" .Template.Name "sources" (list $istioAnn $annotations)) | trim | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "eric-mxe-model-catalogue-service.istio-labels" . | indent 8 }}
+    spec:
+      automountServiceAccountToken: false
+      priorityClassName: {{- include "eric-mxe-model-catalogue-service.podPriority" . | indent 2 }}
+      tolerations: {{ include "eric-mxe-model-catalogue-service.merge-tolerations" (dict "root" . "podbasename" "eric-mxe-model-catalogue-service") | nindent 8}}
+      containers:
+        - name: minio-post-delete-hook
+          {{- with (index .Values "imageCredentials" "minio-cli") }}
+          image: "{{ include "eric-mxe-model-catalogue-service.setImageRepo" (list $ .registry.url .repoPath "minio-cli") }}{{ index $.Values "images" "minio-cli" "name" }}:{{ index $.Values "images" "minio-cli" "tag" }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-model-catalogue-service.registryImagePullPolicy" (list . (index .Values "imageCredentials" "minio-cli" "registry" "imagePullPolicy")) }}
+          command: ["/bin/bash", "/etc/cleanup/minio-cleanup.sh"]
+          volumeMounts:
+            - mountPath: "/etc/cleanup/"
+              name: cleanup-scripts
+            - mountPath: /run/secrets/config
+              name: minio-configuration
+            {{ include "eric-mxe-model-catalogue-service.minio-init-volume-mounts" . | nindent 12 }}
+          env:
+            - name: MINIO_URL
+              value: {{ include "eric-mxe-model-catalogue-service.minio-url" . | quote }}
+            - name: MINIO_MODEL_SOURCE_SERVICE_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.model-source-service-minio-user-secret-name" . | quote }}
+                  key: accesskey
+            - name: MINIO_MODEL_SOURCE_INSTANCE_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.model-source-instance-minio-user-secret-name" . | quote }}
+                  key: accesskey
+            - name: USERS_TO_DELETE
+              value: "$(MINIO_MODEL_SOURCE_INSTANCE_ACCESS_KEY),$(MINIO_MODEL_SOURCE_SERVICE_ACCESS_KEY)"
+            - name: CATALOGUE_SERVICE_MINIO_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.model-source-service-minio-user-secret-name" . | quote }}
+                  key: bucket
+            - name: BUCKETS_TO_DELETE
+              value: "$(CATALOGUE_SERVICE_MINIO_BUCKET)"
+            - name: SERVICE_MESH_MTLS_ENABLED
+              value: {{ .Values.global.security.tls.enabled | quote }}
+          resources:
+            {{- toYaml .Values.resources.minioCli | trim | nindent 12 }}
+          {{- include "eric-mxe-model-catalogue-service.minio-security-context" . | nindent 10 }}
+      restartPolicy: OnFailure
+      volumes:
+      - configMap:
+          name: {{ include "eric-mxe-model-catalogue-service.name" . }}-post-delete-hook-config
+        name: cleanup-scripts
+      - name: minio-configuration
+        secret:
+          secretName: {{ .Values.minio.adminSecretName | quote }}
+      - name: mxe-mc-home
+        emptyDir: {}
+      {{- if .Values.global.security.tls.enabled }}
+      - name: trusted-ca
+        secret:
+          secretName: eric-sec-sip-tls-trusted-root-cert
+      {{- end }}
+      {{- include "eric-mxe-model-catalogue-service.image-pull-secrets" . | nindent 6 }}
+      {{- if (or .Values.nodeSelector $global.nodeSelector) }}
+      nodeSelector: {{- include "eric-mxe-model-catalogue-service.nodeSelector" . | nindent 8 }}
+      {{- end }}

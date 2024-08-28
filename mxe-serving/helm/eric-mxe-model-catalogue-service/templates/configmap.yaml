@@ -1,0 +1,16 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "eric-mxe-model-catalogue-service.certificate-sidecar-configmap-name" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: eric-mxe-model-catalogue-service-configmap"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-model-catalogue-service.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-model-catalogue-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-model-catalogue-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-model-catalogue-service.annotations" . | nindent 4 }}
+data:
+  run.sh: |
+    {{- (.Files.Get "files/certificate-sidecar.sh") | nindent 4 }}
+{{- end -}}

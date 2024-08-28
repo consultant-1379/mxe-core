@@ -1,0 +1,16 @@
+{
+  "script": "settings/Settings",
+  "title": "SETTINGS_TITLE",
+  "route": "settings",
+  "menu": {
+    "id": "SETTINGS",
+    "data": {
+      "path": "settings"
+    }
+  },
+  "dependencies": {
+    "@eui/component": "^0.9.0",
+    "@eui/lit-component": "^0.9.0",
+    "@eui/app": "^0.9.1"
+  }
+}

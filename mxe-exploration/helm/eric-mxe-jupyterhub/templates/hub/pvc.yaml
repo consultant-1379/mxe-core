@@ -1,0 +1,28 @@
+{{- if eq .Values.hub.db.type "sqlite-pvc" -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "eric-mxe-jupyterhub.hub-pvc-name" . | quote }}
+  labels:
+    app.kubernetes.io/component: "jupyterhub-hub-persistent-volume-claim"
+    app.kubernetes.io/name: {{ include "eric-mxe-jupyterhub.hub-pvc-name" . | quote }}
+    {{- include "eric-mxe-jupyterhub.labels" . | nindent 4 }}
+  annotations:
+    {{- with .Values.hub.db.pvc.annotations }}
+    {{- . | toYaml | nindent 4 }}
+    {{- end }}
+    {{- include "eric-mxe-jupyterhub.annotations" . | nindent 4 }}
+spec:
+  {{- with .Values.hub.db.pvc.selector }}
+  selector:
+    {{- . | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if typeIs "string" .Values.hub.db.pvc.storageClassName }}
+  storageClassName: {{ .Values.hub.db.pvc.storageClassName | quote }}
+  {{- end }}
+  accessModes:
+    {{- .Values.hub.db.pvc.accessModes | toYaml | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ .Values.hub.db.pvc.storage | quote }}
+{{- end }}

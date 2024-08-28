@@ -1,0 +1,29 @@
+#
+# COPYRIGHT Ericsson 2023
+#
+#
+#
+# The copyright to the computer program(s) herein is the property of
+#
+# Ericsson Inc. The programs may be used and/or copied only with written
+#
+# permission from Ericsson Inc. or in accordance with the terms and
+#
+# conditions stipulated in the agreement/contract under which the
+#
+# program(s) have been supplied.
+#
+#    pip-compile --output-file=requirements.txt --resolver=backtracking requirements.in
+#
+# JupyterHub itself, update this version pinning by running the workflow
+# mentioned above.
+jupyterhub==4.0.1
+
+## Kubernetes spawner
+jupyterhub-kubespawner
+
+## Other optional dependencies for additional features
+pycurl  # internal http requests handle more load with pycurl
+
+# The idle culler service
+jupyterhub-idle-culler

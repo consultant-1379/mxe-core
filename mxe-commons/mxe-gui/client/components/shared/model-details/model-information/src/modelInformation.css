@@ -1,0 +1,107 @@
+/* style goes here */
+:host {
+  display: block;
+  background: var(--card-color-background, var(--card-color-background, #fafafa));
+  padding: 24px;
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.container.error {
+  text-align: center;
+  display: block;
+}
+
+.model-icon,
+eui-v0-icon {
+  max-width: 150px;
+  height: auto;
+  display: inline;
+  align-self: flex-start;
+}
+
+.top {
+  display: flex;
+  margin-bottom: 24px;
+}
+
+.top .title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--text);
+  margin-right: 16px;
+}
+
+.top .subtitle {
+  font-size: 14px;
+  opacity: 0.8;
+  color: var(--text);
+}
+
+.wrapper {
+  display: flex;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) 4fr;
+  grid-column-gap: 64px;
+}
+
+.column {
+  padding-right: 24px;
+}
+
+.column:last-child {
+  padding-right: 0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  margin-left: var(--space-base);
+  transition: all 300ms ease-in-out;
+  /*position: absolute;*/
+  /*top: var(--space-xl);*/
+  /*right: var(--space-xl);*/
+}
+
+.actions eui-base-v0-button {
+  margin-right: var(--space-base);
+}
+
+.column > .title {
+  opacity: 0.8;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text);
+}
+
+.info-table {
+  flex: 1;
+}
+
+.onboard-info {
+  flex: 1;
+}
+
+.description {
+  flex: 3;
+}
+
+.column-name {
+  opacity: 0.6;
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.column-value {
+  opacity: 0.8;
+  font-size: 16px;
+  color: var(--text);
+  white-space: pre-line;
+  user-select: text;
+  margin-bottom: 24px;
+}

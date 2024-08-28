@@ -1,0 +1,27 @@
+{{- if .Values.global.security.tls.enabled -}}
+apiVersion: siptls.sec.ericsson.com/v1
+kind: InternalCertificate
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: {{ include "eric-mxe-default-backend.name" . }}-pg-cert
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: default-backend"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-default-backend.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-default-backend.labels" . | fromYaml -}}
+    {{- include "eric-mxe-default-backend.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-default-backend.annotations" . | nindent 4 }}
+spec:
+  kubernetes:
+    generatedSecretName: {{ include "eric-mxe-default-backend.name" . }}-pg-cert
+    certificateName: {{ include "eric-mxe-default-backend.pg-client-cert" . }}
+    privateKeyName: {{ include "eric-mxe-default-backend.pg-private-key" . }}
+  certificate:
+    subject:
+      cn: {{ include "eric-mxe-default-backend.name" . | replace "-" "" }}
+    issuer:
+      reference: {{  include "eric-mxe-default-backend.pg-ca-issuer" . | quote}}
+    extendedKeyUsage:
+      tlsClientAuth: true
+      tlsServerAuth: false
+{{- end -}}

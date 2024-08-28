@@ -1,0 +1,184 @@
++ case "$(uname -s)" in
+++ uname -s
+++ readlink -f /home/evatsiv/gitViews/mxe-core/3pp-images/argo-workflows/copy_service_image.sh
++ SCRIPT=/home/evatsiv/gitViews/mxe-core/3pp-images/argo-workflows/copy_service_image.sh
+++ dirname /home/evatsiv/gitViews/mxe-core/3pp-images/argo-workflows/copy_service_image.sh
++ BASEDIR=/home/evatsiv/gitViews/mxe-core/3pp-images/argo-workflows
+++ dirname /home/evatsiv/gitViews/mxe-core/3pp-images/argo-workflows
++ MODULEROOT=/home/evatsiv/gitViews/mxe-core/3pp-images
++ ML_PIPELINE_DROP_TAG=1.1.0-hb7ebb42
++ ARGO_WORKFLOW_VERSION=v3.4.9
++ CBO_VERSION=6.14.0-10
++ IMAGES=("argoexec" "argocli" "workflow-controller")
++ SOURCE_PREFIX=eric-aiml-pipeline
++ SOURCE_IMAGE_REPO=armdocker.rnd.ericsson.se/proj-mlops-ci-internal
++ TARGET_IMAGE_PREFIX=armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj
++ for image in "${IMAGES[@]}"
++ SOURCE_IMAGE=armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-argoexec:1.1.0-hb7ebb42
++ TARGET_IMAGE=armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argoexec:v3.4.9-cbos-6.14.0-10
++ echo 'Pulling armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-argoexec:1.1.0-hb7ebb42'
+Pulling armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-argoexec:1.1.0-hb7ebb42
++ docker pull armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-argoexec:1.1.0-hb7ebb42
+1.1.0-hb7ebb42: Pulling from proj-mlops-ci-internal/eric-aiml-pipeline-argoexec
+80a38e635e7c: Already exists
+cecab604ac61: Pulling fs layer
+9804dcd37ecd: Pulling fs layer
+21d9d39b0f11: Pulling fs layer
+34bc4d1e752b: Pulling fs layer
+5a89c29be1af: Pulling fs layer
+5b8763342af9: Pulling fs layer
+34bc4d1e752b: Waiting
+5a89c29be1af: Waiting
+5b8763342af9: Waiting
+21d9d39b0f11: Download complete
+9804dcd37ecd: Verifying Checksum
+9804dcd37ecd: Download complete
+34bc4d1e752b: Verifying Checksum
+34bc4d1e752b: Download complete
+5a89c29be1af: Verifying Checksum
+5a89c29be1af: Download complete
+cecab604ac61: Verifying Checksum
+cecab604ac61: Download complete
+cecab604ac61: Pull complete
+9804dcd37ecd: Pull complete
+21d9d39b0f11: Pull complete
+34bc4d1e752b: Pull complete
+5a89c29be1af: Pull complete
+5b8763342af9: Download complete
+5b8763342af9: Pull complete
+Digest: sha256:c65c80496ab7a7383952390870553eaae6da3a63b1217f2f06ee042ecfba2a3f
+Status: Downloaded newer image for armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-argoexec:1.1.0-hb7ebb42
+armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-argoexec:1.1.0-hb7ebb42
++ docker tag armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-argoexec:1.1.0-hb7ebb42 armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argoexec:v3.4.9-cbos-6.14.0-10
++ echo 'Pushing armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argoexec:v3.4.9-cbos-6.14.0-10'
+Pushing armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argoexec:v3.4.9-cbos-6.14.0-10
++ docker push armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argoexec:v3.4.9-cbos-6.14.0-10
+The push refers to repository [armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argoexec]
+49451f212958: Preparing
+a6deca2653bd: Preparing
+3dba9051d088: Preparing
+f9ee3440b63f: Preparing
+34c77fc674ef: Preparing
+e78cd3db6caa: Preparing
+697db960bc50: Preparing
+e78cd3db6caa: Waiting
+697db960bc50: Waiting
+34c77fc674ef: Layer already exists
+f9ee3440b63f: Layer already exists
+a6deca2653bd: Layer already exists
+49451f212958: Layer already exists
+3dba9051d088: Layer already exists
+697db960bc50: Layer already exists
+e78cd3db6caa: Layer already exists
+v3.4.9-cbos-6.14.0-10: digest: sha256:c65c80496ab7a7383952390870553eaae6da3a63b1217f2f06ee042ecfba2a3f size: 1783
++ for image in "${IMAGES[@]}"
++ SOURCE_IMAGE=armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-argocli:1.1.0-hb7ebb42
++ TARGET_IMAGE=armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argocli:v3.4.9-cbos-6.14.0-10
++ echo 'Pulling armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-argocli:1.1.0-hb7ebb42'
+Pulling armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-argocli:1.1.0-hb7ebb42
++ docker pull armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-argocli:1.1.0-hb7ebb42
+1.1.0-hb7ebb42: Pulling from proj-mlops-ci-internal/eric-aiml-pipeline-argocli
+80a38e635e7c: Already exists
+f10cb81a4296: Pulling fs layer
+b4396dd360ff: Pulling fs layer
+4d21410d7c11: Pulling fs layer
+8716f5f151af: Pulling fs layer
+3c338a400bb0: Pulling fs layer
+d7b265c7ae2a: Pulling fs layer
+8716f5f151af: Waiting
+3c338a400bb0: Waiting
+d7b265c7ae2a: Waiting
+f10cb81a4296: Verifying Checksum
+f10cb81a4296: Download complete
+f10cb81a4296: Pull complete
+4d21410d7c11: Verifying Checksum
+4d21410d7c11: Download complete
+b4396dd360ff: Verifying Checksum
+b4396dd360ff: Download complete
+b4396dd360ff: Pull complete
+4d21410d7c11: Pull complete
+8716f5f151af: Verifying Checksum
+8716f5f151af: Download complete
+8716f5f151af: Pull complete
+d7b265c7ae2a: Verifying Checksum
+d7b265c7ae2a: Download complete
+3c338a400bb0: Verifying Checksum
+3c338a400bb0: Download complete
+3c338a400bb0: Pull complete
+d7b265c7ae2a: Pull complete
+Digest: sha256:4a8c2a56e6f98dbcb1969dd110317f96a83eb3f23c28486b137e2f7306d844f5
+Status: Downloaded newer image for armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-argocli:1.1.0-hb7ebb42
+armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-argocli:1.1.0-hb7ebb42
++ docker tag armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-argocli:1.1.0-hb7ebb42 armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argocli:v3.4.9-cbos-6.14.0-10
++ echo 'Pushing armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argocli:v3.4.9-cbos-6.14.0-10'
+Pushing armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argocli:v3.4.9-cbos-6.14.0-10
++ docker push armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argocli:v3.4.9-cbos-6.14.0-10
+The push refers to repository [armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argocli]
+6a35439cfba0: Preparing
+5407505468c7: Preparing
+3ae4322b6a9d: Preparing
+2e174b7e02e7: Preparing
+24918d32f494: Preparing
+33e336e00a44: Preparing
+697db960bc50: Preparing
+33e336e00a44: Waiting
+697db960bc50: Waiting
+5407505468c7: Layer already exists
+2e174b7e02e7: Layer already exists
+24918d32f494: Layer already exists
+6a35439cfba0: Layer already exists
+3ae4322b6a9d: Layer already exists
+697db960bc50: Layer already exists
+33e336e00a44: Layer already exists
+v3.4.9-cbos-6.14.0-10: digest: sha256:4a8c2a56e6f98dbcb1969dd110317f96a83eb3f23c28486b137e2f7306d844f5 size: 1781
++ for image in "${IMAGES[@]}"
++ SOURCE_IMAGE=armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-workflow-controller:1.1.0-hb7ebb42
++ TARGET_IMAGE=armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/workflow-controller:v3.4.9-cbos-6.14.0-10
++ echo 'Pulling armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-workflow-controller:1.1.0-hb7ebb42'
+Pulling armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-workflow-controller:1.1.0-hb7ebb42
++ docker pull armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-workflow-controller:1.1.0-hb7ebb42
+1.1.0-hb7ebb42: Pulling from proj-mlops-ci-internal/eric-aiml-pipeline-workflow-controller
+80a38e635e7c: Already exists
+cbf8dc409e94: Pulling fs layer
+8525182c195e: Pulling fs layer
+6965d1756ac0: Pulling fs layer
+fc8e30596db6: Pulling fs layer
+1be977548420: Pulling fs layer
+fc8e30596db6: Waiting
+1be977548420: Waiting
+cbf8dc409e94: Download complete
+6965d1756ac0: Verifying Checksum
+6965d1756ac0: Download complete
+cbf8dc409e94: Pull complete
+8525182c195e: Verifying Checksum
+8525182c195e: Download complete
+8525182c195e: Pull complete
+6965d1756ac0: Pull complete
+1be977548420: Verifying Checksum
+1be977548420: Download complete
+fc8e30596db6: Verifying Checksum
+fc8e30596db6: Download complete
+fc8e30596db6: Pull complete
+1be977548420: Pull complete
+Digest: sha256:3f8db21ed702bcf3778d6b8b140d68c8aba09e0da927e4903d3cf3fe28994555
+Status: Downloaded newer image for armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-workflow-controller:1.1.0-hb7ebb42
+armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-workflow-controller:1.1.0-hb7ebb42
++ docker tag armdocker.rnd.ericsson.se/proj-mlops-ci-internal/eric-aiml-pipeline-workflow-controller:1.1.0-hb7ebb42 armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/workflow-controller:v3.4.9-cbos-6.14.0-10
++ echo 'Pushing armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/workflow-controller:v3.4.9-cbos-6.14.0-10'
+Pushing armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/workflow-controller:v3.4.9-cbos-6.14.0-10
++ docker push armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/workflow-controller:v3.4.9-cbos-6.14.0-10
+The push refers to repository [armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/workflow-controller]
+3cf53952504c: Preparing
+946b790d0128: Preparing
+4945a85db7bd: Preparing
+710118a48230: Preparing
+60d418596d3e: Preparing
+697db960bc50: Preparing
+697db960bc50: Waiting
+4945a85db7bd: Layer already exists
+60d418596d3e: Layer already exists
+3cf53952504c: Layer already exists
+946b790d0128: Layer already exists
+710118a48230: Layer already exists
+697db960bc50: Layer already exists
+v3.4.9-cbos-6.14.0-10: digest: sha256:3f8db21ed702bcf3778d6b8b140d68c8aba09e0da927e4903d3cf3fe28994555 size: 1574

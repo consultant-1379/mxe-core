@@ -1,0 +1,8 @@
+{
+  "script": "job-table/JobTable",
+  "id": "JobTable",
+  "data": {},
+  "dependencies": {
+    "@eui/lit-component": "0.7.x"
+  }
+}

@@ -1,0 +1,388 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "affinity": {
+            "type": "object",
+            "properties": {
+                "podAntiAffinity": {
+                    "type": "object",
+                    "properties": {
+                        "preferredDuringSchedulingIgnoredDuringExecution": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "podAffinityTerm": {
+                                        "type": "object",
+                                        "properties": {
+                                            "labelSelector": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "matchExpressions": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "key": {
+                                                                    "type": "string"
+                                                                },
+                                                                "operator": {
+                                                                    "type": "string"
+                                                                },
+                                                                "values": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "topologyKey": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "weight": {
+                                        "type": "integer"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "annotations": {
+            "type": "object"
+        },
+        "appArmorProfile": {
+            "type": "object",
+            "properties": {
+                "localhostProfile": {
+                    "oneOf": [
+                        { "type": "string"},
+                        { "type": "null" }
+                      ]
+                },
+                "type": {
+                    "oneOf": [
+                        { "type": "string",
+                          "enum": ["unconfined","localhost","runtime\/default", ""]
+                        },
+                        { "type": "null" }
+                      ]
+                }
+            }
+        },
+        "auth": {
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "string"
+                },
+                "credentials": {
+                    "type": "object"
+                }
+            }
+        },
+        "enabled": {
+            "type": "boolean"
+        },
+        "fullnameOverride": {
+            "type": "string"
+        },
+        "imageCredentials": {
+            "type": "object",
+            "properties": {
+                "pullSecret": {
+                    "oneOf": [
+                        { "type": "string"},
+                        { "type": "null" }
+                      ]
+                },
+                "pypiserver": {
+                    "type": "object",
+                    "properties": {
+                        "registry": {
+                            "type": "object",
+                            "properties": {
+                                "imagePullPolicy": {
+                                    "anyOf": [
+                                        { "type": "string","enum": ["Always","Never","IfNotPresent"] },
+                                        { "type": "null" }
+                                      ]
+                                },
+                                "pullSecret": {
+                                    "oneOf": [
+                                        { "type": "string"},
+                                        { "type": "null" }
+                                      ]
+                                },
+                                "url": {
+                                    "oneOf": [
+                                        { "type": "string"},
+                                        { "type": "null" }
+                                      ]
+                                }
+                            }
+                        },
+                        "repoPath": {
+                            "oneOf": [
+                                { "type": "string"},
+                                { "type": "null" }
+                              ]
+                        }
+                    }
+                },
+                "registry": {
+                    "type": "object",
+                    "properties": {
+                        "url": {
+                            "oneOf": [
+                                { "type": "string"},
+                                { "type": "null" }
+                              ]
+                        }
+                    }
+                },
+                "repoPath": {
+                    "oneOf": [
+                        { "type": "string"},
+                        { "type": "null" }
+                      ]
+                }
+            }
+        },
+        "imagePullSecrets": {
+            "type": "array"
+        },
+        "images": {
+            "type": "object",
+            "properties": {
+                "pypiserver": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "pullPolicy": {
+                            "anyOf": [
+                                { "type": "string", "enum": ["Always","Never","IfNotPresent"] },
+                                { "type": "null" }
+                              ]
+                        },
+                        "tag": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "labels": {
+            "type": "object"
+        },
+        "nameOverride": {
+            "type": "string"
+        },
+        "nodeSelector": {
+            "type": "object"
+        },
+        "persistence": {
+            "type": "object",
+            "properties": {
+                "persistentVolumeClaim": {
+                    "type": "object",
+                    "properties": {
+                        "accessModes": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "annotations": {
+                            "type": "object"
+                        },
+                        "size": {
+                            "type": "string"
+                        },
+                        "storageClassName": {
+                            "oneOf": [
+                                { "type": "string"},
+                                { "type": "null" }
+                              ]
+                        }
+                    }
+                }
+            }
+        },
+        "podPriority": {
+            "type": "object",
+            "properties": {
+                "pypiserver": {
+                    "type": "object",
+                    "properties": {
+                        "priorityClassName": {
+                            "oneOf": [
+                                { "type": "string"},
+                                { "type": "null" }
+                              ]
+                        }
+                    }
+                }
+            }
+        },
+        "probes": {
+            "type": "object",
+            "properties": {
+                "pypiserver": {
+                    "type": "object",
+                    "properties": {
+                        "livenessProbe": {
+                            "type": "object",
+                            "properties": {
+                                "failureThreshold": {
+                                    "type": "integer"
+                                },
+                                "initialDelaySeconds": {
+                                    "type": "integer"
+                                },
+                                "timeoutSeconds": {
+                                    "type": "integer"
+                                }
+                            }
+                        },
+                        "readinessProbe": {
+                            "type": "object",
+                            "properties": {
+                                "initialDelaySeconds": {
+                                    "type": "integer"
+                                },
+                                "periodSeconds": {
+                                    "type": "integer"
+                                },
+                                "timeoutSeconds": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "productInfo": {
+            "type": "object",
+            "properties": {
+                "rstate": {
+                    "type": "string"
+                }
+            }
+        },
+        "pypiserver": {
+            "type": "object",
+            "properties": {
+                "extraArgs": {
+                    "type": "array"
+                }
+            }
+        },
+        "replicaCount": {
+            "type": "integer"
+        },
+        "resources": {
+            "type": "object",
+            "properties": {
+                "pypiserver": {
+                    "type": "object",
+                    "properties": {
+                        "limits": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": "string"
+                                },
+                                "ephemeral-storage": {
+                                    "type": "string"
+                                },
+                                "memory": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "requests": {
+                            "type": "object",
+                            "properties": {
+                                "cpu": {
+                                    "type": "string"
+                                },
+                                "ephemeral-storage": {
+                                    "type": "string"
+                                },
+                                "memory": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "seccompProfile": {
+            "type": "object",
+            "properties": {
+                "localhostProfile": {
+                    "oneOf": [
+                        { "type": "string"},
+                        { "type": "null" }
+                      ]
+                },
+                "type": {
+                    "oneOf": [
+                        { "type": "string", "enum": ["RuntimeDefault","Unconfined","Localhost", ""] },
+                        { "type": "null" }
+                      ]
+                }
+            }
+        },
+        "service": {
+            "type": "object",
+            "properties": {
+                "port": {
+                    "type": "integer"
+                }
+            }
+        },
+        "serviceMesh": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "tlsMode": {
+                    "type": "string"
+                }
+            }
+        },
+        "terminationGracePeriodSeconds": {
+            "type": "integer"
+        },
+        "tolerations": {
+            "type": "array"
+        },
+        "topologySpreadConstraints": {
+            "type": "array"
+        },
+        "updateStrategy": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": ["Recreate","RollingUpdate"]
+                }
+            }
+        }
+    }
+}

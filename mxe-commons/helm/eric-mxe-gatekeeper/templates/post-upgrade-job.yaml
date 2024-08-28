@@ -1,0 +1,76 @@
+{{- $global := fromJson (include "eric-mxe-gatekeeper.global" .) -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "eric-mxe-gatekeeper-upgrade-jobs.realm-updater-name" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: realm-updater-job"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-gatekeeper.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-gatekeeper.labels" . | fromYaml -}}
+    {{- include "eric-mxe-gatekeeper.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $hook := printf "%s" "helm.sh/hook: post-upgrade"  | fromYaml -}}
+    {{- $hookDeletePolicy := printf "%s" "helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation"  | fromYaml -}}
+    {{- $annotations := include "eric-mxe-gatekeeper.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-gatekeeper.mergeAnnotations" (dict "location" .Template.Name "sources" (list $hook $hookDeletePolicy $annotations)) | trim | nindent 4 }}
+spec:
+  completions: 1
+  parallelism: 1
+  backoffLimit: 3
+  template:
+    metadata:
+      annotations:
+        {{- $istio := include "eric-mxe-gatekeeper.job-istio-annotations" . | fromYaml -}}
+        {{- $annotations := include "eric-mxe-gatekeeper.annotations" . | fromYaml -}}
+        {{- $security := include "eric-mxe-gatekeeper.security-annotations-post-upgrade" . | fromYaml -}}
+        {{- include "eric-mxe-gatekeeper.mergeAnnotations" (dict "location" .Template.Name "sources" (list $istio $annotations $security)) | trim | nindent 8 }}
+      labels:
+        {{- include "eric-mxe-gatekeeper.job-istio-labels" . | indent 8 }}
+    spec:
+      {{- if include "eric-mxe-gatekeeper.realmUpdaterJob.podPriority" . }}
+      priorityClassName: {{- include "eric-mxe-gatekeeper.realmUpdaterJob.podPriority" . | indent 2 }}
+      {{- end }}
+      serviceAccountName: {{ include "eric-mxe-gatekeeper.serviceaccount" . | quote }}
+      containers:
+        - name: realm-updater-job
+          {{- with .Values.imageCredentials.keycloakinit }}
+          image: "{{ include "eric-mxe-gatekeeper.setImageRepo" (list $ .registry.url .repoPath "keycloakinit") }}{{ $.Values.images.keycloakinit.name }}:{{ $.Values.images.keycloakinit.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-gatekeeper.registryImagePullPolicy" (list . .Values.imageCredentials.keycloakinit.registry.imagePullPolicy) }}
+          {{- include "eric-mxe-gatekeeper.post-upgrade-job-keycloak-init-args-command" . | nindent 10 }}
+          env:
+            - name: GATEKEEPER_CONFIG_SERVICE_CONFIG_SECRET_NAME
+              value: {{ include "eric-mxe-gatekeeper.secret-config" . | quote }}
+            - name: KEYCLOAK_INIT_SERVICE_SERVER_URL
+              value: {{ include "eric-mxe-gatekeeper.keycloak-path" . | quote }}
+            - name: KEYCLOAK_INIT_SERVICE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-gatekeeper.secret-realm-master" . | quote }}
+                  key: "kcadminid"
+            - name: KEYCLOAK_INIT_SERVICE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-gatekeeper.secret-realm-master" . | quote }}
+                  key: "kcpasswd"
+            - name: REALM_NAME
+              value: "{{ .Values.keycloak.realm.mxe.realmName }}"
+            - name: SERVICE_MESH_MTLS_ENABLED
+              value: {{ .Values.global.serviceMesh.enabled | quote }}
+            - name: KEYSTORE_FILE_PATH
+              value: "/tmp/server.keystore"
+            - name: TRUSTCA_FILE_PATH
+              value: "/tmp/castore"
+          {{- include "eric-mxe-gatekeeper.post-upgrade-job-volume-mounts" . | nindent 10 }}
+          resources:
+            {{- toYaml .Values.resources.realmUpdaterJob | trim | nindent 12 }}
+          securityContext:
+            {{- include "eric-mxe-gatekeeper-upgrade-jobs.securityContext" . | nindent 12 }}
+      {{- include "eric-mxe-gatekeeper.tolerations" . | nindent 6 }}
+      tolerations: {{ include "eric-mxe-gatekeeper.merge-tolerations" (dict "root" . "podbasename" "eric-mxe-gatekeeper") | nindent 6}}  
+      {{- include "eric-mxe-gatekeeper.post-upgrade-job-volumes" . | nindent 6 }}
+      restartPolicy: Never
+      {{- if (or .Values.nodeSelector $global.nodeSelector) }}
+      nodeSelector: {{- include "eric-mxe-gatekeeper.nodeSelector" . | nindent 8 }}
+      {{- end }}
+      {{- include "eric-mxe-gatekeeper.image-pull-secrets" . | nindent 6 }}

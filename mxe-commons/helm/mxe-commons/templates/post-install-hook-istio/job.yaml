@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "mxe-commons.post-install-hook-istio-name" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: post-install-hook-istio-job"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "mxe-commons.post-install-hook-istio-name" .)  | fromYaml -}}
+    {{- $mxeLabels := include "mxe-commons.standard-labels" . | fromYaml -}}
+    {{- include "mxe-commons.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $mxeLabels )) | trim | nindent 4 }}
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": "hook-succeeded,before-hook-creation"
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+spec:
+  completions: 1
+  parallelism: 1
+  backoffLimit: 3
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "false"
+        {{- include "mxe-commons.security-annotations-post-install-hook" . | nindent 8 }}
+      labels:
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ include "mxe-commons.post-install-hook-istio-name" . | quote }}
+      containers:
+        - name: post-install-hook-istio
+          image: "{{ include "mxe-commons.post-install-hook-istio.image-repository" . }}{{ index .Values "mxePostInstallHookIstio" "image" "name" }}:{{ index .Values "mxePostInstallHookIstio" "image" "tag" }}"
+          imagePullPolicy: "{{ include "mxe-commons.registryImagePullPolicy" (list . (index .Values "mxePostInstallHookIstio" "image" "pullPolicy" )) }}"
+          volumeMounts:
+            - mountPath: "/etc/kubernetes-run-script/"
+              name: kubernetes-run-script
+          env:
+            - name: MXE_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace    
+            - name: INGRESS_CONFIG_SNIPPET
+              value: {{ include "mxe-commons.post-install-hook-ingress-config-snippet" . | quote }}
+          securityContext:
+            {{- include "mxe-commons.post-install-hook-security-context" . | nindent 12 }}
+      restartPolicy: Never
+      volumes:
+      - configMap:
+          name: {{ include "mxe-commons.post-install-hook-istio-name" . | quote }}
+          defaultMode: 0744
+        name: kubernetes-run-script
+      {{- include "mxe-commons.post-install-hook-istio.image-pull-secrets" . | nindent 6 }}

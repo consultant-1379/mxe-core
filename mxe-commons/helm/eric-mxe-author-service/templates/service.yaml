@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "eric-mxe-author-service.name" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: author-service"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-author-service.name" .)  | fromYaml -}}
+    {{- $authSrvLabels := include "eric-mxe-author-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-author-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $authSrvLabels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-author-service.annotations" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- if .Values.global }}
+  {{- if .Values.global.internalIPFamily }}
+  ipFamilies: [ {{ .Values.global.internalIPFamily | quote }} ]
+  {{- end }}
+  {{- end }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.service.metrics }}
+      targetPort: mgmt
+      protocol: TCP
+      name: metrics
+      appProtocol: http
+  selector:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "author-service"
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}

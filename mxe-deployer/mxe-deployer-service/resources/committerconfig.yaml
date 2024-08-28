@@ -1,0 +1,13 @@
+authors:
+    - domain: gitlab.internal.ericsson.com
+      name: Raman N
+      email: raman.n@ericsson.com
+    - domain: gerrit.ericsson.se
+      name: RAMAN N
+      email: Raman.n@ericsson.com
+    - domain: mxe.olah024.gitea.rnd.gic.ericsson.se
+      name: RaMaN N
+      email: RAMAN.N@ERICSSON.COM
+    - domain: default
+      name: MXE Deployer
+      email: MXEDeployer@ericsson.com

@@ -1,0 +1,17 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: {{ include "eric-mxe-jupyterhub.proxy-service-public-name" . }}-dr
+  labels:
+    app.kubernetes.io/component: "jupyterhub-proxy-dr"
+    app.kubernetes.io/name: {{ include "eric-mxe-jupyterhub.proxy-service-public-name" . | quote }}
+    {{- include "eric-mxe-jupyterhub.labels" . | nindent 4 }}
+  annotations: {{ include "eric-mxe-jupyterhub.annotations" . | nindent 4 }}
+spec:
+  host: {{ include "eric-mxe-jupyterhub.proxy-service-public-name" . | quote }}
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+{{ end }}

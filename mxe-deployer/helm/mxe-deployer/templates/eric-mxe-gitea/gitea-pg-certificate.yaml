@@ -1,0 +1,30 @@
+{{- if .Values.global.security.tls.enabled -}}
+apiVersion: siptls.sec.ericsson.com/v1
+kind: InternalCertificate
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: gitea-pg-certificate
+  labels:
+    app.kubernetes.io/part-of: "mxe-gitea"
+    app.kubernetes.io/component: "mxe-gitea"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name:  mxe-deployer-gitea-http-dr
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-gitea.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- include "mxe-gitea.product-info" . | nindent 4 }}
+spec:
+  kubernetes:
+    generatedSecretName: gitea-pg-certificate
+    certificateName: clicert.pem
+    privateKeyName: cliprivkey.pem
+  certificate:
+    subject:
+      cn: gitea
+    issuer:
+      reference: eric-data-document-database-pg-client-ca
+    extendedKeyUsage:
+      tlsClientAuth: true
+      tlsServerAuth: false
+{{- end -}}

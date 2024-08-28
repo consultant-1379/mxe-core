@@ -1,0 +1,38 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="MxePerformanceTestSuite">
+
+    <listeners>
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGTestListener" />
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGSuiteListener" />
+    </listeners>
+
+    <parameter name="cluster" value="cluster3" />
+
+    <test name="Access Control Test">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeAccessControlTest">
+                <parameter name="packageName" value="armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:0.0.1" />
+                <parameter name="secondPackageName" value="armdocker.rnd.ericsson.se/proj-mxe-models/image/img_vgg16:0.0.1" />
+                <parameter name="modelId" value="inception3" />
+                <parameter name="secondModelId" value="vgg16" />
+                <parameter name="modelVersion" value="0.0.1" />
+                <parameter name="secondModelVersion" value="0.0.1" />
+                <methods>
+                    <include name="mxeUserTest">
+                        <parameter name="newUserName" value="newusername"></parameter>
+                        <parameter name="newPassword" value="newpassword"></parameter>
+                    </include>
+                    <include name="basicAccessControlTest" />
+                    <include name="modelAccessControlTestWithRoles" />
+                    <include name="modelAccessControlTestWithGroups" />
+                    <exclude name="serviceAccessControlTestWithRoles" />
+                    <exclude name="serviceAccessControlTestWithGroups" />
+                    <exclude name ="serviceAccessControlTestWithRoles" />
+                    <exclude name="serviceAccessControlTestWithGroups" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+</suite>

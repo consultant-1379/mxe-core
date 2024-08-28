@@ -1,0 +1,43 @@
+rbac:
+  roleFullNameOverride:
+
+ingress:
+  nameOverride: null
+  enabled: true
+  hostname: null
+  secretName: null
+  ingressClass: eric-mxe-ingress-controller-class
+  annotationPrefix: null
+  defaultBackendFullNameOverride: null
+  defaultBackendNameOverride: null
+  owasp:
+    enabled: true
+
+labels: {}
+annotations: {}
+nodeSelector: {}
+
+tolerations: []
+
+terminationGracePeriodSeconds: 30
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "-"
+
+# DR-D1121-011 - Present in Top Level Helm Chart Values.yaml
+# global:
+#   mxeApiTlsSecretName:
+#   mxeApiHostname:
+#   mxeDisableDefaultIngressControllerUse: false
+#   registry:
+#     url: "armdocker.rnd.ericsson.se"
+#     pullSecret:
+#   values: {}
+#   annotations: {}
+
+serviceMesh:
+  enabled: true
+  tlsMode: MUTUAL

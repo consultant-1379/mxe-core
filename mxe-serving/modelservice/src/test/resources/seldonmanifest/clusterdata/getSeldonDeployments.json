@@ -1,0 +1,919 @@
+{
+  "apiVersion" : "machinelearning.seldon.io/v1",
+  "items" : [ {
+    "apiVersion" : "machinelearning.seldon.io/v1",
+    "kind" : "SeldonDeployment",
+    "metadata" : {
+      "clusterName" : "",
+      "creationTimestamp" : "2019-03-02T20:58:13Z",
+      "generation" : 1.0,
+      "labels" : {
+        "app" : "seldon",
+        "app.kubernetes.io/deploy-manager" : "ksonnet",
+        "ksonnet.io/component" : "img-abtest",
+        "mxe/deploymenttype": "static",
+        "mxe/createdbyuserid": "user-img-abtest",
+        "mxe/createdbyusername": "username-img-abtest"
+      },
+      "name" : "img-abtest",
+      "namespace" : "mxe",
+      "resourceVersion" : "24709329",
+      "selfLink" : "/apis/machinelearning.seldon.io/v1/namespaces/mxe/seldondeployments/img-abtest",
+      "uid" : "e4fff0ed-3d2d-11e9-87fc-0050569a614d"
+    },
+    "spec" : {
+      "annotations" : {
+        "deployment_version" : "v1",
+        "project_name" : "img-abtest",
+        "seldon.io/rest-read-timeout": "0"
+      },
+      "name" : "img-abtest",
+      "predictors" : [ {
+        "componentSpecs" : [ {
+          "metadata" : {
+            "annotations" : {
+              "fluentbit.io/parser" : "parizer"
+            },
+            "labels" : {
+              "seldon-app-classifier-1" : "img-abtest-img-abtest-classifier-1",
+              "version" : "v2"
+            }
+          },
+          "spec" : {
+            "containers" : [ {
+              "env" : [ {
+                "name" : "PREDICTIVE_UNIT_SERVICE_PORT",
+                "value" : "9000"
+              }, {
+                "name" : "PREDICTIVE_UNIT_PARAMETERS",
+                "value" : "[]"
+              }, {
+                "name" : "PREDICTIVE_UNIT_ID",
+                "value" : "classifier-1"
+              }, {
+                "name" : "PREDICTOR_ID",
+                "value" : "img-abtest"
+              }, {
+                "name" : "SELDON_DEPLOYMENT_ID",
+                "value" : "img-abtest"
+              } ],
+              "image" : "vmx-eea166.ete.ka.sw.ericsson.se:32222/img_vgg16:v0.0.1",
+              "imagePullPolicy" : "IfNotPresent",
+              "lifecycle" : {
+                "preStop" : {
+                  "exec" : {
+                    "command" : [ "/bin/sh", "-c", "/bin/sleep 5" ]
+                  }
+                }
+              },
+              "livenessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "name" : "classifier-1",
+              "ports" : [ {
+                "containerPort" : 9000.0,
+                "name" : "http"
+              } ],
+              "readinessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "volumeMounts" : [ {
+                "mountPath" : "/etc/podinfo",
+                "name" : "podinfo",
+                "readOnly" : true
+              } ]
+            } ],
+            "terminationGracePeriodSeconds" : 1.0
+          }
+        }, {
+          "metadata" : {
+            "annotations" : {
+              "fluentbit.io/parser" : "parizer"
+            },
+            "labels" : {
+              "seldon-app-classifier-2" : "img-abtest-img-abtest-classifier-2",
+              "version" : "v2"
+            }
+          },
+          "spec" : {
+            "containers" : [ {
+              "env" : [ {
+                "name" : "PREDICTIVE_UNIT_SERVICE_PORT",
+                "value" : "9001"
+              }, {
+                "name" : "PREDICTIVE_UNIT_PARAMETERS",
+                "value" : "[]"
+              }, {
+                "name" : "PREDICTIVE_UNIT_ID",
+                "value" : "classifier-2"
+              }, {
+                "name" : "PREDICTOR_ID",
+                "value" : "img-abtest"
+              }, {
+                "name" : "SELDON_DEPLOYMENT_ID",
+                "value" : "img-abtest"
+              } ],
+              "image" : "vmx-eea166.ete.ka.sw.ericsson.se:32222/img_inception3:v0.0.1",
+              "imagePullPolicy" : "IfNotPresent",
+              "lifecycle" : {
+                "preStop" : {
+                  "exec" : {
+                    "command" : [ "/bin/sh", "-c", "/bin/sleep 5" ]
+                  }
+                }
+              },
+              "livenessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "name" : "classifier-2",
+              "ports" : [ {
+                "containerPort" : 9001.0,
+                "name" : "http"
+              } ],
+              "readinessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "volumeMounts" : [ {
+                "mountPath" : "/etc/podinfo",
+                "name" : "podinfo",
+                "readOnly" : true
+              } ]
+            } ],
+            "terminationGracePeriodSeconds" : 1.0
+          }
+        } ],
+        "graph" : {
+          "children" : [ {
+            "endpoint" : {
+              "service_host" : "img-abtest-img-abtest-classifier-1",
+              "service_port" : 9000.0,
+              "type" : "REST"
+            },
+            "name" : "classifier-1",
+            "type" : "MODEL"
+          }, {
+            "endpoint" : {
+              "service_host" : "img-abtest-img-abtest-classifier-2",
+              "service_port" : 9001.0,
+              "type" : "REST"
+            },
+            "name" : "classifier-2",
+            "type" : "MODEL"
+          } ],
+          "endpoint" : { },
+          "implementation" : "RANDOM_ABTEST",
+          "name" : "random-ab-test",
+          "parameters" : [ {
+            "name" : "ratioA",
+            "type" : "FLOAT",
+            "value" : "0.3"
+          } ]
+        },
+        "name" : "img-abtest",
+        "replicas" : 1.0
+      } ]
+    },
+    "status" : {
+      "predictorStatus" : [ {
+        "name" : "img-abtest-img-abtest-svc-orch",
+        "replicas" : 1.0,
+        "replicasAvailable" : 1.0
+      }, {
+        "name" : "img-abtest-img-abtest-classifier-2-1",
+        "replicas" : 1.0,
+        "replicasAvailable" : 1.0
+      }, {
+        "name" : "img-abtest-img-abtest-classifier-1-0",
+        "replicas" : 1.0,
+        "replicasAvailable" : 1.0
+      } ],
+      "state" : "Creating"
+    }
+  }, {
+    "apiVersion" : "machinelearning.seldon.io/v1",
+    "kind" : "SeldonDeployment",
+    "metadata" : {
+      "clusterName" : "",
+      "creationTimestamp" : "2019-03-02T20:58:21Z",
+      "generation" : 1.0,
+      "labels" : {
+        "app" : "seldon",
+        "app.kubernetes.io/deploy-manager" : "ksonnet",
+        "ksonnet.io/component" : "img-mab",
+        "mxe/deploymenttype": "dynamic",
+        "mxe/createdbyuserid": "user-img-mab",
+        "mxe/createdbyusername": "username-img-mab"
+      },
+      "name" : "img-mab",
+      "namespace" : "mxe",
+      "resourceVersion" : "24709363",
+      "selfLink" : "/apis/machinelearning.seldon.io/v1/namespaces/mxe/seldondeployments/img-mab",
+      "uid" : "e987ca0f-3d2d-11e9-87fc-0050569a614d"
+    },
+    "spec" : {
+      "annotations" : {
+        "deployment_version" : "v1",
+        "project_name" : "img-mab"
+      },
+      "name" : "img-mab",
+      "predictors" : [ {
+        "componentSpecs" : [ {
+          "metadata" : {
+            "labels" : {
+              "seldon-app-classifier-1" : "img-mab-img-mab-classifier-1",
+              "version" : "v1"
+            }
+          },
+          "spec" : {
+            "containers" : [ {
+              "env" : [ {
+                "name" : "PREDICTIVE_UNIT_SERVICE_PORT",
+                "value" : "9000"
+              }, {
+                "name" : "PREDICTIVE_UNIT_PARAMETERS",
+                "value" : "[]"
+              }, {
+                "name" : "PREDICTIVE_UNIT_ID",
+                "value" : "classifier-1"
+              }, {
+                "name" : "PREDICTOR_ID",
+                "value" : "img-mab"
+              }, {
+                "name" : "SELDON_DEPLOYMENT_ID",
+                "value" : "img-mab"
+              } ],
+              "image" : "vmx-eea166.ete.ka.sw.ericsson.se:32222/img_vgg16:v0.0.1",
+              "imagePullPolicy" : "IfNotPresent",
+              "lifecycle" : {
+                "preStop" : {
+                  "exec" : {
+                    "command" : [ "/bin/sh", "-c", "/bin/sleep 5" ]
+                  }
+                }
+              },
+              "livenessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "name" : "classifier-1",
+              "ports" : [ {
+                "containerPort" : 9000.0,
+                "name" : "http"
+              } ],
+              "readinessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "volumeMounts" : [ {
+                "mountPath" : "/etc/podinfo",
+                "name" : "podinfo",
+                "readOnly" : true
+              } ]
+            } ],
+            "terminationGracePeriodSeconds" : 1.0
+          }
+        }, {
+          "metadata" : {
+            "labels" : {
+              "seldon-app-classifier-2" : "img-mab-img-mab-classifier-2",
+              "version" : "v2"
+            }
+          },
+          "spec" : {
+            "containers" : [ {
+              "env" : [ {
+                "name" : "PREDICTIVE_UNIT_SERVICE_PORT",
+                "value" : "9001"
+              }, {
+                "name" : "PREDICTIVE_UNIT_PARAMETERS",
+                "value" : "[]"
+              }, {
+                "name" : "PREDICTIVE_UNIT_ID",
+                "value" : "classifier-2"
+              }, {
+                "name" : "PREDICTOR_ID",
+                "value" : "img-mab"
+              }, {
+                "name" : "SELDON_DEPLOYMENT_ID",
+                "value" : "img-mab"
+              } ],
+              "image" : "vmx-eea166.ete.ka.sw.ericsson.se:32222/img_inception3:v0.0.1",
+              "imagePullPolicy" : "IfNotPresent",
+              "lifecycle" : {
+                "preStop" : {
+                  "exec" : {
+                    "command" : [ "/bin/sh", "-c", "/bin/sleep 5" ]
+                  }
+                }
+              },
+              "livenessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "name" : "classifier-2",
+              "ports" : [ {
+                "containerPort" : 9001.0,
+                "name" : "http"
+              } ],
+              "readinessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "volumeMounts" : [ {
+                "mountPath" : "/etc/podinfo",
+                "name" : "podinfo",
+                "readOnly" : true
+              } ]
+            } ],
+            "terminationGracePeriodSeconds" : 1.0
+          }
+        }, {
+          "metadata" : {
+            "labels" : {
+              "seldon-app-eg-router" : "img-mab-img-mab-eg-router"
+            }
+          },
+          "spec" : {
+            "containers" : [ {
+              "env" : [ {
+                "name" : "PREDICTIVE_UNIT_SERVICE_PORT",
+                "value" : "9002"
+              }, {
+                "name" : "PREDICTIVE_UNIT_PARAMETERS",
+                "value" : "[{\"name\":\"n_branches\",\"value\":\"2\",\"type\":\"INT\"},{\"name\":\"epsilon\",\"value\":\"0.2\",\"type\":\"FLOAT\"},{\"name\":\"verbose\",\"value\":\"1\",\"type\":\"BOOL\"}]"
+              }, {
+                "name" : "PREDICTIVE_UNIT_ID",
+                "value" : "eg-router"
+              }, {
+                "name" : "PREDICTOR_ID",
+                "value" : "img-mab"
+              }, {
+                "name" : "SELDON_DEPLOYMENT_ID",
+                "value" : "img-mab"
+              } ],
+              "image" : "seldonio/mab_epsilon_greedy:1.1",
+              "imagePullPolicy" : "IfNotPresent",
+              "lifecycle" : {
+                "preStop" : {
+                  "exec" : {
+                    "command" : [ "/bin/sh", "-c", "/bin/sleep 5" ]
+                  }
+                }
+              },
+              "livenessProbe" : {
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 10.0,
+                "periodSeconds" : 5.0
+              },
+              "name" : "eg-router",
+              "ports" : [ {
+                "containerPort" : 9002.0,
+                "name" : "http"
+              } ],
+              "readinessProbe" : {
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 10.0,
+                "periodSeconds" : 5.0
+              },
+              "volumeMounts" : [ {
+                "mountPath" : "/etc/podinfo",
+                "name" : "podinfo",
+                "readOnly" : true
+              } ]
+            } ],
+            "terminationGracePeriodSeconds" : 1.0
+          }
+        } ],
+        "graph" : {
+          "children" : [ {
+            "endpoint" : {
+              "service_host" : "img-mab-img-mab-classifier-1",
+              "service_port" : 9000.0,
+              "type" : "REST"
+            },
+            "name" : "classifier-1",
+            "type" : "MODEL"
+          }, {
+            "endpoint" : {
+              "service_host" : "img-mab-img-mab-classifier-2",
+              "service_port" : 9001.0,
+              "type" : "REST"
+            },
+            "name" : "classifier-2",
+            "type" : "MODEL"
+          } ],
+          "endpoint" : {
+            "service_host" : "img-mab-img-mab-eg-router",
+            "service_port" : 9002.0,
+            "type" : "REST"
+          },
+          "name" : "eg-router",
+          "parameters" : [ {
+            "name" : "n_branches",
+            "type" : "INT",
+            "value" : "2"
+          }, {
+            "name" : "epsilon",
+            "type" : "FLOAT",
+            "value" : "0.2"
+          }, {
+            "name" : "verbose",
+            "type" : "BOOL",
+            "value" : "1"
+          } ],
+          "type" : "ROUTER"
+        },
+        "name" : "img-mab",
+        "replicas" : 1.0
+      } ]
+    },
+    "status" : {
+      "predictorStatus" : [ {
+        "name" : "img-mab-img-mab-classifier-2-1",
+        "replicas" : 1.0,
+        "replicasAvailable" : 1.0
+      }, {
+        "name" : "img-mab-img-mab-svc-orch",
+        "replicas" : 1.0,
+        "replicasAvailable" : 1.0
+      }, {
+        "name" : "img-mab-img-mab-eg-router-2",
+        "replicas" : 1.0,
+        "replicasAvailable" : 1.0
+      }, {
+        "name" : "img-mab-img-mab-classifier-1-0",
+        "replicas" : 1.0,
+        "replicasAvailable" : 1.0
+      } ],
+      "state" : "Failed",
+      "description": "Failed to create deployment img-mab"
+
+    }
+  }, {
+    "apiVersion" : "machinelearning.seldon.io/v1",
+    "kind" : "SeldonDeployment",
+    "metadata" : {
+      "annotations" : {
+        "kubectl.kubernetes.io/last-applied-configuration" : "{\"apiVersion\":\"machinelearning.seldon.io/v1\",\"kind\":\"SeldonDeployment\",\"metadata\":{\"name\":\"iot-model-a\",\"namespace\":\"mxe\",\"selfLink\":\"/apis/machinelearning.seldon.io/v1/namespaces/mxe/seldondeployments/iot-model-a\",\"uid\":\"e4f6e1cf-3eca-11e9-b4a8-0050569a0898\",\"generation\":1,\"creationTimestamp\":\"2019-03-04T22:14:35Z\",\"labels\":{\"app\":\"seldon\",\"mxe/component\":\"iot-model-a\",\"mxe/version\":\"0.0.1beta\"},\"clusterName\":\"\"},\"spec\":{\"name\":\"iot-model-a\",\"predictors\":[{\"name\":\"iot-model-a\",\"graph\":{\"name\":\"iot-model-a\",\"type\":\"MODEL\",\"endpoint\":{\"service_host\":\"iot-model-a-iot-model-a-iot-model-a\",\"service_port\":9000,\"type\":\"REST\"}},\"componentSpecs\":[{\"metadata\":{\"labels\":{\"seldon-app-iot-model-a\":\"iot-model-a-iot-model-a-iot-model-a\"}},\"spec\":{\"containers\":[{\"name\":\"iot-model-a\",\"image\":\"vmx-eea166.ete.ka.sw.ericsson.se:32222/iot/machine-detection-a-model:0.0.1\",\"ports\":[{\"name\":\"http\",\"containerPort\":9000}],\"env\":[{\"name\":\"PREDICTIVE_UNIT_SERVICE_PORT\",\"value\":\"9000\"},{\"name\":\"PREDICTIVE_UNIT_PARAMETERS\",\"value\":\"[]\"},{\"name\":\"PREDICTIVE_UNIT_ID\",\"value\":\"iot-model-a\"},{\"name\":\"PREDICTOR_ID\",\"value\":\"iot-model-a\"},{\"name\":\"SELDON_DEPLOYMENT_ID\",\"value\":\"iot-model-a\"}],\"volumeMounts\":[{\"name\":\"podinfo\",\"readOnly\":true,\"mountPath\":\"/etc/podinfo\"}],\"livenessProbe\":{\"handler\":{\"tcpSocket\":{\"port\":\"http\"}},\"initialDelaySeconds\":100,\"timeoutSeconds\":1,\"periodSeconds\":5,\"successThreshold\":1,\"failureThreshold\":3},\"readinessProbe\":{\"handler\":{\"tcpSocket\":{\"port\":\"http\"}},\"initialDelaySeconds\":100,\"timeoutSeconds\":1,\"periodSeconds\":5,\"successThreshold\":1,\"failureThreshold\":3},\"lifecycle\":{\"preStop\":{\"exec\":{\"command\":[\"/bin/sh\",\"-c\",\"/bin/sleep 5\"]}}},\"imagePullPolicy\":\"IfNotPresent\"}],\"terminationGracePeriodSeconds\":1}}],\"replicas\":1,\"annotations\":{\"predictor_version\":\"v1\"}}],\"annotations\":{\"deployment_version\":\"v1\",\"project_name\":\"iot-model-a\"}},\"status\":{\"state\":\"Available\",\"predictorStatus\":[{\"name\":\"iot-model-a-iot-model-a-iot-model-a-0\",\"replicas\":1,\"replicasAvailable\":1},{\"name\":\"iot-model-a-iot-model-a-svc-orch\",\"replicas\":1,\"replicasAvailable\":1}]}}\n"
+      },
+      "clusterName" : "",
+      "creationTimestamp" : "2019-03-04T22:14:35Z",
+      "generation" : 1.0,
+      "labels" : {
+        "app" : "seldon",
+        "mxe/component" : "iot-model-a",
+        "mxe/version" : "0.0.1beta",
+        "mxe/deploymenttype": "model"
+      },
+      "name" : "iot-model-a",
+      "namespace" : "mxe",
+      "resourceVersion" : "22889648",
+      "selfLink" : "/apis/machinelearning.seldon.io/v1/namespaces/mxe/seldondeployments/iot-model-a",
+      "uid" : "e4f6e1cf-3eca-11e9-b4a8-0050569a0898"
+    },
+    "spec" : {
+      "annotations" : {
+        "deployment_version" : "v1",
+        "project_name" : "iot-model-a"
+      },
+      "name" : "iot-model-a",
+      "predictors" : [ {
+        "annotations" : {
+          "predictor_version" : "v1"
+        },
+        "componentSpecs" : [ {
+          "metadata" : {
+            "labels" : {
+              "seldon-app-iot-model-a" : "iot-model-a-iot-model-a-iot-model-a"
+            }
+          },
+          "spec" : {
+            "containers" : [ {
+              "env" : [ {
+                "name" : "PREDICTIVE_UNIT_SERVICE_PORT",
+                "value" : "9000"
+              }, {
+                "name" : "PREDICTIVE_UNIT_PARAMETERS",
+                "value" : "[]"
+              }, {
+                "name" : "PREDICTIVE_UNIT_ID",
+                "value" : "iot-model-a"
+              }, {
+                "name" : "PREDICTOR_ID",
+                "value" : "iot-model-a"
+              }, {
+                "name" : "SELDON_DEPLOYMENT_ID",
+                "value" : "iot-model-a"
+              } ],
+              "image" : "vmx-eea166.ete.ka.sw.ericsson.se:32222/iot/machine-detection-a-model:0.0.1",
+              "imagePullPolicy" : "IfNotPresent",
+              "lifecycle" : {
+                "preStop" : {
+                  "exec" : {
+                    "command" : [ "/bin/sh", "-c", "/bin/sleep 5" ]
+                  }
+                }
+              },
+              "livenessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "name" : "iot-model-a",
+              "ports" : [ {
+                "containerPort" : 9000.0,
+                "name" : "http"
+              } ],
+              "readinessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "volumeMounts" : [ {
+                "mountPath" : "/etc/podinfo",
+                "name" : "podinfo",
+                "readOnly" : true
+              } ]
+            } ],
+            "terminationGracePeriodSeconds" : 1.0
+          }
+        } ],
+        "graph" : {
+          "endpoint" : {
+            "service_host" : "iot-model-a-iot-model-a-iot-model-a",
+            "service_port" : 9000.0,
+            "type" : "REST"
+          },
+          "name" : "iot-model-a",
+          "type" : "MODEL"
+        },
+        "name" : "iot-model-a",
+        "replicas" : 1.0
+      } ]
+    },
+    "status" : {
+      "predictorStatus" : [ {
+        "name" : "iot-model-a-iot-model-a-iot-model-a-0",
+        "replicas" : 1.0,
+        "replicasAvailable" : 1.0
+      }, {
+        "name" : "iot-model-a-iot-model-a-svc-orch",
+        "replicas" : 1.0,
+        "replicasAvailable" : 1.0
+      } ],
+      "state" : "Available"
+    }
+  }, {
+    "apiVersion" : "machinelearning.seldon.io/v1",
+    "kind" : "SeldonDeployment",
+    "metadata" : {
+      "annotations" : {
+        "kubectl.kubernetes.io/last-applied-configuration" : "{\"apiVersion\":\"machinelearning.seldon.io/v1\",\"kind\":\"SeldonDeployment\",\"metadata\":{\"name\":\"iot-model-b\",\"namespace\":\"mxe\",\"selfLink\":\"/apis/machinelearning.seldon.io/v1/namespaces/mxe/seldondeployments/iot-model-b\",\"uid\":\"f090618b-3eca-11e9-b4a8-0050569a0898\",\"generation\":1,\"creationTimestamp\":\"2019-03-04T22:14:55Z\",\"labels\":{\"app\":\"seldon\",\"mxe/component\":\"iot-model-b\",\"mxe/version\":\"0.0.1beta\"},\"clusterName\":\"\"},\"spec\":{\"name\":\"iot-model-b\",\"predictors\":[{\"name\":\"iot-model-b\",\"graph\":{\"name\":\"iot-model-b\",\"type\":\"MODEL\",\"endpoint\":{\"service_host\":\"iot-model-b-iot-model-b-iot-model-b\",\"service_port\":9000,\"type\":\"REST\"}},\"componentSpecs\":[{\"metadata\":{\"labels\":{\"seldon-app-iot-model-b\":\"iot-model-b-iot-model-b-iot-model-b\"}},\"spec\":{\"containers\":[{\"name\":\"iot-model-b\",\"image\":\"vmx-eea166.ete.ka.sw.ericsson.se:32222/iot/machine-detection-b-model:0.0.1\",\"ports\":[{\"name\":\"http\",\"containerPort\":9000}],\"env\":[{\"name\":\"PREDICTIVE_UNIT_SERVICE_PORT\",\"value\":\"9000\"},{\"name\":\"PREDICTIVE_UNIT_PARAMETERS\",\"value\":\"[]\"},{\"name\":\"PREDICTIVE_UNIT_ID\",\"value\":\"iot-model-b\"},{\"name\":\"PREDICTOR_ID\",\"value\":\"iot-model-b\"},{\"name\":\"SELDON_DEPLOYMENT_ID\",\"value\":\"iot-model-b\"}],\"volumeMounts\":[{\"name\":\"podinfo\",\"readOnly\":true,\"mountPath\":\"/etc/podinfo\"}],\"livenessProbe\":{\"handler\":{\"tcpSocket\":{\"port\":\"http\"}},\"initialDelaySeconds\":100,\"timeoutSeconds\":1,\"periodSeconds\":5,\"successThreshold\":1,\"failureThreshold\":3},\"readinessProbe\":{\"handler\":{\"tcpSocket\":{\"port\":\"http\"}},\"initialDelaySeconds\":100,\"timeoutSeconds\":1,\"periodSeconds\":5,\"successThreshold\":1,\"failureThreshold\":3},\"lifecycle\":{\"preStop\":{\"exec\":{\"command\":[\"/bin/sh\",\"-c\",\"/bin/sleep 5\"]}}},\"imagePullPolicy\":\"IfNotPresent\"}],\"terminationGracePeriodSeconds\":1}}],\"replicas\":1,\"annotations\":{\"predictor_version\":\"v1\"}}],\"annotations\":{\"deployment_version\":\"v1\",\"project_name\":\"iot-model-b\"}},\"status\":{\"state\":\"Available\",\"predictorStatus\":[{\"name\":\"iot-model-b-iot-model-b-svc-orch\",\"replicas\":1,\"replicasAvailable\":1},{\"name\":\"iot-model-b-iot-model-b-iot-model-b-0\",\"replicas\":1,\"replicasAvailable\":1}]}}\n"
+      },
+      "clusterName" : "",
+      "creationTimestamp" : "2019-03-04T22:14:55Z",
+      "generation" : 1.0,
+      "labels" : {
+        "app" : "seldon",
+        "mxe/component" : "iot-model-b",
+        "mxe/version" : "0.0.1beta",
+        "mxe/deploymenttype": "model"
+      },
+      "name" : "iot-model-b",
+      "namespace" : "mxe",
+      "resourceVersion" : "22889707",
+      "selfLink" : "/apis/machinelearning.seldon.io/v1/namespaces/mxe/seldondeployments/iot-model-b",
+      "uid" : "f090618b-3eca-11e9-b4a8-0050569a0898"
+    },
+    "spec" : {
+      "annotations" : {
+        "deployment_version" : "v1",
+        "project_name" : "iot-model-b"
+      },
+      "name" : "iot-model-b",
+      "predictors" : [ {
+        "annotations" : {
+          "predictor_version" : "v1"
+        },
+        "componentSpecs" : [ {
+          "metadata" : {
+            "labels" : {
+              "seldon-app-iot-model-b" : "iot-model-b-iot-model-b-iot-model-b"
+            }
+          },
+          "spec" : {
+            "containers" : [ {
+              "env" : [ {
+                "name" : "PREDICTIVE_UNIT_SERVICE_PORT",
+                "value" : "9000"
+              }, {
+                "name" : "PREDICTIVE_UNIT_PARAMETERS",
+                "value" : "[]"
+              }, {
+                "name" : "PREDICTIVE_UNIT_ID",
+                "value" : "iot-model-b"
+              }, {
+                "name" : "PREDICTOR_ID",
+                "value" : "iot-model-b"
+              }, {
+                "name" : "SELDON_DEPLOYMENT_ID",
+                "value" : "iot-model-b"
+              } ],
+              "image" : "vmx-eea166.ete.ka.sw.ericsson.se:32222/iot/machine-detection-b-model:0.0.1",
+              "imagePullPolicy" : "IfNotPresent",
+              "lifecycle" : {
+                "preStop" : {
+                  "exec" : {
+                    "command" : [ "/bin/sh", "-c", "/bin/sleep 5" ]
+                  }
+                }
+              },
+              "livenessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "name" : "iot-model-b",
+              "ports" : [ {
+                "containerPort" : 9000.0,
+                "name" : "http"
+              } ],
+              "readinessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "volumeMounts" : [ {
+                "mountPath" : "/etc/podinfo",
+                "name" : "podinfo",
+                "readOnly" : true
+              } ]
+            } ],
+            "terminationGracePeriodSeconds" : 1.0
+          }
+        } ],
+        "graph" : {
+          "endpoint" : {
+            "service_host" : "iot-model-b-iot-model-b-iot-model-b",
+            "service_port" : 9000.0,
+            "type" : "REST"
+          },
+          "name" : "iot-model-b",
+          "type" : "MODEL"
+        },
+        "name" : "iot-model-b",
+        "replicas" : 1.0
+      } ]
+    },
+    "status" : {
+      "predictorStatus" : [ {
+        "name" : "iot-model-b-iot-model-b-svc-orch",
+        "replicas" : 1.0,
+        "replicasAvailable" : 1.0
+      }, {
+        "name" : "iot-model-b-iot-model-b-iot-model-b-0",
+        "replicas" : 1.0,
+        "replicasAvailable" : 1.0
+      } ],
+      "state" : "Available"
+    }
+  }, {
+    "apiVersion" : "machinelearning.seldon.io/v1",
+    "kind" : "SeldonDeployment",
+    "metadata" : {
+      "annotations" : {
+        "kubectl.kubernetes.io/last-applied-configuration" : "{\"apiVersion\":\"machinelearning.seldon.io/v1\",\"kind\":\"SeldonDeployment\",\"metadata\":{\"name\":\"production-model-img\",\"namespace\":\"mxe\",\"selfLink\":\"/apis/machinelearning.seldon.io/v1/namespaces/mxe/seldondeployments/production-model-img\",\"uid\":\"71e4b476-44de-11e9-b4a8-0050569a0898\",\"generation\":1,\"creationTimestamp\":\"2019-03-12T15:49:39Z\",\"labels\":{\"app\":\"seldon\",\"mxe/component\":\"production-model-img\",\"mxe/version\":\"0.0.1beta\"},\"clusterName\":\"\"},\"spec\":{\"name\":\"production-model-img\",\"predictors\":[{\"name\":\"production-model-img\",\"graph\":{\"name\":\"production-model-img\",\"type\":\"MODEL\",\"endpoint\":{\"service_host\":\"production-model-img-production-model-img-production-model-img\",\"service_port\":9000,\"type\":\"REST\"}},\"componentSpecs\":[{\"metadata\":{\"labels\":{\"seldon-app-production-model-img\":\"production-model-img-production-model-img-production-model-img\"}},\"spec\":{\"containers\":[{\"name\":\"production-model-img\",\"image\":\"vmx-eea166.ete.ka.sw.ericsson.se:32222/img_vgg16:v0.0.1\",\"ports\":[{\"name\":\"http\",\"containerPort\":9000}],\"env\":[{\"name\":\"PREDICTIVE_UNIT_SERVICE_PORT\",\"value\":\"9000\"},{\"name\":\"PREDICTIVE_UNIT_PARAMETERS\",\"value\":\"[]\"},{\"name\":\"PREDICTIVE_UNIT_ID\",\"value\":\"production-model-img\"},{\"name\":\"PREDICTOR_ID\",\"value\":\"production-model-img\"},{\"name\":\"SELDON_DEPLOYMENT_ID\",\"value\":\"production-model-img\"}],\"volumeMounts\":[{\"name\":\"podinfo\",\"readOnly\":true,\"mountPath\":\"/etc/podinfo\"}],\"livenessProbe\":{\"handler\":{\"tcpSocket\":{\"port\":\"http\"}},\"initialDelaySeconds\":100,\"timeoutSeconds\":1,\"periodSeconds\":5,\"successThreshold\":1,\"failureThreshold\":3},\"readinessProbe\":{\"handler\":{\"tcpSocket\":{\"port\":\"http\"}},\"initialDelaySeconds\":100,\"timeoutSeconds\":1,\"periodSeconds\":5,\"successThreshold\":1,\"failureThreshold\":3},\"lifecycle\":{\"preStop\":{\"exec\":{\"command\":[\"/bin/sh\",\"-c\",\"/bin/sleep 5\"]}}},\"imagePullPolicy\":\"IfNotPresent\"}],\"terminationGracePeriodSeconds\":1}}],\"replicas\":1,\"annotations\":{\"predictor_version\":\"v1\"}}],\"annotations\":{\"deployment_version\":\"v1\",\"project_name\":\"production-model-img\"}},\"status\":{\"state\":\"Available\",\"predictorStatus\":[{\"name\":\"production-model-img-production-model-img-svc-orch\",\"replicas\":1,\"replicasAvailable\":1},{\"name\":\"seldon-98fe9744d4ebdf03d73bdc7fcf5db2ed\",\"replicas\":1,\"replicasAvailable\":1}]}}\n"
+      },
+      "clusterName" : "",
+      "creationTimestamp" : "2019-03-12T15:49:39Z",
+      "generation" : 1.0,
+      "labels" : {
+        "app" : "seldon",
+        "mxe/component" : "production-model-img",
+        "mxe/version" : "0.0.1beta",
+        "mxe/deploymenttype": "model"
+      },
+      "name" : "production-model-img",
+      "namespace" : "mxe",
+      "resourceVersion" : "24718796",
+      "selfLink" : "/apis/machinelearning.seldon.io/v1/namespaces/mxe/seldondeployments/production-model-img",
+      "uid" : "71e4b476-44de-11e9-b4a8-0050569a0898"
+    },
+    "spec" : {
+      "annotations" : {
+        "deployment_version" : "v1",
+        "project_name" : "production-model-img"
+      },
+      "name" : "production-model-img",
+      "predictors" : [ {
+        "annotations" : {
+          "predictor_version" : "v1"
+        },
+        "componentSpecs" : [ {
+          "metadata" : {
+            "labels" : {
+              "seldon-app-production-model-img" : "production-model-img-production-model-img-production-model-img"
+            }
+          },
+          "spec" : {
+            "containers" : [ {
+              "env" : [ {
+                "name" : "PREDICTIVE_UNIT_SERVICE_PORT",
+                "value" : "9000"
+              }, {
+                "name" : "PREDICTIVE_UNIT_PARAMETERS",
+                "value" : "[]"
+              }, {
+                "name" : "PREDICTIVE_UNIT_ID",
+                "value" : "production-model-img"
+              }, {
+                "name" : "PREDICTOR_ID",
+                "value" : "production-model-img"
+              }, {
+                "name" : "SELDON_DEPLOYMENT_ID",
+                "value" : "production-model-img"
+              } ],
+              "image" : "vmx-eea166.ete.ka.sw.ericsson.se:32222/img_vgg16:v0.0.1",
+              "imagePullPolicy" : "IfNotPresent",
+              "lifecycle" : {
+                "preStop" : {
+                  "exec" : {
+                    "command" : [ "/bin/sh", "-c", "/bin/sleep 5" ]
+                  }
+                }
+              },
+              "livenessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "name" : "production-model-img",
+              "ports" : [ {
+                "containerPort" : 9000.0,
+                "name" : "http"
+              } ],
+              "readinessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "volumeMounts" : [ {
+                "mountPath" : "/etc/podinfo",
+                "name" : "podinfo",
+                "readOnly" : true
+              } ]
+            } ],
+            "terminationGracePeriodSeconds" : 1.0
+          }
+        } ],
+        "graph" : {
+          "endpoint" : {
+            "service_host" : "production-model-img-production-model-img-production-model-img",
+            "service_port" : 9000.0,
+            "type" : "REST"
+          },
+          "name" : "production-model-img",
+          "type" : "MODEL"
+        },
+        "name" : "production-model-img",
+        "replicas" : 1.0
+      } ]
+    },
+    "status" : {
+      "predictorStatus" : [ {
+        "name" : "production-model-img-production-model-img-svc-orch",
+        "replicas" : 1.0,
+        "replicasAvailable" : 1.0
+      }, {
+        "name" : "seldon-98fe9744d4ebdf03d73bdc7fcf5db2ed",
+        "replicas" : 1.0,
+        "replicasAvailable" : 1.0
+      } ],
+      "state" : "Available"
+    }
+  } ],
+  "kind" : "SeldonDeploymentList",
+  "metadata" : {
+    "continue" : "",
+    "resourceVersion" : "28100958",
+    "selfLink" : "/apis/machinelearning.seldon.io/v1/namespaces/mxe/seldondeployments"
+  }
+}

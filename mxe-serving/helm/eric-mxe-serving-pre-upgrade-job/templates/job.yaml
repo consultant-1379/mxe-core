@@ -1,0 +1,44 @@
+{{- if .Release.IsUpgrade }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "eric-mxe-serving-pre-upgrade-job.name" . | quote }}
+  labels:
+   {{- $component := printf "%s" "app.kubernetes.io/component: pre-upgrade-job"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-serving-pre-upgrade-job.labels" . | fromYaml -}}
+    {{- include "eric-mxe-serving-pre-upgrade-job.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $hook := printf "%s" "helm.sh/hook: pre-upgrade"  | fromYaml -}}
+    {{- $hookDeletePolicy := printf "%s" "helm.sh/hook-delete-policy: hook-succeeded,before-hook-creation"  | fromYaml -}}
+    {{- $hookWeight := include "eric-mxe-serving-pre-upgrade-job.hook-weight" -4 | fromYaml -}}
+    {{- $annotations := include "eric-mxe-serving-pre-upgrade-job.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-serving-pre-upgrade-job.mergeAnnotations" (dict "location" .Template.Name "sources" (list $hook $hookDeletePolicy $hookWeight $annotations)) | trim | nindent 4 }}
+spec:
+  template:
+    metadata:
+      annotations:
+        {{- $istio := include "eric-mxe-serving-pre-upgrade-job.istio-annotations" . | fromYaml -}}
+        {{- $annotations := include "eric-mxe-serving-pre-upgrade-job.annotations" . | fromYaml -}}
+        {{- include "eric-mxe-serving-pre-upgrade-job.mergeAnnotations" (dict "location" .Template.Name "sources" (list $istio $annotations)) | trim | nindent 8 }}
+      labels:
+        {{- include "eric-mxe-serving-pre-upgrade-job.istio-labels" . | indent 8 }}
+    spec:
+      restartPolicy: Never
+      serviceAccountName: {{ include "eric-mxe-serving-pre-upgrade-job.serviceaccount" . | quote }}
+      containers:
+        - name: {{ .Chart.Name | quote }}
+          image: "{{ include "eric-mxe-serving-pre-upgrade-job.image-repository" . }}{{ .Values.images.preUpgradeJob.name }}:{{ .Values.images.preUpgradeJob.tag }}"
+          imagePullPolicy: {{ default .Values.images.preUpgradeJob.pullPolicy }}
+          command: 
+            - ./mxe-pre-upgrade
+            - --jobSelector
+            - {{ include "eric-mxe-serving-pre-upgrade-job.jobSelector" . | quote }}
+            - --namespace 
+            - "{{ .Release.Namespace }}"
+            - --check-interval
+            - "{{ .Values.statusCheckInterval }}"
+          resources:
+            {{- toYaml .Values.resources.preUpgradeJob | trim | nindent 12 }}
+      {{- include "eric-mxe-serving-pre-upgrade-job.image-pull-secrets" . | nindent 6 }}
+
+{{- end -}}

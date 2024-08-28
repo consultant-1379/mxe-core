@@ -1,0 +1,33 @@
+{
+  "name": "ab-test",
+  "endpoint": {
+  },
+  "implementation": "RANDOM_ABTEST",
+  "parameters": [
+    {
+      "name": "ratioA",
+      "value": "<MXE_MODELDEPLOYMENT_RATIOA>",
+      "type": "FLOAT"
+    }
+  ],
+  "children": [
+    {
+      "name": "model-1",
+      "endpoint": {
+        "type": "REST"
+      },
+      "type": "MODEL",
+      "children": [
+      ]
+    },
+    {
+      "name": "model-2",
+      "endpoint": {
+        "type": "REST"
+      },
+      "type": "MODEL",
+      "children": [
+      ]
+    }
+  ]
+}

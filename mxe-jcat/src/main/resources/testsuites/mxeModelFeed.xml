@@ -1,0 +1,25 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="MxeSuite">
+
+    <listeners>
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGTestListener" />
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGSuiteListener" />
+    </listeners>
+
+    <parameter name="cluster" value="cluster3" />
+
+    <test name="Model Feed">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxePerformanceTest">
+                <parameter name="modelDeploymentName" value="imginception3" />
+                <methods>
+                    <include name="modelFeedTest">
+                        <parameter name="requestPerSec" value="3" />
+                        <parameter name="overallRequestCount" value="180" />
+                    </include>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>

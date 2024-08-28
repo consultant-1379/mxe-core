@@ -1,0 +1,13 @@
+mxe:
+  model-service-uri: https://vmx-cea024.ete.ka.sw.ericsson.se:32118/model-endpoints/bbb
+  access-token-uri: https://vmx-cea024.ete.ka.sw.ericsson.se:32118/auth/realms/mxe/protocol/openid-connect/token
+  client-id: mxe-rest-client
+  username: mxe-user
+  password: password
+
+security:
+  disableSslCertVerification: true
+
+logging:
+  level:
+    root: info

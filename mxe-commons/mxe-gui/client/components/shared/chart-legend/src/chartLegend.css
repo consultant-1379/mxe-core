@@ -1,0 +1,31 @@
+:host {
+  display: flex;
+  color: var(--text);
+  font-weight: bold;
+  flex-direction: column;
+}
+
+.title {
+  opacity: 0.8;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.legend {
+  display: grid;
+  font-size: 11px;
+  grid-gap: 4px 16px;
+  grid-template-columns: repeat(4, minmax(20px, auto));
+  border-left: 3px solid var(--blue);
+  padding-left: 5px;
+  text-align: center;
+}
+
+.legend .name {
+  opacity: 0.6;
+  margin-bottom: 4px;
+}
+
+.legend .value {
+  opacity: 0.8;
+}

@@ -1,0 +1,25 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mxe-deployer.pre-install-hook-meshgw-cert-patch-name" . | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "pre-install-hook-meshgw-cert-patch"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-deployer.pre-install-hook-meshgw-cert-patch-name" . | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-deployer.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    "helm.sh/hook": "pre-install,pre-upgrade"
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+    {{- include "mxe-deployer.product-info" . | nindent 4 }}
+data:
+  run.sh: |
+    {{- (.Files.Get "files/pre-install-hook-meshgw-cert-patch/run.sh") | nindent 4 }}
+  patch.yaml: |
+    {{- ( tpl (.Files.Get "files/pre-install-hook-meshgw-cert-patch/patch.yaml") . ) | nindent 4 }}
+{{- end -}}

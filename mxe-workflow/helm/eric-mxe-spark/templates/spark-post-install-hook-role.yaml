@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "eric-mxe-spark.post-install-hook-role" . | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: post-install-hook-role"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-spark.post-install-hook-role" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-spark.labels" . | fromYaml -}}
+    {{- include "eric-mxe-spark.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-spark.annotations" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - "apps"
+    resources:
+      - "statefulsets"
+      - "deployments"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+      - "patch"
+      - "update"

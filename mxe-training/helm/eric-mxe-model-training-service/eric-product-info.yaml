@@ -1,0 +1,53 @@
+productName: "MXE"
+productNumber: "CXD 101 0810"
+
+images:
+  modelService:
+    productName: "MXE"
+    productNumber: "CXU 101 0054"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-model-training-service"
+    tag: "VERSION"
+  dbInit:
+    productName: "MXE"
+    productNumber: "CXU 101 0056"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-db-init"
+    tag: "VERSION"
+  packager:
+    productName: "MXE"
+    productNumber: "CXD 101 0219"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-model-training-packager"
+    tag: "VERSION"
+  kubernetes-modifier:
+    productName: "MXE"
+    productNumber: "CXU 101 0060"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-kubernetes-modifier"
+    tag: "VERSION"
+  minio-cli:
+    productName: "MXE"
+    productNumber: "CXD 101 0219"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "proj-mxe"
+    name: "minio/mc"
+    tag: "RELEASE.2024-04-18T16-45-29Z-ubuntu-20240405"
+  modelBase:
+    productName: "MXE"
+    productNumber: "CXD 101 0219"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-model-python-base"
+    tag: "VERSION"
+  certificate-sidecar:
+    productName: "MXE"
+    productNumber: "CXD 101 0219"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "proj-mxe"
+    name: "certificate-sidecar"
+    tag: "ubuntu-20240405"

@@ -1,0 +1,7 @@
+mee-ambassador:
+  ambassador:
+    service:
+      type: ClusterIP
+    
+    scope:
+      singleNamespace: false

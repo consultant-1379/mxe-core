@@ -1,0 +1,9 @@
+<settings>
+    <mirrors>
+        <mirror>
+            <id>remote-repos</id>
+            <mirrorOf>central</mirrorOf>
+            <url>https://arm.sero.gic.ericsson.se/artifactory/remote-repos/</url>
+        </mirror>
+    </mirrors>
+</settings>

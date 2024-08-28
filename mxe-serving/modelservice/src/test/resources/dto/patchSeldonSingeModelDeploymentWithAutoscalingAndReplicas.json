@@ -1,0 +1,13 @@
+{
+  "name" : "iot-model-a",
+  "type" : "model",
+  "autoScaling": {
+    "minReplicas" : 1,
+    "maxReplicas" : 3,
+    "metrics": [{
+      "name": "cpuMilliCores",
+      "targetAverageValue" : 12
+    }]
+  },
+  "replicas" : 2
+}

@@ -1,0 +1,315 @@
+# Default values for eric-mxe-model-training-service.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+ingress:
+  enabled: true
+  hostname: null
+  secretName: null
+  ingressClass: eric-mxe-ingress-controller-class
+  annotationPrefix: null
+  defaultBackendFullNameOverride: null
+  defaultBackendNameOverride: null
+  owasp:
+    enabled: true
+
+minio:
+  http:
+    url: http://eric-data-object-storage-mn:9000
+  https:
+    url: https://eric-data-object-storage-mn:9000
+  adminSecretName: eric-data-object-storage-mn-secret
+  userTrainingJobResultServiceSecretName:
+  userTrainingJobResultInstanceSecretName:
+  userTrainingPackageServiceSecretName:
+  userTrainingPackageInstanceSecretName:
+  trainingp:
+    service:
+      secretkey:
+    instance:
+      secretkey:
+  trainingjr:
+    service:
+      secretkey:
+    instance:
+      secretkey:
+
+nameOverride: null
+
+modelService:
+  # hostOverride:
+  port: http
+
+authorService:
+  # hostOverride:
+  port: http
+
+dockerRegistry:
+  ingressEnabled: true
+  nameOverride:
+  fullHostOverride:
+  portOverride:
+  secretNameOverride: mxe-pull-secret
+  externalHostname:
+  externalPort: 32222
+
+installerDockerRegistry:
+  caSecretName:
+
+docker:
+  nameOverride:
+  fullHostOverride:
+  portOverride:
+
+service:
+  type: ClusterIP
+  port: 8080
+  metrics: 8081
+
+database:
+  create: true
+  # nameOverride: 
+  serviceName: "eric-data-document-database-pg"
+  portName: "postgresql"
+  superUserSecretName: "mxe-db-password"
+  superUserIdKey: "super-user"
+  superUserPwdKey: "super-pwd"
+  connectionDb:
+  # customUserSecretFullNameOverride: 
+  createCustomUserSecret: true
+  customUserIdKey: "user"
+  customUserPwdKey: "password"
+  customUserPwd:
+
+resources:
+  modelService:
+    requests:
+      cpu: 100m
+      memory: 1Gi
+      ephemeral-storage: 50Mi
+    limits:
+      cpu: 400m
+      memory: 2Gi
+      ephemeral-storage: 100Mi
+  kubernetesModifier:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+  initCacerts:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+  certificateSidecarService:
+    limits:
+      cpu: 100m
+      ephemeral-storage: 100Mi
+      memory: 200Mi
+    requests:
+      cpu: 100m
+      ephemeral-storage: 50Mi
+      memory: 200Mi
+  dbInit:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+  minioCli:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchExpressions:
+              - key: "app.kubernetes.io/part-of"
+                operator: "In"
+                values:
+                  - "mxe"
+              - key: "app.kubernetes.io/component"
+                operator: "In"
+                values:
+                  - "model-training-service"
+              - key: "app.kubernetes.io/instance"
+                operator: "In"
+                values:
+                  - "{{ .Release.Name }}"
+
+imageCredentials:
+  pullSecret:
+  registry:
+    url:
+    pullSecret:
+  repoPath:
+  modelService:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+  dbInit:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+  packager:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+  kubernetes-modifier:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+  minio-cli:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+  modelBase:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+  certificate-sidecar:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "-"
+
+images:
+  modelService:
+    name: "mxe/eric-mxe-model-training-service"
+    tag: "VERSION"
+    pullPolicy: 
+  dbInit:
+    name: "mxe/eric-mxe-db-init"
+    tag: "VERSION"
+    pullPolicy: 
+  packager:
+    name: "mxe/eric-mxe-model-training-packager"
+    tag: "VERSION"
+    pullPolicy: 
+  trainer:
+    pullPolicy: Always
+  kubernetes-modifier:
+    name: "mxe/eric-mxe-kubernetes-modifier"
+    tag: "VERSION"
+    pullPolicy: 
+  minio-cli:
+    name: "minio/mc"
+    tag: "RELEASE.2024-04-18T16-45-29Z-ubuntu-20240405"
+    pullPolicy: 
+  modelBase:
+    name: "mxe/eric-mxe-training-python-base"
+    tag: "VERSION"
+  certificate-sidecar:
+    name: "certificate-sidecar"
+    tag: "ubuntu-20240405"
+    pullPolicy: 
+
+updateStrategy:
+  type: "RollingUpdate"
+  rollingUpdate:
+    maxUnavailable: 25%
+    maxSurge: 25% 
+
+keycloak:
+  statefulset:
+    name: eric-sec-access-mgmt
+
+# DR-D1121-011 - Present in Top Level Helm Chart Values.yaml
+# global:
+#   pullSecret:
+#   registry:
+#     url: "armdocker.rnd.ericsson.se"
+#     pullSecret:
+#   mxeApiTlsSecretName:
+#   mxeApiHostname:
+#   mxeIamCaSecretName: iam-ca-cert
+#   mxeDisableDefaultIngressControllerUse: false
+#   mxeClusterDomain: cluster.local
+
+pypiServer:
+  hostOverride:
+
+
+probes:
+  modeltrainingservice:
+    livenessProbe:
+      initialDelaySeconds: 20
+      periodSeconds: 30
+      failureThreshold: 5
+      timeoutSeconds: 5
+    readinessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      failureThreshold: 5
+      timeoutSeconds: 5
+
+#Added to handle DR_D1120_080
+terminationGracePeriodSeconds: 30
+
+serviceMesh:
+  enabled: true
+  tlsMode: ISTIO_MUTUAL
+
+podPriority:
+  modeltrainingservice:
+    priorityClassName:
+
+labels: {}
+annotations: {}
+topologySpreadConstraints: []
+
+# DR-D1123-127 -  ADP services shall define AppArmor profile
+appArmorProfile:
+  type:
+  localhostProfile:
+
+# DR-D1123-128 - ADP services shall define seccomp profile
+seccompProfile:
+  type: RuntimeDefault
+  localhostProfile:

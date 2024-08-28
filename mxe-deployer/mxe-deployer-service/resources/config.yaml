@@ -1,0 +1,5 @@
+
+argocdServer:
+  clientOptions:
+    serverAddr: argocd-server:443
+    plainText: true

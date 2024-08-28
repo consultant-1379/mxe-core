@@ -1,0 +1,30 @@
+{{- if .Values.global.security.tls.enabled -}}
+apiVersion: siptls.sec.ericsson.com/v1
+kind: InternalCertificate
+metadata:
+  name: {{ include "mxe-commons.mesh-ingress-gw-name" . }}-cert
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "controller"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-commons.mesh-ingress-gw-name" . }}-cert
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    certificate-identifier: "mxe-mesh-ingress-gw"
+  annotations:
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+spec:
+  kubernetes:
+    generatedSecretName: {{ include "mxe-commons.mesh-ingress-gw-certs" . }}
+    secretType: 'tls'
+  certificate:
+    subject:
+      cn: {{ include "mxe-commons.mesh-ingress-gw-svc-name" . }}
+    extendedKeyUsage:
+      tlsClientAuth: false
+      tlsServerAuth: true
+    subjectAlternativeName:
+      dns:
+        - {{ .Values.global.mxeOauthApiHostname }}
+{{- end -}}

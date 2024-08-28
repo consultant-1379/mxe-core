@@ -1,0 +1,30 @@
+spec:
+  template:
+    spec:
+      volumes:
+        - name: iam-ca-cert
+          secret:
+            defaultMode: 420
+            secretName: iam-ca-cert
+      initContainers:
+        - name: init-directories
+          volumeMounts:
+            - mountPath: /etc/ssl/certs/ext-rootCA.pem
+              name: iam-ca-cert
+              subPath: ca.crt
+        - name: init-app-ini
+          volumeMounts:
+            - mountPath: /etc/ssl/certs/ext-rootCA.pem
+              name: iam-ca-cert
+              subPath: ca.crt
+        - name: configure-gitea
+          volumeMounts:
+            - mountPath: /etc/ssl/certs/ext-rootCA.pem
+              name: iam-ca-cert
+              subPath: ca.crt
+      containers:
+        - name: gitea
+          volumeMounts:
+            - mountPath: /etc/ssl/certs/ext-rootCA.pem
+              name: iam-ca-cert
+              subPath: ca.crt

@@ -1,0 +1,9 @@
+{
+  "name" : "testname",
+  "type" : "model",
+  "replicas" : 5,
+  "models" : [ {
+    "id" : "Image Recognition VGG16",
+    "version" : "0.0.1"
+  } ]
+}

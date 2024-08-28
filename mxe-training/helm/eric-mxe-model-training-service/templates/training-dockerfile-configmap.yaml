@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "eric-mxe-model-training-service.training-dockerfile-configmap" . | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: model-training-service-dockerfile-configmap"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-model-training-service.training-dockerfile-configmap" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-model-training-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-model-training-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-model-training-service.annotations" . | nindent 4 }}
+data:
+  Dockerfile: |
+    {{ (tpl (.Files.Get "files/training-dockerfile")  .) | nindent 4 }}

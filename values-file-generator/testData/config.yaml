@@ -1,0 +1,115 @@
+
+storage_class: rbd
+cluster_wide_ingress_class_name: nginx
+iam_ca_secret_name: iam-ca-cert
+enable_sip_tls: false
+
+api:
+    mxe:  
+        host: mxe.kroto011.rnd.gic.ericsson.se
+        tlsSecretName: api-tls
+    deployer: 
+        host: mxe-deployer.kroto011.rnd.gic.ericsson.se
+        tlsSecretName: deployer-tls
+    oauth: 
+        host: oauth.mxe.kroto011.rnd.gic.ericsson.se
+        tlsSecretName: oauth-api-tls
+    argocd: 
+        host: argocd.kroto011.rnd.gic.ericsson.se
+        tlsSecretName: argocd-tls
+    gitea: 
+        host: gitea.mxe.kroto011.rnd.gic.ericsson.se
+        tlsSecretName: gitea-api-tls
+
+docker_registry:
+    host: armdocker.rnd.ericsson.se
+    secret: armdocker-creds
+
+mxe_commons:
+    mxe_admin_secret: eric-mxe-gatekeeper-keycloak-access-creds-hooked
+    mxe_user_secret:
+    container_registry_volume_size: 20Gi
+    owasp: true                 ## always true remove from here 
+    metrics_server: false       ## remove and make as a pre-requisite
+    enable_gatekeeper_ha: false
+    rate_limit_enabled: false
+    service_mesh:                           ## this might go away
+        install: true
+        jwt_policy: third-party-jwt
+    pypiserver:                             ## should be fixed in 2.3.. onboarding uses python 3.7, jupyter has 3.9
+        volume_size: 5Gi
+        name: "mxe/pypi-eea"
+        tag: 
+        repository:
+    mxe_gatekeeper:
+        temporal_user: "false"
+    legal_warning_message: |
+        *Log-on is only allowed for authorized users. If you are not an authorized user, please exit.
+        In accordance with requirements of data protection laws, we hereby inform you that personally identifiable information will be handled in log files for legal, security and costs reasons.
+        This system processes sensitive personal data. The misuse of such data may generate considerable harm to the data subjects. Be reminded of the confidentiality obligations you have when accessing this kind of data and the disciplinary consequences of improper handling.
+
+mxe_deployer:
+    helm_repo_url: https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-helm  ## remove if system component installation is removed
+    internal_gitops:
+        enabled: true
+        orgname: mxe            ## Can be defaulted directly in template, no need to parameterize
+        reponame: mxe-gitops    ## Can be defaulted directly in template, no need to parameterize
+    external_gitops: 
+        url:
+        domain:
+    gitops_repo_creds: gitops-repo-creds
+    argocd_server_admin_password: $2a$10$5YbrGwj7jgWU/ZUjSKnFX.A1VJyJpuu3gurOzxg9AnOYSgw0ex1Km  ## hide and document
+    commit_author: 
+        name: "MXE CI User"
+        email: "mxecifunc@ericsson.com"
+    argocd_admin_creds: argocd-admin-creds
+    redis_ha_enabled: true
+    argocd:                         ## revisit once we remove system component installation via deployer
+        controller:
+            requests:
+                cpu: 400m
+                memory: 512Mi
+            limits:
+                cpu: 2000m
+                memory: 2048Mi
+        repoServer:
+            requests:
+                cpu: 400m
+                memory: 512Mi
+            limits:
+                cpu: 2000m
+                memory: 1Gi
+
+mxe_serving: 
+    release_name: mxe-serving           ## Once NiFi is removed, this can be removed
+    model_service_owasp: false          ## Used only in ambassador ingress. Which is anyway on ventilator
+    model_services_manifest_path: model-services/seldon-deployments/   ## hardcode
+    model_services_git_repo_branch: master                             ## hardcode
+    deployer_namespace: mxe                                            ## hardcode 
+
+mxe_workflow:
+    spark_job_namespace:
+
+mxe_exploration:
+    singleUserProfileList: |
+        - display_name: "Minimal Profile"
+          description: "Jupyterlab instance with a minimum of 1 CPU/2GB RAM"
+          kubespawner_override:
+            mem_guarantee: 2G
+            mem_limit: 2G
+            cpu_guarantee: 1
+            cpu_limit: 1
+        - display_name: "Medium Profile"
+          description: "Jupyterlab instance with a minimum of 2 CPU/4GB RAM"
+          kubespawner_override:
+            mem_guarantee: 4G
+            mem_limit: 4G
+            cpu_guarantee: 2
+            cpu_limit: 2
+        - display_name: "Large Profile"
+          description: "Jupyterlab instance with a minimum of 4 CPU/8GB RAM"
+          kubespawner_override:
+            mem_guarantee: 8G
+            mem_limit: 8G
+            cpu_guarantee: 4
+            cpu_limit: 4

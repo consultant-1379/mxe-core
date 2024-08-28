@@ -1,0 +1,3627 @@
++ case "$(uname -s)" in
+++ uname -s
+++ readlink -f /home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd/build_ubuntu_image.sh
++ SCRIPT=/home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd/build_ubuntu_image.sh
+++ dirname /home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd/build_ubuntu_image.sh
++ BASEDIR=/home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd
++++ dirname /home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd
+++ dirname /home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer
++ MODULEROOT=/home/enxxram/workspace/mxe-core/3pp-images
++ source /home/enxxram/workspace/mxe-core/3pp-images/base_image.sh
+++ export LATEST_DATE_TAG=20240405
+++ LATEST_DATE_TAG=20240405
+++ export BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
+++ BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
+++ export LATEST_ALPINE_TAG=3.19.1
+++ LATEST_ALPINE_TAG=3.19.1
+++ export PYTHON_ALPINE_TAG=3.12.3-alpine3.19
+++ PYTHON_ALPINE_TAG=3.12.3-alpine3.19
+++ export ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
+++ ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
++ echo 'Base image is  armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405'
+Base image is  armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
++ REPO_URL=https://github.com/argoproj/argo-cd.git
++ RELEASE_TAG=v2.11.0
++ BUILD_NO=
++ IMAGE=armdocker.rnd.ericsson.se/proj-mxe/argoproj/argocd:v2.11.0-ubuntu-20240405
++ SOURCE_HELM_VERSION=3.14.3
++ TARGET_HELM_VERSION=3.13.0
++ [[ -n '' ]]
++ echo 'Image name is armdocker.rnd.ericsson.se/proj-mxe/argoproj/argocd:v2.11.0-ubuntu-20240405'
+Image name is armdocker.rnd.ericsson.se/proj-mxe/argoproj/argocd:v2.11.0-ubuntu-20240405
++ [[ -d /home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd/argo-cd ]]
++ rm -rf /home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd/argo-cd
++ git clone -b v2.11.0 https://github.com/argoproj/argo-cd.git /home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd/argo-cd
+Cloning into '/home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd/argo-cd'...
+Note: switching to 'd3f33c00197e7f1d16f2a73ce1aeced464b07175'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+Updating files:   7% (253/3386)
+Updating files:   8% (271/3386)
+Updating files:   9% (305/3386)
+Updating files:  10% (339/3386)
+Updating files:  11% (373/3386)
+Updating files:  12% (407/3386)
+Updating files:  13% (441/3386)
+Updating files:  14% (475/3386)
+Updating files:  15% (508/3386)
+Updating files:  16% (542/3386)
+Updating files:  17% (576/3386)
+Updating files:  17% (605/3386)
+Updating files:  18% (610/3386)
+Updating files:  19% (644/3386)
+Updating files:  20% (678/3386)
+Updating files:  21% (712/3386)
+Updating files:  22% (745/3386)
+Updating files:  23% (779/3386)
+Updating files:  24% (813/3386)
+Updating files:  25% (847/3386)
+Updating files:  26% (881/3386)
+Updating files:  27% (915/3386)
+Updating files:  28% (949/3386)
+Updating files:  29% (982/3386)
+Updating files:  30% (1016/3386)
+Updating files:  30% (1020/3386)
+Updating files:  31% (1050/3386)
+Updating files:  32% (1084/3386)
+Updating files:  33% (1118/3386)
+Updating files:  34% (1152/3386)
+Updating files:  35% (1186/3386)
+Updating files:  36% (1219/3386)
+Updating files:  37% (1253/3386)
+Updating files:  38% (1287/3386)
+Updating files:  39% (1321/3386)
+Updating files:  40% (1355/3386)
+Updating files:  41% (1389/3386)
+Updating files:  42% (1423/3386)
+Updating files:  42% (1428/3386)
+Updating files:  43% (1456/3386)
+Updating files:  44% (1490/3386)
+Updating files:  45% (1524/3386)
+Updating files:  46% (1558/3386)
+Updating files:  47% (1592/3386)
+Updating files:  48% (1626/3386)
+Updating files:  49% (1660/3386)
+Updating files:  50% (1693/3386)
+Updating files:  50% (1719/3386)
+Updating files:  51% (1727/3386)
+Updating files:  52% (1761/3386)
+Updating files:  53% (1795/3386)
+Updating files:  54% (1829/3386)
+Updating files:  55% (1863/3386)
+Updating files:  56% (1897/3386)
+Updating files:  57% (1931/3386)
+Updating files:  58% (1964/3386)
+Updating files:  59% (1998/3386)
+Updating files:  60% (2032/3386)
+Updating files:  61% (2066/3386)
+Updating files:  62% (2100/3386)
+Updating files:  63% (2134/3386)
+Updating files:  64% (2168/3386)
+Updating files:  65% (2201/3386)
+Updating files:  66% (2235/3386)
+Updating files:  67% (2269/3386)
+Updating files:  68% (2303/3386)
+Updating files:  69% (2337/3386)
+Updating files:  70% (2371/3386)
+Updating files:  71% (2405/3386)
+Updating files:  72% (2438/3386)
+Updating files:  73% (2472/3386)
+Updating files:  74% (2506/3386)
+Updating files:  75% (2540/3386)
+Updating files:  75% (2553/3386)
+Updating files:  76% (2574/3386)
+Updating files:  77% (2608/3386)
+Updating files:  78% (2642/3386)
+Updating files:  79% (2675/3386)
+Updating files:  80% (2709/3386)
+Updating files:  81% (2743/3386)
+Updating files:  82% (2777/3386)
+Updating files:  83% (2811/3386)
+Updating files:  84% (2845/3386)
+Updating files:  85% (2879/3386)
+Updating files:  86% (2912/3386)
+Updating files:  87% (2946/3386)
+Updating files:  88% (2980/3386)
+Updating files:  88% (3001/3386)
+Updating files:  89% (3014/3386)
+Updating files:  90% (3048/3386)
+Updating files:  91% (3082/3386)
+Updating files:  92% (3116/3386)
+Updating files:  93% (3149/3386)
+Updating files:  94% (3183/3386)
+Updating files:  95% (3217/3386)
+Updating files:  96% (3251/3386)
+Updating files:  97% (3285/3386)
+Updating files:  98% (3319/3386)
+Updating files:  99% (3353/3386)
+Updating files: 100% (3386/3386)
+Updating files: 100% (3386/3386), done.
++ sed -i s#helm3_version=3.14.3#helm3_version=3.13.0#g /home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd/argo-cd/hack/tool-versions.sh
++ wget -O /home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd/argo-cd/hack/installers/checksums/helm-v3.13.0-linux-amd64.tar.gz.sha256 https://get.helm.sh/helm-v3.13.0-linux-amd64.tar.gz.sha256sum
+--2024-05-08 07:19:28--  https://get.helm.sh/helm-v3.13.0-linux-amd64.tar.gz.sha256sum
+Resolving get.helm.sh (get.helm.sh)... 152.199.21.175, 2606:2800:233:1cb7:261b:1f9c:2074:3c
+Connecting to get.helm.sh (get.helm.sh)|152.199.21.175|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 98 [application/octet-stream]
+Saving to: ‘/home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd/argo-cd/hack/installers/checksums/helm-v3.13.0-linux-amd64.tar.gz.sha256’
+
+     0K                                                       100% 8.16M=0s
+
+2024-05-08 07:19:29 (8.16 MB/s) - ‘/home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd/argo-cd/hack/installers/checksums/helm-v3.13.0-linux-amd64.tar.gz.sha256’ saved [98/98]
+
++ DOCKER_BUILDKIT=1
++ docker build --no-cache --build-arg BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405 --build-arg GIT_TREE_STATE=clean -t armdocker.rnd.ericsson.se/proj-mxe/argoproj/argocd:v2.11.0-ubuntu-20240405 -f /home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd/Dockerfile /home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd/argo-cd --progress plain
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 5.79kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for armdockerhub.rnd.ericsson.se/golang:1.21.9@sha256:7d0dcbe5807b1ad7272a598fbf9d7af15b5e2bed4fd6c4c2b5b3684df0b317dd
+#2 ...
+
+#3 [internal] load metadata for armdockerhub.rnd.ericsson.se/node:21.6.2@sha256:65998e325b06014d4f1417a8a6afb1540d1ac66521cca76f2221a6953947f9ee
+#3 DONE 0.3s
+
+#2 [internal] load metadata for armdockerhub.rnd.ericsson.se/golang:1.21.9@sha256:7d0dcbe5807b1ad7272a598fbf9d7af15b5e2bed4fd6c4c2b5b3684df0b317dd
+#2 DONE 0.3s
+
+#4 [internal] load metadata for armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
+#4 DONE 1.7s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 569B done
+#5 DONE 0.0s
+
+#6 [argocd-base  1/13] FROM armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405@sha256:1b8d8ff4777f36f19bfe73ee4df61e3a0b789caeff29caa019539ec7c9a57f95
+#6 resolve armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405@sha256:1b8d8ff4777f36f19bfe73ee4df61e3a0b789caeff29caa019539ec7c9a57f95 0.0s done
+#6 sha256:1b8d8ff4777f36f19bfe73ee4df61e3a0b789caeff29caa019539ec7c9a57f95 1.13kB / 1.13kB done
+#6 sha256:6f6ec53d36a9504f01e3636cf68e0e03761a3b6947a95ba430ae553ee3aaf4d9 424B / 424B done
+#6 sha256:7af9ba4f0a47d9bc8b1ffa492c6b0276476f1889cf4e699fba2236924e5932ed 2.30kB / 2.30kB done
+#6 sha256:3c645031de2917ade93ec54b118d5d3e45de72ef580b8f419a8cdc41e01d042c 3.54MB / 29.53MB 0.1s
+#6 sha256:3c645031de2917ade93ec54b118d5d3e45de72ef580b8f419a8cdc41e01d042c 25.17MB / 29.53MB 0.2s
+#6 sha256:3c645031de2917ade93ec54b118d5d3e45de72ef580b8f419a8cdc41e01d042c 29.53MB / 29.53MB 0.2s done
+#6 extracting sha256:3c645031de2917ade93ec54b118d5d3e45de72ef580b8f419a8cdc41e01d042c
+#6 extracting sha256:3c645031de2917ade93ec54b118d5d3e45de72ef580b8f419a8cdc41e01d042c 2.5s done
+#6 DONE 3.0s
+
+#7 [argocd-ui 1/6] FROM armdockerhub.rnd.ericsson.se/node:21.6.2@sha256:65998e325b06014d4f1417a8a6afb1540d1ac66521cca76f2221a6953947f9ee
+#7 resolve armdockerhub.rnd.ericsson.se/node:21.6.2@sha256:65998e325b06014d4f1417a8a6afb1540d1ac66521cca76f2221a6953947f9ee 0.0s done
+#7 sha256:65998e325b06014d4f1417a8a6afb1540d1ac66521cca76f2221a6953947f9ee 1.21kB / 1.21kB done
+#7 sha256:37fdb3efbe0c9e6d64d26e69725e63ff9f92bd0ce1b51763cc46e270b7572620 2.00kB / 2.00kB done
+#7 sha256:1b9d5f3b36bfd39fa919ff2ef7fbcc5ee6b983b2c40d558208a549428074a42e 7.33kB / 7.33kB done
+#7 sha256:7bb465c2914923b08ae03b7fc67b92a1ef9b09c4c1eb9d6711b22ee6bbb46a00 49.55MB / 49.55MB 1.4s done
+#7 sha256:2b9b41aaa3c52ab268b47da303015b94ced04a1eb02e58860e58b283404974f4 24.05MB / 24.05MB 1.2s done
+#7 sha256:49b40be4436eff6fe463f6977159dc727df37cabe65ade75c75c1caa3cb0a234 64.14MB / 64.14MB 1.8s done
+#7 sha256:c558fac597f8ecbb7a66712e14912ce1d83b23a92ca8b6ff14eef209ab01aff2 210.76MB / 211.12MB 3.0s
+#7 sha256:449619e06fe37ae34d5d3e31b928b174f8b0eee07dfca3669c4a8e6326b8e82c 3.37kB / 3.37kB 1.4s done
+#7 sha256:586631916d9c7bbbcb3206bb13d0d710935bfee76699a73bff3c07038aa29e59 49.31MB / 49.31MB 2.2s done
+#7 extracting sha256:7bb465c2914923b08ae03b7fc67b92a1ef9b09c4c1eb9d6711b22ee6bbb46a00 1.2s
+#7 sha256:8020d38d3250826e37533b9d6fd17e60352457384a51a190f09dd23a93bc63a2 2.23MB / 2.23MB 1.9s done
+#7 sha256:38b1ded32c48881fd79631765e7dd139c00b8b6fff88cee5795b4d8cf538f861 449B / 449B 2.0s done
+#7 ...
+
+#8 [internal] load build context
+#8 transferring context: 116.01MB 3.0s done
+#8 DONE 3.1s
+
+#7 [argocd-ui 1/6] FROM armdockerhub.rnd.ericsson.se/node:21.6.2@sha256:65998e325b06014d4f1417a8a6afb1540d1ac66521cca76f2221a6953947f9ee
+#7 sha256:c558fac597f8ecbb7a66712e14912ce1d83b23a92ca8b6ff14eef209ab01aff2 211.12MB / 211.12MB 3.2s done
+#7 extracting sha256:7bb465c2914923b08ae03b7fc67b92a1ef9b09c4c1eb9d6711b22ee6bbb46a00 3.2s done
+#7 extracting sha256:2b9b41aaa3c52ab268b47da303015b94ced04a1eb02e58860e58b283404974f4
+#7 extracting sha256:2b9b41aaa3c52ab268b47da303015b94ced04a1eb02e58860e58b283404974f4 0.7s done
+#7 extracting sha256:49b40be4436eff6fe463f6977159dc727df37cabe65ade75c75c1caa3cb0a234
+#7 extracting sha256:49b40be4436eff6fe463f6977159dc727df37cabe65ade75c75c1caa3cb0a234 3.2s done
+#7 extracting sha256:c558fac597f8ecbb7a66712e14912ce1d83b23a92ca8b6ff14eef209ab01aff2
+#7 ...
+
+#9 [argocd-build 1/7] FROM armdockerhub.rnd.ericsson.se/golang:1.21.9@sha256:7d0dcbe5807b1ad7272a598fbf9d7af15b5e2bed4fd6c4c2b5b3684df0b317dd
+#9 resolve armdockerhub.rnd.ericsson.se/golang:1.21.9@sha256:7d0dcbe5807b1ad7272a598fbf9d7af15b5e2bed4fd6c4c2b5b3684df0b317dd 0.0s done
+#9 sha256:7d0dcbe5807b1ad7272a598fbf9d7af15b5e2bed4fd6c4c2b5b3684df0b317dd 2.13kB / 2.13kB done
+#9 sha256:71215d55680cf0ab2dcc0e1dd65ed76414e3fb0c294249b5b9319a8fa7c398e4 49.55MB / 49.55MB 0.3s done
+#9 sha256:ea2c5b17936014852d35e313b5eef4828dbecdf2e64779482913793e2e764e75 1.79kB / 1.79kB done
+#9 sha256:38a4862eed92b31f368bc2b463ac2ac6d2e7482f3cd9a87d5e015dcf9dcd7323 2.89kB / 2.89kB done
+#9 sha256:3cb8f9c23302e175d87a827f0a1c376bd59b1f6949bd3bc24ab8da0d669cdfa0 24.05MB / 24.05MB 0.2s done
+#9 sha256:5f899db30843f8330d5a40d1acb26bb00e93a9f21bff253f31c20562fa264767 64.14MB / 64.14MB 0.6s done
+#9 extracting sha256:71215d55680cf0ab2dcc0e1dd65ed76414e3fb0c294249b5b9319a8fa7c398e4 3.6s done
+#9 sha256:c29f45468664d54091f4fe86895cf8a9ab9ca18dbd217ae87f4666b09f942fa1 92.37MB / 92.37MB 0.8s done
+#9 sha256:96758a28187bfba14414c9eb1830633e0d5d00695d38826806ef0816552d02e8 67.01MB / 67.01MB 1.1s done
+#9 sha256:bfb56e0a4d92cfcaf474ee5fe468b7c800f46d77257157be18012e0c923bd1e4 174B / 174B 0.7s done
+#9 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 32B / 32B 0.7s done
+#9 extracting sha256:3cb8f9c23302e175d87a827f0a1c376bd59b1f6949bd3bc24ab8da0d669cdfa0 0.7s done
+#9 extracting sha256:5f899db30843f8330d5a40d1acb26bb00e93a9f21bff253f31c20562fa264767 3.3s done
+#9 extracting sha256:c29f45468664d54091f4fe86895cf8a9ab9ca18dbd217ae87f4666b09f942fa1 1.7s
+#9 ...
+
+#7 [argocd-ui 1/6] FROM armdockerhub.rnd.ericsson.se/node:21.6.2@sha256:65998e325b06014d4f1417a8a6afb1540d1ac66521cca76f2221a6953947f9ee
+#7 ...
+
+#10 [argocd-base  2/13] RUN groupadd -g 999 argocd &&     useradd -r -u 999 -g argocd argocd &&     mkdir -p /home/argocd &&     chown argocd:0 /home/argocd &&     chmod g=u /home/argocd &&     apt-get update &&     apt-get dist-upgrade -y &&     apt-get install -y     git git-lfs tini gpg tzdata connect-proxy ca-certificates wget &&     apt-get clean &&     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#10 0.515 Get:1 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]
+#10 0.629 Get:2 http://security.ubuntu.com/ubuntu jammy-security InRelease [110 kB]
+#10 0.727 Get:3 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [119 kB]
+#10 0.774 Get:4 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [109 kB]
+#10 0.823 Get:5 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]
+#10 0.850 Get:6 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1792 kB]
+#10 0.954 Get:7 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]
+#10 1.270 Get:8 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [2308 kB]
+#10 1.601 Get:9 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
+#10 1.612 Get:10 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [2069 kB]
+#10 1.685 Get:11 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [51.1 kB]
+#10 1.687 Get:12 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [2382 kB]
+#10 1.771 Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1371 kB]
+#10 1.880 Get:14 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [1789 kB]
+#10 1.911 Get:15 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [81.0 kB]
+#10 1.943 Get:16 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [44.7 kB]
+#10 1.947 Get:17 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1078 kB]
+#10 2.054 Get:18 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [31.9 kB]
+#10 2.974 Fetched 31.5 MB in 3s (12.3 MB/s)
+#10 2.974 Reading package lists...
+#10 4.135 Reading package lists...
+#10 5.159 Building dependency tree...
+#10 5.367 Reading state information...
+#10 5.413 Calculating upgrade...
+#10 5.747 The following packages will be upgraded:
+#10 5.747   libc-bin libc6 libgnutls30
+#10 5.964 3 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+#10 5.964 Need to get 4908 kB of archives.
+#10 5.964 After this operation, 0 B of additional disk space will be used.
+#10 5.964 Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libc6 amd64 2.35-0ubuntu3.7 [3235 kB]
+#10 6.869 Get:2 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libc-bin amd64 2.35-0ubuntu3.7 [706 kB]
+#10 6.883 Get:3 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libgnutls30 amd64 3.7.3-4ubuntu1.5 [966 kB]
+#10 7.050 debconf: delaying package configuration, since apt-utils is not installed
+#10 7.077 Fetched 4908 kB in 1s (4249 kB/s)
+#10 7.107 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 4393 files and directories currently installed.)
+#10 7.111 Preparing to unpack .../libc6_2.35-0ubuntu3.7_amd64.deb ...
+#10 7.214 Unpacking libc6:amd64 (2.35-0ubuntu3.7) over (2.35-0ubuntu3.6) ...
+#10 7.698 Setting up libc6:amd64 (2.35-0ubuntu3.7) ...
+#10 8.839 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 4393 files and directories currently installed.)
+#10 8.844 Preparing to unpack .../libc-bin_2.35-0ubuntu3.7_amd64.deb ...
+#10 8.851 Unpacking libc-bin (2.35-0ubuntu3.7) over (2.35-0ubuntu3.6) ...
+#10 8.922 Setting up libc-bin (2.35-0ubuntu3.7) ...
+#10 8.971 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 4393 files and directories currently installed.)
+#10 8.976 Preparing to unpack .../libgnutls30_3.7.3-4ubuntu1.5_amd64.deb ...
+#10 8.984 Unpacking libgnutls30:amd64 (3.7.3-4ubuntu1.5) over (3.7.3-4ubuntu1.4) ...
+#10 9.033 Setting up libgnutls30:amd64 (3.7.3-4ubuntu1.5) ...
+#10 9.053 Processing triggers for libc-bin (2.35-0ubuntu3.7) ...
+#10 9.145 Reading package lists...
+#10 10.17 Building dependency tree...
+#10 ...
+
+#7 [argocd-ui 1/6] FROM armdockerhub.rnd.ericsson.se/node:21.6.2@sha256:65998e325b06014d4f1417a8a6afb1540d1ac66521cca76f2221a6953947f9ee
+#7 extracting sha256:c558fac597f8ecbb7a66712e14912ce1d83b23a92ca8b6ff14eef209ab01aff2 5.1s
+#7 ...
+
+#9 [argocd-build 1/7] FROM armdockerhub.rnd.ericsson.se/golang:1.21.9@sha256:7d0dcbe5807b1ad7272a598fbf9d7af15b5e2bed4fd6c4c2b5b3684df0b317dd
+#9 extracting sha256:c29f45468664d54091f4fe86895cf8a9ab9ca18dbd217ae87f4666b09f942fa1 2.6s done
+#9 extracting sha256:96758a28187bfba14414c9eb1830633e0d5d00695d38826806ef0816552d02e8 5.2s done
+#9 extracting sha256:bfb56e0a4d92cfcaf474ee5fe468b7c800f46d77257157be18012e0c923bd1e4 done
+#9 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 done
+#9 DONE 16.5s
+
+#7 [argocd-ui 1/6] FROM armdockerhub.rnd.ericsson.se/node:21.6.2@sha256:65998e325b06014d4f1417a8a6afb1540d1ac66521cca76f2221a6953947f9ee
+#7 extracting sha256:c558fac597f8ecbb7a66712e14912ce1d83b23a92ca8b6ff14eef209ab01aff2 7.5s done
+#7 extracting sha256:449619e06fe37ae34d5d3e31b928b174f8b0eee07dfca3669c4a8e6326b8e82c
+#7 extracting sha256:449619e06fe37ae34d5d3e31b928b174f8b0eee07dfca3669c4a8e6326b8e82c done
+#7 extracting sha256:586631916d9c7bbbcb3206bb13d0d710935bfee76699a73bff3c07038aa29e59
+#7 ...
+
+#11 [argocd-build 2/7] WORKDIR /go/src/github.com/argoproj/argo-cd
+#11 DONE 0.9s
+
+#12 [builder 2/7] RUN echo 'deb http://archive.debian.org/debian buster-backports main' >> /etc/apt/sources.list
+#12 DONE 0.9s
+
+#7 [argocd-ui 1/6] FROM armdockerhub.rnd.ericsson.se/node:21.6.2@sha256:65998e325b06014d4f1417a8a6afb1540d1ac66521cca76f2221a6953947f9ee
+#7 ...
+
+#13 [argocd-build 3/7] COPY go.* ./
+#13 DONE 0.1s
+
+#7 [argocd-ui 1/6] FROM armdockerhub.rnd.ericsson.se/node:21.6.2@sha256:65998e325b06014d4f1417a8a6afb1540d1ac66521cca76f2221a6953947f9ee
+#7 extracting sha256:586631916d9c7bbbcb3206bb13d0d710935bfee76699a73bff3c07038aa29e59 2.7s done
+#7 extracting sha256:8020d38d3250826e37533b9d6fd17e60352457384a51a190f09dd23a93bc63a2
+#7 extracting sha256:8020d38d3250826e37533b9d6fd17e60352457384a51a190f09dd23a93bc63a2 0.1s done
+#7 extracting sha256:38b1ded32c48881fd79631765e7dd139c00b8b6fff88cee5795b4d8cf538f861 done
+#7 DONE 20.0s
+
+#10 [argocd-base  2/13] RUN groupadd -g 999 argocd &&     useradd -r -u 999 -g argocd argocd &&     mkdir -p /home/argocd &&     chown argocd:0 /home/argocd &&     chmod g=u /home/argocd &&     apt-get update &&     apt-get dist-upgrade -y &&     apt-get install -y     git git-lfs tini gpg tzdata connect-proxy ca-certificates wget &&     apt-get clean &&     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#10 10.17 Building dependency tree...
+#10 10.38 Reading state information...
+#10 10.59 The following additional packages will be installed:
+#10 10.59   dirmngr git-man gnupg gnupg-l10n gnupg-utils gpg-agent gpg-wks-client
+#10 10.59   gpg-wks-server gpgconf gpgsm less libassuan0 libbrotli1 libbsd0 libcbor0.8
+#10 10.59   libcurl3-gnutls libedit2 liberror-perl libexpat1 libfido2-1 libgdbm-compat4
+#10 10.59   libgdbm6 libksba8 libldap-2.5-0 libldap-common libmd0 libnghttp2-14 libnpth0
+#10 10.59   libperl5.34 libpsl5 libreadline8 librtmp1 libsasl2-2 libsasl2-modules
+#10 10.59   libsasl2-modules-db libsqlite3-0 libssh-4 libx11-6 libx11-data libxau6
+#10 10.59   libxcb1 libxdmcp6 libxext6 libxmuu1 netbase openssh-client openssl patch
+#10 10.59   perl perl-modules-5.34 pinentry-curses publicsuffix readline-common xauth
+#10 10.60 Suggested packages:
+#10 10.60   dbus-user-session libpam-systemd pinentry-gnome3 tor gettext-base
+#10 10.60   git-daemon-run | git-daemon-sysvinit git-doc git-email git-gui gitk gitweb
+#10 10.60   git-cvs git-mediawiki git-svn parcimonie xloadimage scdaemon gdbm-l10n
+#10 10.60   libsasl2-modules-gssapi-mit | libsasl2-modules-gssapi-heimdal
+#10 10.60   libsasl2-modules-ldap libsasl2-modules-otp libsasl2-modules-sql keychain
+#10 10.60   libpam-ssh monkeysphere ssh-askpass ed diffutils-doc perl-doc
+#10 10.60   libterm-readline-gnu-perl | libterm-readline-perl-perl make
+#10 10.60   libtap-harness-archive-perl pinentry-doc readline-doc
+#10 10.73 The following NEW packages will be installed:
+#10 10.73   ca-certificates connect-proxy dirmngr git git-lfs git-man gnupg gnupg-l10n
+#10 10.73   gnupg-utils gpg gpg-agent gpg-wks-client gpg-wks-server gpgconf gpgsm less
+#10 10.73   libassuan0 libbrotli1 libbsd0 libcbor0.8 libcurl3-gnutls libedit2
+#10 10.73   liberror-perl libexpat1 libfido2-1 libgdbm-compat4 libgdbm6 libksba8
+#10 10.73   libldap-2.5-0 libldap-common libmd0 libnghttp2-14 libnpth0 libperl5.34
+#10 10.73   libpsl5 libreadline8 librtmp1 libsasl2-2 libsasl2-modules
+#10 10.73   libsasl2-modules-db libsqlite3-0 libssh-4 libx11-6 libx11-data libxau6
+#10 10.73   libxcb1 libxdmcp6 libxext6 libxmuu1 netbase openssh-client openssl patch
+#10 10.73   perl perl-modules-5.34 pinentry-curses publicsuffix readline-common tini
+#10 10.73   tzdata wget xauth
+#10 10.96 0 upgraded, 62 newly installed, 0 to remove and 0 not upgraded.
+#10 10.96 Need to get 25.1 MB of archives.
+#10 10.96 After this operation, 109 MB of additional disk space will be used.
+#10 10.96 Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 perl-modules-5.34 all 5.34.0-3ubuntu1.3 [2976 kB]
+#10 11.92 Get:2 http://archive.ubuntu.com/ubuntu jammy/main amd64 libgdbm6 amd64 1.23-1 [33.9 kB]
+#10 11.92 Get:3 http://archive.ubuntu.com/ubuntu jammy/main amd64 libgdbm-compat4 amd64 1.23-1 [6606 B]
+#10 11.92 Get:4 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libperl5.34 amd64 5.34.0-3ubuntu1.3 [4820 kB]
+#10 12.07 Get:5 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 perl amd64 5.34.0-3ubuntu1.3 [232 kB]
+#10 12.08 Get:6 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 openssl amd64 3.0.2-0ubuntu1.15 [1186 kB]
+#10 12.13 Get:7 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 ca-certificates all 20230311ubuntu0.22.04.1 [155 kB]
+#10 12.13 Get:8 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 less amd64 590-1ubuntu0.22.04.3 [142 kB]
+#10 12.14 Get:9 http://archive.ubuntu.com/ubuntu jammy/main amd64 libmd0 amd64 1.0.4-1build1 [23.0 kB]
+#10 12.14 Get:10 http://archive.ubuntu.com/ubuntu jammy/main amd64 libbsd0 amd64 0.11.5-1 [44.8 kB]
+#10 12.14 Get:11 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libexpat1 amd64 2.4.7-1ubuntu0.3 [91.0 kB]
+#10 12.14 Get:12 http://archive.ubuntu.com/ubuntu jammy/main amd64 readline-common all 8.1.2-1 [53.5 kB]
+#10 12.14 Get:13 http://archive.ubuntu.com/ubuntu jammy/main amd64 libreadline8 amd64 8.1.2-1 [153 kB]
+#10 12.24 Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsqlite3-0 amd64 3.37.2-2ubuntu0.3 [641 kB]
+#10 12.24 Get:15 http://archive.ubuntu.com/ubuntu jammy/main amd64 netbase all 6.3 [12.9 kB]
+#10 12.35 Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 tzdata all 2024a-0ubuntu0.22.04 [348 kB]
+#10 12.35 Get:17 http://archive.ubuntu.com/ubuntu jammy/main amd64 libcbor0.8 amd64 0.8.0-2ubuntu1 [24.6 kB]
+#10 12.35 Get:18 http://archive.ubuntu.com/ubuntu jammy/main amd64 libedit2 amd64 3.1-20210910-1build1 [96.8 kB]
+#10 12.35 Get:19 http://archive.ubuntu.com/ubuntu jammy/main amd64 libfido2-1 amd64 1.10.0-1 [82.8 kB]
+#10 12.35 Get:20 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libnghttp2-14 amd64 1.43.0-1ubuntu0.2 [76.9 kB]
+#10 12.35 Get:21 http://archive.ubuntu.com/ubuntu jammy/main amd64 libpsl5 amd64 0.21.0-1.2build2 [58.4 kB]
+#10 12.35 Get:22 http://archive.ubuntu.com/ubuntu jammy/main amd64 libxau6 amd64 1:1.0.9-1build5 [7634 B]
+#10 12.35 Get:23 http://archive.ubuntu.com/ubuntu jammy/main amd64 libxdmcp6 amd64 1:1.1.3-0ubuntu5 [10.9 kB]
+#10 12.45 Get:24 http://archive.ubuntu.com/ubuntu jammy/main amd64 libxcb1 amd64 1.14-3ubuntu3 [49.0 kB]
+#10 12.45 Get:25 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libx11-data all 2:1.7.5-1ubuntu0.3 [120 kB]
+#10 12.55 Get:26 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libx11-6 amd64 2:1.7.5-1ubuntu0.3 [667 kB]
+#10 12.56 Get:27 http://archive.ubuntu.com/ubuntu jammy/main amd64 libxext6 amd64 2:1.3.4-1build1 [31.8 kB]
+#10 12.56 Get:28 http://archive.ubuntu.com/ubuntu jammy/main amd64 libxmuu1 amd64 2:1.1.3-3 [10.2 kB]
+#10 12.56 Get:29 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 openssh-client amd64 1:8.9p1-3ubuntu0.7 [906 kB]
+#10 12.57 Get:30 http://archive.ubuntu.com/ubuntu jammy/main amd64 publicsuffix all 20211207.1025-1 [129 kB]
+#10 12.57 Get:31 http://archive.ubuntu.com/ubuntu jammy/main amd64 wget amd64 1.21.2-2ubuntu1 [367 kB]
+#10 12.58 Get:32 http://archive.ubuntu.com/ubuntu jammy/main amd64 xauth amd64 1:1.1-1build2 [27.5 kB]
+#10 12.58 Get:33 http://archive.ubuntu.com/ubuntu jammy/universe amd64 connect-proxy amd64 1.105-1.2 [22.0 kB]
+#10 12.66 Get:34 http://archive.ubuntu.com/ubuntu jammy/main amd64 libassuan0 amd64 2.5.5-1build1 [38.2 kB]
+#10 12.66 Get:35 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gpgconf amd64 2.2.27-3ubuntu2.1 [94.2 kB]
+#10 12.76 Get:36 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libksba8 amd64 1.6.0-2ubuntu0.2 [119 kB]
+#10 12.76 Get:37 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsasl2-modules-db amd64 2.1.27+dfsg2-3ubuntu1.2 [20.5 kB]
+#10 12.76 Get:38 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsasl2-2 amd64 2.1.27+dfsg2-3ubuntu1.2 [53.8 kB]
+#10 12.77 Get:39 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libldap-2.5-0 amd64 2.5.17+dfsg-0ubuntu0.22.04.1 [183 kB]
+#10 12.77 Get:40 http://archive.ubuntu.com/ubuntu jammy/main amd64 libnpth0 amd64 1.6-3build2 [8664 B]
+#10 12.77 Get:41 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 dirmngr amd64 2.2.27-3ubuntu2.1 [293 kB]
+#10 12.77 Get:42 http://archive.ubuntu.com/ubuntu jammy/main amd64 libbrotli1 amd64 1.0.9-2build6 [315 kB]
+#10 12.77 Get:43 http://archive.ubuntu.com/ubuntu jammy/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2build4 [58.2 kB]
+#10 12.87 Get:44 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libssh-4 amd64 0.9.6-2ubuntu0.22.04.3 [186 kB]
+#10 12.87 Get:45 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libcurl3-gnutls amd64 7.81.0-1ubuntu1.16 [284 kB]
+#10 12.97 Get:46 http://archive.ubuntu.com/ubuntu jammy/main amd64 liberror-perl all 0.17029-1 [26.5 kB]
+#10 12.97 Get:47 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 git-man all 1:2.34.1-1ubuntu1.10 [954 kB]
+#10 12.98 Get:48 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 git amd64 1:2.34.1-1ubuntu1.10 [3166 kB]
+#10 13.09 Get:49 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 git-lfs amd64 3.0.2-1ubuntu0.2 [3503 kB]
+#10 13.21 Get:50 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gnupg-l10n all 2.2.27-3ubuntu2.1 [54.4 kB]
+#10 13.21 Get:51 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gnupg-utils amd64 2.2.27-3ubuntu2.1 [308 kB]
+#10 13.22 Get:52 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gpg amd64 2.2.27-3ubuntu2.1 [519 kB]
+#10 13.22 Get:53 http://archive.ubuntu.com/ubuntu jammy/main amd64 pinentry-curses amd64 1.1.1-1build2 [34.4 kB]
+#10 13.22 Get:54 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gpg-agent amd64 2.2.27-3ubuntu2.1 [209 kB]
+#10 13.22 Get:55 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gpg-wks-client amd64 2.2.27-3ubuntu2.1 [62.7 kB]
+#10 13.22 Get:56 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gpg-wks-server amd64 2.2.27-3ubuntu2.1 [57.5 kB]
+#10 13.23 Get:57 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gpgsm amd64 2.2.27-3ubuntu2.1 [197 kB]
+#10 13.29 Get:58 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gnupg all 2.2.27-3ubuntu2.1 [315 kB]
+#10 13.39 Get:59 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libldap-common all 2.5.17+dfsg-0ubuntu0.22.04.1 [15.8 kB]
+#10 13.39 Get:60 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsasl2-modules amd64 2.1.27+dfsg2-3ubuntu1.2 [68.8 kB]
+#10 13.39 Get:61 http://archive.ubuntu.com/ubuntu jammy/main amd64 patch amd64 2.7.6-7build2 [109 kB]
+#10 13.40 Get:62 http://archive.ubuntu.com/ubuntu jammy/universe amd64 tini amd64 0.19.0-1 [276 kB]
+#10 13.53 debconf: delaying package configuration, since apt-utils is not installed
+#10 13.59 Fetched 25.1 MB in 3s (9452 kB/s)
+#10 13.66 Selecting previously unselected package perl-modules-5.34.
+#10 13.66 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 4393 files and directories currently installed.)
+#10 13.66 Preparing to unpack .../00-perl-modules-5.34_5.34.0-3ubuntu1.3_all.deb ...
+#10 13.78 Unpacking perl-modules-5.34 (5.34.0-3ubuntu1.3) ...
+#10 14.14 Selecting previously unselected package libgdbm6:amd64.
+#10 14.14 Preparing to unpack .../01-libgdbm6_1.23-1_amd64.deb ...
+#10 14.15 Unpacking libgdbm6:amd64 (1.23-1) ...
+#10 14.24 Selecting previously unselected package libgdbm-compat4:amd64.
+#10 14.24 Preparing to unpack .../02-libgdbm-compat4_1.23-1_amd64.deb ...
+#10 14.24 Unpacking libgdbm-compat4:amd64 (1.23-1) ...
+#10 14.29 Selecting previously unselected package libperl5.34:amd64.
+#10 14.29 Preparing to unpack .../03-libperl5.34_5.34.0-3ubuntu1.3_amd64.deb ...
+#10 14.30 Unpacking libperl5.34:amd64 (5.34.0-3ubuntu1.3) ...
+#10 14.70 Selecting previously unselected package perl.
+#10 14.70 Preparing to unpack .../04-perl_5.34.0-3ubuntu1.3_amd64.deb ...
+#10 14.71 Unpacking perl (5.34.0-3ubuntu1.3) ...
+#10 14.75 Selecting previously unselected package openssl.
+#10 14.76 Preparing to unpack .../05-openssl_3.0.2-0ubuntu1.15_amd64.deb ...
+#10 14.76 Unpacking openssl (3.0.2-0ubuntu1.15) ...
+#10 14.80 Selecting previously unselected package ca-certificates.
+#10 14.80 Preparing to unpack .../06-ca-certificates_20230311ubuntu0.22.04.1_all.deb ...
+#10 14.80 Unpacking ca-certificates (20230311ubuntu0.22.04.1) ...
+#10 14.84 Selecting previously unselected package less.
+#10 14.84 Preparing to unpack .../07-less_590-1ubuntu0.22.04.3_amd64.deb ...
+#10 14.84 Unpacking less (590-1ubuntu0.22.04.3) ...
+#10 14.87 Selecting previously unselected package libmd0:amd64.
+#10 14.87 Preparing to unpack .../08-libmd0_1.0.4-1build1_amd64.deb ...
+#10 14.88 Unpacking libmd0:amd64 (1.0.4-1build1) ...
+#10 14.90 Selecting previously unselected package libbsd0:amd64.
+#10 14.90 Preparing to unpack .../09-libbsd0_0.11.5-1_amd64.deb ...
+#10 14.91 Unpacking libbsd0:amd64 (0.11.5-1) ...
+#10 14.99 Selecting previously unselected package libexpat1:amd64.
+#10 14.99 Preparing to unpack .../10-libexpat1_2.4.7-1ubuntu0.3_amd64.deb ...
+#10 14.99 Unpacking libexpat1:amd64 (2.4.7-1ubuntu0.3) ...
+#10 15.06 Selecting previously unselected package readline-common.
+#10 15.06 Preparing to unpack .../11-readline-common_8.1.2-1_all.deb ...
+#10 15.07 Unpacking readline-common (8.1.2-1) ...
+#10 15.11 Selecting previously unselected package libreadline8:amd64.
+#10 15.11 Preparing to unpack .../12-libreadline8_8.1.2-1_amd64.deb ...
+#10 15.11 Unpacking libreadline8:amd64 (8.1.2-1) ...
+#10 15.14 Selecting previously unselected package libsqlite3-0:amd64.
+#10 15.14 Preparing to unpack .../13-libsqlite3-0_3.37.2-2ubuntu0.3_amd64.deb ...
+#10 15.14 Unpacking libsqlite3-0:amd64 (3.37.2-2ubuntu0.3) ...
+#10 15.18 Selecting previously unselected package netbase.
+#10 15.18 Preparing to unpack .../14-netbase_6.3_all.deb ...
+#10 15.19 Unpacking netbase (6.3) ...
+#10 15.21 Selecting previously unselected package tzdata.
+#10 15.21 Preparing to unpack .../15-tzdata_2024a-0ubuntu0.22.04_all.deb ...
+#10 15.21 Unpacking tzdata (2024a-0ubuntu0.22.04) ...
+#10 15.44 Selecting previously unselected package libcbor0.8:amd64.
+#10 15.44 Preparing to unpack .../16-libcbor0.8_0.8.0-2ubuntu1_amd64.deb ...
+#10 15.44 Unpacking libcbor0.8:amd64 (0.8.0-2ubuntu1) ...
+#10 15.46 Selecting previously unselected package libedit2:amd64.
+#10 15.47 Preparing to unpack .../17-libedit2_3.1-20210910-1build1_amd64.deb ...
+#10 15.47 Unpacking libedit2:amd64 (3.1-20210910-1build1) ...
+#10 15.49 Selecting previously unselected package libfido2-1:amd64.
+#10 15.49 Preparing to unpack .../18-libfido2-1_1.10.0-1_amd64.deb ...
+#10 15.49 Unpacking libfido2-1:amd64 (1.10.0-1) ...
+#10 15.51 Selecting previously unselected package libnghttp2-14:amd64.
+#10 15.51 Preparing to unpack .../19-libnghttp2-14_1.43.0-1ubuntu0.2_amd64.deb ...
+#10 15.52 Unpacking libnghttp2-14:amd64 (1.43.0-1ubuntu0.2) ...
+#10 15.54 Selecting previously unselected package libpsl5:amd64.
+#10 15.54 Preparing to unpack .../20-libpsl5_0.21.0-1.2build2_amd64.deb ...
+#10 15.55 Unpacking libpsl5:amd64 (0.21.0-1.2build2) ...
+#10 15.56 Selecting previously unselected package libxau6:amd64.
+#10 15.57 Preparing to unpack .../21-libxau6_1%3a1.0.9-1build5_amd64.deb ...
+#10 15.57 Unpacking libxau6:amd64 (1:1.0.9-1build5) ...
+#10 15.59 Selecting previously unselected package libxdmcp6:amd64.
+#10 15.59 Preparing to unpack .../22-libxdmcp6_1%3a1.1.3-0ubuntu5_amd64.deb ...
+#10 15.59 Unpacking libxdmcp6:amd64 (1:1.1.3-0ubuntu5) ...
+#10 15.62 Selecting previously unselected package libxcb1:amd64.
+#10 15.62 Preparing to unpack .../23-libxcb1_1.14-3ubuntu3_amd64.deb ...
+#10 15.63 Unpacking libxcb1:amd64 (1.14-3ubuntu3) ...
+#10 15.65 Selecting previously unselected package libx11-data.
+#10 15.65 Preparing to unpack .../24-libx11-data_2%3a1.7.5-1ubuntu0.3_all.deb ...
+#10 15.65 Unpacking libx11-data (2:1.7.5-1ubuntu0.3) ...
+#10 15.71 Selecting previously unselected package libx11-6:amd64.
+#10 15.71 Preparing to unpack .../25-libx11-6_2%3a1.7.5-1ubuntu0.3_amd64.deb ...
+#10 15.72 Unpacking libx11-6:amd64 (2:1.7.5-1ubuntu0.3) ...
+#10 15.75 Selecting previously unselected package libxext6:amd64.
+#10 15.75 Preparing to unpack .../26-libxext6_2%3a1.3.4-1build1_amd64.deb ...
+#10 15.75 Unpacking libxext6:amd64 (2:1.3.4-1build1) ...
+#10 15.78 Selecting previously unselected package libxmuu1:amd64.
+#10 15.78 Preparing to unpack .../27-libxmuu1_2%3a1.1.3-3_amd64.deb ...
+#10 15.78 Unpacking libxmuu1:amd64 (2:1.1.3-3) ...
+#10 15.80 Selecting previously unselected package openssh-client.
+#10 15.81 Preparing to unpack .../28-openssh-client_1%3a8.9p1-3ubuntu0.7_amd64.deb ...
+#10 15.81 Unpacking openssh-client (1:8.9p1-3ubuntu0.7) ...
+#10 15.85 Selecting previously unselected package publicsuffix.
+#10 15.86 Preparing to unpack .../29-publicsuffix_20211207.1025-1_all.deb ...
+#10 15.86 Unpacking publicsuffix (20211207.1025-1) ...
+#10 15.89 Selecting previously unselected package wget.
+#10 15.89 Preparing to unpack .../30-wget_1.21.2-2ubuntu1_amd64.deb ...
+#10 15.90 Unpacking wget (1.21.2-2ubuntu1) ...
+#10 15.95 Selecting previously unselected package xauth.
+#10 15.95 Preparing to unpack .../31-xauth_1%3a1.1-1build2_amd64.deb ...
+#10 15.95 Unpacking xauth (1:1.1-1build2) ...
+#10 15.99 Selecting previously unselected package connect-proxy.
+#10 15.99 Preparing to unpack .../32-connect-proxy_1.105-1.2_amd64.deb ...
+#10 16.00 Unpacking connect-proxy (1.105-1.2) ...
+#10 16.02 Selecting previously unselected package libassuan0:amd64.
+#10 16.02 Preparing to unpack .../33-libassuan0_2.5.5-1build1_amd64.deb ...
+#10 16.03 Unpacking libassuan0:amd64 (2.5.5-1build1) ...
+#10 16.05 Selecting previously unselected package gpgconf.
+#10 16.05 Preparing to unpack .../34-gpgconf_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 16.05 Unpacking gpgconf (2.2.27-3ubuntu2.1) ...
+#10 16.08 Selecting previously unselected package libksba8:amd64.
+#10 16.08 Preparing to unpack .../35-libksba8_1.6.0-2ubuntu0.2_amd64.deb ...
+#10 16.08 Unpacking libksba8:amd64 (1.6.0-2ubuntu0.2) ...
+#10 16.11 Selecting previously unselected package libsasl2-modules-db:amd64.
+#10 16.11 Preparing to unpack .../36-libsasl2-modules-db_2.1.27+dfsg2-3ubuntu1.2_amd64.deb ...
+#10 16.11 Unpacking libsasl2-modules-db:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#10 16.17 Selecting previously unselected package libsasl2-2:amd64.
+#10 16.17 Preparing to unpack .../37-libsasl2-2_2.1.27+dfsg2-3ubuntu1.2_amd64.deb ...
+#10 16.17 Unpacking libsasl2-2:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#10 16.20 Selecting previously unselected package libldap-2.5-0:amd64.
+#10 16.20 Preparing to unpack .../38-libldap-2.5-0_2.5.17+dfsg-0ubuntu0.22.04.1_amd64.deb ...
+#10 16.20 Unpacking libldap-2.5-0:amd64 (2.5.17+dfsg-0ubuntu0.22.04.1) ...
+#10 16.22 Selecting previously unselected package libnpth0:amd64.
+#10 16.22 Preparing to unpack .../39-libnpth0_1.6-3build2_amd64.deb ...
+#10 16.23 Unpacking libnpth0:amd64 (1.6-3build2) ...
+#10 16.26 Selecting previously unselected package dirmngr.
+#10 16.27 Preparing to unpack .../40-dirmngr_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 16.28 Unpacking dirmngr (2.2.27-3ubuntu2.1) ...
+#10 16.33 Selecting previously unselected package libbrotli1:amd64.
+#10 16.33 Preparing to unpack .../41-libbrotli1_1.0.9-2build6_amd64.deb ...
+#10 16.34 Unpacking libbrotli1:amd64 (1.0.9-2build6) ...
+#10 16.37 Selecting previously unselected package librtmp1:amd64.
+#10 16.37 Preparing to unpack .../42-librtmp1_2.4+20151223.gitfa8646d.1-2build4_amd64.deb ...
+#10 16.37 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build4) ...
+#10 16.39 Selecting previously unselected package libssh-4:amd64.
+#10 16.40 Preparing to unpack .../43-libssh-4_0.9.6-2ubuntu0.22.04.3_amd64.deb ...
+#10 16.40 Unpacking libssh-4:amd64 (0.9.6-2ubuntu0.22.04.3) ...
+#10 16.43 Selecting previously unselected package libcurl3-gnutls:amd64.
+#10 16.44 Preparing to unpack .../44-libcurl3-gnutls_7.81.0-1ubuntu1.16_amd64.deb ...
+#10 16.44 Unpacking libcurl3-gnutls:amd64 (7.81.0-1ubuntu1.16) ...
+#10 16.48 Selecting previously unselected package liberror-perl.
+#10 16.48 Preparing to unpack .../45-liberror-perl_0.17029-1_all.deb ...
+#10 16.48 Unpacking liberror-perl (0.17029-1) ...
+#10 16.51 Selecting previously unselected package git-man.
+#10 16.51 Preparing to unpack .../46-git-man_1%3a2.34.1-1ubuntu1.10_all.deb ...
+#10 16.51 Unpacking git-man (1:2.34.1-1ubuntu1.10) ...
+#10 16.54 Selecting previously unselected package git.
+#10 16.54 Preparing to unpack .../47-git_1%3a2.34.1-1ubuntu1.10_amd64.deb ...
+#10 16.55 Unpacking git (1:2.34.1-1ubuntu1.10) ...
+#10 16.70 Selecting previously unselected package git-lfs.
+#10 16.70 Preparing to unpack .../48-git-lfs_3.0.2-1ubuntu0.2_amd64.deb ...
+#10 16.71 Unpacking git-lfs (3.0.2-1ubuntu0.2) ...
+#10 16.78 Selecting previously unselected package gnupg-l10n.
+#10 16.78 Preparing to unpack .../49-gnupg-l10n_2.2.27-3ubuntu2.1_all.deb ...
+#10 16.79 Unpacking gnupg-l10n (2.2.27-3ubuntu2.1) ...
+#10 16.81 Selecting previously unselected package gnupg-utils.
+#10 16.81 Preparing to unpack .../50-gnupg-utils_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 16.81 Unpacking gnupg-utils (2.2.27-3ubuntu2.1) ...
+#10 16.83 Selecting previously unselected package gpg.
+#10 16.83 Preparing to unpack .../51-gpg_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 16.84 Unpacking gpg (2.2.27-3ubuntu2.1) ...
+#10 16.87 Selecting previously unselected package pinentry-curses.
+#10 16.87 Preparing to unpack .../52-pinentry-curses_1.1.1-1build2_amd64.deb ...
+#10 16.88 Unpacking pinentry-curses (1.1.1-1build2) ...
+#10 16.90 Selecting previously unselected package gpg-agent.
+#10 16.90 Preparing to unpack .../53-gpg-agent_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 16.90 Unpacking gpg-agent (2.2.27-3ubuntu2.1) ...
+#10 16.93 Selecting previously unselected package gpg-wks-client.
+#10 16.93 Preparing to unpack .../54-gpg-wks-client_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 16.94 Unpacking gpg-wks-client (2.2.27-3ubuntu2.1) ...
+#10 16.96 Selecting previously unselected package gpg-wks-server.
+#10 16.96 Preparing to unpack .../55-gpg-wks-server_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 16.96 Unpacking gpg-wks-server (2.2.27-3ubuntu2.1) ...
+#10 16.98 Selecting previously unselected package gpgsm.
+#10 16.99 Preparing to unpack .../56-gpgsm_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 16.99 Unpacking gpgsm (2.2.27-3ubuntu2.1) ...
+#10 17.01 Selecting previously unselected package gnupg.
+#10 17.01 Preparing to unpack .../57-gnupg_2.2.27-3ubuntu2.1_all.deb ...
+#10 17.01 Unpacking gnupg (2.2.27-3ubuntu2.1) ...
+#10 17.03 Selecting previously unselected package libldap-common.
+#10 17.03 Preparing to unpack .../58-libldap-common_2.5.17+dfsg-0ubuntu0.22.04.1_all.deb ...
+#10 17.04 Unpacking libldap-common (2.5.17+dfsg-0ubuntu0.22.04.1) ...
+#10 17.05 Selecting previously unselected package libsasl2-modules:amd64.
+#10 17.06 Preparing to unpack .../59-libsasl2-modules_2.1.27+dfsg2-3ubuntu1.2_amd64.deb ...
+#10 17.06 Unpacking libsasl2-modules:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#10 ...
+
+#14 [argocd-ui 2/6] WORKDIR /src
+#14 DONE 0.1s
+
+#10 [argocd-base  2/13] RUN groupadd -g 999 argocd &&     useradd -r -u 999 -g argocd argocd &&     mkdir -p /home/argocd &&     chown argocd:0 /home/argocd &&     chmod g=u /home/argocd &&     apt-get update &&     apt-get dist-upgrade -y &&     apt-get install -y     git git-lfs tini gpg tzdata connect-proxy ca-certificates wget &&     apt-get clean &&     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#10 17.18 Selecting previously unselected package patch.
+#10 17.18 Preparing to unpack .../60-patch_2.7.6-7build2_amd64.deb ...
+#10 17.19 Unpacking patch (2.7.6-7build2) ...
+#10 17.22 Selecting previously unselected package tini.
+#10 17.22 Preparing to unpack .../61-tini_0.19.0-1_amd64.deb ...
+#10 17.22 Unpacking tini (0.19.0-1) ...
+#10 17.28 Setting up libksba8:amd64 (1.6.0-2ubuntu0.2) ...
+#10 ...
+
+#15 [argocd-ui 3/6] COPY [ui/package.json, ui/yarn.lock, ./]
+#15 DONE 0.1s
+
+#10 [argocd-base  2/13] RUN groupadd -g 999 argocd &&     useradd -r -u 999 -g argocd argocd &&     mkdir -p /home/argocd &&     chown argocd:0 /home/argocd &&     chmod g=u /home/argocd &&     apt-get update &&     apt-get dist-upgrade -y &&     apt-get install -y     git git-lfs tini gpg tzdata connect-proxy ca-certificates wget &&     apt-get clean &&     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#10 17.29 Setting up libexpat1:amd64 (2.4.7-1ubuntu0.3) ...
+#10 17.33 Setting up libxau6:amd64 (1:1.0.9-1build5) ...
+#10 17.35 Setting up libpsl5:amd64 (0.21.0-1.2build2) ...
+#10 17.36 Setting up connect-proxy (1.105-1.2) ...
+#10 17.36 Setting up wget (1.21.2-2ubuntu1) ...
+#10 17.39 Setting up libcbor0.8:amd64 (0.8.0-2ubuntu1) ...
+#10 17.40 Setting up libbrotli1:amd64 (1.0.9-2build6) ...
+#10 17.41 Setting up libsqlite3-0:amd64 (3.37.2-2ubuntu0.3) ...
+#10 17.41 Setting up libsasl2-modules:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#10 17.42 Setting up libnghttp2-14:amd64 (1.43.0-1ubuntu0.2) ...
+#10 17.44 Setting up less (590-1ubuntu0.22.04.3) ...
+#10 17.46 Setting up libnpth0:amd64 (1.6-3build2) ...
+#10 17.47 Setting up libassuan0:amd64 (2.5.5-1build1) ...
+#10 17.48 Setting up perl-modules-5.34 (5.34.0-3ubuntu1.3) ...
+#10 17.48 Setting up libldap-common (2.5.17+dfsg-0ubuntu0.22.04.1) ...
+#10 17.49 Setting up libsasl2-modules-db:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#10 17.50 Setting up tzdata (2024a-0ubuntu0.22.04) ...
+#10 17.63 
+#10 17.63 Current default time zone: 'Etc/UTC'
+#10 17.63 Local time is now:      Wed May  8 05:19:51 UTC 2024.
+#10 17.63 Universal Time is now:  Wed May  8 05:19:51 UTC 2024.
+#10 17.63 Run 'dpkg-reconfigure tzdata' if you wish to change it.
+#10 17.63 
+#10 17.66 Setting up libx11-data (2:1.7.5-1ubuntu0.3) ...
+#10 17.67 Setting up gnupg-l10n (2.2.27-3ubuntu2.1) ...
+#10 17.67 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build4) ...
+#10 17.68 Setting up tini (0.19.0-1) ...
+#10 17.68 Setting up patch (2.7.6-7build2) ...
+#10 17.69 Setting up libsasl2-2:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#10 17.69 Setting up libssh-4:amd64 (0.9.6-2ubuntu0.22.04.3) ...
+#10 17.70 Setting up libmd0:amd64 (1.0.4-1build1) ...
+#10 17.70 Setting up git-man (1:2.34.1-1ubuntu1.10) ...
+#10 17.71 Setting up netbase (6.3) ...
+#10 17.72 Setting up libfido2-1:amd64 (1.10.0-1) ...
+#10 17.73 Setting up openssl (3.0.2-0ubuntu1.15) ...
+#10 17.73 Setting up libbsd0:amd64 (0.11.5-1) ...
+#10 17.74 Setting up readline-common (8.1.2-1) ...
+#10 17.75 Setting up publicsuffix (20211207.1025-1) ...
+#10 17.75 Setting up libgdbm6:amd64 (1.23-1) ...
+#10 17.76 Setting up pinentry-curses (1.1.1-1build2) ...
+#10 17.77 Setting up libxdmcp6:amd64 (1:1.1.3-0ubuntu5) ...
+#10 17.78 Setting up libxcb1:amd64 (1.14-3ubuntu3) ...
+#10 17.78 Setting up libedit2:amd64 (3.1-20210910-1build1) ...
+#10 17.79 Setting up libreadline8:amd64 (8.1.2-1) ...
+#10 17.79 Setting up libldap-2.5-0:amd64 (2.5.17+dfsg-0ubuntu0.22.04.1) ...
+#10 17.79 Setting up ca-certificates (20230311ubuntu0.22.04.1) ...
+#10 18.43 Updating certificates in /etc/ssl/certs...
+#10 19.12 137 added, 0 removed; done.
+#10 19.14 Setting up libgdbm-compat4:amd64 (1.23-1) ...
+#10 19.15 Setting up gpgconf (2.2.27-3ubuntu2.1) ...
+#10 19.16 Setting up libx11-6:amd64 (2:1.7.5-1ubuntu0.3) ...
+#10 19.16 Setting up libxmuu1:amd64 (2:1.1.3-3) ...
+#10 19.17 Setting up gpg (2.2.27-3ubuntu2.1) ...
+#10 19.18 Setting up gnupg-utils (2.2.27-3ubuntu2.1) ...
+#10 19.18 Setting up libperl5.34:amd64 (5.34.0-3ubuntu1.3) ...
+#10 19.19 Setting up gpg-agent (2.2.27-3ubuntu2.1) ...
+#10 19.80 Setting up openssh-client (1:8.9p1-3ubuntu0.7) ...
+#10 19.89 update-alternatives: using /usr/bin/ssh to provide /usr/bin/rsh (rsh) in auto mode
+#10 19.89 update-alternatives: warning: skip creation of /usr/share/man/man1/rsh.1.gz because associated file /usr/share/man/man1/ssh.1.gz (of link group rsh) doesn't exist
+#10 19.89 update-alternatives: using /usr/bin/slogin to provide /usr/bin/rlogin (rlogin) in auto mode
+#10 19.89 update-alternatives: warning: skip creation of /usr/share/man/man1/rlogin.1.gz because associated file /usr/share/man/man1/slogin.1.gz (of link group rlogin) doesn't exist
+#10 19.89 update-alternatives: using /usr/bin/scp to provide /usr/bin/rcp (rcp) in auto mode
+#10 19.89 update-alternatives: warning: skip creation of /usr/share/man/man1/rcp.1.gz because associated file /usr/share/man/man1/scp.1.gz (of link group rcp) doesn't exist
+#10 19.90 Setting up gpgsm (2.2.27-3ubuntu2.1) ...
+#10 19.91 Setting up libxext6:amd64 (2:1.3.4-1build1) ...
+#10 19.91 Setting up libcurl3-gnutls:amd64 (7.81.0-1ubuntu1.16) ...
+#10 19.92 Setting up dirmngr (2.2.27-3ubuntu2.1) ...
+#10 20.08 Setting up perl (5.34.0-3ubuntu1.3) ...
+#10 20.11 Setting up gpg-wks-server (2.2.27-3ubuntu2.1) ...
+#10 20.12 Setting up xauth (1:1.1-1build2) ...
+#10 20.13 Setting up gpg-wks-client (2.2.27-3ubuntu2.1) ...
+#10 20.14 Setting up liberror-perl (0.17029-1) ...
+#10 20.14 Setting up git (1:2.34.1-1ubuntu1.10) ...
+#10 20.16 Setting up gnupg (2.2.27-3ubuntu2.1) ...
+#10 20.16 Setting up git-lfs (3.0.2-1ubuntu0.2) ...
+#10 20.19 Processing triggers for libc-bin (2.35-0ubuntu3.7) ...
+#10 20.20 Processing triggers for ca-certificates (20230311ubuntu0.22.04.1) ...
+#10 20.21 Updating certificates in /etc/ssl/certs...
+#10 21.01 0 added, 0 removed; done.
+#10 21.01 Running hooks in /etc/ca-certificates/update.d...
+#10 21.01 done.
+#10 DONE 21.2s
+
+#16 [builder 3/7] RUN apt-get update && apt-get install --no-install-recommends -y     openssh-server     nginx     unzip     fcgiwrap     git     git-lfs     make     wget     gcc     sudo     zip &&     apt-get clean &&     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#16 0.464 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+#16 0.490 Get:2 http://archive.debian.org/debian buster-backports InRelease [51.4 kB]
+#16 0.491 Get:3 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+#16 0.506 Get:4 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]
+#16 0.593 Get:5 http://deb.debian.org/debian bookworm/main amd64 Packages [8786 kB]
+#16 0.715 Get:6 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [13.8 kB]
+#16 0.861 Get:7 http://archive.debian.org/debian buster-backports/main amd64 Packages [481 kB]
+#16 0.976 Get:8 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [157 kB]
+#16 2.035 Fetched 9743 kB in 2s (6011 kB/s)
+#16 2.035 Reading package lists...
+#16 2.761 Reading package lists...
+#16 3.508 Building dependency tree...
+#16 3.684 Reading state information...
+#16 3.861 git is already the newest version (1:2.39.2-1.1).
+#16 3.861 make is already the newest version (4.3-4.1).
+#16 3.861 wget is already the newest version (1.21.3-1+b2).
+#16 3.861 gcc is already the newest version (4:12.2.0-3).
+#16 3.861 The following additional packages will be installed:
+#16 3.862   bsdutils dmsetup iproute2 libapparmor1 libargon2-1 libblkid1 libbpf1
+#16 3.862   libcap2-bin libcryptsetup12 libdevmapper1.02.1 libelf1 libfcgi0ldbl
+#16 3.863   libfdisk1 libip4tc2 libjson-c5 libkmod2 libmnl0 libmount1 libsmartcols1
+#16 3.863   libsystemd-shared libuuid1 libwrap0 libxtables12 mount nginx-common
+#16 3.863   openssh-sftp-server runit-helper systemd util-linux util-linux-extra
+#16 3.864 Suggested packages:
+#16 3.864   iproute2-doc cryptsetup-bin nfs-common nginx-doc ssl-cert molly-guard
+#16 3.864   monkeysphere ssh-askpass ufw systemd-container systemd-homed systemd-userdbd
+#16 3.864   systemd-boot systemd-resolved libqrencode4 libtss2-esys-3.0.2-0 libtss2-mu0
+#16 3.864   libtss2-rc0 polkitd | policykit-1 dosfstools kbd util-linux-locales
+#16 3.864 Recommended packages:
+#16 3.864   bsdextrautils libatm1 libpam-cap libfcgi-bin uuid-runtime default-logind
+#16 3.864   | logind | libpam-systemd ncurses-term xauth default-dbus-system-bus
+#16 3.864   | dbus-system-bus systemd-timesyncd | time-daemon
+#16 4.101 The following NEW packages will be installed:
+#16 4.102   dmsetup fcgiwrap git-lfs iproute2 libapparmor1 libargon2-1 libbpf1
+#16 4.102   libcap2-bin libcryptsetup12 libdevmapper1.02.1 libelf1 libfcgi0ldbl
+#16 4.102   libfdisk1 libip4tc2 libjson-c5 libkmod2 libmnl0 libsystemd-shared libwrap0
+#16 4.102   libxtables12 nginx nginx-common openssh-server openssh-sftp-server
+#16 4.102   runit-helper sudo systemd unzip zip
+#16 4.103 The following packages will be upgraded:
+#16 4.104   bsdutils libblkid1 libmount1 libsmartcols1 libuuid1 mount util-linux
+#16 4.104   util-linux-extra
+#16 4.135 8 upgraded, 29 newly installed, 0 to remove and 5 not upgraded.
+#16 4.135 Need to get 16.0 MB of archives.
+#16 4.135 After this operation, 45.6 MB of additional disk space will be used.
+#16 4.135 Get:1 http://deb.debian.org/debian-security bookworm-security/main amd64 bsdutils amd64 1:2.38.1-5+deb12u1 [94.3 kB]
+#16 4.152 Get:2 http://deb.debian.org/debian-security bookworm-security/main amd64 libsmartcols1 amd64 2.38.1-5+deb12u1 [107 kB]
+#16 4.154 Get:3 http://deb.debian.org/debian-security bookworm-security/main amd64 util-linux-extra amd64 2.38.1-5+deb12u1 [110 kB]
+#16 4.160 Get:4 http://deb.debian.org/debian-security bookworm-security/main amd64 util-linux amd64 2.38.1-5+deb12u1 [1176 kB]
+#16 4.180 Get:5 http://deb.debian.org/debian-security bookworm-security/main amd64 mount amd64 2.38.1-5+deb12u1 [134 kB]
+#16 4.200 Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 libblkid1 amd64 2.38.1-5+deb12u1 [147 kB]
+#16 4.207 Get:7 http://deb.debian.org/debian bookworm/main amd64 libargon2-1 amd64 0~20171227-0.3+deb12u1 [19.4 kB]
+#16 4.209 Get:8 http://deb.debian.org/debian bookworm/main amd64 dmsetup amd64 2:1.02.185-2 [82.0 kB]
+#16 4.210 Get:9 http://deb.debian.org/debian bookworm/main amd64 libdevmapper1.02.1 amd64 2:1.02.185-2 [133 kB]
+#16 4.213 Get:10 http://deb.debian.org/debian bookworm/main amd64 libjson-c5 amd64 0.16-2 [44.1 kB]
+#16 4.213 Get:11 http://deb.debian.org/debian-security bookworm-security/main amd64 libuuid1 amd64 2.38.1-5+deb12u1 [28.6 kB]
+#16 4.214 Get:12 http://deb.debian.org/debian bookworm/main amd64 libcryptsetup12 amd64 2:2.6.1-4~deb12u2 [223 kB]
+#16 4.216 Get:13 http://deb.debian.org/debian-security bookworm-security/main amd64 libfdisk1 amd64 2.38.1-5+deb12u1 [193 kB]
+#16 4.217 Get:14 http://deb.debian.org/debian bookworm/main amd64 libkmod2 amd64 30+20221128-1 [57.9 kB]
+#16 4.218 Get:15 http://deb.debian.org/debian bookworm/main amd64 libapparmor1 amd64 3.0.8-3 [41.2 kB]
+#16 4.219 Get:16 http://deb.debian.org/debian bookworm/main amd64 libip4tc2 amd64 1.8.9-2 [19.0 kB]
+#16 4.223 Get:17 http://deb.debian.org/debian-security bookworm-security/main amd64 libmount1 amd64 2.38.1-5+deb12u1 [165 kB]
+#16 4.225 Get:18 http://deb.debian.org/debian bookworm/main amd64 libsystemd-shared amd64 252.22-1~deb12u1 [1691 kB]
+#16 4.244 Get:19 http://deb.debian.org/debian bookworm/main amd64 systemd amd64 252.22-1~deb12u1 [3032 kB]
+#16 4.284 Get:20 http://deb.debian.org/debian bookworm/main amd64 libfcgi0ldbl amd64 2.4.2-2 [26.1 kB]
+#16 4.285 Get:21 http://deb.debian.org/debian bookworm/main amd64 fcgiwrap amd64 1.1.0-14 [17.0 kB]
+#16 4.286 Get:22 http://deb.debian.org/debian bookworm/main amd64 openssh-sftp-server amd64 1:9.2p1-2+deb12u2 [66.0 kB]
+#16 4.286 Get:23 http://deb.debian.org/debian bookworm/main amd64 runit-helper all 2.15.2 [6520 B]
+#16 4.287 Get:24 http://deb.debian.org/debian bookworm/main amd64 libwrap0 amd64 7.6.q-32 [54.9 kB]
+#16 4.288 Get:25 http://deb.debian.org/debian bookworm/main amd64 openssh-server amd64 1:9.2p1-2+deb12u2 [456 kB]
+#16 4.290 Get:26 http://deb.debian.org/debian bookworm/main amd64 sudo amd64 1.9.13p3-1+deb12u1 [1889 kB]
+#16 4.543 Get:27 http://deb.debian.org/debian bookworm/main amd64 libelf1 amd64 0.188-2.1 [174 kB]
+#16 4.546 Get:28 http://deb.debian.org/debian bookworm/main amd64 libbpf1 amd64 1:1.1.0-1 [145 kB]
+#16 4.547 Get:29 http://deb.debian.org/debian bookworm/main amd64 libmnl0 amd64 1.0.4-3 [12.5 kB]
+#16 4.548 Get:30 http://deb.debian.org/debian bookworm/main amd64 libxtables12 amd64 1.8.9-2 [30.8 kB]
+#16 4.549 Get:31 http://deb.debian.org/debian bookworm/main amd64 libcap2-bin amd64 1:2.66-4 [34.7 kB]
+#16 4.550 Get:32 http://deb.debian.org/debian bookworm/main amd64 iproute2 amd64 6.1.0-3 [1046 kB]
+#16 4.557 Get:33 http://deb.debian.org/debian bookworm/main amd64 git-lfs amd64 3.3.0-1+b5 [3488 kB]
+#16 4.601 Get:34 http://deb.debian.org/debian bookworm/main amd64 nginx-common all 1.22.1-9 [112 kB]
+#16 4.603 Get:35 http://deb.debian.org/debian bookworm/main amd64 nginx amd64 1.22.1-9 [527 kB]
+#16 4.608 Get:36 http://deb.debian.org/debian bookworm/main amd64 unzip amd64 6.0-28 [166 kB]
+#16 4.609 Get:37 http://deb.debian.org/debian bookworm/main amd64 zip amd64 3.0-13 [230 kB]
+#16 4.758 debconf: delaying package configuration, since apt-utils is not installed
+#16 4.794 Fetched 16.0 MB in 1s (31.9 MB/s)
+#16 4.809 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 15610 files and directories currently installed.)
+#16 4.820 Preparing to unpack .../bsdutils_1%3a2.38.1-5+deb12u1_amd64.deb ...
+#16 4.829 Unpacking bsdutils (1:2.38.1-5+deb12u1) over (1:2.38.1-5+b1) ...
+#16 4.934 Setting up bsdutils (1:2.38.1-5+deb12u1) ...
+#16 4.973 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 15609 files and directories currently installed.)
+#16 4.985 Preparing to unpack .../libsmartcols1_2.38.1-5+deb12u1_amd64.deb ...
+#16 4.994 Unpacking libsmartcols1:amd64 (2.38.1-5+deb12u1) over (2.38.1-5+b1) ...
+#16 5.051 Setting up libsmartcols1:amd64 (2.38.1-5+deb12u1) ...
+#16 5.090 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 15608 files and directories currently installed.)
+#16 5.100 Preparing to unpack .../util-linux-extra_2.38.1-5+deb12u1_amd64.deb ...
+#16 5.108 Unpacking util-linux-extra (2.38.1-5+deb12u1) over (2.38.1-5+b1) ...
+#16 5.164 Setting up util-linux-extra (2.38.1-5+deb12u1) ...
+#16 5.216 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 15607 files and directories currently installed.)
+#16 5.227 Preparing to unpack .../util-linux_2.38.1-5+deb12u1_amd64.deb ...
+#16 5.266 Unpacking util-linux (2.38.1-5+deb12u1) over (2.38.1-5+b1) ...
+#16 5.759 Setting up util-linux (2.38.1-5+deb12u1) ...
+#16 5.971 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 15606 files and directories currently installed.)
+#16 5.994 Preparing to unpack .../mount_2.38.1-5+deb12u1_amd64.deb ...
+#16 6.006 Unpacking mount (2.38.1-5+deb12u1) over (2.38.1-5+b1) ...
+#16 6.095 Preparing to unpack .../libblkid1_2.38.1-5+deb12u1_amd64.deb ...
+#16 6.102 Unpacking libblkid1:amd64 (2.38.1-5+deb12u1) over (2.38.1-5+b1) ...
+#16 6.178 Setting up libblkid1:amd64 (2.38.1-5+deb12u1) ...
+#16 6.215 Selecting previously unselected package libargon2-1:amd64.
+#16 6.215 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 15604 files and directories currently installed.)
+#16 6.235 Preparing to unpack .../libargon2-1_0~20171227-0.3+deb12u1_amd64.deb ...
+#16 6.240 Unpacking libargon2-1:amd64 (0~20171227-0.3+deb12u1) ...
+#16 6.269 Selecting previously unselected package dmsetup.
+#16 6.274 Preparing to unpack .../dmsetup_2%3a1.02.185-2_amd64.deb ...
+#16 6.275 Unpacking dmsetup (2:1.02.185-2) ...
+#16 6.309 Selecting previously unselected package libdevmapper1.02.1:amd64.
+#16 6.313 Preparing to unpack .../libdevmapper1.02.1_2%3a1.02.185-2_amd64.deb ...
+#16 6.322 Unpacking libdevmapper1.02.1:amd64 (2:1.02.185-2) ...
+#16 6.384 Selecting previously unselected package libjson-c5:amd64.
+#16 6.387 Preparing to unpack .../libjson-c5_0.16-2_amd64.deb ...
+#16 6.389 Unpacking libjson-c5:amd64 (0.16-2) ...
+#16 6.422 Preparing to unpack .../libuuid1_2.38.1-5+deb12u1_amd64.deb ...
+#16 6.436 Unpacking libuuid1:amd64 (2.38.1-5+deb12u1) over (2.38.1-5+b1) ...
+#16 6.495 Setting up libuuid1:amd64 (2.38.1-5+deb12u1) ...
+#16 6.546 Selecting previously unselected package libcryptsetup12:amd64.
+#16 6.546 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 15637 files and directories currently installed.)
+#16 6.559 Preparing to unpack .../0-libcryptsetup12_2%3a2.6.1-4~deb12u2_amd64.deb ...
+#16 6.563 Unpacking libcryptsetup12:amd64 (2:2.6.1-4~deb12u2) ...
+#16 6.636 Selecting previously unselected package libfdisk1:amd64.
+#16 6.638 Preparing to unpack .../1-libfdisk1_2.38.1-5+deb12u1_amd64.deb ...
+#16 6.641 Unpacking libfdisk1:amd64 (2.38.1-5+deb12u1) ...
+#16 6.787 Selecting previously unselected package libkmod2:amd64.
+#16 6.787 Preparing to unpack .../2-libkmod2_30+20221128-1_amd64.deb ...
+#16 6.801 Unpacking libkmod2:amd64 (30+20221128-1) ...
+#16 6.863 Selecting previously unselected package libapparmor1:amd64.
+#16 6.873 Preparing to unpack .../3-libapparmor1_3.0.8-3_amd64.deb ...
+#16 6.892 Unpacking libapparmor1:amd64 (3.0.8-3) ...
+#16 ...
+
+#17 [argocd-base  3/13] COPY hack/gpg-wrapper.sh /usr/local/bin/gpg-wrapper.sh
+#17 DONE 0.1s
+
+#18 [argocd-base  4/13] COPY hack/git-verify-wrapper.sh /usr/local/bin/git-verify-wrapper.sh
+#18 DONE 0.1s
+
+#16 [builder 3/7] RUN apt-get update && apt-get install --no-install-recommends -y     openssh-server     nginx     unzip     fcgiwrap     git     git-lfs     make     wget     gcc     sudo     zip &&     apt-get clean &&     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#16 6.994 Selecting previously unselected package libip4tc2:amd64.
+#16 6.994 Preparing to unpack .../4-libip4tc2_1.8.9-2_amd64.deb ...
+#16 7.001 Unpacking libip4tc2:amd64 (1.8.9-2) ...
+#16 ...
+
+#19 [argocd-ui 4/6] RUN yarn install --network-timeout 200000 &&     yarn cache clean
+#19 0.475 yarn install v1.22.19
+#19 0.570 [1/4] Resolving packages...
+#19 0.599 warning Resolution field "rxjs@6.6.7" is incompatible with requested version "rxjs@^7.8.1"
+#19 1.069 [2/4] Fetching packages...
+#19 1.112 (node:6) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+#19 1.112 (Use `node --trace-deprecation ...` to show where the warning was created)
+#19 ...
+
+#16 [builder 3/7] RUN apt-get update && apt-get install --no-install-recommends -y     openssh-server     nginx     unzip     fcgiwrap     git     git-lfs     make     wget     gcc     sudo     zip &&     apt-get clean &&     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#16 7.075 Preparing to unpack .../5-libmount1_2.38.1-5+deb12u1_amd64.deb ...
+#16 7.077 Unpacking libmount1:amd64 (2.38.1-5+deb12u1) over (2.38.1-5+b1) ...
+#16 7.151 Setting up libmount1:amd64 (2.38.1-5+deb12u1) ...
+#16 7.222 Selecting previously unselected package libsystemd-shared:amd64.
+#16 7.222 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 15668 files and directories currently installed.)
+#16 7.242 Preparing to unpack .../00-libsystemd-shared_252.22-1~deb12u1_amd64.deb ...
+#16 7.248 Unpacking libsystemd-shared:amd64 (252.22-1~deb12u1) ...
+#16 7.466 Selecting previously unselected package systemd.
+#16 7.468 Preparing to unpack .../01-systemd_252.22-1~deb12u1_amd64.deb ...
+#16 7.486 Unpacking systemd (252.22-1~deb12u1) ...
+#16 7.828 Selecting previously unselected package libfcgi0ldbl:amd64.
+#16 7.830 Preparing to unpack .../02-libfcgi0ldbl_2.4.2-2_amd64.deb ...
+#16 7.832 Unpacking libfcgi0ldbl:amd64 (2.4.2-2) ...
+#16 7.868 Selecting previously unselected package fcgiwrap.
+#16 7.869 Preparing to unpack .../03-fcgiwrap_1.1.0-14_amd64.deb ...
+#16 7.874 Unpacking fcgiwrap (1.1.0-14) ...
+#16 7.901 Selecting previously unselected package openssh-sftp-server.
+#16 7.903 Preparing to unpack .../04-openssh-sftp-server_1%3a9.2p1-2+deb12u2_amd64.deb ...
+#16 7.905 Unpacking openssh-sftp-server (1:9.2p1-2+deb12u2) ...
+#16 7.929 Selecting previously unselected package runit-helper.
+#16 7.931 Preparing to unpack .../05-runit-helper_2.15.2_all.deb ...
+#16 7.933 Unpacking runit-helper (2.15.2) ...
+#16 7.958 Selecting previously unselected package libwrap0:amd64.
+#16 7.961 Preparing to unpack .../06-libwrap0_7.6.q-32_amd64.deb ...
+#16 7.963 Unpacking libwrap0:amd64 (7.6.q-32) ...
+#16 8.004 Selecting previously unselected package openssh-server.
+#16 8.006 Preparing to unpack .../07-openssh-server_1%3a9.2p1-2+deb12u2_amd64.deb ...
+#16 8.013 Unpacking openssh-server (1:9.2p1-2+deb12u2) ...
+#16 8.090 Selecting previously unselected package sudo.
+#16 8.092 Preparing to unpack .../08-sudo_1.9.13p3-1+deb12u1_amd64.deb ...
+#16 8.096 Unpacking sudo (1.9.13p3-1+deb12u1) ...
+#16 8.256 Selecting previously unselected package libelf1:amd64.
+#16 8.258 Preparing to unpack .../09-libelf1_0.188-2.1_amd64.deb ...
+#16 8.260 Unpacking libelf1:amd64 (0.188-2.1) ...
+#16 8.302 Selecting previously unselected package libbpf1:amd64.
+#16 8.303 Preparing to unpack .../10-libbpf1_1%3a1.1.0-1_amd64.deb ...
+#16 8.307 Unpacking libbpf1:amd64 (1:1.1.0-1) ...
+#16 8.344 Selecting previously unselected package libmnl0:amd64.
+#16 8.345 Preparing to unpack .../11-libmnl0_1.0.4-3_amd64.deb ...
+#16 8.348 Unpacking libmnl0:amd64 (1.0.4-3) ...
+#16 8.378 Selecting previously unselected package libxtables12:amd64.
+#16 8.380 Preparing to unpack .../12-libxtables12_1.8.9-2_amd64.deb ...
+#16 8.383 Unpacking libxtables12:amd64 (1.8.9-2) ...
+#16 8.406 Selecting previously unselected package libcap2-bin.
+#16 8.407 Preparing to unpack .../13-libcap2-bin_1%3a2.66-4_amd64.deb ...
+#16 8.409 Unpacking libcap2-bin (1:2.66-4) ...
+#16 8.443 Selecting previously unselected package iproute2.
+#16 8.445 Preparing to unpack .../14-iproute2_6.1.0-3_amd64.deb ...
+#16 8.447 Unpacking iproute2 (6.1.0-3) ...
+#16 8.572 Selecting previously unselected package git-lfs.
+#16 8.574 Preparing to unpack .../15-git-lfs_3.3.0-1+b5_amd64.deb ...
+#16 8.576 Unpacking git-lfs (3.3.0-1+b5) ...
+#16 8.934 Selecting previously unselected package nginx-common.
+#16 8.936 Preparing to unpack .../16-nginx-common_1.22.1-9_all.deb ...
+#16 8.942 Unpacking nginx-common (1.22.1-9) ...
+#16 8.973 Selecting previously unselected package nginx.
+#16 8.975 Preparing to unpack .../17-nginx_1.22.1-9_amd64.deb ...
+#16 8.978 Unpacking nginx (1.22.1-9) ...
+#16 9.062 Selecting previously unselected package unzip.
+#16 9.064 Preparing to unpack .../18-unzip_6.0-28_amd64.deb ...
+#16 9.065 Unpacking unzip (6.0-28) ...
+#16 9.098 Selecting previously unselected package zip.
+#16 9.100 Preparing to unpack .../19-zip_3.0-13_amd64.deb ...
+#16 9.102 Unpacking zip (3.0-13) ...
+#16 9.146 Setting up libip4tc2:amd64 (1.8.9-2) ...
+#16 9.152 Setting up runit-helper (2.15.2) ...
+#16 9.158 Setting up openssh-sftp-server (1:9.2p1-2+deb12u2) ...
+#16 9.164 Setting up libapparmor1:amd64 (3.0.8-3) ...
+#16 9.171 Setting up libfcgi0ldbl:amd64 (2.4.2-2) ...
+#16 9.177 Setting up libargon2-1:amd64 (0~20171227-0.3+deb12u1) ...
+#16 9.183 Setting up unzip (6.0-28) ...
+#16 9.191 Setting up nginx-common (1.22.1-9) ...
+#16 9.304 debconf: unable to initialize frontend: Dialog
+#16 9.304 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#16 9.304 debconf: falling back to frontend: Readline
+#16 9.310 debconf: unable to initialize frontend: Readline
+#16 9.310 debconf: (This frontend requires a controlling tty.)
+#16 9.310 debconf: falling back to frontend: Teletype
+#16 9.469 Created symlink /etc/systemd/system/multi-user.target.wants/nginx.service → /lib/systemd/system/nginx.service.
+
+#16 9.488 Setting up libcap2-bin (1:2.66-4) ...
+#16 9.493 Setting up zip (3.0-13) ...
+#16 9.499 Setting up libwrap0:amd64 (7.6.q-32) ...
+#16 9.507 Setting up libmnl0:amd64 (1.0.4-3) ...
+#16 9.513 Setting up sudo (1.9.13p3-1+deb12u1) ...
+#16 9.548 invoke-rc.d: could not determine current runlevel
+#16 9.552 invoke-rc.d: policy-rc.d denied execution of start.
+#16 9.556 Setting up libxtables12:amd64 (1.8.9-2) ...
+#16 9.562 Setting up libfdisk1:amd64 (2.38.1-5+deb12u1) ...
+#16 9.567 Setting up mount (2.38.1-5+deb12u1) ...
+#16 9.572 Setting up git-lfs (3.3.0-1+b5) ...
+#16 9.595 Setting up libelf1:amd64 (0.188-2.1) ...
+#16 9.602 Setting up libjson-c5:amd64 (0.16-2) ...
+#16 9.608 Setting up libbpf1:amd64 (1:1.1.0-1) ...
+#16 9.614 Setting up libkmod2:amd64 (30+20221128-1) ...
+#16 9.620 Setting up openssh-server (1:9.2p1-2+deb12u2) ...
+#16 9.717 debconf: unable to initialize frontend: Dialog
+#16 9.717 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#16 9.717 debconf: falling back to frontend: Readline
+#16 9.724 debconf: unable to initialize frontend: Readline
+#16 9.724 debconf: (This frontend requires a controlling tty.)
+#16 9.724 debconf: falling back to frontend: Teletype
+#16 9.777 
+#16 9.777 Creating config file /etc/ssh/sshd_config with new version
+#16 9.804 Creating SSH2 RSA key; this may take some time ...
+#16 ...
+
+#20 [argocd-build 4/7] RUN go mod download
+#20 ...
+
+#16 [builder 3/7] RUN apt-get update && apt-get install --no-install-recommends -y     openssh-server     nginx     unzip     fcgiwrap     git     git-lfs     make     wget     gcc     sudo     zip &&     apt-get clean &&     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#16 9.804 Creating SSH2 RSA key; this may take some time ...
+#16 10.20 3072 SHA256:PFr8HzK7fkvV5lKugQj3D4dJH0ufPeZ/2f4u6b8Wzbg root@buildkitsandbox (RSA)
+#16 10.20 Creating SSH2 ECDSA key; this may take some time ...
+#16 10.21 256 SHA256:0TSA0k8PUyt0lGhU7BXssqTaZeXgtBCLHJ8iQqXGwaM root@buildkitsandbox (ECDSA)
+#16 10.21 Creating SSH2 ED25519 key; this may take some time ...
+#16 10.22 256 SHA256:9/5erfvilt9v3nuxb47sZrfSuyhpMKXIvAtrd2680Rg root@buildkitsandbox (ED25519)
+#16 10.30 invoke-rc.d: could not determine current runlevel
+#16 10.30 invoke-rc.d: policy-rc.d denied execution of start.
+#16 10.43 Created symlink /etc/systemd/system/sshd.service → /lib/systemd/system/ssh.service.
+
+#16 10.43 Created symlink /etc/systemd/system/multi-user.target.wants/ssh.service → /lib/systemd/system/ssh.service.
+
+#16 10.54 Setting up iproute2 (6.1.0-3) ...
+#16 10.64 debconf: unable to initialize frontend: Dialog
+#16 10.64 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#16 10.64 debconf: falling back to frontend: Readline
+#16 10.64 debconf: unable to initialize frontend: Readline
+#16 10.64 debconf: (This frontend requires a controlling tty.)
+#16 10.64 debconf: falling back to frontend: Teletype
+#16 10.67 Setting up libsystemd-shared:amd64 (252.22-1~deb12u1) ...
+#16 10.68 Setting up nginx (1.22.1-9) ...
+#16 10.69 invoke-rc.d: could not determine current runlevel
+#16 10.70 invoke-rc.d: policy-rc.d denied execution of start.
+#16 10.70 Setting up libdevmapper1.02.1:amd64 (2:1.02.185-2) ...
+#16 10.71 Setting up dmsetup (2:1.02.185-2) ...
+#16 10.72 Setting up libcryptsetup12:amd64 (2:2.6.1-4~deb12u2) ...
+#16 10.73 Setting up systemd (252.22-1~deb12u1) ...
+#16 10.75 Created symlink /etc/systemd/system/getty.target.wants/getty@tty1.service → /lib/systemd/system/getty@.service.
+
+#16 10.75 Created symlink /etc/systemd/system/multi-user.target.wants/remote-fs.target → /lib/systemd/system/remote-fs.target.
+
+#16 10.76 Created symlink /etc/systemd/system/sysinit.target.wants/systemd-pstore.service → /lib/systemd/system/systemd-pstore.service.
+
+#16 10.76 Initializing machine ID from random generator.
+
+#16 10.78 Creating group 'systemd-journal' with GID 999.
+
+#16 10.78 Creating group 'systemd-network' with GID 998.
+
+#16 10.78 Creating user 'systemd-network' (systemd Network Management) with UID 998 and GID 998.
+
+#16 10.82 Setting up fcgiwrap (1.1.0-14) ...
+#16 10.84 invoke-rc.d: could not determine current runlevel
+#16 10.84 invoke-rc.d: policy-rc.d denied execution of start.
+#16 10.97 Created symlink /etc/systemd/system/sockets.target.wants/fcgiwrap.socket → /lib/systemd/system/fcgiwrap.socket.
+
+#16 11.11 Processing triggers for libc-bin (2.36-9+deb12u4) ...
+#16 DONE 11.6s
+
+#19 [argocd-ui 4/6] RUN yarn install --network-timeout 200000 &&     yarn cache clean
+#19 ...
+
+#21 [builder 4/7] WORKDIR /tmp
+#21 DONE 0.0s
+
+#22 [builder 5/7] COPY hack/install.sh hack/tool-versions.sh ./
+#22 DONE 0.0s
+
+#23 [builder 6/7] COPY hack/installers installers
+#23 DONE 0.1s
+
+#24 [builder 7/7] RUN ./install.sh helm &&     INSTALL_PATH=/usr/local/bin ./install.sh kustomize
+#24 0.275 + export DOWNLOADS=/tmp/dl
+#24 0.275 + DOWNLOADS=/tmp/dl
+#24 0.275 + export BIN=/usr/local/bin
+#24 0.275 + BIN=/usr/local/bin
+#24 0.275 + mkdir -p /tmp/dl
+#24 0.278 + ARCHITECTURE=
+#24 0.278 + case $(uname -m) in
+#24 0.279 ++ uname -m
+#24 0.280 + ARCHITECTURE=amd64
+#24 0.280 + INSTALL_OS=
+#24 0.280 ++ uname -s
+#24 0.281 + unameOut=Linux
+#24 0.282 + case "${unameOut}" in
+#24 0.282 + INSTALL_OS=linux
+#24 0.282 + for product in $*
+#24 0.283 ++ dirname ./install.sh
+#24 0.286 + ARCHITECTURE=amd64
+#24 0.286 + INSTALL_OS=linux
+#24 0.286 + ./installers/install-helm.sh
+#24 0.288 ++ dirname ./installers/install-helm.sh
+#24 0.289 + . ./installers/../tool-versions.sh
+#24 0.289 ++ helm3_version=3.13.0
+#24 0.289 ++ kubectl_version=1.17.8
+#24 0.289 ++ kubectx_version=0.6.3
+#24 0.289 ++ kustomize5_version=5.2.1
+#24 0.289 ++ protoc_version=3.17.3
+#24 0.289 + export TARGET_FILE=helm-v3.13.0-linux-amd64.tar.gz
+#24 0.289 + TARGET_FILE=helm-v3.13.0-linux-amd64.tar.gz
+#24 0.289 + '[' -e /tmp/dl/helm-v3.13.0-linux-amd64.tar.gz ']'
+#24 0.289 + curl -sLf --retry 3 -o /tmp/dl/helm-v3.13.0-linux-amd64.tar.gz https://get.helm.sh/helm-v3.13.0-linux-amd64.tar.gz
+#24 1.234 ++ dirname ./installers/install-helm.sh
+#24 1.235 + ./installers/compare-chksum.sh
+#24 1.237 + test helm-v3.13.0-linux-amd64.tar.gz = 
+#24 1.237 + dirname ./installers/compare-chksum.sh
+#24 1.238 + cd ./installers
+#24 1.238 + pwd
+#24 1.238 + CHKSUM_FILE=/tmp/installers/checksums/helm-v3.13.0-linux-amd64.tar.gz.sha256
+#24 1.238 + cd /tmp/dl
+#24 1.238 + test -f helm-v3.13.0-linux-amd64.tar.gz
+#24 1.238 + grep -q helm-v3.13.0-linux-amd64.tar.gz /tmp/installers/checksums/helm-v3.13.0-linux-amd64.tar.gz.sha256
+#24 1.239 + shasum -a 256 -c /tmp/installers/checksums/helm-v3.13.0-linux-amd64.tar.gz.sha256
+#24 1.364 helm-v3.13.0-linux-amd64.tar.gz: OK
+#24 1.365 + mkdir -p /tmp/helm
+#24 1.366 + tar -C /tmp/helm -xf /tmp/dl/helm-v3.13.0-linux-amd64.tar.gz
+#24 1.830 + sudo install -m 0755 /tmp/helm/linux-amd64/helm /usr/local/bin/helm
+#24 1.860 + helm version --client
+#24 2.076 version.BuildInfo{Version:"v3.13.0", GitCommit:"825e86f6a7a38cef1112bfa606e4127a706749b1", GitTreeState:"clean", GoVersion:"go1.20.8"}
+#24 2.080 + export DOWNLOADS=/tmp/dl
+#24 2.080 + DOWNLOADS=/tmp/dl
+#24 2.080 + export BIN=/usr/local/bin
+#24 2.080 + BIN=/usr/local/bin
+#24 2.080 + mkdir -p /tmp/dl
+#24 2.081 + ARCHITECTURE=
+#24 2.081 + case $(uname -m) in
+#24 2.081 ++ uname -m
+#24 2.082 + ARCHITECTURE=amd64
+#24 2.083 + INSTALL_OS=
+#24 2.083 ++ uname -s
+#24 2.083 + unameOut=Linux
+#24 2.083 + case "${unameOut}" in
+#24 2.083 + INSTALL_OS=linux
+#24 2.083 + for product in $*
+#24 2.084 ++ dirname ./install.sh
+#24 2.084 + ARCHITECTURE=amd64
+#24 2.084 + INSTALL_OS=linux
+#24 2.084 + ./installers/install-kustomize.sh
+#24 2.086 ++ dirname ./installers/install-kustomize.sh
+#24 2.087 + . ./installers/../tool-versions.sh
+#24 2.087 ++ helm3_version=3.13.0
+#24 2.087 ++ kubectl_version=1.17.8
+#24 2.087 ++ kubectx_version=0.6.3
+#24 2.087 ++ kustomize5_version=5.2.1
+#24 2.087 ++ protoc_version=3.17.3
+#24 2.087 +++ dirname ./installers/install-kustomize.sh
+#24 2.088 ++ cd ./installers/../..
+#24 2.088 ++ pwd
+#24 2.088 + PROJECT_ROOT=/
+#24 2.088 + INSTALL_PATH=/usr/local/bin
+#24 2.088 + PATH=/usr/local/bin:/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+#24 2.089 + '[' -d /usr/local/bin ']'
+#24 2.089 + KUSTOMIZE_VERSION=5.2.1
+#24 2.089 + '[' -z linux ']'
+#24 2.089 + case $ARCHITECTURE in
+#24 2.089 + case $KUSTOMIZE_VERSION in
+#24 2.089 + export TARGET_FILE=kustomize_5.2.1_linux_amd64.tar.gz
+#24 2.089 + TARGET_FILE=kustomize_5.2.1_linux_amd64.tar.gz
+#24 2.089 + URL=https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v5.2.1/kustomize_v5.2.1_linux_amd64.tar.gz
+#24 2.089 + BINNAME=kustomize
+#24 2.089 + '[' -e /tmp/dl/kustomize_5.2.1_linux_amd64.tar.gz ']'
+#24 2.089 + curl -sLf --retry 3 -o /tmp/dl/kustomize_5.2.1_linux_amd64.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v5.2.1/kustomize_v5.2.1_linux_amd64.tar.gz
+#24 2.883 ++ dirname ./installers/install-kustomize.sh
+#24 2.884 + ./installers/compare-chksum.sh
+#24 2.884 + test kustomize_5.2.1_linux_amd64.tar.gz = 
+#24 2.884 + dirname ./installers/compare-chksum.sh
+#24 2.885 + cd ./installers
+#24 2.886 + pwd
+#24 2.886 + CHKSUM_FILE=/tmp/installers/checksums/kustomize_5.2.1_linux_amd64.tar.gz.sha256
+#24 2.886 + cd /tmp/dl
+#24 2.886 + test -f kustomize_5.2.1_linux_amd64.tar.gz
+#24 2.886 + grep -q kustomize_5.2.1_linux_amd64.tar.gz /tmp/installers/checksums/kustomize_5.2.1_linux_amd64.tar.gz.sha256
+#24 2.887 + shasum -a 256 -c /tmp/installers/checksums/kustomize_5.2.1_linux_amd64.tar.gz.sha256
+#24 2.944 kustomize_5.2.1_linux_amd64.tar.gz: OK
+#24 2.946 + tar -C /tmp -xf /tmp/dl/kustomize_5.2.1_linux_amd64.tar.gz
+#24 3.105 + sudo install -m 0755 /tmp/kustomize /usr/local/bin/kustomize
+#24 3.120 + kustomize version
+#24 3.169 v5.2.1
+#24 DONE 3.6s
+
+#20 [argocd-build 4/7] RUN go mod download
+#20 ...
+
+#25 [argocd-base  5/13] COPY --from=builder /usr/local/bin/helm /usr/local/bin/helm
+#25 DONE 0.1s
+
+#26 [argocd-base  6/13] COPY --from=builder /usr/local/bin/kustomize /usr/local/bin/kustomize
+#26 DONE 0.0s
+
+#27 [argocd-base  7/13] COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+#27 DONE 0.1s
+
+#19 [argocd-ui 4/6] RUN yarn install --network-timeout 200000 &&     yarn cache clean
+#19 ...
+
+#28 [argocd-base  8/13] RUN ln -s /usr/local/bin/entrypoint.sh /usr/local/bin/uid_entrypoint.sh
+#28 DONE 0.4s
+
+#20 [argocd-build 4/7] RUN go mod download
+#20 ...
+
+#29 [argocd-base  9/13] WORKDIR /app/config/ssh
+#29 DONE 0.1s
+
+#30 [argocd-base 10/13] RUN touch ssh_known_hosts &&     ln -s /app/config/ssh/ssh_known_hosts /etc/ssh/ssh_known_hosts
+#30 DONE 0.4s
+
+#20 [argocd-build 4/7] RUN go mod download
+#20 ...
+
+#31 [argocd-base 11/13] WORKDIR /app/config
+#31 DONE 0.1s
+
+#32 [argocd-base 12/13] RUN mkdir -p tls &&     mkdir -p gpg/source &&     mkdir -p gpg/keys &&     chown argocd gpg/keys &&     chmod 0700 gpg/keys  &&     wget http://pki.ericsson.se/CertData/EGADIssuingCA3.crt -P /usr/local/share/ca-certificates  &&     wget http://pki.ericsson.se/CertData/EGADRootCA.crt -P /usr/local/share/ca-certificates    &&     update-ca-certificates
+#32 0.396 --2024-05-08 05:20:05--  http://pki.ericsson.se/CertData/EGADIssuingCA3.crt
+#32 0.396 Resolving pki.ericsson.se (pki.ericsson.se)... 153.88.74.76, 153.88.74.78
+#32 0.406 Connecting to pki.ericsson.se (pki.ericsson.se)|153.88.74.76|:80... connected.
+#32 0.419 HTTP request sent, awaiting response... 200 OK
+#32 0.431 Length: 2358 (2.3K) [application/x-x509-ca-cert]
+#32 0.431 Saving to: '/usr/local/share/ca-certificates/EGADIssuingCA3.crt'
+#32 0.431 
+#32 0.431      0K ..                                                    100%  360M=0s
+#32 0.431 
+#32 0.431 2024-05-08 05:20:05 (360 MB/s) - '/usr/local/share/ca-certificates/EGADIssuingCA3.crt' saved [2358/2358]
+#32 0.431 
+#32 0.434 --2024-05-08 05:20:05--  http://pki.ericsson.se/CertData/EGADRootCA.crt
+#32 0.434 Resolving pki.ericsson.se (pki.ericsson.se)... 153.88.74.78, 153.88.74.76
+#32 0.435 Connecting to pki.ericsson.se (pki.ericsson.se)|153.88.74.78|:80... connected.
+#32 0.447 HTTP request sent, awaiting response... 200 OK
+#32 0.457 Length: 2004 (2.0K) [application/x-x509-ca-cert]
+#32 0.457 Saving to: '/usr/local/share/ca-certificates/EGADRootCA.crt'
+#32 0.457 
+#32 0.457      0K .                                                     100%  454M=0s
+#32 0.457 
+#32 0.457 2024-05-08 05:20:05 (454 MB/s) - '/usr/local/share/ca-certificates/EGADRootCA.crt' saved [2004/2004]
+#32 0.457 
+#32 0.461 Updating certificates in /etc/ssl/certs...
+#32 1.740 rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+#32 1.747 2 added, 0 removed; done.
+#32 1.747 Running hooks in /etc/ca-certificates/update.d...
+#32 1.748 done.
+#32 DONE 2.2s
+
+#20 [argocd-build 4/7] RUN go mod download
+#20 ...
+
+#33 [argocd-base 13/13] WORKDIR /home/argocd
+#33 DONE 0.1s
+
+#19 [argocd-ui 4/6] RUN yarn install --network-timeout 200000 &&     yarn cache clean
+#19 ...
+
+#20 [argocd-build 4/7] RUN go mod download
+#20 DONE 29.1s
+
+#34 [argocd-build 5/7] COPY . .
+#34 DONE 0.4s
+
+#19 [argocd-ui 4/6] RUN yarn install --network-timeout 200000 &&     yarn cache clean
+#19 37.42 [3/4] Linking dependencies...
+#19 37.42 warning " > argo-ui@1.0.0" has unmet peer dependency "antd@^4.16.13".
+#19 37.42 warning " > argo-ui@1.0.0" has incorrect peer dependency "rxjs@^7.8.1".
+#19 37.42 warning " > foundation-sites@6.7.5" has unmet peer dependency "jquery@>=3.6.0".
+#19 37.42 warning " > foundation-sites@6.7.5" has unmet peer dependency "motion-ui@latest".
+#19 37.42 warning " > foundation-sites@6.7.5" has unmet peer dependency "what-input@>=5.2.10".
+#19 37.43 warning " > redoc@2.0.0-rc.64" has unmet peer dependency "core-js@^3.1.4".
+#19 37.43 warning " > redoc@2.0.0-rc.64" has unmet peer dependency "mobx@^6.0.4".
+#19 37.43 warning " > redoc@2.0.0-rc.64" has unmet peer dependency "styled-components@^4.1.1 || ^5.1.1".
+#19 37.43 warning "redoc > @redocly/react-dropdown-aria@2.0.12" has unmet peer dependency "styled-components@^5.1.1".
+#19 37.43 warning "redoc > mobx-react@7.3.0" has unmet peer dependency "mobx@^6.1.0".
+#19 37.43 warning "redoc > mobx-react > mobx-react-lite@3.3.0" has unmet peer dependency "mobx@^6.1.0".
+#19 37.43 warning " > jest-transform-css@2.0.0" has incorrect peer dependency "postcss@^7.0.2".
+#19 37.43 warning " > tslint-plugin-prettier@2.0.1" has incorrect peer dependency "tslint@^5.0.0".
+#19 49.67 [4/4] Building fresh packages...
+#19 50.45 Done in 49.98s.
+#19 50.69 yarn cache v1.22.19
+#19 54.48 success Cleared cache.
+#19 54.48 Done in 3.80s.
+#19 DONE 54.7s
+
+#35 [argocd-ui 5/6] COPY [ui/, .]
+#35 DONE 0.1s
+
+#36 [argocd-ui 6/6] RUN HOST_ARCH=amd64 NODE_ENV='production' NODE_ONLINE_ENV='online' NODE_OPTIONS=--max_old_space_size=8192 yarn build
+#36 0.568 yarn run v1.22.19
+#36 0.599 $ find ./dist -type f -not -name gitkeep -delete && webpack --config ./src/app/webpack.config.js --mode production
+#36 1.198 Bundling in production...
+#36 50.15 assets by path *.js 5.83 MiB
+#36 50.15   assets by chunk 2.92 MiB (id hint: vendors)
+#36 50.15     asset 7324.d5902eb1c4824ca13ef6.chunk.js 2.73 MiB [emitted] [immutable] [minimized] [big] (id hint: vendors) 1 related asset
+#36 50.15     asset 665.6326beaf78353e277f12.chunk.js 37.2 KiB [emitted] [immutable] [minimized] (id hint: vendors) 1 related asset
+#36 50.15     asset 5377.4965ddefd04bb55ed30b.chunk.js 32 KiB [emitted] [immutable] [minimized] (id hint: vendors) 1 related asset
+#36 50.15     + 7 assets
+#36 50.15   + 75 assets
+#36 50.15 assets by path assets/ 3.06 MiB
+#36 50.15   assets by path assets/images/ 636 KiB 39 assets
+#36 50.15   assets by path assets/fonts/ 1.6 MiB 33 assets
+#36 50.15   assets by path assets/favicon/ 4.17 KiB 3 assets
+#36 50.15   asset assets/scripts/redoc.standalone.js 845 KiB [emitted] [copied] [minimized] [big] 1 related asset
+#36 50.15   asset assets/fonts.css 2.16 KiB [emitted] [copied]
+#36 50.15 asset index.html 788 bytes [emitted]
+#36 50.15 orphan modules 5.5 MiB [orphan] 1859 modules
+#36 50.15 runtime modules 11 KiB 14 modules
+#36 50.15 built modules 11.8 MiB [built]
+#36 50.15   modules by path ./node_modules/ 10.2 MiB 1305 modules
+#36 50.15   modules by path ./src/app/ 1.63 MiB 116 modules
+#36 50.15   semver (ignored) 15 bytes [built] [code generated]
+#36 50.15   ./util.inspect (ignored) 15 bytes [built] [code generated]
+#36 50.15 
+#36 50.15 WARNING in asset size limit: The following asset(s) exceed the recommended size limit (244 KiB).
+#36 50.15 This can impact web performance.
+#36 50.15 Assets: 
+#36 50.15   assets/images/argo.png (279 KiB)
+#36 50.15   assets/fonts/fa-solid-900.ttf (385 KiB)
+#36 50.15   assets/scripts/redoc.standalone.js (845 KiB)
+#36 50.15   main.08bea4d9f3b3774bfab7.js (2.38 MiB)
+#36 50.15   7324.d5902eb1c4824ca13ef6.chunk.js (2.73 MiB)
+#36 50.15 
+#36 50.15 WARNING in entrypoint size limit: The following entrypoint(s) combined asset size exceeds the recommended limit (244 KiB). This can impact web performance.
+#36 50.15 Entrypoints:
+#36 50.15   main (2.38 MiB)
+#36 50.15       main.08bea4d9f3b3774bfab7.js
+#36 50.15 
+#36 50.15 webpack 5.84.1 compiled with 2 warnings in 48110 ms
+#36 50.20 Done in 49.64s.
+#36 DONE 50.3s
+
+#37 [argocd-build 6/7] COPY --from=argocd-ui /src/dist/app /go/src/github.com/argoproj/argo-cd/ui/dist/app
+#37 DONE 0.0s
+
+#38 [argocd-build 7/7] RUN GIT_COMMIT=$GIT_COMMIT     GIT_TREE_STATE=clean     GIT_TAG=$GIT_TAG     BUILD_DATE=$BUILD_DATE     GOOS=linux     GOARCH=amd64     make argocd-all
+#38 0.359 find /go/src/github.com/argoproj/argo-cd -name debug.test -exec rm -f {} +
+#38 0.390 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GODEBUG="tarinsecurepath=0,zipinsecurepath=0" go build -v -ldflags '-X github.com/argoproj/argo-cd/v2/common.version=2.11.0 -X github.com/argoproj/argo-cd/v2/common.buildDate=2024-05-08T05:21:36Z -X github.com/argoproj/argo-cd/v2/common.gitCommit=d3f33c00197e7f1d16f2a73ce1aeced464b07175 -X github.com/argoproj/argo-cd/v2/common.gitTreeState=clean -X github.com/argoproj/argo-cd/v2/common.kubectlVersion=v0.26.11 -X "github.com/argoproj/argo-cd/v2/common.extraBuildInfo=" -extldflags "-static"' -o /go/src/github.com/argoproj/argo-cd/dist/argocd ./cmd
+#38 2.451 internal/goarch
+#38 2.452 internal/unsafeheader
+#38 2.454 internal/cpu
+#38 2.454 internal/coverage/rtcov
+#38 2.460 internal/godebugs
+#38 2.470 internal/abi
+#38 2.471 internal/goexperiment
+#38 2.472 internal/goos
+#38 2.487 runtime/internal/atomic
+#38 2.488 runtime/internal/math
+#38 2.503 runtime/internal/sys
+#38 2.512 internal/bytealg
+#38 2.532 runtime/internal/syscall
+#38 2.539 internal/race
+#38 2.569 sync/atomic
+#38 2.570 internal/itoa
+#38 2.583 math/bits
+#38 2.618 unicode/utf8
+#38 2.639 math
+#38 2.659 unicode
+#38 2.663 encoding
+#38 2.686 unicode/utf16
+#38 2.698 runtime
+#38 2.719 log/internal
+#38 2.740 container/list
+#38 2.778 crypto/internal/alias
+#38 2.816 crypto/subtle
+#38 2.851 crypto/internal/boring/sig
+#38 2.858 vendor/golang.org/x/crypto/cryptobyte/asn1
+#38 2.868 internal/nettrace
+#38 2.875 vendor/golang.org/x/crypto/internal/alias
+#38 2.876 google.golang.org/protobuf/internal/flags
+#38 2.879 google.golang.org/protobuf/internal/set
+#38 2.884 google.golang.org/grpc/serviceconfig
+#38 2.886 github.com/argoproj/argo-cd/v2/pkg/apis/application
+#38 2.895 golang.org/x/crypto/internal/alias
+#38 2.896 github.com/argoproj/gitops-engine/pkg/utils/text
+#38 2.898 github.com/ProtonMail/go-crypto/internal/byteutil
+#38 2.905 image/color
+#38 2.912 github.com/pjbgf/sha1cd/internal
+#38 2.915 github.com/pjbgf/sha1cd/ubc
+#38 2.922 github.com/go-git/go-git/v5/plumbing/color
+#38 2.942 github.com/golang/groupcache/lru
+#38 2.954 k8s.io/apimachinery/pkg/selection
+#38 2.972 k8s.io/utils/strings/slices
+#38 2.974 k8s.io/apimachinery/pkg/types
+#38 2.985 github.com/gobwas/glob/util/runes
+#38 2.994 github.com/dgryski/go-rendezvous
+#38 3.000 github.com/vmihailenco/msgpack/v5/msgpcode
+#38 3.010 github.com/vmihailenco/tagparser/v2/internal
+#38 3.014 oras.land/oras-go/v2/internal/docker
+#38 3.021 hash/maphash
+#38 3.027 oras.land/oras-go/v2/internal/slices
+#38 3.044 github.com/google/go-cmp/cmp/internal/flags
+#38 3.047 github.com/argoproj/gitops-engine/pkg/utils/json
+#38 3.050 golang.org/x/text/encoding/internal/identifier
+#38 3.052 golang.org/x/text/internal/utf8internal
+#38 3.062 k8s.io/utils/integer
+#38 3.068 sigs.k8s.io/kustomize/kyaml/sets
+#38 3.073 sigs.k8s.io/kustomize/kyaml/sliceutil
+#38 3.074 sigs.k8s.io/kustomize/kyaml/yaml/internal/k8sgen/pkg/selection
+#38 3.088 sigs.k8s.io/kustomize/kyaml/ext
+#38 3.092 k8s.io/client-go/util/exec
+#38 3.099 k8s.io/utils/buffer
+#38 3.099 github.com/fvbommel/sortorder
+#38 3.111 github.com/fatih/camelcase
+#38 3.113 go.opentelemetry.io/otel/internal
+#38 3.114 go.opentelemetry.io/otel/metric/embedded
+#38 3.128 go.opentelemetry.io/otel/trace/embedded
+#38 3.129 go.opentelemetry.io/otel/sdk/instrumentation
+#38 3.129 go.opentelemetry.io/otel/sdk
+#38 3.137 github.com/microsoft/azure-devops-go-api/azuredevops/system
+#38 3.139 github.com/aws/aws-sdk-go/aws/client/metadata
+#38 3.143 github.com/aws/aws-sdk-go/internal/sdkmath
+#38 3.150 golang.org/x/exp/maps
+#38 3.159 github.com/casbin/casbin/v2/constant
+#38 3.159 github.com/tidwall/match
+#38 3.160 github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud
+#38 3.173 github.com/Azure/azure-sdk-for-go/sdk/internal/errorinfo
+#38 3.174 github.com/AzureAD/microsoft-authentication-library-for-go/apps/cache
+#38 3.183 github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops/internal/grant
+#38 3.187 github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/version
+#38 3.187 github.com/slack-go/slack/internal/errorsx
+#38 3.191 github.com/aws/aws-sdk-go-v2/internal/sdkio
+#38 3.200 gomodules.xyz/notify
+#38 3.201 golang.org/x/crypto/cryptobyte/asn1
+#38 3.210 github.com/googleapis/gax-go/v2/internal
+#38 3.239 go.opencensus.io
+#38 3.257 go.opencensus.io/trace/internal
+#38 3.259 go.opencensus.io/internal/tagencoding
+#38 3.259 github.com/antonmedv/expr/parser/operator
+#38 3.291 github.com/antonmedv/expr/parser/utils
+#38 3.299 go.mongodb.org/mongo-driver/bson/bsontype
+#38 3.299 go.mongodb.org/mongo-driver/bson/bsonoptions
+#38 3.311 github.com/alicebob/miniredis/v2/geohash
+#38 5.046 internal/reflectlite
+#38 5.046 k8s.io/klog/v2/internal/dbg
+#38 5.046 sync
+#38 5.047 runtime/metrics
+#38 5.124 internal/testlog
+#38 5.124 internal/bisect
+#38 5.125 internal/singleflight
+#38 5.160 google.golang.org/protobuf/internal/pragma
+#38 5.164 github.com/argoproj/pkg/sync
+#38 5.182 github.com/josharian/intern
+#38 5.186 google.golang.org/grpc/internal/buffer
+#38 5.199 github.com/aws/aws-sdk-go/internal/sync/singleflight
+#38 5.209 internal/godebug
+#38 5.214 errors
+#38 5.223 sort
+#38 5.246 internal/oserror
+#38 5.247 strconv
+#38 5.258 io
+#38 5.283 syscall
+#38 5.309 internal/safefilepath
+#38 5.327 path
+#38 5.339 bytes
+#38 5.375 strings
+#38 5.478 hash
+#38 5.525 crypto/internal/nistec/fiat
+#38 5.552 reflect
+#38 5.583 bufio
+#38 5.711 crypto
+#38 5.735 crypto/internal/randutil
+#38 5.752 math/rand
+#38 5.762 time
+#38 5.856 internal/syscall/unix
+#38 5.914 internal/syscall/execenv
+#38 5.975 crypto/rc4
+#38 6.026 vendor/golang.org/x/net/dns/dnsmessage
+#38 6.080 internal/intern
+#38 6.141 net/netip
+#38 6.284 context
+#38 6.377 internal/poll
+#38 6.402 io/fs
+#38 6.468 hash/crc32
+#38 6.497 embed
+#38 6.558 hash/fnv
+#38 6.566 internal/fmtsort
+#38 6.572 encoding/binary
+#38 6.590 os
+#38 6.610 golang.org/x/crypto/blowfish
+#38 6.617 regexp/syntax
+#38 6.652 github.com/argoproj/argo-cd/v2/util/collections
+#38 6.675 github.com/go-logr/logr
+#38 6.736 encoding/base64
+#38 6.743 golang.org/x/sys/unix
+#38 6.807 crypto/cipher
+#38 6.845 fmt
+#38 6.921 crypto/internal/boring
+#38 6.951 crypto/aes
+#38 7.010 crypto/des
+#38 7.101 crypto/internal/edwards25519/field
+#38 7.128 crypto/internal/nistec
+#38 7.145 encoding/json
+#38 7.187 log
+#38 7.263 google.golang.org/grpc/attributes
+#38 7.315 google.golang.org/grpc/internal/grpclog
+#38 7.362 math/big
+#38 7.425 crypto/ecdh
+#38 7.526 crypto/sha512
+#38 7.645 google.golang.org/grpc/grpclog
+#38 7.672 crypto/internal/edwards25519
+#38 7.737 google.golang.org/grpc/connectivity
+#38 7.791 crypto/hmac
+#38 7.819 crypto/md5
+#38 7.823 crypto/sha1
+#38 7.899 github.com/sirupsen/logrus
+#38 7.900 crypto/sha256
+#38 7.910 encoding/hex
+#38 7.947 encoding/pem
+#38 8.021 net
+#38 8.042 net/url
+#38 8.098 crypto/elliptic
+#38 8.148 crypto/internal/bigmod
+#38 8.225 crypto/internal/boring/bbig
+#38 8.226 encoding/asn1
+#38 8.265 crypto/rand
+#38 8.274 crypto/dsa
+#38 8.311 crypto/ed25519
+#38 8.322 crypto/rsa
+#38 8.369 path/filepath
+#38 8.425 vendor/golang.org/x/crypto/cryptobyte
+#38 8.477 crypto/x509/pkix
+#38 8.547 vendor/golang.org/x/crypto/chacha20
+#38 8.558 vendor/golang.org/x/crypto/internal/poly1305
+#38 8.600 crypto/ecdsa
+#38 8.615 io/ioutil
+#38 8.651 vendor/golang.org/x/crypto/hkdf
+#38 8.681 compress/flate
+#38 8.730 vendor/golang.org/x/sys/cpu
+#38 8.801 google.golang.org/protobuf/internal/detrand
+#38 8.847 google.golang.org/protobuf/internal/errors
+#38 8.899 google.golang.org/protobuf/encoding/protowire
+#38 8.930 vendor/golang.org/x/crypto/chacha20poly1305
+#38 8.951 compress/gzip
+#38 8.962 google.golang.org/protobuf/reflect/protoreflect
+#38 9.044 go/token
+#38 9.046 google.golang.org/protobuf/internal/version
+#38 9.064 golang.org/x/crypto/chacha20
+#38 9.113 golang.org/x/crypto/curve25519
+#38 9.159 golang.org/x/crypto/internal/poly1305
+#38 9.169 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
+#38 9.212 regexp
+#38 9.271 github.com/pkg/errors
+#38 9.377 github.com/bombsimon/logrusr/v2
+#38 9.405 google.golang.org/protobuf/internal/encoding/messageset
+#38 9.456 crypto/x509
+#38 9.465 google.golang.org/protobuf/internal/strs
+#38 9.466 google.golang.org/protobuf/internal/order
+#38 9.467 google.golang.org/protobuf/internal/genid
+#38 9.497 google.golang.org/protobuf/internal/encoding/text
+#38 9.511 google.golang.org/protobuf/reflect/protoregistry
+#38 9.512 google.golang.org/protobuf/runtime/protoiface
+#38 9.528 google.golang.org/protobuf/internal/descfmt
+#38 9.613 google.golang.org/protobuf/proto
+#38 9.656 google.golang.org/protobuf/internal/descopts
+#38 9.667 google.golang.org/protobuf/internal/encoding/defval
+#38 9.674 github.com/argoproj/pkg/time
+#38 9.695 github.com/argoproj/argo-cd/v2/util/env
+#38 9.705 github.com/argoproj/gitops-engine/pkg/utils/tracing
+#38 9.744 github.com/argoproj/pkg/rand
+#38 9.752 os/exec
+#38 9.770 database/sql/driver
+#38 9.830 google.golang.org/protobuf/encoding/prototext
+#38 9.908 google.golang.org/protobuf/internal/filedesc
+#38 9.909 github.com/argoproj/pkg/exec
+#38 10.01 github.com/google/uuid
+#38 10.06 vendor/golang.org/x/text/transform
+#38 10.06 crypto/tls
+#38 10.10 golang.org/x/crypto/ssh
+#38 10.11 github.com/argoproj/argo-cd/v2/util/io
+#38 10.19 vendor/golang.org/x/text/unicode/bidi
+#38 10.43 vendor/golang.org/x/text/secure/bidirule
+#38 10.46 google.golang.org/protobuf/internal/encoding/tag
+#38 10.47 vendor/golang.org/x/text/unicode/norm
+#38 10.57 google.golang.org/protobuf/internal/impl
+#38 11.14 vendor/golang.org/x/net/idna
+#38 11.29 net/textproto
+#38 11.41 vendor/golang.org/x/net/http/httpproxy
+#38 11.42 google.golang.org/grpc/internal/credentials
+#38 11.46 vendor/golang.org/x/net/http/httpguts
+#38 11.48 vendor/golang.org/x/net/http2/hpack
+#38 11.48 mime
+#38 11.53 mime/quotedprintable
+#38 11.61 net/http/httptrace
+#38 11.62 net/http/internal
+#38 11.65 net/http/internal/ascii
+#38 11.68 github.com/argoproj/gitops-engine/pkg/utils/io
+#38 11.68 github.com/bmatcuk/doublestar/v4
+#38 11.70 github.com/golang-jwt/jwt/v4
+#38 11.71 mime/multipart
+#38 11.85 github.com/ProtonMail/go-crypto/openpgp/errors
+#38 11.88 net/http
+#38 11.88 github.com/ProtonMail/go-crypto/openpgp/armor
+#38 11.96 github.com/ProtonMail/go-crypto/openpgp/aes/keywrap
+#38 11.99 github.com/ProtonMail/go-crypto/eax
+#38 12.00 github.com/ProtonMail/go-crypto/ocb
+#38 12.03 golang.org/x/crypto/cast5
+#38 12.09 github.com/ProtonMail/go-crypto/bitcurves
+#38 12.10 github.com/ProtonMail/go-crypto/openpgp/internal/algorithm
+#38 12.17 github.com/ProtonMail/go-crypto/brainpool
+#38 12.17 github.com/ProtonMail/go-crypto/openpgp/internal/encoding
+#38 12.22 github.com/cloudflare/circl/internal/conv
+#38 12.22 golang.org/x/sys/cpu
+#38 12.26 github.com/cloudflare/circl/math
+#38 12.29 github.com/cloudflare/circl/sign
+#38 12.29 github.com/cloudflare/circl/math/fp25519
+#38 12.31 github.com/cloudflare/circl/math/fp448
+#38 12.32 google.golang.org/protobuf/internal/filetype
+#38 12.39 google.golang.org/protobuf/runtime/protoimpl
+#38 12.40 github.com/cloudflare/circl/dh/x448
+#38 12.42 github.com/cloudflare/circl/dh/x25519
+#38 12.43 github.com/golang/protobuf/proto
+#38 12.54 google.golang.org/protobuf/types/known/anypb
+#38 12.60 google.golang.org/genproto/googleapis/rpc/status
+#38 12.67 github.com/golang/protobuf/ptypes/any
+#38 12.68 google.golang.org/protobuf/types/known/durationpb
+#38 12.71 google.golang.org/protobuf/types/known/timestamppb
+#38 12.77 google.golang.org/grpc/credentials
+#38 12.77 github.com/golang/protobuf/ptypes/duration
+#38 12.78 github.com/golang/protobuf/ptypes/timestamp
+#38 12.80 github.com/cloudflare/circl/sign/ed25519
+#38 12.81 github.com/golang/protobuf/ptypes
+#38 12.89 github.com/cloudflare/circl/math/mlsbset
+#38 12.89 google.golang.org/grpc/resolver
+#38 12.96 google.golang.org/grpc/internal
+#38 12.96 github.com/cloudflare/circl/ecc/goldilocks
+#38 12.97 github.com/cloudflare/circl/internal/sha3
+#38 13.00 google.golang.org/grpc/codes
+#38 13.03 google.golang.org/grpc/internal/status
+#38 13.03 compress/bzip2
+#38 13.10 hash/adler32
+#38 13.10 google.golang.org/grpc/status
+#38 13.12 compress/zlib
+#38 13.17 github.com/ProtonMail/go-crypto/openpgp/elgamal
+#38 13.19 github.com/argoproj/argo-cd/v2/common
+#38 13.22 golang.org/x/crypto/blake2b
+#38 13.28 github.com/cloudflare/circl/sign/ed448
+#38 13.29 github.com/argoproj/argo-cd/v2/util/cert
+#38 13.38 github.com/argoproj/argo-cd/v2/util/log
+#38 13.39 github.com/ProtonMail/go-crypto/openpgp/internal/ecc
+#38 13.40 golang.org/x/crypto/argon2
+#38 13.43 github.com/argoproj/argo-cd/v2/util/exec
+#38 13.51 golang.org/x/crypto/hkdf
+#38 13.54 github.com/ProtonMail/go-crypto/openpgp/s2k
+#38 13.59 image
+#38 13.64 golang.org/x/crypto/sha3
+#38 13.65 github.com/ProtonMail/go-crypto/openpgp/ecdh
+#38 13.71 github.com/ProtonMail/go-crypto/openpgp/ecdsa
+#38 13.80 github.com/ProtonMail/go-crypto/openpgp/eddsa
+#38 13.85 github.com/google/go-querystring/query
+#38 13.86 container/heap
+#38 13.91 dario.cat/mergo
+#38 13.92 image/internal/imageutil
+#38 13.96 github.com/go-git/go-billy/v5
+#38 13.96 image/jpeg
+#38 13.99 github.com/cyphar/filepath-securejoin
+#38 14.03 github.com/go-git/go-billy/v5/helper/polyfill
+#38 14.06 github.com/go-git/go-billy/v5/helper/chroot
+#38 14.06 github.com/go-git/go-billy/v5/util
+#38 14.10 github.com/go-git/go-billy/v5/osfs
+#38 14.15 github.com/go-git/go-git/v5/internal/url
+#38 14.20 github.com/ProtonMail/go-crypto/openpgp/packet
+#38 14.20 github.com/pjbgf/sha1cd
+#38 14.23 internal/saferio
+#38 14.25 encoding/gob
+#38 14.32 github.com/go-git/go-git/v5/plumbing/hash
+#38 14.34 github.com/argoproj/argo-cd/v2/util/proxy
+#38 14.34 golang.org/x/oauth2/internal
+#38 14.37 github.com/go-git/go-git/v5/plumbing
+#38 14.39 golang.org/x/oauth2
+#38 14.45 github.com/go-git/gcfg/token
+#38 14.52 github.com/go-git/gcfg/types
+#38 14.53 github.com/go-git/gcfg/scanner
+#38 14.59 gopkg.in/warnings.v0
+#38 14.61 os/user
+#38 14.63 github.com/go-git/go-git/v5/internal/revision
+#38 14.75 github.com/go-git/go-git/v5/internal/path_util
+#38 14.76 github.com/go-git/go-git/v5/plumbing/cache
+#38 14.77 github.com/go-git/go-git/v5/plumbing/filemode
+#38 14.78 github.com/ProtonMail/go-crypto/openpgp
+#38 14.82 golang.org/x/net/context
+#38 14.83 github.com/go-git/go-git/v5/utils/binary
+#38 14.84 github.com/jbenet/go-context/io
+#38 14.86 github.com/go-git/gcfg
+#38 14.86 github.com/go-git/go-git/v5/plumbing/format/index
+#38 14.87 github.com/go-git/go-git/v5/utils/ioutil
+#38 14.95 github.com/go-git/go-git/v5/plumbing/format/idxfile
+#38 14.97 github.com/go-git/go-git/v5/plumbing/storer
+#38 14.98 github.com/go-git/go-git/v5/plumbing/format/config
+#38 15.04 github.com/go-git/go-git/v5/utils/sync
+#38 15.05 github.com/google/go-github/v53/github
+#38 15.08 github.com/emirpasic/gods/utils
+#38 15.08 github.com/go-git/go-git/v5/plumbing/format/packfile
+#38 15.09 github.com/go-git/go-git/v5/config
+#38 15.11 github.com/go-git/go-git/v5/plumbing/format/gitignore
+#38 15.17 github.com/emirpasic/gods/containers
+#38 15.21 github.com/go-git/go-git/v5/plumbing/format/diff
+#38 15.21 github.com/emirpasic/gods/lists
+#38 15.23 github.com/emirpasic/gods/lists/arraylist
+#38 15.32 github.com/emirpasic/gods/trees
+#38 15.33 github.com/emirpasic/gods/trees/binaryheap
+#38 15.36 github.com/go-git/go-git/v5/storage
+#38 15.39 html
+#38 15.40 github.com/go-git/go-git/v5/utils/merkletrie/noder
+#38 15.40 github.com/go-git/go-git/v5/utils/trace
+#38 15.43 github.com/go-git/go-git/v5/utils/merkletrie/internal/frame
+#38 15.44 github.com/go-git/go-git/v5/plumbing/format/pktline
+#38 15.45 github.com/go-git/go-git/v5/utils/merkletrie
+#38 15.48 github.com/go-git/go-git/v5/plumbing/protocol/packp/capability
+#38 15.48 github.com/sergi/go-diff/diffmatchpatch
+#38 15.52 github.com/go-git/go-git/v5/plumbing/protocol/packp/sideband
+#38 15.53 github.com/go-git/go-git/v5/storage/memory
+#38 15.55 github.com/go-git/go-git/v5/plumbing/format/objfile
+#38 15.63 github.com/go-git/go-git/v5/storage/filesystem/dotgit
+#38 15.66 github.com/go-git/go-git/v5/plumbing/protocol/packp
+#38 15.66 github.com/go-git/go-git/v5/utils/diff
+#38 15.68 github.com/go-git/go-git/v5/plumbing/object
+#38 15.83 github.com/go-git/go-git/v5/storage/filesystem
+#38 15.90 github.com/go-git/go-git/v5/plumbing/transport
+#38 16.00 golang.org/x/sys/execabs
+#38 16.02 github.com/go-git/go-git/v5/plumbing/transport/internal/common
+#38 16.08 github.com/kevinburke/ssh_config
+#38 16.11 github.com/go-git/go-git/v5/plumbing/transport/git
+#38 16.14 github.com/go-git/go-git/v5/plumbing/transport/http
+#38 16.17 github.com/go-git/go-git/v5/plumbing/revlist
+#38 16.26 golang.org/x/crypto/ssh/knownhosts
+#38 16.29 github.com/go-git/go-git/v5/plumbing/transport/server
+#38 16.32 golang.org/x/crypto/ssh/agent
+#38 16.35 github.com/skeema/knownhosts
+#38 16.41 github.com/go-git/go-git/v5/plumbing/transport/file
+#38 16.41 golang.org/x/net/internal/socks
+#38 16.49 github.com/go-git/go-git/v5/utils/merkletrie/filesystem
+#38 16.51 github.com/xanzy/ssh-agent
+#38 16.54 github.com/go-git/go-git/v5/utils/merkletrie/index
+#38 16.55 github.com/patrickmn/go-cache
+#38 16.56 golang.org/x/net/proxy
+#38 16.59 cloud.google.com/go/compute/metadata
+#38 16.63 github.com/go-git/go-git/v5/plumbing/transport/ssh
+#38 16.70 golang.org/x/oauth2/authhandler
+#38 16.76 golang.org/x/oauth2/google/internal/externalaccount
+#38 16.78 golang.org/x/oauth2/jws
+#38 16.79 github.com/go-git/go-git/v5/plumbing/transport/client
+#38 16.82 github.com/go-git/go-git/v5
+#38 16.85 golang.org/x/oauth2/jwt
+#38 16.91 github.com/gogo/protobuf/proto
+#38 17.06 golang.org/x/oauth2/google
+#38 17.24 github.com/gogo/protobuf/sortkeys
+#38 17.29 github.com/google/gofuzz/bytesource
+#38 17.37 github.com/google/gofuzz
+#38 17.52 gopkg.in/inf.v0
+#38 17.53 k8s.io/apimachinery/third_party/forked/golang/reflect
+#38 17.66 k8s.io/apimachinery/pkg/fields
+#38 17.74 k8s.io/apimachinery/pkg/conversion
+#38 17.77 k8s.io/apimachinery/pkg/util/sets
+#38 17.82 k8s.io/utils/internal/third_party/forked/golang/net
+#38 17.86 k8s.io/utils/net
+#38 17.96 flag
+#38 18.20 k8s.io/klog/v2/internal/severity
+#38 18.23 k8s.io/klog/v2/internal/buffer
+#38 18.32 k8s.io/klog/v2/internal/clock
+#38 18.36 k8s.io/klog/v2/internal/serialize
+#38 18.38 k8s.io/apimachinery/pkg/util/errors
+#38 18.41 k8s.io/klog/v2
+#38 18.49 k8s.io/apimachinery/pkg/util/validation/field
+#38 18.72 k8s.io/apimachinery/pkg/util/validation
+#38 18.86 go/scanner
+#38 18.86 k8s.io/apimachinery/pkg/labels
+#38 18.91 github.com/bradleyfalzon/ghinstallation/v2
+#38 19.01 go/ast
+#38 19.03 go/doc/comment
+#38 19.16 internal/lazyregexp
+#38 19.26 go/build/constraint
+#38 19.39 k8s.io/apimachinery/pkg/conversion/queryparams
+#38 19.43 sigs.k8s.io/json/internal/golang/encoding/json
+#38 19.46 runtime/debug
+#38 19.51 go/doc
+#38 19.54 go/internal/typeparams
+#38 19.56 go/parser
+#38 19.58 k8s.io/apimachinery/pkg/api/resource
+#38 19.80 k8s.io/apimachinery/pkg/runtime/schema
+#38 19.87 sigs.k8s.io/json
+#38 19.90 k8s.io/apimachinery/pkg/util/naming
+#38 19.92 k8s.io/apimachinery/pkg/util/json
+#38 19.94 k8s.io/apimachinery/pkg/util/runtime
+#38 19.94 github.com/modern-go/concurrent
+#38 19.96 github.com/modern-go/reflect2
+#38 19.99 gopkg.in/yaml.v2
+#38 20.01 k8s.io/apimachinery/pkg/util/intstr
+#38 20.02 golang.org/x/text/transform
+#38 20.08 golang.org/x/text/unicode/bidi
+#38 20.09 golang.org/x/text/unicode/norm
+#38 20.27 golang.org/x/text/secure/bidirule
+#38 20.31 golang.org/x/net/http2/hpack
+#38 20.44 github.com/gobwas/glob/util/strings
+#38 20.48 github.com/gobwas/glob/match
+#38 20.68 github.com/gobwas/glob/syntax/lexer
+#38 20.72 golang.org/x/net/idna
+#38 20.72 github.com/gobwas/glob/syntax/ast
+#38 20.74 github.com/json-iterator/go
+#38 20.76 github.com/Masterminds/semver/v3
+#38 20.78 github.com/gobwas/glob/compiler
+#38 20.87 github.com/gobwas/glob/syntax
+#38 20.89 github.com/gobwas/glob
+#38 20.90 github.com/klauspost/compress/s2
+#38 20.91 github.com/argoproj/argo-cd/v2/util/glob
+#38 20.94 github.com/cespare/xxhash/v2
+#38 20.97 golang.org/x/net/http/httpguts
+#38 21.00 github.com/redis/go-redis/v9/internal/rand
+#38 21.01 golang.org/x/net/http2
+#38 21.02 github.com/redis/go-redis/v9/internal/util
+#38 21.05 github.com/redis/go-redis/v9/internal
+#38 21.09 github.com/redis/go-redis/v9/internal/hashtag
+#38 21.10 github.com/redis/go-redis/v9/internal/hscan
+#38 21.18 github.com/redis/go-redis/v9/internal/proto
+#38 21.45 github.com/redis/go-redis/v9/internal/pool
+#38 21.63 github.com/redis/go-redis/v9
+#38 21.76 github.com/vmihailenco/go-tinylfu
+#38 21.83 sigs.k8s.io/structured-merge-diff/v4/value
+#38 21.85 github.com/vmihailenco/tagparser/v2/internal/parser
+#38 21.89 github.com/vmihailenco/tagparser/v2
+#38 21.96 github.com/vmihailenco/msgpack/v5
+#38 22.28 k8s.io/apimachinery/pkg/util/net
+#38 22.33 k8s.io/apimachinery/pkg/runtime
+#38 22.42 golang.org/x/sync/singleflight
+#38 22.48 encoding/csv
+#38 22.49 text/template/parse
+#38 22.55 github.com/spf13/pflag
+#38 22.82 text/template
+#38 22.98 k8s.io/apimachinery/pkg/watch
+#38 23.09 k8s.io/apimachinery/pkg/apis/meta/v1
+#38 23.42 github.com/kballard/go-shellquote
+#38 23.50 sigs.k8s.io/yaml/goyaml.v2
+#38 23.52 github.com/spf13/cobra
+#38 23.94 archive/tar
+#38 24.63 sigs.k8s.io/yaml
+#38 24.64 github.com/argoproj/argo-cd/v2/util/io/files
+#38 24.76 github.com/argoproj/argo-cd/v2/util/io/path
+#38 24.76 github.com/argoproj/argo-cd/v2/util/config
+#38 24.81 github.com/opencontainers/go-digest
+#38 24.82 github.com/opencontainers/image-spec/specs-go
+#38 24.85 oras.land/oras-go/v2/errdef
+#38 24.87 github.com/opencontainers/image-spec/specs-go/v1
+#38 24.89 oras.land/oras-go/v2/internal/spec
+#38 24.90 oras.land/oras-go/v2/internal/httputil
+#38 24.91 oras.land/oras-go/v2/internal/descriptor
+#38 24.96 oras.land/oras-go/v2/content
+#38 24.98 golang.org/x/sync/errgroup
+#38 25.04 golang.org/x/sync/semaphore
+#38 25.05 oras.land/oras-go/v2/internal/ioutil
+#38 25.09 oras.land/oras-go/v2/registry
+#38 25.10 oras.land/oras-go/v2/internal/cas
+#38 25.18 oras.land/oras-go/v2/internal/syncutil
+#38 25.22 oras.land/oras-go/v2/registry/remote/errcode
+#38 25.25 oras.land/oras-go/v2/registry/remote/retry
+#38 25.28 oras.land/oras-go/v2/registry/remote/internal/errutil
+#38 25.34 k8s.io/utils/clock
+#38 25.37 oras.land/oras-go/v2/registry/remote/auth
+#38 25.40 k8s.io/apimachinery/pkg/util/wait
+#38 25.41 k8s.io/apimachinery/pkg/api/errors
+#38 25.52 k8s.io/client-go/util/connrotation
+#38 25.54 github.com/argoproj/argo-cd/v2/util/git
+#38 25.57 oras.land/oras-go/v2/internal/registryutil
+#38 25.57 golang.org/x/time/rate
+#38 25.62 oras.land/oras-go/v2/registry/remote
+#38 25.65 k8s.io/client-go/util/workqueue
+#38 25.87 k8s.io/client-go/transport
+#38 25.94 net/http/httputil
+#38 25.94 github.com/argoproj/argo-cd/v2/util/security
+#38 25.99 github.com/davecgh/go-spew/spew
+#38 26.23 github.com/argoproj/gitops-engine/internal/kubernetes_vendor/pkg/util/hash
+#38 26.23 k8s.io/api/core/v1
+#38 26.24 github.com/argoproj/argo-cd/v2/util/http
+#38 26.24 k8s.io/apimachinery/pkg/api/meta
+#38 26.29 k8s.io/apimachinery/pkg/apis/meta/v1/unstructured
+#38 26.46 github.com/google/gnostic/extensions
+#38 26.55 gopkg.in/yaml.v3
+#38 26.56 google.golang.org/protobuf/types/descriptorpb
+#38 26.81 github.com/go-redis/cache/v9
+#38 26.84 github.com/mailru/easyjson/jlexer
+#38 26.92 github.com/argoproj/argo-cd/v2/util/cache
+#38 27.02 github.com/mailru/easyjson/buffer
+#38 27.07 github.com/mailru/easyjson/jwriter
+#38 27.18 github.com/argoproj/argo-cd/v2/util/helm
+#38 27.21 github.com/go-openapi/jsonreference/internal
+#38 27.28 github.com/google/go-cmp/cmp/internal/diff
+#38 27.35 github.com/google/go-cmp/cmp/internal/function
+#38 27.36 github.com/google/go-cmp/cmp/internal/value
+#38 27.37 github.com/google/gnostic/jsonschema
+#38 27.38 github.com/go-openapi/swag
+#38 27.43 github.com/google/go-cmp/cmp
+#38 27.54 github.com/google/gnostic/compiler
+#38 27.64 github.com/google/gnostic/openapiv2
+#38 27.73 github.com/google/gnostic/openapiv3
+#38 28.04 github.com/go-openapi/jsonpointer
+#38 28.10 github.com/go-openapi/jsonreference
+#38 28.15 encoding/base32
+#38 28.24 k8s.io/kube-openapi/pkg/internal/third_party/go-json-experiment/json
+#38 30.18 sigs.k8s.io/structured-merge-diff/v4/schema
+#38 30.21 k8s.io/kube-openapi/pkg/util/proto
+#38 30.26 sigs.k8s.io/structured-merge-diff/v4/fieldpath
+#38 30.36 k8s.io/kube-openapi/pkg/internal
+#38 30.45 github.com/argoproj/gitops-engine/pkg/sync/resource
+#38 30.46 k8s.io/kube-openapi/pkg/validation/spec
+#38 30.49 k8s.io/apimachinery/pkg/runtime/serializer/recognizer
+#38 30.54 k8s.io/apimachinery/pkg/util/framer
+#38 30.58 k8s.io/apimachinery/pkg/util/yaml
+#38 30.59 sigs.k8s.io/structured-merge-diff/v4/typed
+#38 30.68 k8s.io/apimachinery/pkg/runtime/serializer/json
+#38 30.82 k8s.io/apimachinery/pkg/runtime/serializer/protobuf
+#38 30.96 k8s.io/apimachinery/pkg/runtime/serializer/versioning
+#38 30.96 sigs.k8s.io/structured-merge-diff/v4/merge
+#38 31.06 k8s.io/apimachinery/pkg/runtime/serializer
+#38 31.10 k8s.io/kubernetes/pkg/apis/authentication
+#38 31.15 k8s.io/kubernetes/pkg/api/legacyscheme
+#38 31.18 k8s.io/api/authentication/v1
+#38 31.28 k8s.io/kubernetes/pkg/apis/admission
+#38 31.36 k8s.io/kubernetes/pkg/apis/admissionregistration
+#38 31.44 k8s.io/kube-openapi/pkg/schemaconv
+#38 31.63 k8s.io/api/admission/v1
+#38 31.65 k8s.io/kubernetes/pkg/apis/authentication/v1
+#38 31.65 k8s.io/apimachinery/pkg/util/managedfields
+#38 31.77 github.com/argoproj/gitops-engine/pkg/diff/internal/fieldmanager
+#38 31.81 k8s.io/api/admission/v1beta1
+#38 31.92 k8s.io/kubernetes/pkg/apis/admission/v1
+#38 31.95 k8s.io/api/admissionregistration/v1
+#38 32.04 k8s.io/kubernetes/pkg/apis/admission/v1beta1
+#38 32.04 k8s.io/utils/pointer
+#38 32.11 k8s.io/kubernetes/pkg/apis/admission/install
+#38 32.12 k8s.io/apimachinery/pkg/apis/meta/v1beta1
+#38 32.16 github.com/blang/semver/v4
+#38 32.25 k8s.io/apimachinery/pkg/apis/meta/internalversion
+#38 32.35 expvar
+#38 32.40 k8s.io/kubernetes/pkg/apis/core
+#38 32.49 github.com/beorn7/perks/quantile
+#38 32.54 k8s.io/kubernetes/pkg/apis/admissionregistration/v1
+#38 32.56 k8s.io/api/admissionregistration/v1alpha1
+#38 32.67 k8s.io/api/admissionregistration/v1beta1
+#38 32.92 k8s.io/kubernetes/pkg/apis/admissionregistration/v1alpha1
+#38 33.12 github.com/prometheus/client_model/go
+#38 33.28 github.com/prometheus/common/model
+#38 33.34 k8s.io/kubernetes/pkg/apis/admissionregistration/v1beta1
+#38 33.67 k8s.io/kubernetes/pkg/apis/admissionregistration/install
+#38 33.74 github.com/matttproud/golang_protobuf_extensions/pbutil
+#38 33.75 github.com/prometheus/client_golang/prometheus/internal
+#38 33.79 github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg
+#38 33.86 github.com/prometheus/common/expfmt
+#38 33.93 k8s.io/kubernetes/pkg/apis/autoscaling
+#38 33.96 github.com/prometheus/procfs/internal/fs
+#38 33.98 github.com/prometheus/procfs/internal/util
+#38 34.04 github.com/prometheus/procfs
+#38 34.06 k8s.io/kubernetes/pkg/apis/apps
+#38 34.12 k8s.io/apimachinery/pkg/version
+#38 34.15 k8s.io/component-base/version
+#38 34.17 database/sql
+#38 34.25 github.com/docker/distribution/digestset
+#38 34.30 github.com/docker/distribution/reference
+#38 34.45 k8s.io/kubernetes/pkg/util/parsers
+#38 34.53 k8s.io/api/authentication/v1alpha1
+#38 34.54 github.com/argoproj/gitops-engine/internal/kubernetes_vendor/pkg/api/v1/endpoints
+#38 34.60 k8s.io/api/apps/v1
+#38 34.67 k8s.io/kubernetes/pkg/apis/core/v1
+#38 34.68 k8s.io/api/apps/v1beta1
+#38 35.03 github.com/prometheus/client_golang/prometheus
+#38 35.45 k8s.io/api/apps/v1beta2
+#38 35.72 k8s.io/kubernetes/pkg/apis/authentication/v1alpha1
+#38 35.80 k8s.io/api/authentication/v1beta1
+#38 35.99 github.com/prometheus/client_golang/prometheus/promhttp
+#38 36.05 k8s.io/component-base/metrics/prometheusextension
+#38 36.25 github.com/prometheus/client_golang/prometheus/collectors
+#38 36.42 k8s.io/kubernetes/pkg/apis/authentication/v1beta1
+#38 36.48 k8s.io/kubernetes/pkg/apis/authentication/install
+#38 36.56 k8s.io/kubernetes/pkg/apis/authorization
+#38 36.57 k8s.io/component-base/metrics
+#38 36.74 k8s.io/api/authorization/v1
+#38 36.84 k8s.io/api/authorization/v1beta1
+#38 36.88 k8s.io/api/autoscaling/v1
+#38 37.27 k8s.io/kubernetes/pkg/apis/authorization/v1
+#38 37.44 k8s.io/component-base/metrics/legacyregistry
+#38 37.46 k8s.io/api/autoscaling/v2
+#38 37.51 k8s.io/component-base/metrics/prometheus/feature
+#38 37.54 k8s.io/component-base/featuregate
+#38 37.55 k8s.io/kubernetes/pkg/apis/authorization/v1beta1
+#38 37.57 k8s.io/kubernetes/pkg/apis/autoscaling/v1
+#38 37.62 k8s.io/apiserver/pkg/util/feature
+#38 37.64 k8s.io/kubernetes/pkg/apis/authorization/install
+#38 37.65 k8s.io/apiserver/pkg/features
+#38 37.67 k8s.io/api/autoscaling/v2beta1
+#38 37.68 k8s.io/kubernetes/pkg/features
+#38 37.72 k8s.io/kubernetes/pkg/apis/apps/v1
+#38 37.78 k8s.io/kubernetes/pkg/apis/apps/v1beta1
+#38 38.14 k8s.io/kubernetes/pkg/apis/apps/v1beta2
+#38 38.29 k8s.io/kubernetes/pkg/apis/autoscaling/v2
+#38 38.30 k8s.io/kubernetes/pkg/apis/autoscaling/v2beta1
+#38 38.33 k8s.io/api/autoscaling/v2beta2
+#38 38.55 k8s.io/kubernetes/pkg/apis/batch
+#38 38.59 k8s.io/api/batch/v1
+#38 38.92 k8s.io/kubernetes/pkg/apis/certificates
+#38 39.02 k8s.io/kubernetes/pkg/apis/apps/install
+#38 39.07 k8s.io/api/certificates/v1
+#38 39.07 k8s.io/kubernetes/pkg/apis/autoscaling/v2beta2
+#38 39.10 k8s.io/api/certificates/v1beta1
+#38 39.36 k8s.io/kubernetes/pkg/apis/batch/v1
+#38 39.43 k8s.io/kubernetes/pkg/apis/autoscaling/install
+#38 39.43 k8s.io/api/batch/v1beta1
+#38 39.43 k8s.io/kubernetes/pkg/apis/certificates/v1
+#38 39.46 k8s.io/kubernetes/pkg/apis/certificates/v1beta1
+#38 39.52 k8s.io/kubernetes/pkg/apis/coordination
+#38 39.58 k8s.io/api/coordination/v1
+#38 39.59 k8s.io/kubernetes/pkg/apis/certificates/install
+#38 39.62 k8s.io/api/coordination/v1beta1
+#38 39.68 k8s.io/kubernetes/pkg/apis/core/install
+#38 39.72 k8s.io/kubernetes/pkg/apis/coordination/v1
+#38 39.72 k8s.io/kubernetes/pkg/apis/batch/v1beta1
+#38 39.74 k8s.io/kubernetes/pkg/apis/discovery
+#38 39.76 k8s.io/kubernetes/pkg/apis/coordination/v1beta1
+#38 39.78 k8s.io/api/discovery/v1
+#38 39.81 k8s.io/kubernetes/pkg/apis/coordination/install
+#38 39.82 k8s.io/api/discovery/v1beta1
+#38 39.84 k8s.io/kubernetes/pkg/apis/events
+#38 39.91 k8s.io/kubernetes/pkg/apis/batch/install
+#38 39.92 k8s.io/api/events/v1
+#38 39.95 k8s.io/api/events/v1beta1
+#38 40.00 k8s.io/kubernetes/pkg/apis/discovery/v1
+#38 40.11 k8s.io/kubernetes/pkg/apis/discovery/v1beta1
+#38 40.15 k8s.io/kubernetes/pkg/apis/events/v1
+#38 40.15 k8s.io/kubernetes/pkg/apis/networking
+#38 40.18 k8s.io/kubernetes/pkg/apis/events/v1beta1
+#38 40.20 k8s.io/kubernetes/pkg/apis/discovery/install
+#38 40.23 k8s.io/kubernetes/pkg/apis/policy
+#38 40.23 k8s.io/api/extensions/v1beta1
+#38 40.27 k8s.io/kubernetes/pkg/apis/events/install
+#38 40.31 k8s.io/kubernetes/pkg/apis/flowcontrol
+#38 40.33 k8s.io/api/flowcontrol/v1alpha1
+#38 40.38 k8s.io/kubernetes/pkg/apis/extensions
+#38 40.43 k8s.io/api/flowcontrol/v1beta1
+#38 40.44 k8s.io/api/flowcontrol/v1beta2
+#38 40.97 k8s.io/kubernetes/pkg/apis/flowcontrol/v1beta1
+#38 41.01 k8s.io/kubernetes/pkg/apis/flowcontrol/v1alpha1
+#38 41.13 k8s.io/kubernetes/pkg/apis/flowcontrol/v1beta2
+#38 41.16 k8s.io/api/flowcontrol/v1beta3
+#38 41.31 k8s.io/kubernetes/pkg/apis/imagepolicy
+#38 41.34 k8s.io/api/imagepolicy/v1alpha1
+#38 41.39 k8s.io/api/networking/v1
+#38 41.64 k8s.io/kubernetes/pkg/apis/imagepolicy/v1alpha1
+#38 41.74 k8s.io/kubernetes/pkg/apis/imagepolicy/install
+#38 41.80 k8s.io/api/networking/v1alpha1
+#38 42.11 k8s.io/kubernetes/pkg/apis/flowcontrol/v1beta3
+#38 42.15 k8s.io/kubernetes/pkg/apis/networking/v1alpha1
+#38 42.20 k8s.io/kubernetes/pkg/apis/extensions/v1beta1
+#38 42.22 k8s.io/api/networking/v1beta1
+#38 42.23 k8s.io/kubernetes/pkg/apis/networking/v1
+#38 42.28 k8s.io/kubernetes/pkg/apis/flowcontrol/install
+#38 42.31 k8s.io/kubernetes/pkg/apis/node
+#38 42.39 k8s.io/api/node/v1
+#38 42.43 k8s.io/api/node/v1alpha1
+#38 42.71 k8s.io/kubernetes/pkg/apis/node/v1alpha1
+#38 42.73 k8s.io/kubernetes/pkg/apis/node/v1
+#38 42.75 k8s.io/kubernetes/pkg/apis/networking/v1beta1
+#38 42.83 k8s.io/api/node/v1beta1
+#38 42.83 k8s.io/api/policy/v1
+#38 42.89 k8s.io/kubernetes/pkg/apis/extensions/install
+#38 42.93 k8s.io/kubernetes/pkg/apis/networking/install
+#38 42.96 k8s.io/apimachinery/pkg/api/equality
+#38 42.98 k8s.io/api/policy/v1beta1
+#38 43.01 k8s.io/kubernetes/pkg/apis/rbac
+#38 43.02 k8s.io/kubernetes/pkg/apis/node/v1beta1
+#38 43.04 k8s.io/kubernetes/pkg/apis/policy/v1
+#38 43.09 k8s.io/kubernetes/pkg/apis/node/install
+#38 43.12 k8s.io/api/rbac/v1
+#38 43.12 k8s.io/api/rbac/v1alpha1
+#38 43.18 k8s.io/api/rbac/v1beta1
+#38 43.66 k8s.io/kubernetes/pkg/apis/rbac/v1alpha1
+#38 43.75 k8s.io/kubernetes/pkg/apis/rbac/v1
+#38 43.80 k8s.io/kubernetes/pkg/apis/rbac/v1beta1
+#38 43.81 k8s.io/kubernetes/pkg/apis/policy/v1beta1
+#38 43.85 k8s.io/kubernetes/pkg/apis/scheduling
+#38 43.97 k8s.io/api/scheduling/v1
+#38 43.98 k8s.io/api/scheduling/v1alpha1
+#38 43.98 k8s.io/kubernetes/pkg/apis/rbac/install
+#38 44.00 k8s.io/kubernetes/pkg/apis/policy/install
+#38 44.01 k8s.io/api/scheduling/v1beta1
+#38 44.03 k8s.io/kubernetes/pkg/apis/storage
+#38 44.12 k8s.io/kubernetes/pkg/apis/scheduling/v1
+#38 44.14 k8s.io/kubernetes/pkg/apis/scheduling/v1alpha1
+#38 44.15 k8s.io/kubernetes/pkg/apis/scheduling/v1beta1
+#38 44.18 k8s.io/api/storage/v1
+#38 44.21 k8s.io/api/storage/v1alpha1
+#38 44.22 k8s.io/api/storage/v1beta1
+#38 44.23 k8s.io/kubernetes/pkg/apis/scheduling/install
+#38 44.26 github.com/evanphx/json-patch
+#38 44.36 k8s.io/apimachinery/pkg/util/mergepatch
+#38 44.43 k8s.io/apimachinery/pkg/util/jsonmergepatch
+#38 44.49 k8s.io/apimachinery/third_party/forked/golang/json
+#38 44.56 k8s.io/apimachinery/pkg/util/strategicpatch
+#38 44.58 k8s.io/kubernetes/pkg/apis/storage/v1alpha1
+#38 44.81 k8s.io/api/apiserverinternal/v1alpha1
+#38 44.97 k8s.io/api/resource/v1alpha1
+#38 45.01 k8s.io/klog/v2/klogr
+#38 45.02 k8s.io/kubernetes/pkg/apis/storage/v1beta1
+#38 45.02 k8s.io/kubernetes/pkg/apis/storage/v1
+#38 45.06 github.com/liggitt/tabwriter
+#38 45.11 k8s.io/apimachinery/pkg/util/duration
+#38 45.16 k8s.io/client-go/third_party/forked/golang/template
+#38 45.23 k8s.io/client-go/util/jsonpath
+#38 45.23 golang.org/x/text/encoding
+#38 45.26 k8s.io/kubernetes/pkg/apis/storage/install
+#38 45.29 golang.org/x/text/encoding/internal
+#38 45.30 github.com/argoproj/gitops-engine/pkg/utils/kube/scheme
+#38 45.35 golang.org/x/text/runes
+#38 45.38 k8s.io/apimachinery/pkg/apis/meta/v1/unstructured/unstructuredscheme
+#38 45.42 k8s.io/cli-runtime/pkg/printers
+#38 45.44 golang.org/x/text/encoding/unicode
+#38 45.47 k8s.io/api/apidiscovery/v2beta1
+#38 45.50 k8s.io/apimachinery/pkg/runtime/serializer/streaming
+#38 45.51 k8s.io/client-go/kubernetes/scheme
+#38 45.54 k8s.io/client-go/pkg/apis/clientauthentication
+#38 45.61 k8s.io/client-go/pkg/version
+#38 45.63 golang.org/x/term
+#38 45.64 k8s.io/client-go/tools/clientcmd/api
+#38 45.65 k8s.io/client-go/pkg/apis/clientauthentication/v1
+#38 45.67 k8s.io/client-go/pkg/apis/clientauthentication/v1beta1
+#38 45.74 k8s.io/client-go/tools/metrics
+#38 45.75 k8s.io/client-go/rest/watch
+#38 45.75 k8s.io/client-go/util/keyutil
+#38 45.77 k8s.io/utils/clock/testing
+#38 45.77 k8s.io/client-go/pkg/apis/clientauthentication/install
+#38 45.80 github.com/munnerz/goautoneg
+#38 45.80 k8s.io/client-go/util/cert
+#38 45.80 k8s.io/client-go/plugin/pkg/client/auth/exec
+#38 45.81 k8s.io/client-go/util/flowcontrol
+#38 45.83 k8s.io/kube-openapi/pkg/cached
+#38 45.86 encoding/xml
+#38 45.88 github.com/emicklei/go-restful/v3/log
+#38 45.89 k8s.io/kube-openapi/pkg/schemamutation
+#38 45.90 k8s.io/kube-openapi/pkg/spec3
+#38 45.97 k8s.io/client-go/rest
+#38 46.01 k8s.io/kube-openapi/pkg/builder3/util
+#38 46.14 github.com/imdario/mergo
+#38 46.23 github.com/emicklei/go-restful/v3
+#38 46.28 k8s.io/kube-openapi/pkg/openapiconv
+#38 46.34 github.com/go-errors/errors
+#38 46.36 k8s.io/client-go/dynamic
+#38 46.39 sigs.k8s.io/kustomize/kyaml/internal/forked/github.com/go-yaml/yaml
+#38 46.41 sigs.k8s.io/kustomize/kyaml/errors
+#38 46.49 sigs.k8s.io/kustomize/kyaml/utils
+#38 46.51 sigs.k8s.io/kustomize/kyaml/yaml/internal/k8sgen/pkg/util/sets
+#38 46.53 sigs.k8s.io/kustomize/kyaml/openapi/kubernetesapi/v1212
+#38 46.56 sigs.k8s.io/kustomize/kyaml/yaml/internal/k8sgen/pkg/util/errors
+#38 46.60 sigs.k8s.io/kustomize/kyaml/yaml/internal/k8sgen/pkg/util/validation/field
+#38 46.65 sigs.k8s.io/kustomize/kyaml/openapi/kubernetesapi
+#38 46.66 sigs.k8s.io/kustomize/kyaml/yaml/internal/k8sgen/pkg/util/validation
+#38 46.66 sigs.k8s.io/kustomize/kyaml/openapi/kustomizationapi
+#38 46.68 k8s.io/kube-openapi/pkg/common
+#38 46.71 github.com/monochromegane/go-gitignore
+#38 46.75 sigs.k8s.io/kustomize/kyaml/yaml/internal/k8sgen/pkg/labels
+#38 46.81 github.com/xlab/treeprint
+#38 46.87 k8s.io/kube-openapi/pkg/handler3
+#38 46.95 sigs.k8s.io/kustomize/kyaml/filesys
+#38 46.97 sigs.k8s.io/kustomize/api/image
+#38 47.03 sigs.k8s.io/kustomize/api/internal/kusterr
+#38 47.06 plugin
+#38 47.12 github.com/google/shlex
+#38 47.16 go.starlark.net/internal/spell
+#38 47.17 k8s.io/client-go/openapi
+#38 47.17 go.starlark.net/syntax
+#38 47.17 sigs.k8s.io/kustomize/kyaml/yaml
+#38 47.18 sigs.k8s.io/kustomize/api/konfig/builtinpluginconsts
+#38 47.20 k8s.io/client-go/discovery
+#38 47.21 sigs.k8s.io/kustomize/api/provenance
+#38 47.23 github.com/gregjones/httpcache
+#38 47.35 github.com/google/btree
+#38 47.46 k8s.io/client-go/restmapper
+#38 47.47 go.starlark.net/resolve
+#38 47.52 github.com/peterbourgon/diskv
+#38 47.60 go.starlark.net/internal/compile
+#38 47.62 k8s.io/client-go/openapi/cached
+#38 47.68 k8s.io/client-go/discovery/cached/memory
+#38 47.73 sigs.k8s.io/kustomize/api/filters/filtersutil
+#38 47.75 sigs.k8s.io/kustomize/kyaml/openapi
+#38 47.79 sigs.k8s.io/kustomize/kyaml/kio/kioutil
+#38 47.80 sigs.k8s.io/kustomize/kyaml/order
+#38 47.80 go.starlark.net/starlark
+#38 47.84 sigs.k8s.io/kustomize/api/hasher
+#38 47.84 sigs.k8s.io/kustomize/kyaml/kio
+#38 47.87 k8s.io/client-go/discovery/cached/disk
+#38 47.89 sigs.k8s.io/kustomize/kyaml/resid
+#38 47.94 sigs.k8s.io/kustomize/api/types
+#38 48.01 sigs.k8s.io/kustomize/kyaml/fieldmeta
+#38 48.16 sigs.k8s.io/kustomize/api/filters/fieldspec
+#38 48.16 sigs.k8s.io/kustomize/api/filters/iampolicygenerator
+#38 48.17 sigs.k8s.io/kustomize/api/konfig
+#38 48.19 sigs.k8s.io/kustomize/api/internal/utils
+#38 48.20 sigs.k8s.io/kustomize/api/filters/fsslice
+#38 48.21 sigs.k8s.io/kustomize/api/filters/patchjson6902
+#38 48.23 sigs.k8s.io/kustomize/api/filters/prefix
+#38 48.25 sigs.k8s.io/kustomize/kyaml/yaml/schema
+#38 48.26 sigs.k8s.io/kustomize/api/filters/annotations
+#38 48.26 sigs.k8s.io/kustomize/api/filters/imagetag
+#38 48.31 sigs.k8s.io/kustomize/api/filters/labels
+#38 48.32 sigs.k8s.io/kustomize/api/filters/namespace
+#38 48.32 sigs.k8s.io/kustomize/kyaml/yaml/walk
+#38 48.37 sigs.k8s.io/kustomize/api/ifc
+#38 48.41 sigs.k8s.io/kustomize/api/internal/git
+#38 48.43 sigs.k8s.io/kustomize/api/internal/generators
+#38 48.50 sigs.k8s.io/kustomize/api/filters/replicacount
+#38 48.54 sigs.k8s.io/kustomize/api/filters/suffix
+#38 48.57 sigs.k8s.io/kustomize/api/filters/valueadd
+#38 48.61 sigs.k8s.io/kustomize/api/kv
+#38 48.62 sigs.k8s.io/kustomize/kyaml/yaml/merge2
+#38 48.63 sigs.k8s.io/kustomize/kyaml/comments
+#38 48.66 sigs.k8s.io/kustomize/kyaml/yaml/merge3
+#38 48.78 sigs.k8s.io/kustomize/kyaml/fn/runtime/runtimeutil
+#38 48.79 sigs.k8s.io/kustomize/api/filters/patchstrategicmerge
+#38 48.84 sigs.k8s.io/kustomize/kyaml/kio/filters
+#38 48.87 sigs.k8s.io/kustomize/api/resource
+#38 48.88 sigs.k8s.io/kustomize/kyaml/fn/runtime/exec
+#38 48.88 go.starlark.net/starlarkstruct
+#38 48.91 sigs.k8s.io/kustomize/kyaml/fn/runtime/container
+#38 48.96 sigs.k8s.io/kustomize/kyaml/internal/forked/github.com/qri-io/starlib/util
+#38 48.99 sigs.k8s.io/kustomize/api/filters/refvar
+#38 49.02 sigs.k8s.io/kustomize/api/internal/plugins/builtinconfig
+#38 49.03 sigs.k8s.io/kustomize/kyaml/fn/runtime/starlark
+#38 49.04 sigs.k8s.io/kustomize/api/filters/replacement
+#38 49.05 sigs.k8s.io/kustomize/api/resmap
+#38 49.06 sigs.k8s.io/kustomize/api/loader
+#38 49.08 sigs.k8s.io/kustomize/api/internal/validate
+#38 49.12 sigs.k8s.io/kustomize/api/provider
+#38 49.13 sigs.k8s.io/kustomize/kyaml/runfn
+#38 49.15 k8s.io/client-go/tools/auth
+#38 49.15 k8s.io/client-go/tools/clientcmd/api/v1
+#38 49.18 sigs.k8s.io/kustomize/api/internal/plugins/utils
+#38 49.19 sigs.k8s.io/kustomize/api/internal/builtins
+#38 49.24 sigs.k8s.io/kustomize/api/filters/nameref
+#38 49.28 sigs.k8s.io/kustomize/api/internal/plugins/execplugin
+#38 49.34 sigs.k8s.io/kustomize/api/internal/plugins/fnplugin
+#38 49.35 k8s.io/client-go/tools/clientcmd/api/latest
+#38 49.38 sigs.k8s.io/kustomize/api/internal/accumulator
+#38 49.39 k8s.io/client-go/util/homedir
+#38 49.41 sigs.k8s.io/kustomize/api/internal/plugins/builtinhelpers
+#38 49.41 k8s.io/client-go/tools/clientcmd
+#38 49.41 k8s.io/client-go/applyconfigurations/internal
+#38 49.44 sigs.k8s.io/kustomize/api/internal/plugins/loader
+#38 49.47 k8s.io/client-go/applyconfigurations/meta/v1
+#38 49.53 k8s.io/client-go/kubernetes/typed/authentication/v1
+#38 49.53 sigs.k8s.io/kustomize/api/internal/target
+#38 49.63 k8s.io/client-go/kubernetes/typed/authentication/v1alpha1
+#38 49.65 k8s.io/client-go/kubernetes/typed/authentication/v1beta1
+#38 49.66 k8s.io/client-go/applyconfigurations/admissionregistration/v1
+#38 49.69 k8s.io/client-go/applyconfigurations/apiserverinternal/v1alpha1
+#38 49.69 sigs.k8s.io/kustomize/api/krusty
+#38 49.73 k8s.io/client-go/applyconfigurations/core/v1
+#38 49.75 k8s.io/cli-runtime/pkg/resource
+#38 49.79 k8s.io/client-go/kubernetes/typed/apiserverinternal/v1alpha1
+#38 49.80 k8s.io/client-go/kubernetes/typed/admissionregistration/v1
+#38 49.87 k8s.io/client-go/applyconfigurations/admissionregistration/v1alpha1
+#38 49.89 k8s.io/client-go/applyconfigurations/admissionregistration/v1beta1
+#38 50.02 k8s.io/client-go/kubernetes/typed/admissionregistration/v1beta1
+#38 50.03 k8s.io/client-go/kubernetes/typed/admissionregistration/v1alpha1
+#38 50.19 k8s.io/client-go/applyconfigurations/autoscaling/v1
+#38 50.20 k8s.io/client-go/kubernetes/typed/authorization/v1
+#38 50.28 k8s.io/client-go/kubernetes/typed/authorization/v1beta1
+#38 50.29 k8s.io/cli-runtime/pkg/genericclioptions
+#38 50.36 k8s.io/client-go/kubernetes/typed/autoscaling/v1
+#38 50.43 k8s.io/client-go/applyconfigurations/autoscaling/v2
+#38 50.46 k8s.io/client-go/applyconfigurations/autoscaling/v2beta1
+#38 50.55 k8s.io/client-go/applyconfigurations/autoscaling/v2beta2
+#38 50.59 k8s.io/client-go/kubernetes/typed/autoscaling/v2
+#38 50.62 k8s.io/client-go/kubernetes/typed/autoscaling/v2beta1
+#38 50.69 k8s.io/client-go/applyconfigurations/certificates/v1
+#38 50.70 k8s.io/client-go/kubernetes/typed/autoscaling/v2beta2
+#38 50.72 k8s.io/client-go/applyconfigurations/certificates/v1beta1
+#38 50.78 k8s.io/client-go/kubernetes/typed/certificates/v1
+#38 50.82 k8s.io/client-go/applyconfigurations/coordination/v1
+#38 50.83 k8s.io/client-go/kubernetes/typed/certificates/v1beta1
+#38 50.84 k8s.io/client-go/applyconfigurations/apps/v1
+#38 50.88 k8s.io/client-go/applyconfigurations/apps/v1beta1
+#38 50.91 k8s.io/client-go/applyconfigurations/apps/v1beta2
+#38 50.92 k8s.io/client-go/applyconfigurations/batch/v1
+#38 51.14 k8s.io/client-go/kubernetes/typed/batch/v1
+#38 51.15 k8s.io/client-go/kubernetes/typed/apps/v1beta1
+#38 51.15 k8s.io/client-go/kubernetes/typed/apps/v1
+#38 51.27 k8s.io/client-go/kubernetes/typed/apps/v1beta2
+#38 51.38 k8s.io/client-go/applyconfigurations/batch/v1beta1
+#38 51.40 k8s.io/client-go/kubernetes/typed/coordination/v1
+#38 51.42 k8s.io/client-go/applyconfigurations/coordination/v1beta1
+#38 51.54 k8s.io/client-go/kubernetes/typed/coordination/v1beta1
+#38 51.55 k8s.io/client-go/tools/reference
+#38 51.56 k8s.io/client-go/kubernetes/typed/batch/v1beta1
+#38 51.58 k8s.io/client-go/kubernetes/typed/core/v1
+#38 51.61 k8s.io/client-go/applyconfigurations/discovery/v1
+#38 51.62 k8s.io/client-go/applyconfigurations/discovery/v1beta1
+#38 51.72 k8s.io/client-go/kubernetes/typed/discovery/v1
+#38 51.73 k8s.io/client-go/applyconfigurations/events/v1
+#38 51.74 k8s.io/client-go/kubernetes/typed/discovery/v1beta1
+#38 51.80 k8s.io/client-go/applyconfigurations/events/v1beta1
+#38 51.84 k8s.io/client-go/kubernetes/typed/events/v1
+#38 51.84 k8s.io/client-go/applyconfigurations/extensions/v1beta1
+#38 51.93 k8s.io/client-go/kubernetes/typed/events/v1beta1
+#38 51.96 k8s.io/client-go/applyconfigurations/flowcontrol/v1alpha1
+#38 52.09 k8s.io/client-go/applyconfigurations/flowcontrol/v1beta1
+#38 52.20 k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1
+#38 52.22 k8s.io/client-go/kubernetes/typed/extensions/v1beta1
+#38 52.24 k8s.io/client-go/kubernetes/typed/flowcontrol/v1beta1
+#38 52.25 k8s.io/client-go/applyconfigurations/flowcontrol/v1beta2
+#38 52.31 k8s.io/client-go/applyconfigurations/flowcontrol/v1beta3
+#38 52.35 k8s.io/client-go/kubernetes/typed/flowcontrol/v1beta2
+#38 52.38 k8s.io/client-go/applyconfigurations/networking/v1
+#38 52.47 k8s.io/client-go/kubernetes/typed/flowcontrol/v1beta3
+#38 52.49 k8s.io/client-go/applyconfigurations/networking/v1alpha1
+#38 52.54 k8s.io/client-go/applyconfigurations/networking/v1beta1
+#38 52.57 k8s.io/client-go/kubernetes/typed/networking/v1alpha1
+#38 52.58 k8s.io/client-go/applyconfigurations/node/v1
+#38 52.60 k8s.io/client-go/kubernetes/typed/networking/v1
+#38 52.64 k8s.io/client-go/applyconfigurations/node/v1alpha1
+#38 52.67 k8s.io/client-go/kubernetes/typed/networking/v1beta1
+#38 52.70 k8s.io/client-go/kubernetes/typed/node/v1
+#38 52.74 k8s.io/client-go/kubernetes/typed/node/v1alpha1
+#38 52.75 k8s.io/client-go/applyconfigurations/node/v1beta1
+#38 52.78 k8s.io/client-go/applyconfigurations/policy/v1
+#38 52.82 k8s.io/client-go/applyconfigurations/policy/v1beta1
+#38 52.83 k8s.io/client-go/applyconfigurations/rbac/v1
+#38 52.85 k8s.io/client-go/kubernetes/typed/node/v1beta1
+#38 52.86 k8s.io/client-go/kubernetes/typed/policy/v1
+#38 52.93 k8s.io/client-go/applyconfigurations/rbac/v1alpha1
+#38 52.99 k8s.io/client-go/applyconfigurations/rbac/v1beta1
+#38 52.99 k8s.io/client-go/kubernetes/typed/rbac/v1
+#38 52.99 k8s.io/client-go/kubernetes/typed/policy/v1beta1
+#38 53.07 k8s.io/client-go/kubernetes/typed/rbac/v1alpha1
+#38 53.13 k8s.io/client-go/kubernetes/typed/rbac/v1beta1
+#38 53.13 k8s.io/client-go/applyconfigurations/resource/v1alpha1
+#38 53.16 k8s.io/client-go/applyconfigurations/scheduling/v1
+#38 53.24 k8s.io/client-go/kubernetes/typed/scheduling/v1
+#38 53.26 k8s.io/client-go/applyconfigurations/scheduling/v1alpha1
+#38 53.28 k8s.io/client-go/applyconfigurations/scheduling/v1beta1
+#38 53.31 k8s.io/client-go/kubernetes/typed/resource/v1alpha1
+#38 53.32 k8s.io/client-go/applyconfigurations/storage/v1
+#38 53.36 k8s.io/client-go/kubernetes/typed/scheduling/v1alpha1
+#38 53.36 k8s.io/client-go/kubernetes/typed/scheduling/v1beta1
+#38 53.42 k8s.io/client-go/applyconfigurations/storage/v1alpha1
+#38 53.48 k8s.io/client-go/applyconfigurations/storage/v1beta1
+#38 53.48 k8s.io/client-go/scale/scheme
+#38 53.55 k8s.io/client-go/scale/scheme/appsint
+#38 53.55 k8s.io/client-go/kubernetes/typed/storage/v1
+#38 53.58 k8s.io/client-go/scale/scheme/appsv1beta1
+#38 53.60 k8s.io/client-go/kubernetes/typed/storage/v1alpha1
+#38 53.67 k8s.io/client-go/scale/scheme/appsv1beta2
+#38 53.76 k8s.io/client-go/scale/scheme/autoscalingv1
+#38 53.76 k8s.io/client-go/scale/scheme/extensionsint
+#38 53.78 k8s.io/client-go/kubernetes/typed/storage/v1beta1
+#38 53.80 k8s.io/client-go/scale/scheme/extensionsv1beta1
+#38 53.80 k8s.io/kubectl/pkg/scheme
+#38 53.81 archive/zip
+#38 53.85 k8s.io/client-go/scale
+#38 53.90 github.com/chai2010/gettext-go/mo
+#38 53.97 github.com/chai2010/gettext-go/plural
+#38 53.98 github.com/chai2010/gettext-go/po
+#38 54.01 k8s.io/kubectl/pkg/util/openapi
+#38 54.04 k8s.io/client-go/kubernetes
+#38 54.07 k8s.io/kube-openapi/pkg/util/proto/validation
+#38 54.08 github.com/chai2010/gettext-go
+#38 54.09 github.com/MakeNowJust/heredoc
+#38 54.12 github.com/mitchellh/go-wordwrap
+#38 54.17 k8s.io/kubectl/pkg/util/openapi/validation
+#38 54.19 github.com/russross/blackfriday/v2
+#38 54.21 k8s.io/kubectl/pkg/util/i18n
+#38 54.29 os/signal
+#38 54.31 k8s.io/apimachinery/pkg/util/httpstream
+#38 54.37 github.com/moby/term
+#38 54.40 k8s.io/apimachinery/pkg/util/remotecommand
+#38 54.46 github.com/moby/spdystream/spdy
+#38 54.50 k8s.io/apimachinery/third_party/forked/golang/netutil
+#38 54.52 k8s.io/kubectl/pkg/util/interrupt
+#38 54.55 github.com/exponent-io/jsonpath
+#38 54.56 github.com/moby/spdystream
+#38 54.61 k8s.io/kubectl/pkg/validation
+#38 54.68 k8s.io/utils/exec
+#38 54.70 github.com/jonboulle/clockwork
+#38 54.76 k8s.io/client-go/util/csaupgrade
+#38 54.77 k8s.io/apimachinery/pkg/util/cache
+#38 54.78 k8s.io/apimachinery/pkg/util/httpstream/spdy
+#38 54.81 text/tabwriter
+#38 54.86 k8s.io/apimachinery/pkg/util/diff
+#38 54.89 k8s.io/client-go/tools/pager
+#38 54.89 k8s.io/utils/trace
+#38 54.91 k8s.io/client-go/transport/spdy
+#38 54.91 k8s.io/kubectl/pkg/rawhttp
+#38 54.93 k8s.io/kubectl/pkg/util/slice
+#38 54.94 k8s.io/kubectl/pkg/apps
+#38 54.95 k8s.io/kubectl/pkg/cmd/util/podcmd
+#38 54.96 k8s.io/kubectl/pkg/util/certificate
+#38 54.96 k8s.io/client-go/tools/cache
+#38 54.98 k8s.io/kubectl/pkg/util/deployment
+#38 54.98 k8s.io/client-go/tools/remotecommand
+#38 55.01 k8s.io/kubectl/pkg/util/event
+#38 55.05 k8s.io/kubectl/pkg/util/fieldpath
+#38 55.09 k8s.io/kubectl/pkg/util/term
+#38 55.12 k8s.io/kubectl/pkg/util/qos
+#38 55.13 k8s.io/kubectl/pkg/util/rbac
+#38 55.18 k8s.io/kubectl/pkg/util/resource
+#38 55.19 k8s.io/kubectl/pkg/util/templates
+#38 55.28 k8s.io/kubectl/pkg/util/storage
+#38 55.33 k8s.io/kubectl/pkg/util/podutils
+#38 55.37 k8s.io/kubectl/pkg/cmd/util/editor/crlf
+#38 55.39 k8s.io/kubectl/pkg/cmd/util
+#38 55.40 k8s.io/kubectl/pkg/util
+#38 55.48 k8s.io/kubectl/pkg/util/prune
+#38 55.49 k8s.io/component-helpers/auth/rbac/validation
+#38 55.51 k8s.io/apimachinery/pkg/util/rand
+#38 55.53 k8s.io/client-go/tools/watch
+#38 55.53 k8s.io/component-helpers/auth/rbac/reconciliation
+#38 55.55 k8s.io/component-base/cli/flag
+#38 55.61 k8s.io/client-go/util/certificate/csr
+#38 55.69 k8s.io/kubectl/pkg/generate
+#38 55.70 k8s.io/kubectl/pkg/util/hash
+#38 55.74 k8s.io/kube-aggregator/pkg/apis/apiregistration
+#38 55.76 github.com/robfig/cron/v3
+#38 55.88 k8s.io/kube-aggregator/pkg/apis/apiregistration/v1
+#38 55.94 k8s.io/kube-aggregator/pkg/apis/apiregistration/v1beta1
+#38 56.14 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions
+#38 56.20 github.com/argoproj/gitops-engine/pkg/diff
+#38 56.22 k8s.io/kubectl/pkg/cmd/get
+#38 56.30 k8s.io/kubectl/pkg/cmd/apiresources
+#38 56.31 k8s.io/kubectl/pkg/describe
+#38 56.39 k8s.io/kubectl/pkg/cmd/util/editor
+#38 56.44 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1
+#38 57.21 github.com/gogo/protobuf/types
+#38 57.23 k8s.io/kubectl/pkg/cmd/wait
+#38 57.54 github.com/grpc-ecosystem/go-grpc-middleware/logging
+#38 57.57 golang.org/x/net/internal/timeseries
+#38 57.75 html/template
+#38 57.79 google.golang.org/grpc/backoff
+#38 57.83 google.golang.org/grpc/internal/channelz
+#38 58.14 google.golang.org/grpc/channelz
+#38 58.19 google.golang.org/grpc/metadata
+#38 58.26 golang.org/x/net/trace
+#38 58.29 google.golang.org/grpc/balancer
+#38 58.41 google.golang.org/grpc/balancer/base
+#38 58.54 google.golang.org/grpc/internal/grpcrand
+#38 58.54 google.golang.org/grpc/credentials/insecure
+#38 58.56 google.golang.org/grpc/balancer/roundrobin
+#38 58.58 google.golang.org/grpc/internal/envconfig
+#38 58.59 google.golang.org/grpc/internal/backoff
+#38 58.61 google.golang.org/grpc/internal/balancer/gracefulswitch
+#38 58.62 github.com/gogo/protobuf/jsonpb
+#38 58.62 google.golang.org/grpc/internal/grpcutil
+#38 58.66 google.golang.org/grpc/internal/balancerload
+#38 58.66 google.golang.org/grpc/encoding
+#38 58.68 google.golang.org/grpc/encoding/proto
+#38 58.69 google.golang.org/grpc/binarylog/grpc_binarylog_v1
+#38 58.70 google.golang.org/grpc/internal/grpcsync
+#38 58.77 google.golang.org/grpc/internal/idle
+#38 58.83 google.golang.org/grpc/internal/metadata
+#38 58.84 google.golang.org/grpc/internal/binarylog
+#38 58.86 k8s.io/kubectl/pkg/polymorphichelpers
+#38 58.87 k8s.io/kubectl/pkg/cmd/auth
+#38 58.92 google.golang.org/protobuf/internal/encoding/json
+#38 58.99 google.golang.org/grpc/internal/serviceconfig
+#38 59.03 google.golang.org/grpc/internal/resolver
+#38 59.07 google.golang.org/grpc/balancer/grpclb/state
+#38 59.07 google.golang.org/protobuf/encoding/protojson
+#38 59.09 google.golang.org/grpc/internal/resolver/dns
+#38 59.18 google.golang.org/grpc/internal/resolver/passthrough
+#38 59.20 google.golang.org/grpc/internal/transport/networktype
+#38 59.22 google.golang.org/grpc/internal/resolver/unix
+#38 59.27 google.golang.org/grpc/internal/syscall
+#38 59.33 google.golang.org/grpc/keepalive
+#38 59.35 google.golang.org/grpc/peer
+#38 59.37 google.golang.org/grpc/stats
+#38 59.44 github.com/golang/protobuf/jsonpb
+#38 59.44 google.golang.org/grpc/tap
+#38 59.50 github.com/golang/protobuf/protoc-gen-go/descriptor
+#38 59.54 google.golang.org/protobuf/reflect/protodesc
+#38 59.71 google.golang.org/grpc/internal/pretty
+#38 59.71 google.golang.org/protobuf/types/known/wrapperspb
+#38 59.74 k8s.io/kubectl/pkg/util/completion
+#38 59.75 google.golang.org/grpc/internal/transport
+#38 59.79 github.com/golang/protobuf/ptypes/wrappers
+#38 59.81 github.com/grpc-ecosystem/grpc-gateway/internal
+#38 59.82 github.com/golang/protobuf/descriptor
+#38 59.86 github.com/grpc-ecosystem/grpc-gateway/utilities
+#38 59.90 google.golang.org/genproto/googleapis/api/httpbody
+#38 59.90 google.golang.org/protobuf/types/known/fieldmaskpb
+#38 59.93 go.opentelemetry.io/otel/internal/attribute
+#38 59.97 go.opentelemetry.io/otel/attribute
+#38 59.99 google.golang.org/genproto/protobuf/field_mask
+#38 60.03 github.com/grpc-ecosystem/grpc-gateway/runtime
+#38 60.12 go.opentelemetry.io/otel/semconv/v1.17.0
+#38 60.30 k8s.io/kubectl/pkg/cmd/delete
+#38 60.40 k8s.io/kubectl/pkg/cmd/create
+#38 60.58 google.golang.org/grpc
+#38 60.60 go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc/internal
+#38 60.61 github.com/go-logr/logr/funcr
+#38 60.81 github.com/go-logr/stdr
+#38 60.87 go.opentelemetry.io/otel/codes
+#38 60.90 go.opentelemetry.io/otel/metric
+#38 61.06 go.opentelemetry.io/otel/internal/baggage
+#38 61.09 go.opentelemetry.io/otel/baggage
+#38 61.22 go.opentelemetry.io/otel/trace
+#38 61.35 k8s.io/kubectl/pkg/cmd/apply
+#38 61.43 k8s.io/kubectl/pkg/cmd/replace
+#38 61.54 github.com/grpc-ecosystem/go-grpc-middleware
+#38 61.60 github.com/grpc-ecosystem/go-grpc-middleware/tags
+#38 61.65 github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus/ctxlogrus
+#38 61.66 go.opentelemetry.io/otel/propagation
+#38 61.69 github.com/grpc-ecosystem/go-grpc-middleware/tags/logrus
+#38 61.72 github.com/grpc-ecosystem/go-grpc-middleware/util/backoffutils
+#38 61.74 github.com/grpc-ecosystem/go-grpc-middleware/util/metautils
+#38 61.77 github.com/grpc-ecosystem/go-grpc-middleware/retry
+#38 61.79 go.opentelemetry.io/otel/internal/global
+#38 61.85 google.golang.org/protobuf/types/known/emptypb
+#38 61.91 github.com/argoproj/argo-cd/v2/util/errors
+#38 61.99 github.com/argoproj/argo-cd/v2/server/settings/oidc
+#38 62.02 go.opentelemetry.io/otel
+#38 62.07 go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc
+#38 62.07 github.com/argoproj/argo-cd/v2/util
+#38 62.08 golang.org/x/crypto/pbkdf2
+#38 62.08 k8s.io/client-go/tools/portforward
+#38 62.09 golang.org/x/crypto/scrypt
+#38 62.16 github.com/argoproj/argo-cd/v2/util/crypto
+#38 62.18 golang.org/x/crypto/bcrypt
+#38 62.18 github.com/argoproj/argo-cd/v2/util/tls
+#38 62.21 github.com/argoproj/argo-cd/v2/util/grpc
+#38 62.22 github.com/argoproj/argo-cd/v2/util/password
+#38 62.26 k8s.io/client-go/util/retry
+#38 62.28 k8s.io/client-go/informers/internalinterfaces
+#38 62.29 k8s.io/client-go/listers/core/v1
+#38 62.30 github.com/argoproj/gitops-engine/pkg/utils/kube
+#38 62.39 github.com/r3labs/diff
+#38 62.50 k8s.io/apimachinery/pkg/apis/meta/v1/validation
+#38 62.57 github.com/argoproj/argo-cd/v2/util/text/label
+#38 62.64 k8s.io/apimachinery/pkg/api/validation
+#38 62.65 github.com/argoproj/argo-cd/v2/util/healthz
+#38 62.68 internal/profile
+#38 62.75 k8s.io/client-go/informers/core/v1
+#38 62.77 runtime/pprof
+#38 62.97 github.com/argoproj/gitops-engine/pkg/health
+#38 63.08 github.com/argoproj/gitops-engine/pkg/sync/common
+#38 63.09 github.com/argoproj/argo-cd/v2/util/kube
+#38 63.12 runtime/trace
+#38 63.19 net/http/pprof
+#38 63.21 github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1
+#38 63.34 github.com/argoproj/gitops-engine/pkg/cache
+#38 63.59 github.com/argoproj/argo-cd/v2/util/profile
+#38 63.63 github.com/argoproj/pkg/kubeclientmetrics
+#38 63.71 k8s.io/client-go/tools/leaderelection/resourcelock
+#38 64.03 sigs.k8s.io/controller-runtime/pkg/log
+#38 64.12 sigs.k8s.io/controller-runtime/pkg/internal/log
+#38 64.16 github.com/itchyny/timefmt-go
+#38 64.20 github.com/argoproj/argo-cd/v2/resource_customizations
+#38 64.28 github.com/yuin/gopher-lua/ast
+#38 64.29 github.com/itchyny/gojq
+#38 64.30 k8s.io/client-go/tools/leaderelection
+#38 64.40 github.com/yuin/gopher-lua/parse
+#38 64.50 sigs.k8s.io/controller-runtime/pkg/metrics
+#38 64.65 github.com/yuin/gopher-lua/pm
+#38 64.75 github.com/argoproj/argo-cd/v2/util/resource
+#38 64.82 github.com/yuin/gopher-lua
+#38 64.83 github.com/argoproj/argo-cd/v2/pkg/ratelimiter
+#38 64.88 github.com/argoproj/argo-cd/v2/util/argo/managedfields
+#38 64.95 github.com/argoproj/argo-cd/v2/util/rand
+#38 64.99 github.com/argoproj/argo-cd/v2/util/stats
+#38 65.03 github.com/argoproj/gitops-engine/pkg/sync/hook/helm
+#38 65.14 github.com/argoproj/gitops-engine/pkg/sync/hook
+#38 65.21 github.com/argoproj/gitops-engine/pkg/sync/ignore
+#38 65.26 github.com/argoproj/gitops-engine/pkg/sync/syncwaves
+#38 65.32 k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1
+#38 66.30 layeh.com/gopher-json
+#38 66.31 k8s.io/client-go/listers/admissionregistration/v1
+#38 66.39 k8s.io/client-go/listers/admissionregistration/v1alpha1
+#38 66.40 k8s.io/client-go/informers/admissionregistration/v1
+#38 66.46 k8s.io/client-go/informers/admissionregistration/v1alpha1
+#38 66.75 k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/scheme
+#38 66.81 k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1
+#38 66.92 k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1
+#38 67.02 k8s.io/client-go/listers/admissionregistration/v1beta1
+#38 67.03 k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset
+#38 67.09 k8s.io/client-go/informers/admissionregistration/v1beta1
+#38 67.18 github.com/argoproj/gitops-engine/pkg/sync
+#38 67.19 k8s.io/client-go/listers/apiserverinternal/v1alpha1
+#38 67.25 k8s.io/client-go/informers/apiserverinternal/v1alpha1
+#38 67.75 k8s.io/client-go/listers/apps/v1
+#38 67.84 k8s.io/client-go/informers/admissionregistration
+#38 67.92 k8s.io/client-go/informers/apps/v1
+#38 68.17 k8s.io/client-go/informers/apiserverinternal
+#38 68.48 k8s.io/client-go/listers/apps/v1beta1
+#38 68.70 k8s.io/client-go/informers/apps/v1beta1
+#38 68.83 k8s.io/client-go/listers/apps/v1beta2
+#38 68.99 k8s.io/client-go/listers/autoscaling/v1
+#38 69.02 k8s.io/client-go/informers/apps/v1beta2
+#38 69.05 k8s.io/client-go/informers/autoscaling/v1
+#38 69.31 k8s.io/client-go/listers/autoscaling/v2
+#38 69.35 k8s.io/client-go/informers/autoscaling/v2
+#38 69.39 github.com/argoproj/argo-cd/v2/pkg/client/clientset/versioned/scheme
+#38 69.43 github.com/argoproj/argo-cd/v2/pkg/client/clientset/versioned/typed/application/v1alpha1
+#38 69.49 github.com/argoproj/argo-cd/v2/pkg/client/listers/application/v1alpha1
+#38 69.57 github.com/argoproj/argo-cd/v2/reposerver/apiclient
+#38 69.64 github.com/argoproj/argo-cd/v2/util/gpg
+#38 69.65 github.com/argoproj/argo-cd/v2/util/settings
+#38 69.79 github.com/argoproj/argo-cd/v2/controller/metrics
+#38 69.98 github.com/argoproj/argo-cd/v2/util/argo/normalizers
+#38 70.02 github.com/argoproj/argo-cd/v2/util/lua
+#38 70.34 github.com/argoproj/argo-cd/v2/pkg/client/clientset/versioned
+#38 70.35 github.com/argoproj/argo-cd/v2/util/app/path
+#38 70.43 github.com/argoproj/argo-cd/v2/util/cache/appstate
+#38 70.52 github.com/argoproj/argo-cd/v2/pkg/client/informers/externalversions/internalinterfaces
+#38 70.58 k8s.io/client-go/informers/apps
+#38 70.60 github.com/argoproj/argo-cd/v2/util/db
+#38 70.64 github.com/argoproj/argo-cd/v2/pkg/client/informers/externalversions/application/v1alpha1
+#38 70.65 k8s.io/client-go/listers/autoscaling/v2beta1
+#38 70.70 k8s.io/client-go/informers/autoscaling/v2beta1
+#38 70.79 k8s.io/client-go/listers/autoscaling/v2beta2
+#38 70.89 k8s.io/client-go/informers/autoscaling/v2beta2
+#38 71.16 k8s.io/client-go/listers/batch/v1
+#38 71.22 k8s.io/client-go/listers/batch/v1beta1
+#38 71.26 k8s.io/client-go/informers/batch/v1
+#38 71.31 k8s.io/client-go/informers/batch/v1beta1
+#38 71.47 github.com/argoproj/argo-cd/v2/util/argo
+#38 71.47 github.com/argoproj/argo-cd/v2/controller/sharding
+#38 71.82 k8s.io/client-go/informers/autoscaling
+#38 71.82 k8s.io/client-go/informers/batch
+#38 72.14 k8s.io/client-go/listers/certificates/v1
+#38 72.18 k8s.io/client-go/informers/certificates/v1
+#38 72.35 k8s.io/client-go/listers/certificates/v1beta1
+#38 72.39 github.com/argoproj/argo-cd/v2/cmd/util
+#38 72.41 github.com/argoproj/argo-cd/v2/controller/cache
+#38 72.42 github.com/argoproj/argo-cd/v2/util/argo/diff
+#38 72.56 k8s.io/client-go/informers/certificates/v1beta1
+#38 72.65 k8s.io/client-go/listers/coordination/v1
+#38 72.70 k8s.io/client-go/informers/coordination/v1
+#38 73.13 k8s.io/client-go/informers/certificates
+#38 73.21 k8s.io/client-go/listers/coordination/v1beta1
+#38 73.22 k8s.io/client-go/informers/core
+#38 73.27 k8s.io/client-go/informers/coordination/v1beta1
+#38 73.27 k8s.io/client-go/listers/discovery/v1
+#38 73.31 k8s.io/client-go/informers/discovery/v1
+#38 73.77 k8s.io/client-go/listers/discovery/v1beta1
+#38 73.84 k8s.io/client-go/informers/discovery/v1beta1
+#38 73.85 k8s.io/client-go/listers/events/v1
+#38 73.85 k8s.io/client-go/listers/events/v1beta1
+#38 73.85 k8s.io/client-go/informers/coordination
+#38 73.88 k8s.io/client-go/informers/events/v1
+#38 73.89 k8s.io/client-go/informers/events/v1beta1
+#38 74.29 k8s.io/client-go/listers/extensions/v1beta1
+#38 74.36 k8s.io/client-go/informers/discovery
+#38 74.42 k8s.io/client-go/listers/flowcontrol/v1alpha1
+#38 74.44 k8s.io/client-go/informers/events
+#38 74.46 k8s.io/client-go/informers/extensions/v1beta1
+#38 74.46 k8s.io/client-go/informers/flowcontrol/v1alpha1
+#38 74.91 k8s.io/client-go/listers/flowcontrol/v1beta1
+#38 74.95 k8s.io/client-go/informers/flowcontrol/v1beta1
+#38 75.03 k8s.io/client-go/listers/flowcontrol/v1beta2
+#38 75.04 k8s.io/client-go/listers/flowcontrol/v1beta3
+#38 75.08 k8s.io/client-go/informers/flowcontrol/v1beta2
+#38 75.08 k8s.io/client-go/informers/extensions
+#38 75.08 k8s.io/client-go/informers/flowcontrol/v1beta3
+#38 75.47 k8s.io/client-go/listers/networking/v1
+#38 75.55 k8s.io/client-go/informers/networking/v1
+#38 75.57 k8s.io/client-go/listers/networking/v1alpha1
+#38 75.58 k8s.io/client-go/listers/networking/v1beta1
+#38 75.61 k8s.io/client-go/informers/networking/v1alpha1
+#38 75.62 k8s.io/client-go/informers/networking/v1beta1
+#38 75.67 k8s.io/client-go/informers/flowcontrol
+#38 76.07 k8s.io/client-go/listers/node/v1
+#38 76.11 k8s.io/client-go/informers/node/v1
+#38 76.18 k8s.io/client-go/listers/node/v1alpha1
+#38 76.18 k8s.io/client-go/listers/node/v1beta1
+#38 76.19 k8s.io/client-go/informers/networking
+#38 76.21 k8s.io/client-go/informers/node/v1alpha1
+#38 76.22 k8s.io/client-go/informers/node/v1beta1
+#38 76.68 k8s.io/client-go/listers/policy/v1
+#38 76.70 k8s.io/client-go/listers/policy/v1beta1
+#38 76.73 k8s.io/client-go/listers/rbac/v1
+#38 76.74 k8s.io/client-go/informers/node
+#38 76.78 k8s.io/client-go/informers/rbac/v1
+#38 76.78 k8s.io/client-go/informers/policy/v1
+#38 76.81 k8s.io/client-go/informers/policy/v1beta1
+#38 77.24 k8s.io/client-go/listers/rbac/v1alpha1
+#38 77.30 k8s.io/client-go/informers/rbac/v1alpha1
+#38 77.34 k8s.io/client-go/listers/rbac/v1beta1
+#38 77.36 k8s.io/client-go/listers/resource/v1alpha1
+#38 77.36 k8s.io/client-go/informers/policy
+#38 77.39 k8s.io/client-go/informers/rbac/v1beta1
+#38 77.41 k8s.io/client-go/informers/resource/v1alpha1
+#38 77.84 k8s.io/client-go/listers/scheduling/v1
+#38 77.90 k8s.io/client-go/informers/scheduling/v1
+#38 77.92 k8s.io/client-go/listers/scheduling/v1alpha1
+#38 77.95 k8s.io/client-go/informers/rbac
+#38 77.96 k8s.io/client-go/informers/resource
+#38 77.97 k8s.io/client-go/informers/scheduling/v1alpha1
+#38 78.40 k8s.io/client-go/listers/scheduling/v1beta1
+#38 78.41 k8s.io/client-go/listers/storage/v1
+#38 78.42 k8s.io/client-go/listers/storage/v1alpha1
+#38 78.45 k8s.io/client-go/informers/scheduling/v1beta1
+#38 78.46 k8s.io/client-go/listers/storage/v1beta1
+#38 78.48 k8s.io/client-go/informers/storage/v1
+#38 78.51 k8s.io/client-go/informers/storage/v1alpha1
+#38 78.55 k8s.io/client-go/informers/storage/v1beta1
+#38 79.00 k8s.io/client-go/informers/scheduling
+#38 79.15 github.com/argoproj/argo-cd/v2/util/cli
+#38 79.16 go.opentelemetry.io/otel/semconv/v1.21.0
+#38 79.17 k8s.io/client-go/informers/storage
+#38 79.24 go.opentelemetry.io/otel/sdk/internal
+#38 79.27 go.opentelemetry.io/otel/sdk/internal/env
+#38 79.31 go.opentelemetry.io/otel/trace/noop
+#38 79.35 go.opentelemetry.io/proto/otlp/common/v1
+#38 79.36 go.opentelemetry.io/otel/sdk/resource
+#38 79.43 go.opentelemetry.io/proto/otlp/resource/v1
+#38 79.46 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal
+#38 79.48 go.opentelemetry.io/proto/otlp/trace/v1
+#38 79.51 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal/envconfig
+#38 79.57 github.com/cenkalti/backoff/v4
+#38 79.58 go.opentelemetry.io/otel/sdk/trace
+#38 79.59 google.golang.org/grpc/encoding/gzip
+#38 79.63 github.com/grpc-ecosystem/grpc-gateway/v2/utilities
+#38 79.64 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal/retry
+#38 79.69 github.com/grpc-ecosystem/grpc-gateway/v2/internal/httprule
+#38 79.72 google.golang.org/grpc/health/grpc_health_v1
+#38 79.82 google.golang.org/protobuf/types/known/structpb
+#38 79.90 google.golang.org/genproto/googleapis/rpc/errdetails
+#38 79.91 k8s.io/client-go/informers
+#38 79.96 go.opentelemetry.io/otel/exporters/otlp/otlptrace/internal/tracetransform
+#38 79.97 github.com/grpc-ecosystem/grpc-gateway/v2/runtime
+#38 80.01 go.opentelemetry.io/otel/semconv/internal
+#38 80.02 go.opentelemetry.io/otel/exporters/otlp/otlptrace
+#38 80.07 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal/otlpconfig
+#38 80.09 go.opentelemetry.io/otel/semconv/v1.6.1
+#38 80.15 github.com/argoproj/pkg/stats
+#38 80.20 github.com/argoproj/argo-cd/v2/applicationset/services
+#38 80.23 github.com/argoproj/argo-cd/v2/applicationset/services/github_app_auth
+#38 80.25 github.com/argoproj/argo-cd/v2/applicationset/services/internal/http
+#38 80.33 github.com/hashicorp/go-version
+#38 80.36 github.com/argoproj/argo-cd/v2/applicationset/services/plugin
+#38 80.41 golang.org/x/crypto/openpgp/errors
+#38 80.42 code.gitea.io/sdk/gitea
+#38 80.48 go.opentelemetry.io/proto/otlp/collector/trace/v1
+#38 80.48 golang.org/x/crypto/openpgp/armor
+#38 80.54 golang.org/x/crypto/openpgp/elgamal
+#38 80.56 golang.org/x/crypto/openpgp/s2k
+#38 80.61 golang.org/x/crypto/openpgp/packet
+#38 80.61 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc
+#38 80.75 github.com/argoproj/argo-cd/v2/util/trace
+#38 80.89 github.com/Masterminds/goutils
+#38 81.01 github.com/huandu/xstrings
+#38 81.09 github.com/argoproj/argo-cd/v2/controller
+#38 81.12 github.com/mitchellh/reflectwalk
+#38 81.13 github.com/shopspring/decimal
+#38 81.14 golang.org/x/crypto/openpgp
+#38 81.16 github.com/mitchellh/copystructure
+#38 81.26 github.com/spf13/cast
+#38 81.29 github.com/google/go-github/v35/github
+#38 81.32 github.com/gosimple/unidecode
+#38 81.36 github.com/gosimple/slug
+#38 81.43 github.com/valyala/bytebufferpool
+#38 81.46 github.com/Masterminds/sprig/v3
+#38 81.47 github.com/valyala/fasttemplate
+#38 81.52 github.com/evanphx/json-patch/v5
+#38 81.67 k8s.io/apimachinery/pkg/apis/meta/internalversion/scheme
+#38 81.69 k8s.io/client-go/metadata
+#38 81.85 sigs.k8s.io/controller-runtime/pkg/client/apiutil
+#38 81.88 github.com/mitchellh/mapstructure
+#38 82.14 github.com/gfleury/go-bitbucket-v1
+#38 82.19 sigs.k8s.io/controller-runtime/pkg/internal/objectutil
+#38 82.23 sigs.k8s.io/controller-runtime/pkg/client
+#38 82.49 github.com/argoproj/argo-cd/v2/cmd/argocd-application-controller/commands
+#38 82.73 sigs.k8s.io/controller-runtime/pkg/controller/controllerutil
+#38 82.83 github.com/argoproj/argo-cd/v2/applicationset/utils
+#38 83.25 github.com/hashicorp/go-cleanhttp
+#38 83.34 github.com/hashicorp/go-retryablehttp
+#38 83.57 golang.org/x/oauth2/bitbucket
+#38 83.61 golang.org/x/oauth2/clientcredentials
+#38 83.71 github.com/ktrysmt/go-bitbucket
+#38 84.08 github.com/microsoft/azure-devops-go-api/azuredevops
+#38 84.22 github.com/xanzy/go-gitlab
+#38 84.24 github.com/microsoft/azure-devops-go-api/azuredevops/webapi
+#38 84.28 github.com/microsoft/azure-devops-go-api/azuredevops/delegatedauthorization
+#38 84.32 github.com/microsoft/azure-devops-go-api/azuredevops/identity
+#38 84.33 github.com/microsoft/azure-devops-go-api/azuredevops/operations
+#38 84.37 github.com/microsoft/azure-devops-go-api/azuredevops/policy
+#38 84.44 github.com/microsoft/azure-devops-go-api/azuredevops/core
+#38 84.48 net/http/cookiejar
+#38 84.55 github.com/aws/aws-sdk-go/aws/awserr
+#38 84.60 github.com/aws/aws-sdk-go/internal/ini
+#38 84.61 github.com/microsoft/azure-devops-go-api/azuredevops/git
+#38 84.65 github.com/argoproj/argo-cd/v2/applicationset/services/internal/github_app
+#38 84.77 github.com/aws/aws-sdk-go/internal/shareddefaults
+#38 84.79 github.com/aws/aws-sdk-go/aws/credentials
+#38 84.87 github.com/aws/aws-sdk-go/aws/endpoints
+#38 84.88 github.com/aws/aws-sdk-go/internal/sdkio
+#38 84.92 github.com/aws/aws-sdk-go/aws/arn
+#38 84.94 github.com/jmespath/go-jmespath
+#38 85.28 github.com/aws/aws-sdk-go/aws/awsutil
+#38 85.47 github.com/aws/aws-sdk-go/internal/sdkrand
+#38 85.49 github.com/aws/aws-sdk-go/internal/strings
+#38 85.51 github.com/aws/aws-sdk-go/aws/credentials/processcreds
+#38 85.55 github.com/aws/aws-sdk-go/internal/sdkuri
+#38 85.58 github.com/jeremywohl/flatten
+#38 85.59 github.com/google/go-cmp/cmp/cmpopts
+#38 85.61 k8s.io/client-go/tools/record/util
+#38 85.66 k8s.io/client-go/tools/record
+#38 85.78 sigs.k8s.io/controller-runtime/pkg/event
+#38 85.85 sigs.k8s.io/controller-runtime/pkg/reconcile
+#38 85.91 sigs.k8s.io/controller-runtime/pkg/internal/field/selector
+#38 85.95 sigs.k8s.io/controller-runtime/pkg/cache/internal
+#38 85.99 k8s.io/apimachinery/pkg/util/uuid
+#38 86.01 sigs.k8s.io/controller-runtime/pkg/internal/controller/metrics
+#38 86.09 sigs.k8s.io/controller-runtime/pkg/internal/recorder
+#38 86.11 sigs.k8s.io/controller-runtime/pkg/cache
+#38 86.26 k8s.io/component-base/config
+#38 86.30 k8s.io/component-base/config/v1alpha1
+#38 86.30 sigs.k8s.io/controller-runtime/pkg/runtime/inject
+#38 86.36 sigs.k8s.io/controller-runtime/pkg/scheme
+#38 86.38 sigs.k8s.io/controller-runtime/pkg/handler
+#38 86.40 sigs.k8s.io/controller-runtime/pkg/predicate
+#38 86.44 sigs.k8s.io/controller-runtime/pkg/cluster
+#38 86.48 sigs.k8s.io/controller-runtime/pkg/source/internal
+#38 86.53 sigs.k8s.io/controller-runtime/pkg/source
+#38 86.53 sigs.k8s.io/controller-runtime/pkg/config/v1alpha1
+#38 86.55 github.com/argoproj/argo-cd/v2/applicationset/services/pull_request
+#38 86.59 sigs.k8s.io/controller-runtime/pkg/internal/controller
+#38 86.59 sigs.k8s.io/controller-runtime/pkg/config
+#38 86.63 sigs.k8s.io/controller-runtime/pkg/healthz
+#38 86.65 sigs.k8s.io/controller-runtime/pkg/internal/httpserver
+#38 86.70 sigs.k8s.io/controller-runtime/pkg/recorder
+#38 86.72 sigs.k8s.io/controller-runtime/pkg/leaderelection
+#38 86.73 gomodules.xyz/jsonpatch/v2
+#38 86.79 github.com/fsnotify/fsnotify
+#38 86.87 sigs.k8s.io/controller-runtime/pkg/certwatcher/metrics
+#38 86.88 sigs.k8s.io/controller-runtime/pkg/webhook/internal/metrics
+#38 86.91 sigs.k8s.io/controller-runtime/pkg/certwatcher
+#38 86.94 sigs.k8s.io/controller-runtime/pkg/webhook/admission
+#38 86.96 sigs.k8s.io/controller-runtime/pkg/ratelimiter
+#38 86.98 sigs.k8s.io/controller-runtime/pkg/conversion
+#38 86.98 sigs.k8s.io/controller-runtime/pkg/client/config
+#38 87.00 sigs.k8s.io/controller-runtime/pkg/webhook/conversion
+#38 87.03 sigs.k8s.io/controller-runtime/pkg/manager/signals
+#38 87.07 github.com/go-playground/webhooks/v6/azuredevops
+#38 87.12 sigs.k8s.io/controller-runtime/pkg/webhook
+#38 87.15 github.com/go-playground/webhooks/v6/github
+#38 87.19 github.com/go-playground/webhooks/v6/gitlab
+#38 87.25 sigs.k8s.io/controller-runtime/pkg/manager
+#38 87.36 github.com/argoproj/argo-cd/v2/util/github_app
+#38 87.48 k8s.io/client-go/plugin/pkg/client/auth/gcp
+#38 87.49 sigs.k8s.io/controller-runtime/pkg/controller
+#38 87.51 github.com/argoproj/argo-cd/v2/cmpserver/apiclient
+#38 87.53 github.com/argoproj/argo-cd/v2/util/buffered_context
+#38 87.55 github.com/argoproj/argo-cd/v2/util/tgzstream
+#38 87.56 sigs.k8s.io/controller-runtime/pkg/builder
+#38 87.61 github.com/mattn/go-zglob/fastwalk
+#38 87.69 github.com/mattn/go-zglob
+#38 87.75 sigs.k8s.io/controller-runtime
+#38 87.76 google.golang.org/genproto/googleapis/api
+#38 87.81 github.com/argoproj/argo-cd/v2/util/cmp
+#38 87.81 google.golang.org/genproto/googleapis/api/annotations
+#38 87.83 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
+#38 87.87 github.com/argoproj/argo-cd/v2/cmpserver/plugin
+#38 88.00 github.com/argoproj/argo-cd/v2/util/jwt
+#38 88.04 github.com/Knetic/govaluate
+#38 88.05 github.com/argoproj/argo-cd/v2/pkg/apiclient/version
+#38 88.25 github.com/gogo/protobuf/gogoproto
+#38 88.31 github.com/argoproj/argo-cd/v2/assets
+#38 88.32 github.com/casbin/casbin/v2/effector
+#38 88.33 github.com/argoproj/argo-cd/v2/pkg/apiclient/settings
+#38 88.34 github.com/argoproj/argo-cd/v2/util/assets
+#38 88.37 github.com/casbin/casbin/v2/errors
+#38 88.37 github.com/casbin/casbin/v2/log
+#38 88.38 github.com/casbin/casbin/v2/config
+#38 88.42 github.com/casbin/casbin/v2/rbac
+#38 88.43 github.com/casbin/casbin/v2/persist/cache
+#38 88.45 github.com/casbin/casbin/v2/util
+#38 88.48 github.com/tidwall/pretty
+#38 88.56 github.com/casbin/casbin/v2/model
+#38 88.57 github.com/casbin/casbin/v2/rbac/default-role-manager
+#38 88.86 github.com/tidwall/gjson
+#38 88.87 github.com/casbin/casbin/v2/persist
+#38 88.88 github.com/argoproj/argo-cd/v2/util/dex
+#38 88.91 github.com/casbin/casbin/v2/persist/file-adapter
+#38 89.00 github.com/go-jose/go-jose/v3/cipher
+#38 89.00 github.com/aws/aws-sdk-go/aws
+#38 89.01 github.com/go-jose/go-jose/v3/json
+#38 89.10 github.com/golang/protobuf/ptypes/empty
+#38 89.12 github.com/casbin/casbin/v2
+#38 89.13 github.com/argoproj/argo-cd/v2/util/kustomize
+#38 89.18 github.com/aws/aws-sdk-go/aws/request
+#38 89.25 github.com/aws/aws-sdk-go/aws/auth/bearer
+#38 89.29 github.com/google/go-jsonnet/ast
+#38 89.41 github.com/go-jose/go-jose/v3
+#38 89.46 github.com/aws/aws-sdk-go/aws/client
+#38 89.48 github.com/aws/aws-sdk-go/private/protocol
+#38 89.54 github.com/aws/aws-sdk-go/aws/corehandlers
+#38 89.58 github.com/aws/aws-sdk-go/private/protocol/rest
+#38 89.61 github.com/aws/aws-sdk-go/private/protocol/query/queryutil
+#38 89.75 github.com/aws/aws-sdk-go/private/protocol/xml/xmlutil
+#38 89.94 github.com/aws/aws-sdk-go/aws/signer/v4
+#38 89.98 github.com/aws/aws-sdk-go/private/protocol/query
+#38 89.99 github.com/aws/aws-sdk-go/private/protocol/json/jsonutil
+#38 90.05 github.com/aws/aws-sdk-go/aws/csm
+#38 90.07 github.com/aws/aws-sdk-go/service/sts
+#38 90.18 github.com/aws/aws-sdk-go/private/protocol/jsonrpc
+#38 90.21 github.com/aws/aws-sdk-go/aws/ec2metadata
+#38 90.25 github.com/aws/aws-sdk-go/private/protocol/restjson
+#38 90.35 github.com/aws/aws-sdk-go/service/sso
+#38 90.37 github.com/aws/aws-sdk-go/service/sts/stsiface
+#38 90.39 github.com/aws/aws-sdk-go/service/ssooidc
+#38 90.42 github.com/aws/aws-sdk-go/aws/credentials/stscreds
+#38 90.52 github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds
+#38 90.53 github.com/aws/aws-sdk-go/service/sso/ssoiface
+#38 90.58 github.com/aws/aws-sdk-go/aws/credentials/endpointcreds
+#38 90.59 github.com/aws/aws-sdk-go/service/codecommit
+#38 90.62 github.com/aws/aws-sdk-go/aws/credentials/ssocreds
+#38 90.63 github.com/aws/aws-sdk-go/aws/defaults
+#38 90.65 github.com/aws/aws-sdk-go/service/resourcegroupstaggingapi
+#38 90.72 github.com/argoproj/argo-cd/v2/util/rbac
+#38 90.73 github.com/aws/aws-sdk-go/aws/session
+#38 90.81 github.com/coreos/go-oidc/v3/oidc
+#38 90.99 github.com/argoproj/argo-cd/v2/util/oidc
+#38 91.03 github.com/google/go-jsonnet/astgen
+#38 91.15 github.com/google/go-jsonnet/internal/errors
+#38 91.20 github.com/google/go-jsonnet/internal/parser
+#38 91.27 github.com/argoproj/argo-cd/v2/server/rbacpolicy
+#38 91.52 github.com/google/go-jsonnet/internal/program
+#38 91.63 github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus
+#38 91.87 github.com/argoproj/argo-cd/v2/util/session
+#38 91.89 github.com/grpc-ecosystem/go-grpc-prometheus
+#38 92.08 google.golang.org/grpc/health
+#38 92.13 google.golang.org/grpc/reflection/grpc_reflection_v1
+#38 92.33 google.golang.org/grpc/reflection/grpc_reflection_v1alpha
+#38 92.59 google.golang.org/grpc/reflection
+#38 92.72 github.com/argoproj/argo-cd/v2/server/settings
+#38 92.73 github.com/argoproj/argo-cd/v2/cmd/argocd-dex/commands
+#38 93.22 github.com/argoproj/argo-cd/v2/reposerver/askpass
+#38 93.35 github.com/Azure/azure-sdk-for-go/sdk/azcore/internal/shared
+#38 93.35 github.com/argoproj/argo-cd/v2/cmd/argocd-git-ask-pass/commands
+#38 93.38 github.com/argoproj/argo-cd/v2/applicationset/services/scm_provider
+#38 93.39 github.com/Azure/azure-sdk-for-go/sdk/azcore/internal/exported
+#38 93.44 github.com/Azure/azure-sdk-for-go/sdk/internal/log
+#38 93.46 github.com/Azure/azure-sdk-for-go/sdk/azcore/policy
+#38 93.48 github.com/Azure/azure-sdk-for-go/sdk/azcore/log
+#38 93.48 github.com/Azure/azure-sdk-for-go/sdk/azcore
+#38 93.50 github.com/Azure/azure-sdk-for-go/sdk/azcore/internal/log
+#38 93.55 github.com/Azure/azure-sdk-for-go/sdk/azcore/internal/pollers
+#38 93.55 github.com/Azure/azure-sdk-for-go/sdk/internal/diag
+#38 93.61 github.com/Azure/azure-sdk-for-go/sdk/azcore/internal/pollers/async
+#38 93.62 github.com/Azure/azure-sdk-for-go/sdk/azcore/internal/pollers/body
+#38 93.65 github.com/Azure/azure-sdk-for-go/sdk/azcore/internal/pollers/loc
+#38 93.67 github.com/Azure/azure-sdk-for-go/sdk/azcore/internal/pollers/op
+#38 93.68 github.com/Azure/azure-sdk-for-go/sdk/internal/temporal
+#38 93.70 github.com/Azure/azure-sdk-for-go/sdk/internal/uuid
+#38 93.71 github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming
+#38 93.75 github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime
+#38 93.77 github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/json
+#38 93.94 github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/json/types/time
+#38 93.96 github.com/kylelemons/godebug/diff
+#38 93.97 github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops/authority
+#38 93.98 github.com/argoproj/argo-cd/v2/applicationset/generators
+#38 93.99 github.com/kylelemons/godebug/pretty
+#38 94.04 github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops/wstrust/defs
+#38 94.11 github.com/AzureAD/microsoft-authentication-library-for-go/apps/errors
+#38 94.14 github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/shared
+#38 94.17 github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops/wstrust
+#38 94.19 github.com/golang-jwt/jwt
+#38 94.20 github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops/internal/comm
+#38 94.26 github.com/google/go-jsonnet
+#38 94.29 github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/local
+#38 94.31 github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops/accesstokens
+#38 94.35 github.com/pkg/browser
+#38 94.38 golang.org/x/crypto/pkcs12/internal/rc2
+#38 94.41 github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops
+#38 94.42 golang.org/x/crypto/pkcs12
+#38 94.43 github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth
+#38 94.52 github.com/Azure/go-autorest/autorest/date
+#38 94.55 github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/base/internal/storage
+#38 94.76 github.com/Azure/go-autorest/logger
+#38 94.87 github.com/Azure/go-autorest/tracing
+#38 94.93 github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/base
+#38 95.01 github.com/Azure/go-autorest/autorest/adal
+#38 95.14 github.com/AzureAD/microsoft-authentication-library-for-go/apps/confidential
+#38 95.16 github.com/argoproj/argo-cd/v2/server/version
+#38 95.20 github.com/argoproj/argo-cd/v2/applicationset/controllers
+#38 95.22 github.com/argoproj/argo-cd/v2/applicationset/webhook
+#38 95.25 github.com/argoproj/argo-cd/v2/cmpserver
+#38 95.25 github.com/AzureAD/microsoft-authentication-library-for-go/apps/public
+#38 95.34 github.com/Azure/azure-sdk-for-go/sdk/azidentity
+#38 95.38 github.com/argoproj/argo-cd/v2/cmd/argocd-cmp-server/commands
+#38 95.51 github.com/Azure/go-autorest/autorest
+#38 95.55 gopkg.in/retry.v1
+#38 95.60 k8s.io/klog
+#38 95.90 github.com/argoproj/argo-cd/v2/util/notification/expression/shared
+#38 95.91 github.com/argoproj/argo-cd/v2/util/notification/k8s
+#38 95.95 github.com/Azure/go-autorest/autorest/azure
+#38 95.95 github.com/argoproj/argo-cd/v2/util/notification/argocd
+#38 96.15 github.com/argoproj/argo-cd/v2/cmd/argocd-applicationset-controller/commands
+#38 96.22 github.com/Azure/kubelogin/pkg/token
+#38 96.38 github.com/argoproj/argo-cd/v2/cmd/argocd-k8s-auth/commands
+#38 96.44 github.com/argoproj/notifications-engine/pkg/util/text
+#38 96.46 github.com/chainguard-dev/git-urls
+#38 96.47 github.com/argoproj/argo-cd/v2/util/notification/expression/strings
+#38 96.51 github.com/argoproj/argo-cd/v2/util/notification/expression/time
+#38 96.54 github.com/PagerDuty/go-pagerduty
+#38 96.55 github.com/RocketChat/Rocket.Chat.Go.SDK/models
+#38 96.58 github.com/RocketChat/Rocket.Chat.Go.SDK/rest
+#38 96.62 github.com/argoproj/argo-cd/v2/util/notification/expression/repo
+#38 96.65 github.com/argoproj/notifications-engine/pkg/util/http
+#38 96.67 github.com/argoproj/notifications-engine/pkg/util/misc
+#38 96.71 github.com/gorilla/websocket
+#38 96.72 github.com/argoproj/argo-cd/v2/util/notification/expression
+#38 96.75 github.com/slack-go/slack/internal/backoff
+#38 96.77 github.com/slack-go/slack/internal/timex
+#38 96.79 github.com/slack-go/slack/slackutilsx
+#38 96.80 github.com/aws/aws-sdk-go-v2/internal/rand
+#38 96.82 github.com/aws/aws-sdk-go-v2/internal/sdk
+#38 96.83 github.com/aws/aws-sdk-go-v2/internal/sync/singleflight
+#38 96.85 github.com/aws/smithy-go/context
+#38 96.88 github.com/aws/smithy-go/internal/sync/singleflight
+#38 96.92 github.com/aws/smithy-go/logging
+#38 96.95 github.com/aws/smithy-go
+#38 96.96 github.com/aws/smithy-go/middleware
+#38 97.02 github.com/aws/smithy-go/auth
+#38 97.02 github.com/slack-go/slack
+#38 97.03 github.com/aws/smithy-go/time
+#38 97.06 github.com/aws/smithy-go/transport/http/internal/io
+#38 97.08 github.com/aws/smithy-go/ptr
+#38 97.10 github.com/aws/smithy-go/rand
+#38 97.13 github.com/aws/smithy-go/transport/http
+#38 97.14 github.com/aws/aws-sdk-go-v2/aws/middleware/private/metrics
+#38 97.16 github.com/aws/aws-sdk-go-v2/aws/ratelimit
+#38 97.17 github.com/aws/aws-sdk-go-v2/internal/timeconv
+#38 97.20 github.com/aws/aws-sdk-go-v2/feature/ec2/imds/internal/config
+#38 97.20 github.com/aws/smithy-go/io
+#38 97.23 github.com/aws/aws-sdk-go-v2/internal/shareddefaults
+#38 97.24 github.com/aws/aws-sdk-go-v2/aws/protocol/restjson
+#38 97.25 github.com/aws/aws-sdk-go-v2/internal/strings
+#38 97.26 github.com/aws/smithy-go/encoding/httpbinding
+#38 97.28 github.com/aws/smithy-go/document
+#38 97.31 github.com/aws/smithy-go/auth/bearer
+#38 97.33 github.com/aws/aws-sdk-go-v2/internal/auth
+#38 97.37 github.com/aws/aws-sdk-go-v2/aws
+#38 97.40 github.com/aws/aws-sdk-go-v2/internal/endpoints/awsrulesfn
+#38 97.42 github.com/aws/aws-sdk-go-v2/service/sso/types
+#38 97.44 github.com/aws/smithy-go/endpoints
+#38 97.45 github.com/aws/aws-sdk-go-v2/service/ssooidc/types
+#38 97.47 github.com/aws/smithy-go/encoding
+#38 97.51 github.com/aws/smithy-go/encoding/json
+#38 97.52 github.com/aws/aws-sdk-go-v2/aws/protocol/query
+#38 97.53 github.com/aws/aws-sdk-go-v2/aws/middleware
+#38 97.60 github.com/aws/aws-sdk-go-v2/credentials
+#38 97.62 github.com/aws/aws-sdk-go-v2/credentials/processcreds
+#38 97.62 github.com/aws/aws-sdk-go-v2/aws/defaults
+#38 97.65 github.com/aws/aws-sdk-go-v2/aws/signer/internal/v4
+#38 97.70 github.com/aws/aws-sdk-go-v2/aws/transport/http
+#38 97.71 github.com/aws/aws-sdk-go-v2/aws/retry
+#38 97.80 github.com/aws/aws-sdk-go-v2/aws/signer/v4
+#38 97.89 github.com/aws/aws-sdk-go-v2/internal/configsources
+#38 97.93 github.com/aws/aws-sdk-go-v2/feature/ec2/imds
+#38 97.95 github.com/aws/aws-sdk-go-v2/credentials/endpointcreds/internal/client
+#38 98.00 github.com/aws/aws-sdk-go-v2/internal/auth/smithy
+#38 98.05 github.com/aws/aws-sdk-go-v2/internal/endpoints
+#38 98.08 github.com/aws/aws-sdk-go-v2/credentials/endpointcreds
+#38 98.14 github.com/aws/aws-sdk-go-v2/internal/endpoints/v2
+#38 98.16 github.com/aws/aws-sdk-go-v2/aws/protocol/xml
+#38 98.20 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding
+#38 98.21 github.com/aws/aws-sdk-go-v2/credentials/ec2rolecreds
+#38 98.21 github.com/aws/aws-sdk-go-v2/service/sso/internal/endpoints
+#38 98.26 github.com/aws/aws-sdk-go-v2/service/sso
+#38 98.26 github.com/aws/aws-sdk-go-v2/service/ssooidc/internal/endpoints
+#38 98.30 github.com/aws/aws-sdk-go-v2/service/ssooidc
+#38 98.30 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url
+#38 98.34 github.com/aws/aws-sdk-go-v2/service/sts/internal/endpoints
+#38 98.39 github.com/aws/aws-sdk-go-v2/service/sts/types
+#38 98.43 github.com/aws/smithy-go/encoding/xml
+#38 98.48 github.com/argoproj/notifications-engine/pkg/util/slack
+#38 98.55 github.com/aws/aws-sdk-go-v2/service/sts
+#38 98.60 github.com/aws/aws-sdk-go-v2/internal/ini
+#38 98.77 github.com/aws/aws-sdk-go-v2/service/sqs/internal/endpoints
+#38 98.81 github.com/aws/aws-sdk-go-v2/service/sqs/types
+#38 98.91 github.com/go-telegram-bot-api/telegram-bot-api/v5
+#38 98.95 github.com/aws/aws-sdk-go-v2/service/sqs
+#38 98.97 github.com/aws/aws-sdk-go-v2/credentials/ssocreds
+#38 99.08 github.com/google/go-github/v41/github
+#38 99.59 github.com/aws/aws-sdk-go-v2/credentials/stscreds
+#38 99.65 github.com/aws/aws-sdk-go-v2/config
+#38 99.93 github.com/gregdel/pushover
+#38 100.2 github.com/opsgenie/opsgenie-go-sdk-v2/client
+#38 100.3 gomodules.xyz/envconfig
+#38 100.4 github.com/opsgenie/opsgenie-go-sdk-v2/alert
+#38 100.5 net/mail
+#38 100.7 net/smtp
+#38 100.9 google.golang.org/api/internal/third_party/uritemplates
+#38 100.9 gopkg.in/gomail.v2
+#38 100.9 google.golang.org/api/googleapi
+#38 100.9 github.com/google/s2a-go/fallback
+#38 101.0 github.com/google/s2a-go/internal/proto/common_go_proto
+#38 101.1 google.golang.org/appengine/internal/base
+#38 101.1 github.com/google/s2a-go/internal/proto/s2a_context_go_proto
+#38 101.1 gomodules.xyz/notify/smtp
+#38 101.1 github.com/google/s2a-go/internal/proto/s2a_go_proto
+#38 101.1 google.golang.org/appengine/internal/datastore
+#38 101.2 google.golang.org/appengine/internal/log
+#38 101.3 github.com/google/s2a-go/internal/authinfo
+#38 101.4 google.golang.org/appengine/internal/remote_api
+#38 101.4 google.golang.org/appengine/internal/app_identity
+#38 101.4 google.golang.org/appengine/internal/modules
+#38 101.5 google.golang.org/appengine/socket
+#38 101.6 golang.org/x/crypto/chacha20poly1305
+#38 101.6 golang.org/x/crypto/cryptobyte
+#38 101.6 google.golang.org/appengine/internal
+#38 101.8 github.com/google/s2a-go/internal/tokenmanager
+#38 101.8 github.com/google/s2a-go/internal/record/internal/aeadcrypter
+#38 101.8 github.com/google/s2a-go/internal/proto/v2/common_go_proto
+#38 101.8 google.golang.org/appengine
+#38 101.8 github.com/google/s2a-go/internal/record/internal/halfconn
+#38 101.9 github.com/google/s2a-go/internal/handshaker/service
+#38 101.9 github.com/google/s2a-go/internal/proto/v2/s2a_context_go_proto
+#38 101.9 github.com/googleapis/enterprise-certificate-proxy/client/util
+#38 101.9 github.com/google/s2a-go/internal/proto/v2/s2a_go_proto
+#38 101.9 net/rpc
+#38 101.9 github.com/google/s2a-go/internal/record
+#38 102.1 github.com/googleapis/enterprise-certificate-proxy/client
+#38 102.1 github.com/google/s2a-go/internal/handshaker
+#38 102.1 google.golang.org/api/internal/cert
+#38 102.2 google.golang.org/api/internal/impersonate
+#38 102.2 google.golang.org/genproto/googleapis/rpc/code
+#38 102.2 github.com/googleapis/gax-go/v2/apierror/internal/proto
+#38 102.3 github.com/googleapis/gax-go/v2/callctx
+#38 102.3 github.com/googleapis/gax-go/v2/apierror
+#38 102.3 go.opencensus.io/internal
+#38 102.3 github.com/google/s2a-go/stream
+#38 102.3 go.opencensus.io/trace/tracestate
+#38 102.4 github.com/google/s2a-go/internal/v2/certverifier
+#38 102.4 github.com/google/s2a-go/internal/v2/remotesigner
+#38 102.4 go.opencensus.io/trace
+#38 102.4 github.com/googleapis/gax-go/v2
+#38 102.4 github.com/google/s2a-go/internal/v2/tlsconfigstore
+#38 102.5 github.com/google/s2a-go/internal/v2
+#38 102.6 go.opencensus.io/trace/propagation
+#38 102.6 go.opencensus.io/resource
+#38 102.6 go.opencensus.io/metric/metricdata
+#38 102.6 github.com/google/s2a-go
+#38 102.7 go.opencensus.io/plugin/ochttp/propagation/b3
+#38 102.7 go.opencensus.io/tag
+#38 102.7 go.opencensus.io/metric/metricproducer
+#38 102.7 google.golang.org/api/googleapi/transport
+#38 102.7 google.golang.org/api/transport/http/internal/propagation
+#38 102.7 time/tzdata
+#38 102.8 github.com/antonmedv/expr/file
+#38 102.8 google.golang.org/api/internal
+#38 102.8 github.com/antonmedv/expr/ast
+#38 102.8 go.opencensus.io/stats/internal
+#38 102.8 github.com/antonmedv/expr/vm/runtime
+#38 102.9 go.opencensus.io/stats
+#38 102.9 go.opencensus.io/stats/view
+#38 102.9 github.com/antonmedv/expr/parser/lexer
+#38 103.0 google.golang.org/api/internal/gensupport
+#38 103.0 google.golang.org/api/option
+#38 103.1 go.opencensus.io/plugin/ochttp
+#38 103.3 google.golang.org/api/option/internaloption
+#38 103.3 github.com/antonmedv/expr/builtin
+#38 103.3 github.com/argoproj/argo-cd/v2/util/hash
+#38 103.3 github.com/argoproj/argo-cd/v2/reposerver/cache
+#38 103.3 github.com/argoproj/argo-cd/v2/reposerver/metrics
+#38 103.4 github.com/TomOnTime/utfutil
+#38 103.4 google.golang.org/api/transport/http
+#38 103.5 github.com/antonmedv/expr/conf
+#38 103.5 github.com/antonmedv/expr/parser
+#38 103.5 github.com/antonmedv/expr/vm
+#38 103.6 google.golang.org/api/chat/v1
+#38 103.6 github.com/antonmedv/expr/optimizer
+#38 103.7 github.com/argoproj/argo-cd/v2/util/app/discovery
+#38 103.8 github.com/felixge/httpsnoop
+#38 103.9 github.com/argoproj/argo-cd/v2/util/text
+#38 103.9 github.com/argoproj/argo-cd/v2/pkg/apiclient/account
+#38 104.0 github.com/argoproj/notifications-engine/pkg/services
+#38 104.0 github.com/antonmedv/expr/checker
+#38 104.1 github.com/antonmedv/expr/compiler
+#38 104.2 github.com/argoproj/pkg/grpc/http
+#38 104.3 github.com/argoproj/argo-cd/v2/pkg/apiclient/application
+#38 104.3 github.com/antonmedv/expr
+#38 104.4 github.com/argoproj/argo-cd/v2/pkg/apiclient/applicationset
+#38 104.4 github.com/argoproj/notifications-engine/pkg/triggers
+#38 104.4 github.com/argoproj/argo-cd/v2/pkg/apiclient/certificate
+#38 104.7 github.com/argoproj/argo-cd/v2/pkg/apiclient/cluster
+#38 104.7 github.com/argoproj/notifications-engine/pkg/subscriptions
+#38 104.7 github.com/argoproj/notifications-engine/pkg/templates
+#38 104.7 github.com/argoproj/argo-cd/v2/pkg/apiclient/gpgkey
+#38 104.7 github.com/argoproj/notifications-engine/pkg/api
+#38 104.9 github.com/argoproj/argo-cd/v2/util/notification/settings
+#38 105.0 github.com/argoproj/notifications-engine/pkg/controller
+#38 105.1 github.com/argoproj/argo-cd/v2/pkg/apiclient/notification
+#38 105.1 github.com/argoproj/argo-cd/v2/pkg/apiclient/repocreds
+#38 105.2 github.com/argoproj/argo-cd/v2/notification_controller/controller
+#38 105.4 github.com/argoproj/argo-cd/v2/pkg/apiclient/repository
+#38 105.4 github.com/argoproj/argo-cd/v2/pkg/apiclient/session
+#38 105.7 github.com/argoproj/argo-cd/v2/util/localconfig
+#38 105.7 github.com/argoproj/argo-cd/v2/pkg/client/informers/externalversions/application
+#38 106.0 github.com/argoproj/argo-cd/v2/pkg/client/informers/externalversions
+#38 106.2 github.com/argoproj/argo-cd/v2/cmd/argocd-notification/commands
+#38 106.2 github.com/argoproj/argo-cd/v2/server/account
+#38 106.2 github.com/argoproj/argo-cd/v2/server/cache
+#38 106.3 github.com/argoproj/argo-cd/v2/util/manifeststream
+#38 106.3 github.com/argoproj/argo-cd/v2/pkg/apiclient/project
+#38 106.3 github.com/argoproj/argo-cd/v2/reposerver/repository
+#38 106.5 github.com/argoproj/argo-cd/v2/server/deeplinks
+#38 106.7 github.com/argoproj/argo-cd/v2/server/application
+#38 106.7 github.com/argoproj/argo-cd/v2/server/applicationset
+#38 107.0 github.com/argoproj/argo-cd/v2/pkg/apiclient
+#38 107.0 github.com/argoproj/argo-cd/v2/reposerver
+#38 107.2 github.com/argoproj/argo-cd/v2/cmd/argocd-repo-server/commands
+#38 107.3 github.com/argoproj/argo-cd/v2/server/badge
+#38 107.4 github.com/argoproj/argo-cd/v2/server/certificate
+#38 107.4 github.com/argoproj/argo-cd/v2/util/clusterauth
+#38 107.9 github.com/argoproj/argo-cd/v2/server/extension
+#38 108.0 github.com/argoproj/argo-cd/v2/server/gpgkey
+#38 108.1 github.com/argoproj/argo-cd/v2/server/logout
+#38 108.1 github.com/argoproj/argo-cd/v2/server/cluster
+#38 108.6 github.com/argoproj/argo-cd/v2/server/metrics
+#38 108.6 github.com/argoproj/argo-cd/v2/server/notification
+#38 108.7 github.com/argoproj/argo-cd/v2/server/project
+#38 108.7 github.com/argoproj/argo-cd/v2/server/repocreds
+#38 108.8 github.com/argoproj/argo-cd/v2/server/repository
+#38 108.8 github.com/argoproj/argo-cd/v2/server/session
+#38 109.4 github.com/go-openapi/analysis/internal/debug
+#38 109.5 github.com/go-openapi/spec
+#38 109.5 github.com/asaskevich/govalidator
+#38 109.5 github.com/go-openapi/errors
+#38 109.6 github.com/argoproj/argo-cd/v2/ui
+#38 109.7 github.com/oklog/ulid
+#38 109.8 go.mongodb.org/mongo-driver/bson/primitive
+#38 109.8 github.com/go-openapi/runtime/logger
+#38 109.8 github.com/go-openapi/runtime/middleware/denco
+#38 109.8 github.com/go-openapi/runtime/middleware/header
+#38 110.0 github.com/go-playground/webhooks/v6/bitbucket
+#38 110.0 github.com/go-playground/webhooks/v6/bitbucket-server
+#38 110.1 go.mongodb.org/mongo-driver/x/bsonx/bsoncore
+#38 110.1 github.com/gogits/go-gogs-client
+#38 110.1 github.com/gorilla/handlers
+#38 110.2 github.com/go-openapi/analysis/internal/flatten/normalize
+#38 110.3 github.com/go-openapi/analysis/internal/flatten/operations
+#38 110.3 github.com/go-openapi/analysis/internal/flatten/replace
+#38 110.3 github.com/go-openapi/analysis/internal/flatten/schutils
+#38 110.3 github.com/go-openapi/analysis/internal/flatten/sortref
+#38 110.4 github.com/go-playground/webhooks/v6/gogs
+#38 110.4 github.com/grpc-ecosystem/go-grpc-middleware/auth
+#38 110.4 github.com/argoproj/argo-cd/v2/util/webhook
+#38 110.4 github.com/desertbit/timer
+#38 110.4 github.com/rs/cors
+#38 110.5 github.com/klauspost/compress/flate
+#38 110.5 nhooyr.io/websocket/internal/errd
+#38 110.5 go.mongodb.org/mongo-driver/bson/bsonrw
+#38 110.5 nhooyr.io/websocket/internal/xsync
+#38 110.5 github.com/soheilhy/cmux
+#38 110.6 github.com/argoproj/argo-cd/v2/util/templates
+#38 110.7 github.com/alicebob/gopher-json
+#38 110.7 github.com/alicebob/miniredis/v2/metro
+#38 110.8 github.com/alicebob/miniredis/v2/hyperloglog
+#38 110.9 github.com/alicebob/miniredis/v2/server
+#38 111.0 github.com/argoproj/argo-cd/v2/cmd/argocd/commands/initialize
+#38 111.1 github.com/alicebob/miniredis/v2
+#38 111.1 github.com/argoproj/notifications-engine/pkg/cmd
+#38 111.1 nhooyr.io/websocket
+#38 111.2 go.mongodb.org/mongo-driver/bson/bsoncodec
+#38 111.4 github.com/improbable-eng/grpc-web/go/grpcweb
+#38 111.5 k8s.io/client-go/testing
+#38 111.6 k8s.io/client-go/rest/fake
+#38 111.7 k8s.io/client-go/plugin/pkg/client/auth/azure
+#38 111.8 k8s.io/client-go/plugin/pkg/client/auth/oidc
+#38 111.8 k8s.io/client-go/discovery/fake
+#38 111.9 k8s.io/client-go/kubernetes/typed/admissionregistration/v1/fake
+#38 111.9 k8s.io/client-go/kubernetes/typed/admissionregistration/v1alpha1/fake
+#38 112.0 go.mongodb.org/mongo-driver/bson
+#38 112.0 k8s.io/client-go/kubernetes/typed/admissionregistration/v1beta1/fake
+#38 112.0 k8s.io/client-go/kubernetes/typed/apiserverinternal/v1alpha1/fake
+#38 112.1 k8s.io/client-go/kubernetes/typed/apps/v1/fake
+#38 112.2 k8s.io/client-go/kubernetes/typed/apps/v1beta1/fake
+#38 112.3 github.com/go-openapi/strfmt
+#38 112.4 k8s.io/client-go/kubernetes/typed/apps/v1beta2/fake
+#38 112.5 k8s.io/client-go/kubernetes/typed/authentication/v1/fake
+#38 112.6 k8s.io/client-go/kubernetes/typed/authentication/v1alpha1/fake
+#38 112.6 k8s.io/client-go/kubernetes/typed/authentication/v1beta1/fake
+#38 112.7 k8s.io/client-go/kubernetes/typed/authorization/v1/fake
+#38 112.8 k8s.io/client-go/kubernetes/typed/authorization/v1beta1/fake
+#38 112.8 github.com/go-openapi/analysis
+#38 112.8 github.com/go-openapi/runtime
+#38 112.9 k8s.io/client-go/kubernetes/typed/autoscaling/v1/fake
+#38 113.0 k8s.io/client-go/kubernetes/typed/autoscaling/v2/fake
+#38 113.0 github.com/go-openapi/runtime/security
+#38 113.1 k8s.io/client-go/kubernetes/typed/autoscaling/v2beta1/fake
+#38 113.3 k8s.io/client-go/kubernetes/typed/autoscaling/v2beta2/fake
+#38 113.3 github.com/go-openapi/loads
+#38 113.3 k8s.io/client-go/kubernetes/typed/batch/v1/fake
+#38 113.3 github.com/go-openapi/runtime/middleware/untyped
+#38 113.4 github.com/go-openapi/validate
+#38 113.4 k8s.io/client-go/kubernetes/typed/batch/v1beta1/fake
+#38 113.4 k8s.io/client-go/kubernetes/typed/certificates/v1/fake
+#38 113.5 k8s.io/client-go/kubernetes/typed/certificates/v1beta1/fake
+#38 113.6 k8s.io/client-go/kubernetes/typed/coordination/v1/fake
+#38 113.6 k8s.io/client-go/kubernetes/typed/coordination/v1beta1/fake
+#38 113.6 k8s.io/client-go/kubernetes/typed/core/v1/fake
+#38 113.7 k8s.io/client-go/kubernetes/typed/discovery/v1/fake
+#38 113.7 k8s.io/client-go/kubernetes/typed/discovery/v1beta1/fake
+#38 113.8 k8s.io/client-go/kubernetes/typed/events/v1/fake
+#38 113.9 k8s.io/client-go/kubernetes/typed/events/v1beta1/fake
+#38 113.9 k8s.io/client-go/kubernetes/typed/extensions/v1beta1/fake
+#38 114.0 k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1/fake
+#38 114.1 github.com/go-openapi/runtime/middleware
+#38 114.1 k8s.io/client-go/kubernetes/typed/flowcontrol/v1beta1/fake
+#38 114.2 k8s.io/client-go/kubernetes/typed/flowcontrol/v1beta2/fake
+#38 114.3 k8s.io/client-go/kubernetes/typed/flowcontrol/v1beta3/fake
+#38 114.3 k8s.io/client-go/kubernetes/typed/networking/v1/fake
+#38 114.4 github.com/argoproj/argo-cd/v2/util/swagger
+#38 114.4 k8s.io/client-go/kubernetes/typed/networking/v1alpha1/fake
+#38 114.4 k8s.io/client-go/kubernetes/typed/networking/v1beta1/fake
+#38 114.4 k8s.io/client-go/kubernetes/typed/node/v1/fake
+#38 114.4 github.com/argoproj/argo-cd/v2/server
+#38 114.5 k8s.io/client-go/kubernetes/typed/node/v1alpha1/fake
+#38 114.5 k8s.io/client-go/kubernetes/typed/node/v1beta1/fake
+#38 114.5 k8s.io/client-go/kubernetes/typed/policy/v1/fake
+#38 114.6 k8s.io/client-go/kubernetes/typed/policy/v1beta1/fake
+#38 114.6 k8s.io/client-go/kubernetes/typed/rbac/v1/fake
+#38 114.6 k8s.io/client-go/kubernetes/typed/rbac/v1alpha1/fake
+#38 114.7 k8s.io/client-go/kubernetes/typed/rbac/v1beta1/fake
+#38 114.7 k8s.io/client-go/kubernetes/typed/resource/v1alpha1/fake
+#38 114.8 k8s.io/client-go/kubernetes/typed/scheduling/v1/fake
+#38 114.8 k8s.io/client-go/kubernetes/typed/scheduling/v1alpha1/fake
+#38 114.9 k8s.io/client-go/kubernetes/typed/scheduling/v1beta1/fake
+#38 114.9 k8s.io/client-go/kubernetes/typed/storage/v1/fake
+#38 115.0 k8s.io/client-go/kubernetes/typed/storage/v1alpha1/fake
+#38 115.0 k8s.io/client-go/kubernetes/typed/storage/v1beta1/fake
+#38 115.1 github.com/dustin/go-humanize
+#38 115.1 github.com/mattn/go-isatty
+#38 115.2 k8s.io/client-go/kubernetes/fake
+#38 115.2 github.com/skratchdot/open-golang/open
+#38 115.6 github.com/argoproj/argo-cd/v2/cmd/argocd-server/commands
+#38 115.6 github.com/argoproj/argo-cd/v2/cmd/argocd/commands/headless
+#38 116.1 github.com/argoproj/argo-cd/v2/cmd/argocd/commands/admin
+#38 116.9 github.com/argoproj/argo-cd/v2/cmd/argocd/commands
+#38 118.0 github.com/argoproj/argo-cd/v2/cmd
+#38 DONE 123.8s
+
+#39 [stage-4 1/2] COPY --from=argocd-build /go/src/github.com/argoproj/argo-cd/dist/argocd* /usr/local/bin/
+#39 DONE 0.0s
+
+#40 [stage-4 2/2] RUN ln -s /usr/local/bin/argocd /usr/local/bin/argocd-server &&     ln -s /usr/local/bin/argocd /usr/local/bin/argocd-repo-server &&     ln -s /usr/local/bin/argocd /usr/local/bin/argocd-cmp-server &&     ln -s /usr/local/bin/argocd /usr/local/bin/argocd-application-controller &&     ln -s /usr/local/bin/argocd /usr/local/bin/argocd-dex &&     ln -s /usr/local/bin/argocd /usr/local/bin/argocd-notifications &&     ln -s /usr/local/bin/argocd /usr/local/bin/argocd-applicationset-controller &&     ln -s /usr/local/bin/argocd /usr/local/bin/argocd-k8s-auth
+#40 DONE 0.2s
+
+#41 exporting to image
+#41 exporting layers
+#41 exporting layers 0.9s done
+#41 writing image sha256:421b40fd7134ae8e7fff283e551154fe4437ba8bc1a97b8a7ae89090dc49a34d done
+#41 naming to armdocker.rnd.ericsson.se/proj-mxe/argoproj/argocd:v2.11.0-ubuntu-20240405 done
+#41 DONE 0.9s
++ buildStatus=0
++ [[ 0 == 0 ]]
++ docker push armdocker.rnd.ericsson.se/proj-mxe/argoproj/argocd:v2.11.0-ubuntu-20240405
+The push refers to repository [armdocker.rnd.ericsson.se/proj-mxe/argoproj/argocd]
+cb7ce93cb606: Preparing
+025674a751a9: Preparing
+5f70bf18a086: Preparing
+40d71c6bddbc: Preparing
+5f70bf18a086: Preparing
+aef073d69f42: Preparing
+736fe6f4ecc6: Preparing
+0b69b9cd56ae: Preparing
+a59aa2a96763: Preparing
+29b2994d8ebf: Preparing
+cd2e1a8e9729: Preparing
+736fe6f4ecc6: Waiting
+0b69b9cd56ae: Waiting
+a59aa2a96763: Waiting
+29b2994d8ebf: Waiting
+c022a8478afd: Preparing
+b6fd0fa43f20: Preparing
+74cb41327569: Preparing
+e0a9f5911802: Preparing
+cd2e1a8e9729: Waiting
+c022a8478afd: Waiting
+b6fd0fa43f20: Waiting
+74cb41327569: Waiting
+e0a9f5911802: Waiting
+5f70bf18a086: Layer already exists
+736fe6f4ecc6: Pushed
+cb7ce93cb606: Pushed
+40d71c6bddbc: Pushed
+aef073d69f42: Pushed
+0b69b9cd56ae: Pushed
+a59aa2a96763: Pushed
+c022a8478afd: Pushed
+b6fd0fa43f20: Pushed
+e0a9f5911802: Layer already exists
+29b2994d8ebf: Pushed
+cd2e1a8e9729: Pushed
+025674a751a9: Pushed
+74cb41327569: Pushed
+v2.11.0-ubuntu-20240405: digest: sha256:ff62d47e49a8c3142db94722ef3bdb03799462d9c873d5730b8c9f2ebf43a999 size: 3447
++ pushed=0
++ [[ 0 == 0 ]]
++ [[ -d /home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd/argo-cd ]]
++ rm -rf /home/enxxram/workspace/mxe-core/3pp-images/mxe-deployer/argo-cd/argo-cd

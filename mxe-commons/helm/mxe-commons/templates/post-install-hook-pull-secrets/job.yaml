@@ -1,0 +1,74 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "mxe-commons.post-install-hook-pull-secrets-name" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: post-install-hook-pull-secrets-merge-job"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "mxe-commons.post-install-hook-pull-secrets-name" .)  | fromYaml -}}
+    {{- $mxeLabels := include "mxe-commons.standard-labels" . | fromYaml -}}
+    {{- include "mxe-commons.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $mxeLabels )) | trim | nindent 4 }}
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": "hook-succeeded,before-hook-creation"
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+spec:
+  completions: 1
+  parallelism: 1
+  backoffLimit: 3
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "false"
+        {{- include "mxe-commons.security-annotations-post-install-hook" . | nindent 8 }}
+      labels:
+        sidecar.istio.io/inject: "false"
+    spec:
+      {{- include "mxe-commons.post-install-hook-pull-secrets-merge-pull-secrets" . | nindent 6 }}
+      serviceAccountName: {{ include "mxe-commons.post-install-hook-pull-secrets-name" . | quote }}
+      containers:
+        - name: post-install-hook-istio
+          image: "{{ include "mxe-commons.post-install-hook-pull-secrets.image-repository" . }}{{ index .Values "mxePostInstallPullSecret" "image" "name" }}:{{ index .Values "mxePostInstallPullSecret" "image" "tag" }}"
+          imagePullPolicy: "{{ include "mxe-commons.registryImagePullPolicy" (list . (index .Values "mxePostInstallPullSecret" "image" "pullPolicy" )) }}"
+          volumeMounts:
+            - name: tmpwork
+              mountPath: "/work"
+            - mountPath: "/etc/kubernetes-run-script/"
+              name: kubernetes-run-script
+            - name: all-pull-secrets
+              mountPath: "/temp/all-pull-secrets/"
+          env:
+            - name: MXE_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: DOCKER_JSONS_DIR
+              value: "/temp/all-pull-secrets/"
+            - name: MERGED_DOCKER_CONFIG_SECRET_NAME
+              value: {{ .Values.mxePostInstallPullSecret.mergedDockerConfigSecretName }}
+          securityContext:
+            {{- include "mxe-commons.post-install-hook-pull-secrets-security-context" . | nindent 12 }}
+      restartPolicy: Never
+      volumes:
+      - name: tmpwork
+        emptyDir: {}
+      - name: kubernetes-run-script
+        configMap:
+          name: {{ include "mxe-commons.post-install-hook-pull-secrets-name" . | quote }}
+          defaultMode: 0744
+      - name: all-pull-secrets
+        projected:
+          sources:
+          {{- if (include "mxe-commons.post-install-hook-pull-secrets-merge-pull-secrets-name" . ) }}
+          - secret:
+              name: {{ include "mxe-commons.post-install-hook-pull-secrets-merge-pull-secrets-name" . }}
+              items:
+                - key: .dockerconfigjson 
+                  path: source-registry-docker-config.json
+          {{- end }}
+          - secret: 
+              name: {{ include "mxe-commons.internal-container-registry-dockerconfig-secret-name" . | quote }}
+              items:
+                - key: .dockerconfigjson 
+                  path: internal-registry-docker-config.json  
+                

@@ -1,0 +1,25 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "mxe-commons.post-install-hook-istio-name" . | quote }}
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "post-install-hook-istio-rolebinding"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-commons.post-install-hook-istio-name" . | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "mxe-commons.post-install-hook-istio-name" . | quote }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "mxe-commons.post-install-hook-istio-name" . | quote }}
+    namespace: {{ .Release.Namespace | quote }}

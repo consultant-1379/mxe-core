@@ -1,0 +1,66 @@
+# Default values for eric-mxe-upgrade-jobs.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+preupgrade-cleanup:
+  fullNameOverride:
+  keycloakAdminSecretNameOverride:
+  ambassadorNameOverride:
+
+imageCredentials:
+  registry:
+      url:
+      pullSecret:
+  repoPath:
+  pullSecret:
+  kubernetes-modifier:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+    repoPath:
+
+tolerations: []
+labels: {}
+
+terminationGracePeriodSeconds: 30
+
+images:
+  kubernetes-modifier:
+    name: "mxe/eric-mxe-kubernetes-modifier"
+    tag: "VERSION"
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "-"
+
+resources:
+  kubernetesModifier:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+
+# DR-D1121-011 - Present in Top Level Helm Chart Values.yaml
+# global:
+#   registry:
+#     url: "armdocker.rnd.ericsson.se"
+#     pullSecret:
+#   labels: {}
+#   annotations: {}
+
+# DR-D1123-127 -  ADP services shall define AppArmor profile
+appArmorProfile:
+  type:
+  localhostProfile:
+
+# ADP services shall define Seccomp profile
+seccompProfile:
+  type: RuntimeDefault
+  localhostProfile:

@@ -1,0 +1,13 @@
+This directory contains folders with version names.
+
+Eg: 2.5.0
+
+Each folder can contain three files:
+- pre
+	Any bob rule that needs to be executed before delta commands. This is because, in the delta, we cannot have a bob rule added, as delta file itself will run from a bob rule. So, calling a bob rule from a bob rule is not support.
+- delta
+	This file contains the commands that needs to be executed for that specific rollback path. This will be initiated via bob rule:pre-req.
+- post
+	Any bob rule that needs to be executed after delta commands. This is because, in the delta, we cannot have a bob rule added, as delta file itself will run from a bob rule. So, calling a bob rule from a bob rule is not support. 
+
+When snowball rollback is done the folders between the rollback from and to versions will be executed sequentially.

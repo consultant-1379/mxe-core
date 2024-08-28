@@ -1,0 +1,10 @@
+
+encryption:
+  enable_in_transit: true 
+
+registry: 
+  url: armdocker.rnd.ericsson.se
+  pullSecret: armdocker-creds
+  imagePullPolicy: Always
+
+storage_class: network-block

@@ -1,0 +1,47 @@
+# Default values for eric-mxe-meshgw-ingress.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+#Modified values.yaml to handle (DR-D1125-011, DR-D1125-014, DR-D1120-060, DR-D1121-068)
+enabled: true
+
+ingress:
+  enabled: true
+  hostname: null
+  secretName: null
+  class: null
+  annotationPrefix: null
+  defaultBackendFullNameOverride: null
+  defaultBackendNameOverride: null
+  ingressClass: eric-mxe-ingress-controller-class
+  owasp:
+    enabled: true
+  modelServiceOwasp:
+    enabled: false
+
+service:
+  nameOverride: null
+  fullnameOverride: eric-mesh-ingressgateway
+
+labels: {}
+annotations: {}
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "-"
+
+nameOverride: null
+
+tolerations: []
+terminationGracePeriodSeconds: 30
+
+# DR-D1121-011 - Present in Top Level Helm Chart Values.yaml
+# global:
+#   mxeApiTlsSecretName:
+#   mxeApiHostname:
+#   mxeDisableDefaultIngressControllerUse: false
+#   labels: {}
+#   annotations: {}
+

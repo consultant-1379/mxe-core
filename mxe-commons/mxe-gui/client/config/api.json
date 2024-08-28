@@ -1,0 +1,67 @@
+{
+  "standalone": [
+    {
+      "name": "getModels",
+      "oldPath": "^/v1/models\\?showPermittedActions=(true|false)$",
+      "path": "/model-lcm/v1/models",
+      "responseDataPath": "models[*]",
+      "responseDataMapping": [{ "expected": "\"created\"", "actual": "\"createdAt\"" }],
+      "additionalResponseData": [{ "key": "actions", "value": "all" }]
+    },
+    {
+      "name": "postModel",
+      "oldPath": "^/v1/models$",
+      "path": "/model-lcm/v1/models",
+      "responseDataPath": "models[*]",
+      "requestDataMapping": [{ "expected": "source", "actual": "sourcefile" }]
+    },
+    {
+      "name": "deleteModel",
+      "oldPath": "^\\/v1\\/models\\/(?<id>[\\s\\S]*)\\/(?<version>[\\s\\S]*)$",
+      "path": "/model-lcm/v1/models/{id}/versions/{version}"
+    },
+    {
+      "name": "getModelServices",
+      "oldPath": "^\\/v2\\/model-services\\?showPermittedActions=(true|false)$",
+      "path": "^/model-lcm/v1/model-services$",
+      "responseDataPath": "services[*]",
+      "responseDataMapping": [{ "expected": "\"created\"", "actual": "\"createdAt\"" }],
+      "additionalResponseData": [{ "key": "actions", "value": "all" }]
+    },
+    {
+      "name": "getModelServiceLogs",
+      "oldPath": "^\\/v2\\/model-services\\/(?<id>[\\s\\S]*)\\/logs\\?(?<query>[\\s\\S]*)",
+      "path": "/model-lcm/v1/model-services/name={id}/logs?{query}"
+    },
+    {
+      "name": "getModelServiceDetails",
+      "oldPath": "^\\/v2\\/model-services\\/(?<id>[\\s\\S]*)\\?showPermittedActions=(true|false)$",
+      "path": "^/model-lcm/v1/model-services/name={id}$",
+      "responseDataMapping": [{ "expected": "\"created\"", "actual": "\"createdAt\"" }],
+      "additionalResponseData": [{ "key": "actions", "value": "all" }]
+    },
+    {
+      "name": "getModelServiceByModel",
+      "oldPath": "^\\/v2\\/model-services\\?modelId=(?<id>[\\s\\S]*)\\&modelVersion=(?<version>[\\s\\S]*)$",
+      "path": "/model-lcm/v1/model-services?modelId={id}&modelVersion={version}",
+      "responseDataMapping": [{ "expected": "\"created\"", "actual": "\"createdAt\"" }],
+      "additionalResponseData": [{ "key": "actions", "value": "all" }]
+    },
+    {
+      "name": "postModelService",
+      "oldPath": "^/v2/model-services$",
+      "path": "^/model-lcm/v1/model-services$",
+      "requestDataMapping": [{ "expected": "manifest", "actual": "custom_manifest" }]
+    },
+    {
+      "name": "deleteAndPatchModelServiceDetails",
+      "oldPath": "^\\/v2\\/model-services\\/(?<id>[\\s\\S]*)$",
+      "path": "^/model-lcm/v1/model-services/name={id}$",
+      "requestDataMapping": [{ "expected": "manifest", "actual": "custom_manifest" }]
+    },
+    {
+      "oldPath": "^/model-endpoints/(?<id>[\\s\\S]*)$",
+      "path": "OPTIONS:inferencingPath"
+    }
+  ]
+}

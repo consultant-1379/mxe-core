@@ -1,0 +1,244 @@
+# DR-D1121-011 - Present in Top Level Helm Chart Values.yaml
+# global:
+#   pullSecret:
+#   registry:
+#     url: armdocker.rnd.ericsson.se
+#   mxeApiTlsSecretName:
+#   mxeApiHostname:
+#   mxeDisableDefaultIngressControllerUse:
+#   labels: {}
+#   annotations: {}
+#   security:
+#     tls:
+#       # DR-D1123-133 (Security)
+#       trustedInternalRootCa:
+#         secret: "eric-sec-sip-tls-trusted-root-cert"
+
+name:
+
+nameOverride: null
+
+highAvailability: true
+
+isExtCA: false
+
+ingressController:
+  hostOverride:
+
+ingress:
+  enabled: true
+  hostname: null
+  clusterWideIngressClass: null
+  ingressClass: eric-mxe-ingress-controller-class
+  tls:
+    passthrough : false
+
+imageCredentials:
+  pullSecret:
+  registry:
+     url:
+  repoPath:
+  gatekeeper:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+  dbInit:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+  keycloakinit:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+  kubernetes-modifier:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+
+updateStrategy:
+  type: "RollingUpdate"
+  rollingUpdate:
+    maxUnavailable: 25%
+    maxSurge: 25%
+
+images:
+  gatekeeper:
+    name: "mxe/eric-mxe-gatekeeper"
+    tag: "VERSION"
+  dbInit:
+    name: "mxe/eric-mxe-db-init"
+    tag: "VERSION"
+  keycloakinit:
+    name: "mxe/eric-mxe-keycloak-init"
+    tag: "VERSION"
+  kubernetes-modifier:
+    name: "mxe/eric-mxe-kubernetes-modifier"
+    tag: "VERSION"
+
+service:
+  type:
+  httpsPort:
+
+database:
+  create: true
+  name: "idam"
+  # nameOverride:
+  serviceName: "eric-data-document-database-pg"
+  portName: "postgresql"
+  superUserSecretName: "mxe-db-password"
+  superUserIdKey: "super-user"
+  superUserPwdKey: "super-pwd"
+  connectionDb:
+  createdUser:
+    pguserid: eric-mxe-keycloak
+    pgpasswd:
+
+keycloak:
+  statefulset:
+    name: eric-sec-access-mgmt
+    containerName: iam
+  service:
+    http:
+      name: eric-sec-access-mgmt-http
+      port: 8080
+      protocol: http
+    https:
+      name: eric-sec-access-mgmt-http
+      port: 8443
+      protocol: https
+    path: auth
+    ingressname: eric-sec-access-mgmt-http
+  realm:
+    master:
+      secret:
+        secretName:
+        kcadminid: admin
+        kcpasswd: My-super-secret-pw123
+    mxe:
+      realmName: mxe
+      secret:
+        secretName:
+        username: mxe-user
+        password: password
+        temporalUser: true
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "-"
+
+resources:
+  gatekeeper:
+    limits:
+      cpu: 1000m
+      ephemeral-storage: 500Mi
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      ephemeral-storage: 100Mi
+      memory: 256Mi
+  realmUpdaterJob:
+    limits:
+      cpu: 100m
+      ephemeral-storage: 50Mi
+      memory: 200Mi
+    requests:
+      cpu: 100m
+      ephemeral-storage: 50Mi
+      memory: 200Mi
+  dbInit:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+  kubernetesModifier:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+  keycloakInit:
+    limits:
+      cpu: 100m
+      ephemeral-storage: 50Mi
+      memory: 200Mi
+    requests:
+      cpu: 100m
+      ephemeral-storage: 50Mi
+      memory: 200Mi
+  addExternalCa:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+
+
+affinity:
+  podAntiAffinity: "hard"
+  topologyKey: "kubernetes.io/hostname"
+
+realm-updater-upgrade-job:
+  fullNameOverride:
+
+tolerations: []
+
+labels: {}
+annotations: {}
+
+terminationGracePeriodSeconds: 30
+topologySpreadConstraints: []
+
+probes:
+  gatekeeper:
+    livenessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      failureThreshold: 5
+      timeoutSeconds: 5
+    readinessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      failureThreshold: 5
+      timeoutSeconds: 5
+
+podPriority:
+  gatekeeper:
+    priorityClassName:
+  realmUpdaterJob:
+    priorityClassName:
+
+
+podDisruptionBudget:
+  minAvailable: 3
+
+# DR-D1123-127 -  ADP services shall define AppArmor profile
+appArmorProfile:
+  type:
+  localhostProfile:
+
+# ADP services shall define Seccomp profile
+seccompProfile:
+  type: RuntimeDefault
+  localhostProfile:
+
+nodeSelector: {}

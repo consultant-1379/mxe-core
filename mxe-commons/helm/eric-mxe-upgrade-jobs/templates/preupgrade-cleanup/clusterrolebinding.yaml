@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "eric-mxe-upgrade-jobs.preupgrade-cleanup-cluster-role-binding" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: preupgrade-cleanup-cluster-role-binding"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-upgrade-jobs.labels" . | fromYaml -}}
+    {{- include "eric-mxe-upgrade-jobs.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+    {{- include "eric-mxe-upgrade-jobs.annotations" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "eric-mxe-upgrade-jobs.preupgrade-cleanup-cluster-role" . | quote }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "eric-mxe-upgrade-jobs.preupgrade-cleanup-service-account" . | quote }}
+    namespace: {{ .Release.Namespace | quote }}

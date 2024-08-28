@@ -1,0 +1,9 @@
+dependencies:
+  - condition: argo-cd.enabled
+    name: argo-cd
+    version: 6.7.18
+    repository: https://arm.seli.gic.ericsson.se/artifactory/proj-mxe-deps-helm/
+  - condition: gitea.enabled
+    name: gitea
+    repository: https://arm.seli.gic.ericsson.se/artifactory/proj-mxe-deps-helm/
+    version: 9.1.0

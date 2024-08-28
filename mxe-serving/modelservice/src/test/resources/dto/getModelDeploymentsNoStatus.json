@@ -1,0 +1,21 @@
+[
+  {
+    "name": "production-model-img",
+    "type": "model",
+    "created": "2019-03-12T15:49:39Z",
+    "status": "creating",
+    "message": null,
+    "replicas": 1,
+    "autoScaling": null,
+    "models": [
+      {
+        "id": "Image Recognition VGG16",
+        "version": "0.0.1",
+        "endpointType": "REST",
+        "weight": null
+      }
+    ],
+    "createdByUserId": "1234-5678-9012",
+    "createdByUserName": "mxe-user"
+  }
+]

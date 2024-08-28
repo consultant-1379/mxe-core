@@ -1,0 +1,7 @@
+{
+	"default": "default",
+	"clusters": [{
+		"name": "default",
+                "mxeEndpoint": "test-mxe-endpoint"
+	}]
+}

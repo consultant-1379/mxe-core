@@ -1,0 +1,229 @@
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+:host {
+  width: 100%;
+  position: relative;
+  display: flex;
+}
+
+.notebook-card {
+  user-select: none;
+  position: relative;
+  width: 100%;
+  min-height: 154px;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xl);
+  border: solid 1px var(--layer1);
+  background-color: var(--card-color-background, var(--card-color-background, #fafafa));
+  cursor: pointer;
+  transition: all 300ms ease-in-out;
+  will-change: auto;
+}
+
+.notebook-card:hover {
+  background-color: var(--card-color-background-hover, #fff);
+}
+
+.notebook-card .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.notebook-card .header .left {
+  opacity: 0.8;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--text);
+  padding-right: var(--space-base);
+}
+
+.notebook-card .header .left {
+  display: flex;
+}
+
+/** @TODO*/
+/* stylelint-disable */
+.notebook-card .header .right {
+  display: none !important;
+}
+/* stylelint-enable */
+
+.notebook-card .subtitle {
+  font-size: 12px;
+  margin-top: 4px;
+  opacity: 0.8;
+  font-weight: bold;
+}
+
+.notebook-card .footer {
+  display: none;
+}
+
+.notebook-card .text {
+  margin-top: var(--space-base);
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.notebook-card .content {
+  text-align: center;
+  /*height: 84px;*/
+  flex: 1;
+  /*margin: var(--space-xl) 0;*/
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: flex-start;
+  align-content: center;
+}
+
+.model-icon {
+  max-width: 100%;
+  max-height: 80px;
+}
+
+.notebook-card .delete {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+}
+
+/**
+ * Stacked
+ * source: https://css-tricks.com/snippets/css/stack-of-paper/
+ */
+.notebook-card.stacked {
+  /* stylelint-disable */
+  box-shadow: 0 0 0 transparent, 4px 4px 0 -1px var(--card-color-background),
+    4px 4px 0 0 var(--layer1), 8px 8px 0 -1px var(--card-color-background),
+    8px 8px 0 0 var(--layer1) !important;
+  /* stylelint-enable */
+}
+.notebook-card.stacked:hover {
+  /* stylelint-disable */
+  box-shadow: 0 0 0 transparent, 5px 5px 0 -1px var(--card-color-background),
+    5px 5px 0 0 var(--layer1), 10px 10px 0 -1px var(--card-color-background),
+    10px 10px 0 0 var(--layer1) !important;
+  /* stylelint-enable */
+}
+
+/**
+ empty
+ */
+.notebook-card.empty .subtitle {
+  color: var(--blue);
+}
+.notebook-card.empty .right {
+  border-color: var(--blue);
+  display: block;
+}
+
+/**
+ running
+ */
+.notebook-card.running {
+  box-shadow: inset 2px 0 0 0 var(--green);
+  border-left: 0;
+}
+
+.notebook-card.running .right {
+  border-color: var(--green);
+  display: block;
+}
+
+.notebook-card.running .subtitle {
+  color: var(--green);
+}
+
+/**
+  creating
+ */
+.notebook-card.creating {
+  box-shadow: inset 2px 0 0 0 var(--orange);
+  border-left: 0;
+}
+
+.notebook-card.creating .right {
+  border-color: var(--orange);
+  display: block;
+}
+
+.notebook-card.creating .subtitle {
+  color: var(--orange);
+}
+
+/**
+  stopped
+ */
+.notebook-card.stopped {
+  box-shadow: inset 2px 0 0 0 var(--orange);
+  border-left: 0;
+}
+
+.notebook-card.stopped .right {
+  border-color: var(--orange);
+  display: block;
+}
+
+.notebook-card.stopped .subtitle {
+  color: var(--orange);
+}
+
+/**
+  failed
+ */
+.notebook-card.failed {
+  box-shadow: inset 2px 0 0 0 var(--red);
+  border-left: 0;
+}
+
+.notebook-card.failed .right {
+  border-color: var(--red);
+  display: block;
+}
+
+.notebook-card.failed .subtitle {
+  color: var(--red);
+}
+
+/**
+  error
+ */
+.notebook-card.error {
+  box-shadow: inset 2px 0 0 0 var(--red);
+  border-left: 0;
+}
+
+.notebook-card.error .right {
+  border-color: var(--red);
+  display: block;
+}
+
+.notebook-card.error .subtitle {
+  color: var(--red);
+}
+
+/**
+  deleting
+ */
+.notebook-card.deleting {
+  box-shadow: inset 2px 0 0 0 var(--red);
+  border-left: 0;
+}
+
+.notebook-card.deleting .right {
+  display: none;
+}
+
+.notebook-card.deleting .subtitle {
+  color: var(--red);
+}

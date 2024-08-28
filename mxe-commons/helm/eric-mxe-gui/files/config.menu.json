@@ -1,0 +1,86 @@
+{
+  "app": {
+    "options": {
+      "version": {{ .Chart.AppVersion | quote }}
+    },
+    "menu": {
+      "data": [
+        {
+          "id": "DASHBOARD",
+          "label": "DASHBOARD",
+          "data": { "path": "dashboard" },
+          "active": true
+        },
+        {
+          "id": "MODEL",
+          "label": "MODEL_LIFECYCLE",
+          "active": true,
+          "type": "group",
+          "children": [
+            {
+              "id": "MODEL_CATALOGUE",
+              "label": "MODEL_CATALOGUE",
+              "data": { "path": "model-catalogue" },
+              "active": true
+            },
+            {
+              "id": "MODEL_SERVICES",
+              "label": "MODEL_SERVICES",
+              "data": { "path": "model-services" },
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "TRAINING",
+          "label": "TRAINING",
+          "active": {{ .Values.uiApps.training }},
+          "type": "group",
+          "children": [
+            {
+              "id": "TRAINING_PACKAGES",
+              "label": "TRAINING_PACKAGES",
+              "data": { "path": "training-packages" },
+              "active": {{ .Values.uiApps.training }}
+            },
+            {
+              "id": "TRAINING_JOBS",
+              "label": "TRAINING_JOBS",
+              "data": { "path": "training-jobs" },
+              "active": {{ .Values.uiApps.training }}
+            }
+          ]
+        },
+        {
+          "id": "EXPLORATION",
+          "label": "EXPLORATION",
+          "type": "group",
+          "active": {{ .Values.uiApps.exploration }},
+          "children": [
+            {
+              "id": "NOTEBOOKS",
+              "label": "NOTEBOOKS",
+              "data": { "path": "notebooks" },
+              "active": {{ .Values.uiApps.exploration }}
+            }
+          ]
+        },
+        {
+          "id": "WORKFLOW",
+          "label": "WORKFLOW",
+          "type": "group",
+          "active": {{ .Values.uiApps.workflow }},
+          "children": [
+            {
+              "id": "WORKFLOW_ORCHESTRATOR",
+              "label": "WORKFLOW_ORCHESTRATOR",
+              "data": { "url": "argo/workflows/" },
+              "type": "external",
+              "active": {{ .Values.uiApps.workflow }}
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

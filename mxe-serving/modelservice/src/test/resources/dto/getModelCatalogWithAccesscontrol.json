@@ -1,0 +1,101 @@
+[
+  {
+    "id": "IoT model A",
+    "description": "This is the IoT device detection model",
+    "version": "0.0.1",
+    "image": "iot/machine-detection-a-model:0.0.1",
+    "created": "2019-03-06T08:31:18Z",
+    "icon": "base64",
+    "status": "available",
+    "message": "Creating model image",
+    "internal": true
+  },
+  {
+    "id": "IoT model A",
+    "description": "This is the IoT device detection model",
+    "version": "0.0.2",
+    "image": "iot/machine-detection-a-model:0.0.2",
+    "created": "2019-03-07T08:31:18Z",
+    "icon": "base64",
+    "status": "available",
+    "message": "Creating model image",
+    "internal": true
+  },
+  {
+    "id": "IoT model A (fake not available)",
+    "description": "This is the IoT device detection model",
+    "version": "0.0.1",
+    "image": "iot/machine-detection-a-model:NA",
+    "created": "2019-03-06T08:31:18Z",
+    "icon": "base64",
+    "status": "packaging",
+    "message": "Creating model image",
+    "internal": true
+  },
+  {
+    "id": "IoT model A (fake not available)",
+    "description": "This is the IoT device detection model",
+    "version": "0.0.2",
+    "image": "iot/machine-detection-a-model:NA",
+    "created": "2019-03-07T08:31:18Z",
+    "icon": "base64",
+    "status": "error",
+    "message": "Creating model image",
+    "internal": true
+  },
+  {
+    "id": "IoT model B",
+    "description": "This is the IoT device detection model",
+    "version": "0.0.1",
+    "image": "iot/machine-detection-b-model:0.0.1",
+    "created": "2019-03-06T08:31:18Z",
+    "icon": "base64",
+    "status": "packaging",
+    "message": "Creating model image",
+    "internal": true
+  },
+  {
+    "id": "Image Recognition VGG16",
+    "description": "This is the IoT device detection model",
+    "version": "0.0.1",
+    "image": "img_vgg16:v0.0.1",
+    "created": "2019-03-06T08:31:18Z",
+    "icon": "base64",
+    "status": "available",
+    "message": "Creating model image",
+    "internal": true
+  },
+  {
+    "id": "Image Recognition VGG16 (fake not available)",
+    "description": "This is the IoT device detection model",
+    "version": "0.0.1",
+    "image": "img_vgg16:NA",
+    "created": "2019-03-06T08:31:18Z",
+    "icon": "base64",
+    "status": "packaging",
+    "message": "Creating model image",
+    "internal": true
+  },
+  {
+    "id": "Image Recognition Inception3",
+    "description": "This is the IoT device detection model",
+    "version": "0.0.1",
+    "image": "img_inception3:v0.0.1",
+    "created": "2019-03-06T08:31:18Z",
+    "icon": "base64",
+    "status": "packaging",
+    "message": "Creating model image",
+    "internal": true
+  },
+  {
+    "id": "Image Recognition Inception3",
+    "description": "This is the IoT device detection model",
+    "version": "0.0.1",
+    "image": "img_inception3:v0.0.2",
+    "created": "2019-03-06T08:31:18Z",
+    "icon": "base64",
+    "status": "packaging",
+    "message": "Creating model image",
+    "internal": true
+  }
+]

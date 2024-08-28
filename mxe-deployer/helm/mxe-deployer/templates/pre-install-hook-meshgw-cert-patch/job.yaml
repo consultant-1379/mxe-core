@@ -1,0 +1,55 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "mxe-deployer.pre-install-hook-meshgw-cert-patch-name" . | quote }}
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "pre-install-hook-meshgw-cert-patch"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-deployer.pre-install-hook-meshgw-cert-patch-name" . | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-deployer.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    "helm.sh/hook": "pre-install,pre-upgrade"
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": "hook-succeeded,before-hook-creation"
+    {{- include "mxe-deployer.product-info" . | nindent 4 }}
+spec:
+  completions: 1
+  parallelism: 1
+  backoffLimit: 3
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "false"
+        {{- include "mxe-deployer.security-annotations-pre-install-hook-meshgw-cert-patch" . | nindent 8 }}
+      labels:
+        sidecar.istio.io/inject: "false"
+    spec:
+      {{- include "mxe-deployer.pre-install-hook-meshgw-cert-patch-pull-secrets" . | nindent 6 }}
+      serviceAccountName: {{ include "mxe-deployer.pre-install-hook-meshgw-cert-patch-name" . | quote }}
+      containers:
+        - name: internal-certificate-patcher
+          image: "{{ include "mxe-deployer.pre-install-hook-meshgw-cert-patch.image-repository" . }}{{ index .Values "mxePreInstallMeshgwCertPatch" "image" "name" }}:{{ index .Values "mxePreInstallMeshgwCertPatch" "image" "tag" }}"
+          imagePullPolicy: "{{ include "mxe-deployer.pre-install-hook-meshgw-cert-patch.registryImagePullPolicy" (list . (index .Values "mxePreInstallMeshgwCertPatch" "image" "pullPolicy" )) }}"
+          volumeMounts:
+            - mountPath: "/etc/kubernetes-run-script/"
+              name: kubernetes-run-script
+          env:
+            - name: MXE_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: PATCH_FILE
+              value: /etc/kubernetes-run-script/patch.yaml
+          securityContext:
+            {{- include "mxe-deployer.pre-install-hook-meshgw-security-context" . | nindent 12 }}
+      restartPolicy: Never
+      volumes:
+      - name: kubernetes-run-script
+        configMap:
+          name: {{ include "mxe-deployer.pre-install-hook-meshgw-cert-patch-name" . | quote }}
+          defaultMode: 0744
+{{- end -}}

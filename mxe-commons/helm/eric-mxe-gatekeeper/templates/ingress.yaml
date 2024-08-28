@@ -1,0 +1,38 @@
+{{- if not .Values.global.mxeDisableDefaultIngressControllerUse -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "{{ include "eric-mxe-gatekeeper.name" . }}"
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: gatekeeper-ingress-api"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-gatekeeper.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-gatekeeper.labels" . | fromYaml -}}
+    {{- include "eric-mxe-gatekeeper.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $ingress := include "eric-mxe-gatekeeper.ingress" . | fromYaml -}}
+    {{- $annotations := include "eric-mxe-gatekeeper.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-gatekeeper.mergeAnnotations" (dict "location" .Template.Name "sources" (list $ingress $annotations)) | trim | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.ingress.clusterWideIngressClass | quote }}
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: {{ include "eric-mxe-gatekeeper.name" . | quote }}
+            port:
+              name: "https"
+        path: /
+        pathType: ImplementationSpecific
+    {{- if .Values.global.mxeApiHostname }}
+    host: {{ .Values.global.mxeApiHostname | quote }}
+    {{- end }}
+  {{ if .Values.global.mxeApiTlsSecretName -}}
+  tls:
+  - hosts:
+    {{- if .Values.global.mxeApiHostname }}
+    - {{ .Values.global.mxeApiHostname -}}
+    {{- end }}
+    secretName: {{ .Values.global.mxeApiTlsSecretName }}
+  {{ end -}}
+{{ end }}

@@ -1,0 +1,109 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="MxeSuite">
+
+    <listeners>
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGTestListener" />
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGSuiteListener" />
+    </listeners>
+
+    <parameter name="cluster" value="cluster3" />
+
+    <test name="Model Test">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeModelTest">
+                <parameter name="packageName" value="armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:0.0.1" />
+                <parameter name="targetPackageName" value="armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:0.0.2" />
+                <parameter name="modelName" value="com.ericsson.img.inception3" />
+                <parameter name="modelVersion" value="0.0.1" />
+                <parameter name="targetModelVersion" value="0.0.2" />
+                <parameter name="unknownModelVersion" value="0.0.3" />
+                <parameter name="instance" value="1" />
+                <parameter name="sourceModelName" value="seldon.test.python" />
+                <parameter name="modelSourcePath" value="testmodels/seldon-test-python" />
+                <parameter name="faultyModelSourcePath" value="testmodels/seldon-test-python-faulty" />
+                <methods>
+                    <!-- excluded from CI tests, because it takes a few minutes to run -->
+                    <exclude name="testMxeModelOnboardDelete" />
+                    <exclude name="testMxeModelOnboardFromSource" />
+                    <exclude name="testMxeModelOnboardFromArchive" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="Service Test">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeServiceTest">
+                <parameter name="packageName" value="armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:0.0.1" />
+                <parameter name="targetPackageName" value="armdocker.rnd.ericsson.se/proj-mxe-models/image/img_vgg16:0.0.1" />
+                <parameter name="modelId" value="com.ericsson.img.inception3" />
+                <parameter name="targetModelId" value="com.ericsson.img.vgg16" />
+                <parameter name="modelVersion" value="0.0.1" />
+                <parameter name="targetModelVersion" value="0.0.1" />
+                <parameter name="instance" value="1" />
+                <parameter name="secondPackageName" value="armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:0.0.2" />
+                <parameter name="secondModelId" value="com.ericsson.img.inception3" />
+                <parameter name="secondModelVersion" value="0.0.2" />
+                <parameter name="weight1" value="0.2" />
+                <parameter name="weight2" value="0.8" />
+                <methods>
+                    <!-- excluded from CI tests, because it takes a few minutes to run -->
+<!--
+                    <exclude name="testMxeSingleModelServiceCreate" />
+-->
+                    <exclude name="testMxeModelServicePrintHelp" />
+                    <exclude name="testMxeSingleAutoscalingModelServiceCreate" />
+                    <exclude name="testMxeABTestServiceCreate" />
+                    <exclude name="testMxeABTestServiceCreateNegativeCases" />
+                    <exclude name="testMxeABTestServiceModify" />
+                    <exclude name="testMxeABTestServiceModifyNegativeCases" />
+                    <exclude name="testMxeSingleAutoscalingModelServiceModify" />
+                    <exclude name="testMxeSingleAutoscalingModelServiceModifyAutoScaling" />
+                    <exclude name="testMxeSingleModelServiceCreate" />
+                    <exclude name="testMxeSingleModelServiceCreateNegativeCases" />
+                    <exclude name="testMxeSingleModelServiceModify" />
+                    <exclude name="testMxeSingleModelServiceScale" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="Flow Test">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeFlowTest">
+                <parameter name="flowFile" value="flows/flow.xml.gz" />
+                <methods>
+                    <include name="testMxeFlowOnboardAndDeploy">
+                        <parameter name="flowName" value="jcattestflow" />
+                        <parameter name="flowDeploymentName" value="jcattestflowdeployment" />
+                    </include>
+                    <include name="testMxeFlowDeploymentScaling">
+                        <parameter name="flowName" value="jcattestflow" />
+                        <parameter name="flowDeploymentName" value="jcattestflowdeployment" />
+                    </include>
+                    <include name="testMxeFlowOnboardAndDeployNegativeCases">
+                        <parameter name="flowName" value="jcattestflowneg" />
+                        <parameter name="flowDeploymentName" value="jcattestflowdeploymentneg" />
+                    </include>
+                    <include name="testMxeFlowPrintHelp" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="Training Test">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeTrainingTest">
+                <parameter name="trainingPackageVersion" value="0.0.1" />
+                <parameter name="sourceTrainingPackageName" value="trainingexample" />
+                <parameter name="trainingPackageSourcePath" value="training/tf-mnist-train" />
+                <parameter name="faultyTrainingPackageSourcePath" value="training/tf-mnist-train-faulty" />
+                <methods>
+                    <!-- excluded from CI tests, because it takes a few minutes to run -->
+                    <exclude name="testMxeTrainingPackageOnboardFromSource" />
+                    <exclude name="testMxeTrainingJobNegativeCases" />
+                    <exclude name="testMxeTrainingJobResultDownload" />
+                    <exclude name="testMxeTrainingJobResultDownloadNegativeCases" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>

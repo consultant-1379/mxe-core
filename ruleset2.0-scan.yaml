@@ -1,0 +1,142 @@
+modelVersion: 2.0
+docker-images:
+  - k8-test: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-py3kubehelmbuilder:latest
+  - xsltproc-img: cmd.cat/xsltproc:latest
+  - va-scan-kubeaudit: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/va-scan-kubeaudit:latest
+  - nmap-img: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/va-port-scanning-nmap:latest
+
+env:
+  - KUBECONFIG (default=~/.kube/config)
+  - PWD 
+  - HELM_USER (default=mxecifunc)
+  - HELM_TOKEN 
+  - NAMESPACE (default=mxe-ci)
+  - ENABLE_HELM_V3 (default=true)
+  - SCAN_REPORTS_DIR (default=.bob/scan-reports)
+  - HELM_REPOPATH (default=proj-mxe-dev-helm)
+  - SYSTEM (default=hahn081)
+  - TEST_BASE_VALUES_DIR (default=values)
+  - STABLE_MXE_VERSION (default=not-set)
+  
+
+rules: 
+  # Run system test on a kubernetes cluster KUBECONFIG parameter must be set
+  vulnerability-check:
+    # Prepare for Kubeaudit
+    - task: prepare-kube-audit 
+      cmd: bash -c '
+        set -ex;
+        mkdir -p ${env.SCAN_REPORTS_DIR}/conf;
+        cp ${env.PWD}/scan-config/kubeaudit_config.yaml ${env.SCAN_REPORTS_DIR}/conf/;
+        sed -i "s/REPOPATH/${env.HELM_REPOPATH}/g" ${env.SCAN_REPORTS_DIR}/conf/kubeaudit_config.yaml;
+        sed -i "s/MXE-VERSION/${env.STABLE_MXE_VERSION}/g" ${env.SCAN_REPORTS_DIR}/conf/kubeaudit_config.yaml;
+        cp ${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR}/mxe-values.yaml ${env.SCAN_REPORTS_DIR}/conf/;
+        cp ${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR}/mxe-deployer-values.yaml ${env.SCAN_REPORTS_DIR}/conf/;
+        sed -i "/&global/a\  internalIPFamily:" ${env.SCAN_REPORTS_DIR}/conf/mxe-values.yaml;
+        sed -i "/eric-sec-access-mgmt:/a\  global:\n    internalIPFamily:" ${env.SCAN_REPORTS_DIR}/conf/mxe-values.yaml;'
+    # Run kubeaudit
+    - task: kube-audit
+      docker-image: va-scan-kubeaudit
+      docker-flags:
+        - "--workdir /opt/va-scan-kubeaudit/"
+        - "-v ${env.PWD}/${env.SCAN_REPORTS_DIR}/conf:/opt/va-scan-kubeaudit/conf"
+        - "-v ${env.PWD}/build/va-reports/kube-audit-report/:/tmp/reports"
+      cmd: " "
+    - task: init 
+      docker-image: k8-test
+      docker-flags:
+        - "--volume ${env.PWD}:${env.PWD}"
+      cmd:
+        - mkdir -p ${env.SCAN_REPORTS_DIR}/nmap
+  # Run Nmap
+    - task: nmap-port-scan-for-mxe-commons
+      docker-image: k8-test
+      docker-flags:
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+        - "--volume ${env.PWD}:${env.PWD}"
+      cmd: 
+        - /usr/local/bin/helm version
+        - /test.py --helm-v3 --kubernetes-admin-conf=${env.KUBECONFIG}
+           --helm-user=${env.HELM_USER}
+           --arm-api-token=${env.HELM_TOKEN}
+           --kubernetes-namespace=${env.NAMESPACE}
+           --nmap-config-file=scan-config/nmap_config_mxe_commons.yaml
+           --kube-exec-timeout=1800
+           --nmap-test
+    - task: nmap-port-scan-for-mxe-deployer
+      docker-image: k8-test
+      docker-flags:
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+        - "--volume ${env.PWD}:${env.PWD}"
+      cmd: 
+        - /usr/local/bin/helm version
+        - /test.py --helm-v3 --kubernetes-admin-conf=${env.KUBECONFIG}
+           --helm-user=${env.HELM_USER}
+           --arm-api-token=${env.HELM_TOKEN}
+           --kubernetes-namespace=${env.NAMESPACE}
+           --nmap-config-file=scan-config/nmap_config_mxe_deployer.yaml
+           --kube-exec-timeout=1800
+           --nmap-test
+    - task: nmap-port-scan-for-mxe-components
+      docker-image: k8-test
+      docker-flags:
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+        - "--volume ${env.PWD}:${env.PWD}"
+      cmd: 
+        - /usr/local/bin/helm version
+        - /test.py --helm-v3 --kubernetes-admin-conf=${env.KUBECONFIG}
+           --helm-user=${env.HELM_USER}
+           --arm-api-token=${env.HELM_TOKEN}
+           --kubernetes-namespace=${env.NAMESPACE}
+           --nmap-config-file=scan-config/nmap_config_mxe_components.yaml
+           --kube-exec-timeout=1800
+           --nmap-test
+  # Run ZAP: to check for active threats
+    - task: owasp-zap-scan
+      docker-image: k8-test
+      docker-flags:
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+        - "--volume ${env.PWD}:${env.PWD}"
+      cmd: /test.py --kubernetes-admin-conf=${env.KUBECONFIG}
+           --helm-user=${env.HELM_USER}
+           --arm-api-token=${env.HELM_TOKEN}
+           --kubernetes-namespace=${env.NAMESPACE}
+           --only-zap-test
+           --zap-config=scan-config/zap_config.yaml || true
+  
+  nmap-xml-to-html-converter:
+    - task: copy-xsl-to-local
+      docker-image: nmap-img
+      docker-flags:
+        - "--volume ${env.PWD}:${env.PWD}"
+      cmd: bash -c '''set -ex; 
+        rm -rf .bob/nmap_xsl;
+        mkdir -p .bob/nmap_xsl;
+        cp -p /usr/bin/../share/nmap/nmap.xsl ${env.PWD}/.bob/nmap_xsl/nmap.xsl;'''
+    - task: copy-xsl-to-local
+      docker-image: xsltproc-img
+      docker-flags:
+        - "--volume ${env.PWD}:${env.PWD}"
+      cmd: bash -c '''
+        set -ex; 
+        rm -rf .bob/nmap/temp;
+        mkdir -p .bob/nmap/temp;
+        for file in $(find ${env.PWD}/${env.SCAN_REPORTS_DIR} -name "*.xml"); 
+        do
+          fileDir=$(dirname $file);
+          fileName=$(basename $file .xml);
+          cp  $file .bob/nmap/temp/;
+          sed -i "s#file:///usr/bin/../share/nmap/nmap.xsl#${env.PWD}/.bob/nmap_xsl/nmap.xsl#g" ".bob/nmap/temp/$fileName.xml";
+          xsltproc .bob/nmap/temp/$fileName.xml -o $fileDir/$fileName.html;
+          rm .bob/nmap/temp/$fileName.xml;
+        done; '''
+
+  archive-scan-reports:
+    - task: make-tar 
+      cmd: 
+        - tar -cvzf ${env.PWD}/.bob/nmap-scan.tar.gz --directory=${env.PWD}/${env.SCAN_REPORTS_DIR}/nmap .
+        

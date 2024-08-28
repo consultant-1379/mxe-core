@@ -1,0 +1,17 @@
+{{- if .Values.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: {{ include "eric-mxe-ingress-controller.class" . }}
+  labels:
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-ingress-controller.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-ingress-controller.labels" . | fromYaml -}}
+    {{- include "eric-mxe-ingress-controller.mergeLabels" (dict "location" .Template.Name "sources" (list $name $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $hook := printf "%s" "helm.sh/hook: pre-install,pre-upgrade"  | fromYaml -}}
+    {{- $hookWeight := include "eric-mxe-ingress-controller.hook-weight" 2 | fromYaml -}}
+    {{- $annotations := include "eric-mxe-ingress-controller.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-ingress-controller.mergeAnnotations" (dict "location" .Template.Name "sources" (list $hook $hookWeight $annotations)) | trim | nindent 4 }}
+spec:
+  controller: {{ include "eric-mxe-ingress-controller.controllerclass" . }}
+{{ end }}

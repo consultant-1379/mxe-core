@@ -1,0 +1,41 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "eric-mxe-deployer-service.role" . | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: mxe-deployer-role"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-deployer-service.role" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-deployer-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-deployer-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-deployer-service.annotations" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - "batch"
+    resources:
+      - "jobs"
+    verbs:
+      - "list"
+      - "create"
+      - "delete"
+  - apiGroups:
+      - "apps"
+    resources:
+      - "statefulsets"
+      - "deployments"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - ""
+    resources:
+      - "configmaps"
+      - "secrets"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+      - "patch"
+      - "update"

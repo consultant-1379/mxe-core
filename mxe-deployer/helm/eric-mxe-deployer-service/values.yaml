@@ -1,0 +1,264 @@
+# Default values for eric-mxe-deployer-service.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "-"
+
+replicaCount: 1
+
+debug: 
+  enabled: false
+
+isExtCA: false
+
+imageCredentials:
+  registry:
+    url:
+    pullSecret:
+  repoPath:
+  mxe-deployer:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+    repoPath:
+  kubernetes-modifier:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+    repoPath:
+  mxe-deployer-init:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+    repoPath:
+
+images:
+  mxe-deployer:
+    name: "mxe/eric-mxe-deployer-service"
+    tag: "VERSION"
+    pullPolicy: 
+  kubernetes-modifier:
+    name: "mxe/eric-mxe-kubernetes-modifier"
+    tag: "VERSION"
+    pullPolicy: 
+  mxe-deployer-init:
+    name: "mxe/eric-mxe-deployer-init"
+    tag: "VERSION"
+    pullPolicy: 
+
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: "eric-mxe-deployer-service"
+
+
+podAnnotations: {}
+
+podSecurityContext:
+  supplementalGroups: []
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  clusterWideIngressClass: null
+  ingressClass: eric-mxe-ingress-controller-class
+  enabled: true
+  hostname: dmserver.mxe.com
+  tlsSecretName: 
+      
+resources:
+  deployerService:
+    limits:
+      cpu: 500m
+      memory: 640Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  kubernetesModifier:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+  keycloakDeployerInit:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+  argocdDeployerInit:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+  addExternalCa:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: 
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: "app.kubernetes.io/part-of"
+              operator: "In"
+              values:
+              - "mxe-deployer"
+            - key: "app.kubernetes.io/component"
+              operator: "In"
+              values:
+              - "eric-mxe-deployer-service"
+            - key: "app.kubernetes.io/instance"
+              operator: "In"
+              values:
+              - "{{ .Release.Name }}"
+          topologyKey: "kubernetes.io/hostname"
+
+config:
+  useArgocdExternalURL: false
+  git:
+    internal:
+      enabled: false
+      host: ""
+      org: ""
+      repo: ""
+      adminAccessSecret: "gitea-admin-creds"
+      userEmail: ""
+      domain: ""
+    url: ""
+    accessSecret: "gitCreds"
+    author:
+      domain: ""
+      name: ""
+      email: ""
+  argocd:
+    ingress: 
+      clusterWideIngressClass: null
+    redisHA:
+      enabled: true
+    redis:
+      enabled: false
+    server:
+      fullNameOverride: "argocd-server"
+      serviceName: argocd-server
+      servicePort: 443
+    ui:
+      ingress:
+        enabled: true
+        host: "argocdui.mxe.com"
+        tlsSecretName:
+      servicePort: 80
+  sso:
+    enabled: true
+    mxe:
+      enableLegacyWildFlySupport: true
+      ingress:
+        protocol: https
+        apiHostName:
+        apiPort: 443
+        oauthApiHostName:
+      realmName: master 
+      adminClientID: admin-cli
+      adminSecret: eric-mxe-gatekeeper-keycloak-access-creds-hooked
+      namespace:
+      ingressController:
+        nameOverride:
+        service:
+          httpPort: 80
+          httpsPort: 443
+    argocdRealmName: argocd
+    clientID: argocd
+    groups:
+      adminGroupName: ArgocdAdmins
+      readOnlyGroupName: ArgocdReadOnlyUsers
+    users:
+      adminUserSecret:
+      readOnlyUserName: argocd-readonly
+      readOnlyUserPassword: argocd-ro-user-secret-pw
+
+# DR-D1121-011 - Present in Top Level Helm Chart Values.yaml
+# global:
+#   pullSecret:
+#   registry:
+#     url: "armdocker.rnd.ericsson.se"
+#     pullSecret:
+#   mxeDisableDefaultIngressControllerUse: false
+#  labels: {}
+#  annotations: {}
+
+deployerPreInstallHookAuthzAllow:
+  nameOverride:
+
+deployerPreInstallHookReqAuthn:
+  nameOverride:
+
+probes:
+  deployerservice:
+    livenessProbe:
+      initialDelaySeconds: 15
+      periodSeconds: 30
+      failureThreshold: 5
+      timeoutSeconds: 5
+    readinessProbe:
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      failureThreshold: 5
+      timeoutSeconds: 5
+
+podPriority:
+  deployerservice:
+    priorityClassName:
+
+terminationGracePeriodSeconds: 30
+
+updateStrategy:
+  type: "RollingUpdate"
+
+labels: {}
+
+topologySpreadConstraints: []
+
+# DR-D1123-127 -  ADP services shall define AppArmor profile
+appArmorProfile:
+  type:
+  localhostProfile:
+# DR-D1123-128 - ADP services shall define Seccomp profile
+seccompProfile:
+  type: RuntimeDefault
+  localhostProfile:

@@ -1,0 +1,7 @@
+{{- $issuer := (include "eric-mxe-deployer-service.oauth-issuer" . ) -}}
+{{- $clientID := (index .Values "config" "sso" "clientID") -}}
+name: Keycloak
+issuer: {{ $issuer }}
+clientID: {{ $clientID }}
+clientSecret: $oidc.keycloak.clientSecret
+requestedScopes: ["openid", "profile", "email", "groups"]

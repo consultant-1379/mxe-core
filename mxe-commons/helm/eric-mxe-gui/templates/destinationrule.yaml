@@ -1,0 +1,17 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ include "eric-mxe-gui.name" . }}-dr
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: mxe-gui"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-gui.labels" . | fromYaml -}}
+    {{- include "eric-mxe-gui.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-gui.annotations" . | nindent 4 }}
+spec:
+  host: {{ include "eric-mxe-gui.name" . | quote }}
+  trafficPolicy:
+    tls:
+      mode: {{ .Values.serviceMesh.tlsMode }}
+{{ end }}

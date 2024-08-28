@@ -1,0 +1,887 @@
+Base image is  ubuntu:focal-20220801
+Cloning into '/mnt/disk0/enxxram/home/enxxram/workspace/mee/2.4/mxe-core-3pp-uplift/3pp-images/mxe-deployer/applicationset/applicationset'...
+Note: switching to 'a5712ba564afaff0b23697135d6281d413e60345'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+#1 [internal] load build definition from Dockerfile
+#1 sha256:5383ea1657d9a309717a56aa9558a7c347d8423583ddb7eec164faed05596209
+#1 transferring dockerfile: 1.69kB done
+#1 DONE 0.1s
+
+#2 [internal] load .dockerignore
+#2 sha256:02d89d7f0de7b068f413ce1f7a5813c1be3c317a1be6e85db1536a4d821f16cb
+#2 transferring context: 411B done
+#2 DONE 0.1s
+
+#5 [auth] library/ubuntu:pull token for registry-1.docker.io
+#5 sha256:211f6f40ee61ddcbba51b52db3752b1067840d78ef32d91655114d4844605e79
+#5 DONE 0.0s
+
+#6 [auth] library/golang:pull token for registry-1.docker.io
+#6 sha256:803da0731bd76f462f6d4e173fb944ff2699d89d85b3e867a9f4c88415973db0
+#6 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/library/golang:1.17.6
+#4 sha256:6cfe77b863be038f07d9bed46b7d4a3ef1e1a2bf8b6a068fc32f735fe6a992bd
+#4 DONE 1.0s
+
+#3 [internal] load metadata for docker.io/library/ubuntu:focal-20220801
+#3 sha256:85249b61f092c2ae037bad44717f27b4636bd57956a0fd58b200b7a28b3aceb3
+#3 DONE 1.0s
+
+#7 [stage-1  1/11] FROM docker.io/library/ubuntu:focal-20220801@sha256:af5efa9c28de78b754777af9b4d850112cad01899a5d37d2617bb94dc63a49aa
+#7 sha256:04fd39b520f37aca256ae241c5432a5d42f92df25e20ddc90a10d53932dc19d9
+#7 CACHED
+
+#17 [builder 1/8] FROM docker.io/library/golang:1.17.6@sha256:fff998d0f7a46baeb15d8478ee909a8237377e07ccf1a8e77d77a32033021d62
+#17 sha256:b95b9724362a62f05f1bdc939fec75160708ad6d123ef54667ef3e5aa2fff45d
+#17 CACHED
+
+#9 [internal] load build context
+#9 sha256:b3356cd87e8f9b397bdfeaf75824db9ae940cfec8c7082d244dca0a7ac96c10b
+#9 transferring context: 4.42MB 0.1s done
+#9 DONE 0.2s
+
+#18 [builder 2/8] WORKDIR /workspace
+#18 sha256:88ab2bc97363eca57c3a7dc523d2b1a1346d1e1d0256657db698e2d4cf153247
+#18 DONE 0.2s
+
+#8 [stage-1  2/11] RUN apt-get update && apt-get dist-upgrade -y &&   apt-get install -y git git-lfs gpg tini &&   apt-get clean &&   rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp/* /var/tmp/*
+#8 sha256:a0abd78d99256742dfc09249975ca54855e541653a708d33e06fb277d73a5332
+#8 ...
+
+#19 [builder 3/8] COPY go.mod .
+#19 sha256:64fdd66fac7d2b5d06967699e0ff25506fd7fffc3fa9f74f795c4ad240a26a10
+#19 DONE 0.1s
+
+#20 [builder 4/8] COPY go.sum .
+#20 sha256:846a9652697a5aaec6aa7060ab5e3825e41e2a2853e4753c6192303d9d4f7685
+#20 DONE 0.1s
+
+#8 [stage-1  2/11] RUN apt-get update && apt-get dist-upgrade -y &&   apt-get install -y git git-lfs gpg tini &&   apt-get clean &&   rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp/* /var/tmp/*
+#8 sha256:a0abd78d99256742dfc09249975ca54855e541653a708d33e06fb277d73a5332
+#8 0.541 Get:1 http://archive.ubuntu.com/ubuntu focal InRelease [265 kB]
+#8 0.663 Get:2 http://security.ubuntu.com/ubuntu focal-security InRelease [114 kB]
+#8 0.753 Get:3 http://archive.ubuntu.com/ubuntu focal-updates InRelease [114 kB]
+#8 0.804 Get:4 http://archive.ubuntu.com/ubuntu focal-backports InRelease [108 kB]
+#8 0.902 Get:5 http://archive.ubuntu.com/ubuntu focal/multiverse amd64 Packages [177 kB]
+#8 0.969 Get:6 http://archive.ubuntu.com/ubuntu focal/main amd64 Packages [1275 kB]
+#8 1.072 Get:7 http://archive.ubuntu.com/ubuntu focal/restricted amd64 Packages [33.4 kB]
+#8 1.077 Get:8 http://archive.ubuntu.com/ubuntu focal/universe amd64 Packages [11.3 MB]
+#8 1.348 Get:9 http://security.ubuntu.com/ubuntu focal-security/universe amd64 Packages [888 kB]
+#8 1.508 Get:10 http://archive.ubuntu.com/ubuntu focal-updates/multiverse amd64 Packages [30.2 kB]
+#8 1.508 Get:11 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 Packages [2539 kB]
+#8 1.593 Get:12 http://archive.ubuntu.com/ubuntu focal-updates/universe amd64 Packages [1176 kB]
+#8 1.634 Get:13 http://archive.ubuntu.com/ubuntu focal-updates/restricted amd64 Packages [1569 kB]
+#8 1.695 Get:14 http://archive.ubuntu.com/ubuntu focal-backports/universe amd64 Packages [27.5 kB]
+#8 1.695 Get:15 http://archive.ubuntu.com/ubuntu focal-backports/main amd64 Packages [55.2 kB]
+#8 1.783 Get:16 http://security.ubuntu.com/ubuntu focal-security/main amd64 Packages [2087 kB]
+#8 1.964 Get:17 http://security.ubuntu.com/ubuntu focal-security/multiverse amd64 Packages [27.5 kB]
+#8 1.967 Get:18 http://security.ubuntu.com/ubuntu focal-security/restricted amd64 Packages [1461 kB]
+#8 2.702 Fetched 23.3 MB in 2s (10.4 MB/s)
+#8 2.702 Reading package lists...
+#8 3.644 Reading package lists...
+#8 4.524 Building dependency tree...
+#8 4.705 Reading state information...
+#8 4.724 Calculating upgrade...
+#8 4.916 The following packages will be upgraded:
+#8 4.917   libgnutls30
+#8 5.152 1 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+#8 5.152 Need to get 828 kB of archives.
+#8 5.152 After this operation, 0 B of additional disk space will be used.
+#8 5.152 Get:1 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libgnutls30 amd64 3.6.13-2ubuntu1.7 [828 kB]
+#8 5.955 debconf: delaying package configuration, since apt-utils is not installed
+#8 5.991 Fetched 828 kB in 1s (921 kB/s)
+#8 6.068 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 4126 files and directories currently installed.)
+#8 6.074 Preparing to unpack .../libgnutls30_3.6.13-2ubuntu1.7_amd64.deb ...
+#8 6.126 Unpacking libgnutls30:amd64 (3.6.13-2ubuntu1.7) over (3.6.13-2ubuntu1.6) ...
+#8 6.387 Setting up libgnutls30:amd64 (3.6.13-2ubuntu1.7) ...
+#8 6.460 Processing triggers for libc-bin (2.31-0ubuntu9.9) ...
+#8 6.624 Reading package lists...
+#8 7.508 Building dependency tree...
+#8 7.685 Reading state information...
+#8 7.849 The following additional packages will be installed:
+#8 7.849   ca-certificates dirmngr git-man gnupg gnupg-l10n gnupg-utils gpg-agent
+#8 7.849   gpg-wks-client gpg-wks-server gpgconf gpgsm krb5-locales less
+#8 7.849   libasn1-8-heimdal libassuan0 libbrotli1 libbsd0 libcbor0.6 libcurl3-gnutls
+#8 7.849   libedit2 liberror-perl libexpat1 libfido2-1 libgdbm-compat4 libgdbm6
+#8 7.849   libgssapi-krb5-2 libgssapi3-heimdal libhcrypto4-heimdal libheimbase1-heimdal
+#8 7.850   libheimntlm0-heimdal libhx509-5-heimdal libk5crypto3 libkeyutils1
+#8 7.850   libkrb5-26-heimdal libkrb5-3 libkrb5support0 libksba8 libldap-2.4-2
+#8 7.850   libldap-common libnghttp2-14 libnpth0 libperl5.30 libpsl5 libreadline8
+#8 7.850   libroken18-heimdal librtmp1 libsasl2-2 libsasl2-modules libsasl2-modules-db
+#8 7.850   libsqlite3-0 libssh-4 libssl1.1 libwind0-heimdal libx11-6 libx11-data
+#8 7.850   libxau6 libxcb1 libxdmcp6 libxext6 libxmuu1 netbase openssh-client openssl
+#8 7.850   patch perl perl-modules-5.30 pinentry-curses publicsuffix readline-common
+#8 7.850   xauth
+#8 7.851 Suggested packages:
+#8 7.851   dbus-user-session libpam-systemd pinentry-gnome3 tor gettext-base
+#8 7.851   git-daemon-run | git-daemon-sysvinit git-doc git-el git-email git-gui gitk
+#8 7.851   gitweb git-cvs git-mediawiki git-svn parcimonie xloadimage scdaemon
+#8 7.851   gdbm-l10n krb5-doc krb5-user libsasl2-modules-gssapi-mit
+#8 7.851   | libsasl2-modules-gssapi-heimdal libsasl2-modules-ldap libsasl2-modules-otp
+#8 7.851   libsasl2-modules-sql keychain libpam-ssh monkeysphere ssh-askpass ed
+#8 7.851   diffutils-doc perl-doc libterm-readline-gnu-perl
+#8 7.851   | libterm-readline-perl-perl make libb-debug-perl liblocale-codes-perl
+#8 7.851   pinentry-doc readline-doc
+#8 7.989 The following NEW packages will be installed:
+#8 7.990   ca-certificates dirmngr git git-lfs git-man gnupg gnupg-l10n gnupg-utils gpg
+#8 7.990   gpg-agent gpg-wks-client gpg-wks-server gpgconf gpgsm krb5-locales less
+#8 7.990   libasn1-8-heimdal libassuan0 libbrotli1 libbsd0 libcbor0.6 libcurl3-gnutls
+#8 7.990   libedit2 liberror-perl libexpat1 libfido2-1 libgdbm-compat4 libgdbm6
+#8 7.990   libgssapi-krb5-2 libgssapi3-heimdal libhcrypto4-heimdal libheimbase1-heimdal
+#8 7.990   libheimntlm0-heimdal libhx509-5-heimdal libk5crypto3 libkeyutils1
+#8 7.990   libkrb5-26-heimdal libkrb5-3 libkrb5support0 libksba8 libldap-2.4-2
+#8 7.990   libldap-common libnghttp2-14 libnpth0 libperl5.30 libpsl5 libreadline8
+#8 7.990   libroken18-heimdal librtmp1 libsasl2-2 libsasl2-modules libsasl2-modules-db
+#8 7.991   libsqlite3-0 libssh-4 libssl1.1 libwind0-heimdal libx11-6 libx11-data
+#8 7.991   libxau6 libxcb1 libxdmcp6 libxext6 libxmuu1 netbase openssh-client openssl
+#8 7.991   patch perl perl-modules-5.30 pinentry-curses publicsuffix readline-common
+#8 7.991   tini xauth
+#8 8.213 0 upgraded, 74 newly installed, 0 to remove and 0 not upgraded.
+#8 8.213 Need to get 26.0 MB of archives.
+#8 8.213 After this operation, 130 MB of additional disk space will be used.
+#8 8.213 Get:1 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 perl-modules-5.30 all 5.30.0-9ubuntu0.2 [2738 kB]
+#8 9.101 Get:2 http://archive.ubuntu.com/ubuntu focal/main amd64 libgdbm6 amd64 1.18.1-5 [27.4 kB]
+#8 9.102 Get:3 http://archive.ubuntu.com/ubuntu focal/main amd64 libgdbm-compat4 amd64 1.18.1-5 [6244 B]
+#8 9.102 Get:4 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libperl5.30 amd64 5.30.0-9ubuntu0.2 [3952 kB]
+#8 9.324 Get:5 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 perl amd64 5.30.0-9ubuntu0.2 [224 kB]
+#8 9.329 Get:6 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libssl1.1 amd64 1.1.1f-1ubuntu2.16 [1321 kB]
+#8 9.421 Get:7 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 openssl amd64 1.1.1f-1ubuntu2.16 [621 kB]
+#8 9.441 Get:8 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 ca-certificates all 20211016~20.04.1 [144 kB]
+#8 9.446 Get:9 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 less amd64 551-1ubuntu0.1 [123 kB]
+#8 9.503 Get:10 http://archive.ubuntu.com/ubuntu focal/main amd64 libbsd0 amd64 0.10.0-1 [45.4 kB]
+#8 9.504 Get:11 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libexpat1 amd64 2.2.9-1ubuntu0.4 [74.4 kB]
+#8 9.507 Get:12 http://archive.ubuntu.com/ubuntu focal/main amd64 readline-common all 8.0-4 [53.5 kB]
+#8 9.508 Get:13 http://archive.ubuntu.com/ubuntu focal/main amd64 libreadline8 amd64 8.0-4 [131 kB]
+#8 9.513 Get:14 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libsqlite3-0 amd64 3.31.1-4ubuntu0.3 [549 kB]
+#8 9.526 Get:15 http://archive.ubuntu.com/ubuntu focal/main amd64 netbase all 6.1 [13.1 kB]
+#8 9.526 Get:16 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 krb5-locales all 1.17-6ubuntu4.1 [11.4 kB]
+#8 9.625 Get:17 http://archive.ubuntu.com/ubuntu focal/main amd64 libcbor0.6 amd64 0.6.0-0ubuntu1 [21.1 kB]
+#8 9.627 Get:18 http://archive.ubuntu.com/ubuntu focal/main amd64 libedit2 amd64 3.1-20191231-1 [87.0 kB]
+#8 9.628 Get:19 http://archive.ubuntu.com/ubuntu focal/main amd64 libfido2-1 amd64 1.3.1-1ubuntu2 [47.9 kB]
+#8 9.628 Get:20 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libkrb5support0 amd64 1.17-6ubuntu4.1 [30.9 kB]
+#8 9.630 Get:21 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libk5crypto3 amd64 1.17-6ubuntu4.1 [79.9 kB]
+#8 9.631 Get:22 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libkeyutils1 amd64 1.6-6ubuntu1.1 [10.3 kB]
+#8 9.633 Get:23 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libkrb5-3 amd64 1.17-6ubuntu4.1 [330 kB]
+#8 9.726 Get:24 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libgssapi-krb5-2 amd64 1.17-6ubuntu4.1 [121 kB]
+#8 9.729 Get:25 http://archive.ubuntu.com/ubuntu focal/main amd64 libpsl5 amd64 0.21.0-1ubuntu1 [51.5 kB]
+#8 9.730 Get:26 http://archive.ubuntu.com/ubuntu focal/main amd64 libxau6 amd64 1:1.0.9-0ubuntu1 [7488 B]
+#8 9.827 Get:27 http://archive.ubuntu.com/ubuntu focal/main amd64 libxdmcp6 amd64 1:1.1.3-0ubuntu1 [10.6 kB]
+#8 9.828 Get:28 http://archive.ubuntu.com/ubuntu focal/main amd64 libxcb1 amd64 1.14-2 [44.7 kB]
+#8 9.828 Get:29 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libx11-data all 2:1.6.9-2ubuntu1.2 [113 kB]
+#8 9.830 Get:30 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libx11-6 amd64 2:1.6.9-2ubuntu1.2 [575 kB]
+#8 9.843 Get:31 http://archive.ubuntu.com/ubuntu focal/main amd64 libxext6 amd64 2:1.3.4-0ubuntu1 [29.1 kB]
+#8 9.845 Get:32 http://archive.ubuntu.com/ubuntu focal/main amd64 libxmuu1 amd64 2:1.1.3-0ubuntu1 [9728 B]
+#8 9.846 Get:33 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 openssh-client amd64 1:8.2p1-4ubuntu0.5 [671 kB]
+#8 9.928 Get:34 http://archive.ubuntu.com/ubuntu focal/main amd64 publicsuffix all 20200303.0012-1 [111 kB]
+#8 9.930 Get:35 http://archive.ubuntu.com/ubuntu focal/main amd64 xauth amd64 1:1.1-0ubuntu1 [25.0 kB]
+#8 9.930 Get:36 http://archive.ubuntu.com/ubuntu focal/main amd64 libassuan0 amd64 2.5.3-7ubuntu2 [35.7 kB]
+#8 10.03 Get:37 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 gpgconf amd64 2.2.19-3ubuntu2.2 [124 kB]
+#8 10.03 Get:38 http://archive.ubuntu.com/ubuntu focal/main amd64 libksba8 amd64 1.3.5-2 [92.6 kB]
+#8 10.03 Get:39 http://archive.ubuntu.com/ubuntu focal/main amd64 libroken18-heimdal amd64 7.7.0+dfsg-1ubuntu1 [41.8 kB]
+#8 10.03 Get:40 http://archive.ubuntu.com/ubuntu focal/main amd64 libasn1-8-heimdal amd64 7.7.0+dfsg-1ubuntu1 [181 kB]
+#8 10.04 Get:41 http://archive.ubuntu.com/ubuntu focal/main amd64 libheimbase1-heimdal amd64 7.7.0+dfsg-1ubuntu1 [29.7 kB]
+#8 10.04 Get:42 http://archive.ubuntu.com/ubuntu focal/main amd64 libhcrypto4-heimdal amd64 7.7.0+dfsg-1ubuntu1 [87.9 kB]
+#8 10.04 Get:43 http://archive.ubuntu.com/ubuntu focal/main amd64 libwind0-heimdal amd64 7.7.0+dfsg-1ubuntu1 [48.0 kB]
+#8 10.13 Get:44 http://archive.ubuntu.com/ubuntu focal/main amd64 libhx509-5-heimdal amd64 7.7.0+dfsg-1ubuntu1 [107 kB]
+#8 10.13 Get:45 http://archive.ubuntu.com/ubuntu focal/main amd64 libkrb5-26-heimdal amd64 7.7.0+dfsg-1ubuntu1 [208 kB]
+#8 10.14 Get:46 http://archive.ubuntu.com/ubuntu focal/main amd64 libheimntlm0-heimdal amd64 7.7.0+dfsg-1ubuntu1 [15.1 kB]
+#8 10.23 Get:47 http://archive.ubuntu.com/ubuntu focal/main amd64 libgssapi3-heimdal amd64 7.7.0+dfsg-1ubuntu1 [96.1 kB]
+#8 10.23 Get:48 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libsasl2-modules-db amd64 2.1.27+dfsg-2ubuntu0.1 [14.7 kB]
+#8 10.23 Get:49 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libsasl2-2 amd64 2.1.27+dfsg-2ubuntu0.1 [49.3 kB]
+#8 10.23 Get:50 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libldap-common all 2.4.49+dfsg-2ubuntu1.9 [16.6 kB]
+#8 10.23 Get:51 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libldap-2.4-2 amd64 2.4.49+dfsg-2ubuntu1.9 [155 kB]
+#8 10.24 Get:52 http://archive.ubuntu.com/ubuntu focal/main amd64 libnpth0 amd64 1.6-1 [7736 B]
+#8 10.24 Get:53 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 dirmngr amd64 2.2.19-3ubuntu2.2 [330 kB]
+#8 10.33 Get:54 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libbrotli1 amd64 1.0.7-6ubuntu0.1 [267 kB]
+#8 10.33 Get:55 http://archive.ubuntu.com/ubuntu focal/main amd64 libnghttp2-14 amd64 1.40.0-1build1 [78.7 kB]
+#8 10.34 Get:56 http://archive.ubuntu.com/ubuntu focal/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2build1 [54.9 kB]
+#8 10.43 Get:57 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libssh-4 amd64 0.9.3-2ubuntu2.2 [170 kB]
+#8 10.43 Get:58 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libcurl3-gnutls amd64 7.68.0-1ubuntu2.12 [232 kB]
+#8 10.44 Get:59 http://archive.ubuntu.com/ubuntu focal/main amd64 liberror-perl all 0.17029-1 [26.5 kB]
+#8 10.44 Get:60 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 git-man all 1:2.25.1-1ubuntu3.5 [886 kB]
+#8 10.46 Get:61 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 git amd64 1:2.25.1-1ubuntu3.5 [4557 kB]
+#8 ...
+
+#21 [builder 5/8] RUN go mod download
+#21 sha256:e942c5117fcf3145f45acf0c0cf65969de538aab71c8f49af1cdc1a7190dbe4f
+#21 ...
+
+#8 [stage-1  2/11] RUN apt-get update && apt-get dist-upgrade -y &&   apt-get install -y git git-lfs gpg tini &&   apt-get clean &&   rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp/* /var/tmp/*
+#8 sha256:a0abd78d99256742dfc09249975ca54855e541653a708d33e06fb277d73a5332
+#8 10.79 Get:62 http://archive.ubuntu.com/ubuntu focal/universe amd64 git-lfs amd64 2.9.2-1 [3316 kB]
+#8 10.99 Get:63 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 gnupg-l10n all 2.2.19-3ubuntu2.2 [51.7 kB]
+#8 10.99 Get:64 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 gnupg-utils amd64 2.2.19-3ubuntu2.2 [481 kB]
+#8 11.02 Get:65 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 gpg amd64 2.2.19-3ubuntu2.2 [482 kB]
+#8 11.05 Get:66 http://archive.ubuntu.com/ubuntu focal/main amd64 pinentry-curses amd64 1.1.0-3build1 [36.3 kB]
+#8 11.05 Get:67 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 gpg-agent amd64 2.2.19-3ubuntu2.2 [232 kB]
+#8 11.07 Get:68 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 gpg-wks-client amd64 2.2.19-3ubuntu2.2 [97.4 kB]
+#8 11.07 Get:69 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 gpg-wks-server amd64 2.2.19-3ubuntu2.2 [90.2 kB]
+#8 11.07 Get:70 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 gpgsm amd64 2.2.19-3ubuntu2.2 [217 kB]
+#8 11.09 Get:71 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 gnupg all 2.2.19-3ubuntu2.2 [259 kB]
+#8 11.11 Get:72 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libsasl2-modules amd64 2.1.27+dfsg-2ubuntu0.1 [48.8 kB]
+#8 11.19 Get:73 http://archive.ubuntu.com/ubuntu focal/main amd64 patch amd64 2.7.6-6 [105 kB]
+#8 11.20 Get:74 http://archive.ubuntu.com/ubuntu focal/universe amd64 tini amd64 0.18.0-1 [283 kB]
+#8 11.33 debconf: delaying package configuration, since apt-utils is not installed
+#8 11.37 Fetched 26.0 MB in 3s (8101 kB/s)
+#8 11.62 Selecting previously unselected package perl-modules-5.30.
+#8 11.62 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 4126 files and directories currently installed.)
+#8 11.63 Preparing to unpack .../00-perl-modules-5.30_5.30.0-9ubuntu0.2_all.deb ...
+#8 11.66 Unpacking perl-modules-5.30 (5.30.0-9ubuntu0.2) ...
+#8 12.59 Selecting previously unselected package libgdbm6:amd64.
+#8 12.59 Preparing to unpack .../01-libgdbm6_1.18.1-5_amd64.deb ...
+#8 12.69 Unpacking libgdbm6:amd64 (1.18.1-5) ...
+#8 12.95 Selecting previously unselected package libgdbm-compat4:amd64.
+#8 12.95 Preparing to unpack .../02-libgdbm-compat4_1.18.1-5_amd64.deb ...
+#8 12.99 Unpacking libgdbm-compat4:amd64 (1.18.1-5) ...
+#8 13.87 Selecting previously unselected package libperl5.30:amd64.
+#8 13.87 Preparing to unpack .../03-libperl5.30_5.30.0-9ubuntu0.2_amd64.deb ...
+#8 13.91 Unpacking libperl5.30:amd64 (5.30.0-9ubuntu0.2) ...
+#8 14.94 Selecting previously unselected package perl.
+#8 14.94 Preparing to unpack .../04-perl_5.30.0-9ubuntu0.2_amd64.deb ...
+#8 14.99 Unpacking perl (5.30.0-9ubuntu0.2) ...
+#8 15.51 Selecting previously unselected package libssl1.1:amd64.
+#8 15.51 Preparing to unpack .../05-libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb ...
+#8 15.52 Unpacking libssl1.1:amd64 (1.1.1f-1ubuntu2.16) ...
+#8 15.81 Selecting previously unselected package openssl.
+#8 15.82 Preparing to unpack .../06-openssl_1.1.1f-1ubuntu2.16_amd64.deb ...
+#8 15.85 Unpacking openssl (1.1.1f-1ubuntu2.16) ...
+#8 16.39 Selecting previously unselected package ca-certificates.
+#8 16.39 Preparing to unpack .../07-ca-certificates_20211016~20.04.1_all.deb ...
+#8 16.42 Unpacking ca-certificates (20211016~20.04.1) ...
+#8 17.20 Selecting previously unselected package less.
+#8 17.20 Preparing to unpack .../08-less_551-1ubuntu0.1_amd64.deb ...
+#8 17.24 Unpacking less (551-1ubuntu0.1) ...
+#8 17.47 Selecting previously unselected package libbsd0:amd64.
+#8 17.48 Preparing to unpack .../09-libbsd0_0.10.0-1_amd64.deb ...
+#8 17.50 Unpacking libbsd0:amd64 (0.10.0-1) ...
+#8 17.94 Selecting previously unselected package libexpat1:amd64.
+#8 17.94 Preparing to unpack .../10-libexpat1_2.2.9-1ubuntu0.4_amd64.deb ...
+#8 17.96 Unpacking libexpat1:amd64 (2.2.9-1ubuntu0.4) ...
+#8 18.61 Selecting previously unselected package readline-common.
+#8 18.61 Preparing to unpack .../11-readline-common_8.0-4_all.deb ...
+#8 18.72 Unpacking readline-common (8.0-4) ...
+#8 19.46 Selecting previously unselected package libreadline8:amd64.
+#8 19.46 Preparing to unpack .../12-libreadline8_8.0-4_amd64.deb ...
+#8 19.51 Unpacking libreadline8:amd64 (8.0-4) ...
+#8 20.13 Selecting previously unselected package libsqlite3-0:amd64.
+#8 20.13 Preparing to unpack .../13-libsqlite3-0_3.31.1-4ubuntu0.3_amd64.deb ...
+#8 20.22 Unpacking libsqlite3-0:amd64 (3.31.1-4ubuntu0.3) ...
+#8 20.82 Selecting previously unselected package netbase.
+#8 20.82 Preparing to unpack .../14-netbase_6.1_all.deb ...
+#8 20.88 Unpacking netbase (6.1) ...
+#8 21.43 Selecting previously unselected package krb5-locales.
+#8 21.43 Preparing to unpack .../15-krb5-locales_1.17-6ubuntu4.1_all.deb ...
+#8 21.49 Unpacking krb5-locales (1.17-6ubuntu4.1) ...
+#8 22.08 Selecting previously unselected package libcbor0.6:amd64.
+#8 22.08 Preparing to unpack .../16-libcbor0.6_0.6.0-0ubuntu1_amd64.deb ...
+#8 22.10 Unpacking libcbor0.6:amd64 (0.6.0-0ubuntu1) ...
+#8 22.44 Selecting previously unselected package libedit2:amd64.
+#8 22.44 Preparing to unpack .../17-libedit2_3.1-20191231-1_amd64.deb ...
+#8 22.54 Unpacking libedit2:amd64 (3.1-20191231-1) ...
+#8 22.89 Selecting previously unselected package libfido2-1:amd64.
+#8 22.89 Preparing to unpack .../18-libfido2-1_1.3.1-1ubuntu2_amd64.deb ...
+#8 22.91 Unpacking libfido2-1:amd64 (1.3.1-1ubuntu2) ...
+#8 23.28 Selecting previously unselected package libkrb5support0:amd64.
+#8 ...
+
+#21 [builder 5/8] RUN go mod download
+#21 sha256:e942c5117fcf3145f45acf0c0cf65969de538aab71c8f49af1cdc1a7190dbe4f
+#21 DONE 22.8s
+
+#8 [stage-1  2/11] RUN apt-get update && apt-get dist-upgrade -y &&   apt-get install -y git git-lfs gpg tini &&   apt-get clean &&   rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp/* /var/tmp/*
+#8 sha256:a0abd78d99256742dfc09249975ca54855e541653a708d33e06fb277d73a5332
+#8 23.28 Preparing to unpack .../19-libkrb5support0_1.17-6ubuntu4.1_amd64.deb ...
+#8 23.31 Unpacking libkrb5support0:amd64 (1.17-6ubuntu4.1) ...
+#8 23.41 Selecting previously unselected package libk5crypto3:amd64.
+#8 ...
+
+#22 [builder 6/8] COPY . .
+#22 sha256:cf4146ce757a7a475b882ca66286a80eba8f8c747cefd5515b0b46eccde4192f
+#22 DONE 0.6s
+
+#8 [stage-1  2/11] RUN apt-get update && apt-get dist-upgrade -y &&   apt-get install -y git git-lfs gpg tini &&   apt-get clean &&   rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp/* /var/tmp/*
+#8 sha256:a0abd78d99256742dfc09249975ca54855e541653a708d33e06fb277d73a5332
+#8 23.41 Preparing to unpack .../20-libk5crypto3_1.17-6ubuntu4.1_amd64.deb ...
+#8 23.42 Unpacking libk5crypto3:amd64 (1.17-6ubuntu4.1) ...
+#8 23.53 Selecting previously unselected package libkeyutils1:amd64.
+#8 23.53 Preparing to unpack .../21-libkeyutils1_1.6-6ubuntu1.1_amd64.deb ...
+#8 23.55 Unpacking libkeyutils1:amd64 (1.6-6ubuntu1.1) ...
+#8 23.64 Selecting previously unselected package libkrb5-3:amd64.
+#8 23.64 Preparing to unpack .../22-libkrb5-3_1.17-6ubuntu4.1_amd64.deb ...
+#8 23.65 Unpacking libkrb5-3:amd64 (1.17-6ubuntu4.1) ...
+#8 23.80 Selecting previously unselected package libgssapi-krb5-2:amd64.
+#8 23.81 Preparing to unpack .../23-libgssapi-krb5-2_1.17-6ubuntu4.1_amd64.deb ...
+#8 23.82 Unpacking libgssapi-krb5-2:amd64 (1.17-6ubuntu4.1) ...
+#8 23.97 Selecting previously unselected package libpsl5:amd64.
+#8 23.97 Preparing to unpack .../24-libpsl5_0.21.0-1ubuntu1_amd64.deb ...
+#8 23.98 Unpacking libpsl5:amd64 (0.21.0-1ubuntu1) ...
+#8 24.09 Selecting previously unselected package libxau6:amd64.
+#8 24.09 Preparing to unpack .../25-libxau6_1%3a1.0.9-0ubuntu1_amd64.deb ...
+#8 24.11 Unpacking libxau6:amd64 (1:1.0.9-0ubuntu1) ...
+#8 24.23 Selecting previously unselected package libxdmcp6:amd64.
+#8 24.24 Preparing to unpack .../26-libxdmcp6_1%3a1.1.3-0ubuntu1_amd64.deb ...
+#8 24.25 Unpacking libxdmcp6:amd64 (1:1.1.3-0ubuntu1) ...
+#8 24.35 Selecting previously unselected package libxcb1:amd64.
+#8 24.36 Preparing to unpack .../27-libxcb1_1.14-2_amd64.deb ...
+#8 24.37 Unpacking libxcb1:amd64 (1.14-2) ...
+#8 24.46 Selecting previously unselected package libx11-data.
+#8 24.46 Preparing to unpack .../28-libx11-data_2%3a1.6.9-2ubuntu1.2_all.deb ...
+#8 24.47 Unpacking libx11-data (2:1.6.9-2ubuntu1.2) ...
+#8 24.59 Selecting previously unselected package libx11-6:amd64.
+#8 ...
+
+#23 [builder 7/8] RUN rm -f ./bin/*
+#23 sha256:ad4675b5bddd6d982bf7449ec237a5ad139e05ef40083f32d4364e60788e2547
+#23 DONE 0.6s
+
+#8 [stage-1  2/11] RUN apt-get update && apt-get dist-upgrade -y &&   apt-get install -y git git-lfs gpg tini &&   apt-get clean &&   rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp/* /var/tmp/*
+#8 sha256:a0abd78d99256742dfc09249975ca54855e541653a708d33e06fb277d73a5332
+#8 24.59 Preparing to unpack .../29-libx11-6_2%3a1.6.9-2ubuntu1.2_amd64.deb ...
+#8 24.63 Unpacking libx11-6:amd64 (2:1.6.9-2ubuntu1.2) ...
+#8 24.79 Selecting previously unselected package libxext6:amd64.
+#8 24.79 Preparing to unpack .../30-libxext6_2%3a1.3.4-0ubuntu1_amd64.deb ...
+#8 24.81 Unpacking libxext6:amd64 (2:1.3.4-0ubuntu1) ...
+#8 24.90 Selecting previously unselected package libxmuu1:amd64.
+#8 24.91 Preparing to unpack .../31-libxmuu1_2%3a1.1.3-0ubuntu1_amd64.deb ...
+#8 24.92 Unpacking libxmuu1:amd64 (2:1.1.3-0ubuntu1) ...
+#8 25.06 Selecting previously unselected package openssh-client.
+#8 25.06 Preparing to unpack .../32-openssh-client_1%3a8.2p1-4ubuntu0.5_amd64.deb ...
+#8 25.08 Unpacking openssh-client (1:8.2p1-4ubuntu0.5) ...
+#8 25.25 Selecting previously unselected package publicsuffix.
+#8 25.25 Preparing to unpack .../33-publicsuffix_20200303.0012-1_all.deb ...
+#8 25.26 Unpacking publicsuffix (20200303.0012-1) ...
+#8 25.34 Selecting previously unselected package xauth.
+#8 25.34 Preparing to unpack .../34-xauth_1%3a1.1-0ubuntu1_amd64.deb ...
+#8 25.35 Unpacking xauth (1:1.1-0ubuntu1) ...
+#8 25.43 Selecting previously unselected package libassuan0:amd64.
+#8 25.43 Preparing to unpack .../35-libassuan0_2.5.3-7ubuntu2_amd64.deb ...
+#8 25.44 Unpacking libassuan0:amd64 (2.5.3-7ubuntu2) ...
+#8 25.52 Selecting previously unselected package gpgconf.
+#8 25.52 Preparing to unpack .../36-gpgconf_2.2.19-3ubuntu2.2_amd64.deb ...
+#8 25.53 Unpacking gpgconf (2.2.19-3ubuntu2.2) ...
+#8 25.64 Selecting previously unselected package libksba8:amd64.
+#8 25.64 Preparing to unpack .../37-libksba8_1.3.5-2_amd64.deb ...
+#8 25.65 Unpacking libksba8:amd64 (1.3.5-2) ...
+#8 25.75 Selecting previously unselected package libroken18-heimdal:amd64.
+#8 25.75 Preparing to unpack .../38-libroken18-heimdal_7.7.0+dfsg-1ubuntu1_amd64.deb ...
+#8 25.76 Unpacking libroken18-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 25.85 Selecting previously unselected package libasn1-8-heimdal:amd64.
+#8 25.85 Preparing to unpack .../39-libasn1-8-heimdal_7.7.0+dfsg-1ubuntu1_amd64.deb ...
+#8 25.86 Unpacking libasn1-8-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 25.97 Selecting previously unselected package libheimbase1-heimdal:amd64.
+#8 25.97 Preparing to unpack .../40-libheimbase1-heimdal_7.7.0+dfsg-1ubuntu1_amd64.deb ...
+#8 25.99 Unpacking libheimbase1-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 26.07 Selecting previously unselected package libhcrypto4-heimdal:amd64.
+#8 26.07 Preparing to unpack .../41-libhcrypto4-heimdal_7.7.0+dfsg-1ubuntu1_amd64.deb ...
+#8 26.08 Unpacking libhcrypto4-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 26.19 Selecting previously unselected package libwind0-heimdal:amd64.
+#8 26.19 Preparing to unpack .../42-libwind0-heimdal_7.7.0+dfsg-1ubuntu1_amd64.deb ...
+#8 26.20 Unpacking libwind0-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 26.31 Selecting previously unselected package libhx509-5-heimdal:amd64.
+#8 26.31 Preparing to unpack .../43-libhx509-5-heimdal_7.7.0+dfsg-1ubuntu1_amd64.deb ...
+#8 26.32 Unpacking libhx509-5-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 26.44 Selecting previously unselected package libkrb5-26-heimdal:amd64.
+#8 26.44 Preparing to unpack .../44-libkrb5-26-heimdal_7.7.0+dfsg-1ubuntu1_amd64.deb ...
+#8 26.45 Unpacking libkrb5-26-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 26.57 Selecting previously unselected package libheimntlm0-heimdal:amd64.
+#8 26.57 Preparing to unpack .../45-libheimntlm0-heimdal_7.7.0+dfsg-1ubuntu1_amd64.deb ...
+#8 26.59 Unpacking libheimntlm0-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 26.69 Selecting previously unselected package libgssapi3-heimdal:amd64.
+#8 26.69 Preparing to unpack .../46-libgssapi3-heimdal_7.7.0+dfsg-1ubuntu1_amd64.deb ...
+#8 26.70 Unpacking libgssapi3-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 26.79 Selecting previously unselected package libsasl2-modules-db:amd64.
+#8 26.79 Preparing to unpack .../47-libsasl2-modules-db_2.1.27+dfsg-2ubuntu0.1_amd64.deb ...
+#8 26.80 Unpacking libsasl2-modules-db:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#8 26.89 Selecting previously unselected package libsasl2-2:amd64.
+#8 26.90 Preparing to unpack .../48-libsasl2-2_2.1.27+dfsg-2ubuntu0.1_amd64.deb ...
+#8 26.91 Unpacking libsasl2-2:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#8 26.99 Selecting previously unselected package libldap-common.
+#8 27.00 Preparing to unpack .../49-libldap-common_2.4.49+dfsg-2ubuntu1.9_all.deb ...
+#8 27.03 Unpacking libldap-common (2.4.49+dfsg-2ubuntu1.9) ...
+#8 27.12 Selecting previously unselected package libldap-2.4-2:amd64.
+#8 27.12 Preparing to unpack .../50-libldap-2.4-2_2.4.49+dfsg-2ubuntu1.9_amd64.deb ...
+#8 27.14 Unpacking libldap-2.4-2:amd64 (2.4.49+dfsg-2ubuntu1.9) ...
+#8 27.32 Selecting previously unselected package libnpth0:amd64.
+#8 27.32 Preparing to unpack .../51-libnpth0_1.6-1_amd64.deb ...
+#8 27.34 Unpacking libnpth0:amd64 (1.6-1) ...
+#8 27.44 Selecting previously unselected package dirmngr.
+#8 27.44 Preparing to unpack .../52-dirmngr_2.2.19-3ubuntu2.2_amd64.deb ...
+#8 27.46 Unpacking dirmngr (2.2.19-3ubuntu2.2) ...
+#8 27.60 Selecting previously unselected package libbrotli1:amd64.
+#8 27.60 Preparing to unpack .../53-libbrotli1_1.0.7-6ubuntu0.1_amd64.deb ...
+#8 27.61 Unpacking libbrotli1:amd64 (1.0.7-6ubuntu0.1) ...
+#8 27.74 Selecting previously unselected package libnghttp2-14:amd64.
+#8 27.74 Preparing to unpack .../54-libnghttp2-14_1.40.0-1build1_amd64.deb ...
+#8 27.76 Unpacking libnghttp2-14:amd64 (1.40.0-1build1) ...
+#8 27.86 Selecting previously unselected package librtmp1:amd64.
+#8 27.86 Preparing to unpack .../55-librtmp1_2.4+20151223.gitfa8646d.1-2build1_amd64.deb ...
+#8 27.87 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build1) ...
+#8 27.97 Selecting previously unselected package libssh-4:amd64.
+#8 27.98 Preparing to unpack .../56-libssh-4_0.9.3-2ubuntu2.2_amd64.deb ...
+#8 27.99 Unpacking libssh-4:amd64 (0.9.3-2ubuntu2.2) ...
+#8 28.12 Selecting previously unselected package libcurl3-gnutls:amd64.
+#8 28.12 Preparing to unpack .../57-libcurl3-gnutls_7.68.0-1ubuntu2.12_amd64.deb ...
+#8 28.13 Unpacking libcurl3-gnutls:amd64 (7.68.0-1ubuntu2.12) ...
+#8 28.23 Selecting previously unselected package liberror-perl.
+#8 28.23 Preparing to unpack .../58-liberror-perl_0.17029-1_all.deb ...
+#8 28.24 Unpacking liberror-perl (0.17029-1) ...
+#8 28.32 Selecting previously unselected package git-man.
+#8 28.32 Preparing to unpack .../59-git-man_1%3a2.25.1-1ubuntu3.5_all.deb ...
+#8 28.33 Unpacking git-man (1:2.25.1-1ubuntu3.5) ...
+#8 28.52 Selecting previously unselected package git.
+#8 28.52 Preparing to unpack .../60-git_1%3a2.25.1-1ubuntu3.5_amd64.deb ...
+#8 28.55 Unpacking git (1:2.25.1-1ubuntu3.5) ...
+#8 29.16 Selecting previously unselected package git-lfs.
+#8 29.16 Preparing to unpack .../61-git-lfs_2.9.2-1_amd64.deb ...
+#8 29.18 Unpacking git-lfs (2.9.2-1) ...
+#8 29.62 Selecting previously unselected package gnupg-l10n.
+#8 29.62 Preparing to unpack .../62-gnupg-l10n_2.2.19-3ubuntu2.2_all.deb ...
+#8 29.64 Unpacking gnupg-l10n (2.2.19-3ubuntu2.2) ...
+#8 29.75 Selecting previously unselected package gnupg-utils.
+#8 29.76 Preparing to unpack .../63-gnupg-utils_2.2.19-3ubuntu2.2_amd64.deb ...
+#8 29.77 Unpacking gnupg-utils (2.2.19-3ubuntu2.2) ...
+#8 29.91 Selecting previously unselected package gpg.
+#8 29.91 Preparing to unpack .../64-gpg_2.2.19-3ubuntu2.2_amd64.deb ...
+#8 29.93 Unpacking gpg (2.2.19-3ubuntu2.2) ...
+#8 30.07 Selecting previously unselected package pinentry-curses.
+#8 30.07 Preparing to unpack .../65-pinentry-curses_1.1.0-3build1_amd64.deb ...
+#8 30.09 Unpacking pinentry-curses (1.1.0-3build1) ...
+#8 30.20 Selecting previously unselected package gpg-agent.
+#8 30.20 Preparing to unpack .../66-gpg-agent_2.2.19-3ubuntu2.2_amd64.deb ...
+#8 30.21 Unpacking gpg-agent (2.2.19-3ubuntu2.2) ...
+#8 30.34 Selecting previously unselected package gpg-wks-client.
+#8 30.34 Preparing to unpack .../67-gpg-wks-client_2.2.19-3ubuntu2.2_amd64.deb ...
+#8 30.35 Unpacking gpg-wks-client (2.2.19-3ubuntu2.2) ...
+#8 30.44 Selecting previously unselected package gpg-wks-server.
+#8 30.44 Preparing to unpack .../68-gpg-wks-server_2.2.19-3ubuntu2.2_amd64.deb ...
+#8 30.45 Unpacking gpg-wks-server (2.2.19-3ubuntu2.2) ...
+#8 30.54 Selecting previously unselected package gpgsm.
+#8 30.54 Preparing to unpack .../69-gpgsm_2.2.19-3ubuntu2.2_amd64.deb ...
+#8 30.56 Unpacking gpgsm (2.2.19-3ubuntu2.2) ...
+#8 30.69 Selecting previously unselected package gnupg.
+#8 30.69 Preparing to unpack .../70-gnupg_2.2.19-3ubuntu2.2_all.deb ...
+#8 30.70 Unpacking gnupg (2.2.19-3ubuntu2.2) ...
+#8 30.82 Selecting previously unselected package libsasl2-modules:amd64.
+#8 30.82 Preparing to unpack .../71-libsasl2-modules_2.1.27+dfsg-2ubuntu0.1_amd64.deb ...
+#8 30.83 Unpacking libsasl2-modules:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#8 30.95 Selecting previously unselected package patch.
+#8 30.95 Preparing to unpack .../72-patch_2.7.6-6_amd64.deb ...
+#8 30.98 Unpacking patch (2.7.6-6) ...
+#8 31.11 Selecting previously unselected package tini.
+#8 31.12 Preparing to unpack .../73-tini_0.18.0-1_amd64.deb ...
+#8 31.15 Unpacking tini (0.18.0-1) ...
+#8 31.36 Setting up libksba8:amd64 (1.3.5-2) ...
+#8 31.42 Setting up libexpat1:amd64 (2.2.9-1ubuntu0.4) ...
+#8 31.48 Setting up libxau6:amd64 (1:1.0.9-0ubuntu1) ...
+#8 31.55 Setting up libkeyutils1:amd64 (1.6-6ubuntu1.1) ...
+#8 31.59 Setting up libpsl5:amd64 (0.21.0-1ubuntu1) ...
+#8 31.63 Setting up perl-modules-5.30 (5.30.0-9ubuntu0.2) ...
+#8 31.67 Setting up libssl1.1:amd64 (1.1.1f-1ubuntu2.16) ...
+#8 31.89 Setting up libbrotli1:amd64 (1.0.7-6ubuntu0.1) ...
+#8 31.93 Setting up libsqlite3-0:amd64 (3.31.1-4ubuntu0.3) ...
+#8 31.97 Setting up libsasl2-modules:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#8 32.03 Setting up libnghttp2-14:amd64 (1.40.0-1build1) ...
+#8 32.07 Setting up less (551-1ubuntu0.1) ...
+#8 32.13 Setting up libnpth0:amd64 (1.6-1) ...
+#8 32.17 Setting up krb5-locales (1.17-6ubuntu4.1) ...
+#8 32.21 Setting up libassuan0:amd64 (2.5.3-7ubuntu2) ...
+#8 32.25 Setting up libcbor0.6:amd64 (0.6.0-0ubuntu1) ...
+#8 32.29 Setting up libldap-common (2.4.49+dfsg-2ubuntu1.9) ...
+#8 32.33 Setting up libkrb5support0:amd64 (1.17-6ubuntu4.1) ...
+#8 32.37 Setting up libsasl2-modules-db:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#8 32.41 Setting up libx11-data (2:1.6.9-2ubuntu1.2) ...
+#8 32.45 Setting up gnupg-l10n (2.2.19-3ubuntu2.2) ...
+#8 32.48 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build1) ...
+#8 32.52 Setting up tini (0.18.0-1) ...
+#8 32.56 Setting up patch (2.7.6-6) ...
+#8 32.59 Setting up libk5crypto3:amd64 (1.17-6ubuntu4.1) ...
+#8 32.63 Setting up libsasl2-2:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#8 32.69 Setting up libroken18-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 32.73 Setting up git-man (1:2.25.1-1ubuntu3.5) ...
+#8 32.77 Setting up netbase (6.1) ...
+#8 32.88 Setting up libkrb5-3:amd64 (1.17-6ubuntu4.1) ...
+#8 32.92 Setting up libfido2-1:amd64 (1.3.1-1ubuntu2) ...
+#8 32.96 Setting up openssl (1.1.1f-1ubuntu2.16) ...
+#8 33.02 Setting up libbsd0:amd64 (0.10.0-1) ...
+#8 33.07 Setting up readline-common (8.0-4) ...
+#8 33.11 Setting up publicsuffix (20200303.0012-1) ...
+#8 33.15 Setting up libheimbase1-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 33.19 Setting up libgdbm6:amd64 (1.18.1-5) ...
+#8 33.23 Setting up pinentry-curses (1.1.0-3build1) ...
+#8 33.29 Setting up libxdmcp6:amd64 (1:1.1.3-0ubuntu1) ...
+#8 33.32 Setting up libxcb1:amd64 (1.14-2) ...
+#8 33.36 Setting up libasn1-8-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 33.40 Setting up libedit2:amd64 (3.1-20191231-1) ...
+#8 33.44 Setting up libreadline8:amd64 (8.0-4) ...
+#8 33.48 Setting up libhcrypto4-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 33.53 Setting up ca-certificates (20211016~20.04.1) ...
+#8 34.12 Updating certificates in /etc/ssl/certs...
+#8 ...
+
+#24 [builder 8/8] RUN make build
+#24 sha256:d23d22702abbd293df03287db9b6802be3feafa7f71ff78b576b0ce32fb00a15
+#24 0.565 go: creating new go.mod: module tmp
+#24 0.567 Downloading sigs.k8s.io/kustomize/kustomize/v3@v3.9.4
+#24 0.885 go: downloading sigs.k8s.io/kustomize/kustomize/v3 v3.9.4
+#24 8.575 go: downloading sigs.k8s.io/kustomize/cmd/config v0.9.1
+#24 8.575 go: downloading sigs.k8s.io/kustomize/api v0.7.4
+#24 8.576 go: downloading k8s.io/client-go v0.18.10
+#24 8.576 go: downloading github.com/spf13/cobra v1.0.0
+#24 8.866 go: downloading sigs.k8s.io/yaml v1.2.0
+#24 8.904 go: downloading github.com/yujunz/go-getter v1.5.1-lite.0.20201201013212-6d9c071adddf
+#24 8.907 go: downloading sigs.k8s.io/kustomize/kyaml v0.10.9
+#24 9.061 go: downloading github.com/olekukonko/tablewriter v0.0.4
+#24 9.502 go: downloading github.com/evanphx/json-patch v4.9.0+incompatible
+#24 9.502 go: downloading k8s.io/apimachinery v0.18.10
+#24 9.691 go: downloading gopkg.in/yaml.v2 v2.3.0
+#24 9.696 go: downloading github.com/imdario/mergo v0.3.5
+#24 9.698 go: downloading github.com/hashicorp/go-multierror v1.1.0
+#24 9.700 go: downloading github.com/go-openapi/jsonpointer v0.19.3
+#24 9.701 go: downloading github.com/go-openapi/jsonreference v0.19.3
+#24 9.702 go: downloading github.com/go-openapi/swag v0.19.5
+#24 9.718 go: downloading github.com/hashicorp/go-cleanhttp v0.5.0
+#24 9.719 go: downloading github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d
+#24 9.721 go: downloading github.com/hashicorp/go-safetemp v1.0.0
+#24 9.729 go: downloading github.com/hashicorp/go-version v1.1.0
+#24 9.748 go: downloading github.com/ulikunitz/xz v0.5.8
+#24 9.769 go: downloading github.com/mattn/go-runewidth v0.0.7
+#24 9.773 go: downloading github.com/go-openapi/strfmt v0.19.5
+#24 9.773 go: downloading github.com/go-openapi/validate v0.19.8
+#24 9.776 go: downloading gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+#24 9.787 go: downloading github.com/stretchr/testify v1.6.1
+#24 9.796 go: downloading k8s.io/api v0.18.10
+#24 ...
+
+#8 [stage-1  2/11] RUN apt-get update && apt-get dist-upgrade -y &&   apt-get install -y git git-lfs gpg tini &&   apt-get clean &&   rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp/* /var/tmp/*
+#8 sha256:a0abd78d99256742dfc09249975ca54855e541653a708d33e06fb277d73a5332
+#8 34.79 127 added, 0 removed; done.
+#8 34.92 Setting up libwind0-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 34.97 Setting up libgssapi-krb5-2:amd64 (1.17-6ubuntu4.1) ...
+#8 35.01 Setting up libgdbm-compat4:amd64 (1.18.1-5) ...
+#8 35.04 Setting up libssh-4:amd64 (0.9.3-2ubuntu2.2) ...
+#8 35.08 Setting up gpgconf (2.2.19-3ubuntu2.2) ...
+#8 35.12 Setting up libperl5.30:amd64 (5.30.0-9ubuntu0.2) ...
+#8 35.16 Setting up libx11-6:amd64 (2:1.6.9-2ubuntu1.2) ...
+#8 35.45 Setting up libxmuu1:amd64 (2:1.1.3-0ubuntu1) ...
+#8 35.63 Setting up gpg (2.2.19-3ubuntu2.2) ...
+#8 35.68 Setting up gnupg-utils (2.2.19-3ubuntu2.2) ...
+#8 35.73 Setting up gpg-agent (2.2.19-3ubuntu2.2) ...
+#8 36.34 Setting up openssh-client (1:8.2p1-4ubuntu0.5) ...
+#8 36.69 Setting up libhx509-5-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 36.72 Setting up gpgsm (2.2.19-3ubuntu2.2) ...
+#8 36.76 Setting up libxext6:amd64 (2:1.3.4-0ubuntu1) ...
+#8 36.86 Setting up perl (5.30.0-9ubuntu0.2) ...
+#8 36.92 Setting up gpg-wks-server (2.2.19-3ubuntu2.2) ...
+#8 36.96 Setting up xauth (1:1.1-0ubuntu1) ...
+#8 37.01 Setting up libkrb5-26-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 37.08 Setting up libheimntlm0-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 37.14 Setting up liberror-perl (0.17029-1) ...
+#8 37.19 Setting up libgssapi3-heimdal:amd64 (7.7.0+dfsg-1ubuntu1) ...
+#8 37.26 Setting up libldap-2.4-2:amd64 (2.4.49+dfsg-2ubuntu1.9) ...
+#8 37.30 Setting up libcurl3-gnutls:amd64 (7.68.0-1ubuntu2.12) ...
+#8 37.36 Setting up dirmngr (2.2.19-3ubuntu2.2) ...
+#8 37.52 Setting up git (1:2.25.1-1ubuntu3.5) ...
+#8 37.60 Setting up git-lfs (2.9.2-1) ...
+#8 37.76 Setting up gpg-wks-client (2.2.19-3ubuntu2.2) ...
+#8 37.81 Setting up gnupg (2.2.19-3ubuntu2.2) ...
+#8 37.85 Processing triggers for libc-bin (2.31-0ubuntu9.9) ...
+#8 37.93 Processing triggers for ca-certificates (20211016~20.04.1) ...
+#8 37.95 Updating certificates in /etc/ssl/certs...
+#8 38.39 0 added, 0 removed; done.
+#8 38.39 Running hooks in /etc/ca-certificates/update.d...
+#8 38.39 done.
+#8 DONE 39.1s
+
+#10 [stage-1  3/11] COPY hack/from-argo-cd/gpg-wrapper.sh /usr/local/bin/gpg-wrapper.sh
+#10 sha256:676773e4752f0c5e80ed18398933c07258485694d43ea612c015e89c061595bc
+#10 DONE 0.2s
+
+#24 [builder 8/8] RUN make build
+#24 sha256:d23d22702abbd293df03287db9b6802be3feafa7f71ff78b576b0ce32fb00a15
+#24 10.40 go: downloading github.com/gogo/protobuf v1.3.1
+#24 10.40 go: downloading k8s.io/kube-openapi v0.0.0-20200410145947-61e04a5be9a6
+#24 10.40 go: downloading k8s.io/klog v1.0.0
+#24 10.41 go: downloading sigs.k8s.io/structured-merge-diff/v3 v3.0.0
+#24 10.46 go: downloading github.com/Azure/go-autorest/autorest v0.9.0
+#24 10.46 go: downloading github.com/Azure/go-autorest/autorest/adal v0.5.0
+#24 10.46 go: downloading golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
+#24 10.51 go: downloading sigs.k8s.io/structured-merge-diff v0.0.0-20190525122527-15d366b2352e
+#24 10.55 go: downloading github.com/qri-io/starlib v0.4.2-0.20200213133954-ff2e8cd5ef8d
+#24 10.57 go: downloading github.com/mailru/easyjson v0.7.0
+#24 10.59 go: downloading github.com/mitchellh/mapstructure v1.1.2
+#24 10.63 go: downloading golang.org/x/net v0.0.0-20201110031124-69a78807bb2b
+#24 10.64 go: downloading github.com/Azure/go-autorest/autorest/date v0.1.0
+#24 10.64 go: downloading github.com/Azure/go-autorest/tracing v0.5.0
+#24 10.67 go: downloading github.com/Azure/go-autorest/logger v0.1.0
+#24 10.71 go: downloading cloud.google.com/go v0.38.0
+#24 10.72 go: downloading google.golang.org/appengine v1.5.0
+#24 10.72 go: downloading github.com/json-iterator/go v1.1.8
+#24 10.76 go: downloading golang.org/x/text v0.3.4
+#24 10.84 go: downloading github.com/googleapis/gnostic v0.1.0
+#24 10.85 go: downloading github.com/modern-go/reflect2 v1.0.1
+#24 10.89 go: downloading golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+#24 10.92 go: downloading golang.org/x/time v0.0.0-20190308202827-9d24e82272b4
+#24 10.92 go: downloading k8s.io/utils v0.0.0-20200324210504-a9aa75ae1b89
+#24 10.94 go: downloading github.com/golang/protobuf v1.3.2
+#24 11.14 go: downloading golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f
+#24 ...
+
+#11 [stage-1  4/11] COPY hack/from-argo-cd/git-verify-wrapper.sh /usr/local/bin/git-verify-wrapper.sh
+#11 sha256:709572f0cb6f7f2053cff6cd5fab03dd65c88074c2dcf9a22861db8a8b2de1a6
+#11 DONE 0.1s
+
+#12 [stage-1  5/11] COPY hack/from-argo-cd/git-ask-pass.sh /usr/local/bin/git-ask-pass.sh
+#12 sha256:cc51c76cec6c506f4766c45be56b39bd8d42f0fb29f12273222d0a08f60fcfcc
+#12 DONE 0.1s
+
+#24 [builder 8/8] RUN make build
+#24 sha256:d23d22702abbd293df03287db9b6802be3feafa7f71ff78b576b0ce32fb00a15
+#24 14.95 go get: installing executables with 'go get' in module mode is deprecated.
+#24 14.95 	To adjust and download dependencies of the current module, use 'go get -d'.
+#24 14.95 	To install using requirements of the current module, use 'go install'.
+#24 14.95 	To install ignoring the current module, use 'go install' with a version,
+#24 14.95 	like 'go install example.com/cmd@latest'.
+#24 14.95 	For more information, see https://golang.org/doc/go-get-install-deprecation
+#24 14.95 	or run 'go help get' or 'go help install'.
+#24 ...
+
+#13 [stage-1  6/11] COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+#13 sha256:ccc6c7bcabaef469574fc4ea8b5a56366687f9811e6c1d11779d6c6803a258d0
+#13 DONE 0.1s
+
+#14 [stage-1  7/11] RUN mkdir -p /app/config/ssh &&     touch /app/config/ssh/ssh_known_hosts &&     ln -s /app/config/ssh/ssh_known_hosts /etc/ssh/ssh_known_hosts
+#14 sha256:6a209683c8603ddac5361395242bf630d64f27c256385edf74f410c4060dd5d5
+#14 DONE 0.6s
+
+#15 [stage-1  8/11] RUN mkdir -p /app/config/tls
+#15 sha256:35f8e01c1c2a4429544c7830c1e493b64af2105dc195aafa742d47f076e8e113
+#15 DONE 0.7s
+
+#16 [stage-1  9/11] RUN mkdir -p /app/config/gpg/source &&     mkdir -p /app/config/gpg/keys
+#16 sha256:ab30e4e2febacfa77f2f7d7b6d44a92eef2bcd9b93c578a7f6a62c14c0f05b04
+#16 DONE 0.8s
+
+#24 [builder 8/8] RUN make build
+#24 sha256:d23d22702abbd293df03287db9b6802be3feafa7f71ff78b576b0ce32fb00a15
+#24 33.45 go get: added cloud.google.com/go v0.38.0
+#24 33.45 go get: added github.com/Azure/go-autorest/autorest v0.9.0
+#24 33.45 go get: added github.com/Azure/go-autorest/autorest/adal v0.5.0
+#24 33.45 go get: added github.com/Azure/go-autorest/autorest/date v0.1.0
+#24 33.45 go get: added github.com/Azure/go-autorest/logger v0.1.0
+#24 33.45 go get: added github.com/Azure/go-autorest/tracing v0.5.0
+#24 33.45 go get: added github.com/PuerkitoBio/purell v1.1.1
+#24 33.45 go get: added github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578
+#24 33.45 go get: added github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
+#24 33.46 go get: added github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d
+#24 33.46 go get: added github.com/davecgh/go-spew v1.1.1
+#24 33.46 go get: added github.com/dgrijalva/jwt-go v3.2.0+incompatible
+#24 33.46 go get: added github.com/evanphx/json-patch v4.9.0+incompatible
+#24 33.46 go get: added github.com/go-errors/errors v1.0.1
+#24 33.46 go get: added github.com/go-openapi/analysis v0.19.5
+#24 33.46 go get: added github.com/go-openapi/errors v0.19.2
+#24 33.46 go get: added github.com/go-openapi/jsonpointer v0.19.3
+#24 33.46 go get: added github.com/go-openapi/jsonreference v0.19.3
+#24 33.46 go get: added github.com/go-openapi/loads v0.19.4
+#24 33.46 go get: added github.com/go-openapi/runtime v0.19.4
+#24 33.46 go get: added github.com/go-openapi/spec v0.19.5
+#24 33.46 go get: added github.com/go-openapi/strfmt v0.19.5
+#24 33.46 go get: added github.com/go-openapi/swag v0.19.5
+#24 33.46 go get: added github.com/go-openapi/validate v0.19.8
+#24 33.46 go get: added github.com/go-stack/stack v1.8.0
+#24 33.46 go get: added github.com/gogo/protobuf v1.3.1
+#24 33.46 go get: added github.com/golang/protobuf v1.3.2
+#24 33.46 go get: added github.com/google/gofuzz v1.1.0
+#24 33.46 go get: added github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
+#24 33.46 go get: added github.com/googleapis/gnostic v0.1.0
+#24 33.46 go get: added github.com/gophercloud/gophercloud v0.1.0
+#24 33.46 go get: added github.com/hashicorp/errwrap v1.0.0
+#24 33.46 go get: added github.com/hashicorp/go-cleanhttp v0.5.0
+#24 33.46 go get: added github.com/hashicorp/go-multierror v1.1.0
+#24 33.46 go get: added github.com/hashicorp/go-safetemp v1.0.0
+#24 33.46 go get: added github.com/hashicorp/go-version v1.1.0
+#24 33.46 go get: added github.com/imdario/mergo v0.3.5
+#24 33.46 go get: added github.com/inconshreveable/mousetrap v1.0.0
+#24 33.46 go get: added github.com/json-iterator/go v1.1.8
+#24 33.46 go get: added github.com/mailru/easyjson v0.7.0
+#24 33.46 go get: added github.com/mattn/go-runewidth v0.0.7
+#24 33.46 go get: added github.com/mitchellh/go-homedir v1.1.0
+#24 33.46 go get: added github.com/mitchellh/go-testing-interface v1.0.0
+#24 33.46 go get: added github.com/mitchellh/mapstructure v1.1.2
+#24 33.46 go get: added github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+#24 33.46 go get: added github.com/modern-go/reflect2 v1.0.1
+#24 33.46 go get: added github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00
+#24 33.46 go get: added github.com/olekukonko/tablewriter v0.0.4
+#24 33.46 go get: added github.com/pkg/errors v0.9.1
+#24 33.46 go get: added github.com/pmezard/go-difflib v1.0.0
+#24 33.46 go get: added github.com/qri-io/starlib v0.4.2-0.20200213133954-ff2e8cd5ef8d
+#24 33.46 go get: added github.com/spf13/cobra v1.0.0
+#24 33.46 go get: added github.com/spf13/pflag v1.0.5
+#24 33.46 go get: added github.com/stretchr/testify v1.6.1
+#24 33.46 go get: added github.com/ulikunitz/xz v0.5.8
+#24 33.46 go get: added github.com/xlab/treeprint v0.0.0-20181112141820-a009c3971eca
+#24 33.46 go get: added github.com/yujunz/go-getter v1.5.1-lite.0.20201201013212-6d9c071adddf
+#24 33.46 go get: added go.mongodb.org/mongo-driver v1.1.2
+#24 33.46 go get: added go.starlark.net v0.0.0-20200306205701-8dd3e2ee1dd5
+#24 33.46 go get: added golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+#24 33.46 go get: added golang.org/x/net v0.0.0-20201110031124-69a78807bb2b
+#24 33.46 go get: added golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
+#24 33.46 go get: added golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f
+#24 33.46 go get: added golang.org/x/text v0.3.4
+#24 33.46 go get: added golang.org/x/time v0.0.0-20190308202827-9d24e82272b4
+#24 33.46 go get: added google.golang.org/appengine v1.5.0
+#24 33.46 go get: added gopkg.in/inf.v0 v0.9.1
+#24 33.46 go get: added gopkg.in/yaml.v2 v2.3.0
+#24 33.46 go get: added gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+#24 33.46 go get: added k8s.io/api v0.18.10
+#24 33.46 go get: added k8s.io/apimachinery v0.18.10
+#24 33.46 go get: added k8s.io/client-go v0.18.10
+#24 33.46 go get: added k8s.io/klog v1.0.0
+#24 33.46 go get: added k8s.io/kube-openapi v0.0.0-20200410145947-61e04a5be9a6
+#24 33.46 go get: added k8s.io/utils v0.0.0-20200324210504-a9aa75ae1b89
+#24 33.46 go get: added sigs.k8s.io/kustomize/api v0.7.4
+#24 33.46 go get: added sigs.k8s.io/kustomize/cmd/config v0.9.1
+#24 33.46 go get: added sigs.k8s.io/kustomize/kustomize/v3 v3.9.4
+#24 33.46 go get: added sigs.k8s.io/kustomize/kyaml v0.10.9
+#24 33.46 go get: added sigs.k8s.io/structured-merge-diff/v3 v3.0.0
+#24 33.46 go get: added sigs.k8s.io/yaml v1.2.0
+#24 33.53 go: creating new go.mod: module tmp
+#24 33.53 Downloading sigs.k8s.io/controller-tools/cmd/controller-gen@v0.3.0
+#24 33.81 go: downloading sigs.k8s.io/controller-tools v0.3.0
+#24 37.91 go: downloading github.com/spf13/cobra v0.0.5
+#24 37.91 go: downloading golang.org/x/tools v0.0.0-20190920225731-5eefd052ad72
+#24 37.92 go: downloading k8s.io/api v0.18.2
+#24 37.92 go: downloading k8s.io/apimachinery v0.18.2
+#24 37.93 go: downloading github.com/gobuffalo/flect v0.2.0
+#24 37.93 go: downloading k8s.io/apiextensions-apiserver v0.18.2
+#24 38.22 go: downloading gopkg.in/yaml.v3 v3.0.0-20190905181640-827449938966
+#24 38.22 go: downloading gopkg.in/yaml.v2 v2.2.8
+#24 38.22 go: downloading github.com/mattn/go-colorable v0.1.2
+#24 38.22 go: downloading github.com/mattn/go-isatty v0.0.8
+#24 38.39 go: downloading golang.org/x/net v0.0.0-20191004110552-13f9640d40b9
+#24 38.41 go: downloading golang.org/x/sys v0.0.0-20191022100944-742c48ecaeb7
+#24 38.55 go: downloading golang.org/x/text v0.3.2
+#24 40.12 go get: installing executables with 'go get' in module mode is deprecated.
+#24 40.12 	To adjust and download dependencies of the current module, use 'go get -d'.
+#24 40.12 	To install using requirements of the current module, use 'go install'.
+#24 40.12 	To install ignoring the current module, use 'go install' with a version,
+#24 40.12 	like 'go install example.com/cmd@latest'.
+#24 40.12 	For more information, see https://golang.org/doc/go-get-install-deprecation
+#24 40.12 	or run 'go help get' or 'go help install'.
+#24 45.45 go get: added github.com/fatih/color v1.7.0
+#24 45.45 go get: added github.com/gobuffalo/flect v0.2.0
+#24 45.45 go get: added github.com/gogo/protobuf v1.3.1
+#24 45.45 go get: added github.com/google/gofuzz v1.1.0
+#24 45.45 go get: added github.com/inconshreveable/mousetrap v1.0.0
+#24 45.45 go get: added github.com/json-iterator/go v1.1.8
+#24 45.45 go get: added github.com/mattn/go-colorable v0.1.2
+#24 45.45 go get: added github.com/mattn/go-isatty v0.0.8
+#24 45.45 go get: added github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+#24 45.45 go get: added github.com/modern-go/reflect2 v1.0.1
+#24 45.45 go get: added github.com/spf13/cobra v0.0.5
+#24 45.45 go get: added github.com/spf13/pflag v1.0.5
+#24 45.45 go get: added golang.org/x/net v0.0.0-20191004110552-13f9640d40b9
+#24 45.45 go get: added golang.org/x/sys v0.0.0-20191022100944-742c48ecaeb7
+#24 45.45 go get: added golang.org/x/text v0.3.2
+#24 45.45 go get: added golang.org/x/tools v0.0.0-20190920225731-5eefd052ad72
+#24 45.45 go get: added gopkg.in/inf.v0 v0.9.1
+#24 45.45 go get: added gopkg.in/yaml.v2 v2.2.8
+#24 45.45 go get: added gopkg.in/yaml.v3 v3.0.0-20190905181640-827449938966
+#24 45.45 go get: added k8s.io/api v0.18.2
+#24 45.45 go get: added k8s.io/apiextensions-apiserver v0.18.2
+#24 45.45 go get: added k8s.io/apimachinery v0.18.2
+#24 45.45 go get: added k8s.io/klog v1.0.0
+#24 45.45 go get: added k8s.io/utils v0.0.0-20200324210504-a9aa75ae1b89
+#24 45.45 go get: added sigs.k8s.io/controller-tools v0.3.0
+#24 45.45 go get: added sigs.k8s.io/structured-merge-diff/v3 v3.0.0
+#24 45.45 go get: added sigs.k8s.io/yaml v1.2.0
+#24 45.46 /workspace/bin/controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
+#24 48.94 /workspace/bin/controller-gen crd:crdVersions=v1,maxDescLen=0 paths="./..." output:crd:artifacts:config=./manifests/crds/
+#24 50.31 KUSTOMIZE=/workspace/bin/kustomize CONTAINER_REGISTRY=quay.io hack/generate-manifests.sh
+#24 50.34 +++ dirname hack/generate-manifests.sh
+#24 50.34 ++ CDPATH=
+#24 50.34 ++ cd -- hack/..
+#24 50.34 ++ pwd -P
+#24 50.34 + SRCROOT=/workspace
+#24 50.34 + AUTOGENMSG='# This is an auto-generated file. DO NOT EDIT'
+#24 50.34 + KUSTOMIZE=/workspace/bin/kustomize
+#24 50.34 ++ mktemp /tmp/appset-manifests.XXXXXX
+#24 50.34 + TEMPFILE=/tmp/appset-manifests.YTAMID
+#24 50.34 + '[' quay.io '!=' '' ']'
+#24 50.34 + CONTAINER_REGISTRY=quay.io/
+#24 50.34 + IMAGE_NAME=argocd-applicationset
+#24 50.34 + IMAGE_NAMESPACE=argoproj
+#24 50.34 + IMAGE_TAG=
+#24 50.34 + '[' '' = '' ']'
+#24 50.34 ++ git rev-parse --abbrev-ref HEAD
+#24 50.36 + branch=HEAD
+#24 50.36 + [[ HEAD = release-* ]]
+#24 50.36 + '[' '' = '' ']'
+#24 50.36 + IMAGE_TAG=latest
+#24 50.36 + cd /workspace/manifests/base
+#24 50.36 + /workspace/bin/kustomize edit set image quay.io/argoproj/argocd-applicationset=quay.io/argoproj/argocd-applicationset:latest
+#24 50.39 + echo '# This is an auto-generated file. DO NOT EDIT'
+#24 50.39 + cd /workspace/manifests/namespace-install
+#24 50.39 + /workspace/bin/kustomize build .
+#24 51.32 + mv /tmp/appset-manifests.YTAMID /workspace/manifests/install.yaml
+#24 51.34 + cd /workspace
+#24 51.34 + chmod 644 manifests/install.yaml
+#24 51.34 + /workspace/hack/verify-argo-cd-versions.sh
+#24 51.36 go fmt ./...
+#24 51.92 go vet ./...
+#24 97.64 CGO_ENABLED=0 go build -ldflags="-w -s -X github.com/argoproj/applicationset/common.version=0.4.1 -X github.com/argoproj/applicationset/common.gitCommit=a5712ba564afaff0b23697135d6281d413e60345" -o ./dist/argocd-applicationset .
+#24 DONE 122.7s
+
+#25 [stage-1 10/11] COPY --from=builder /workspace/dist/argocd-applicationset /usr/local/bin/applicationset-controller
+#25 sha256:b6e9c904834e7818b833bf39d5e78d8505ec444100f20ea77f553bcf2890b2a9
+#25 DONE 0.3s
+
+#26 exporting to image
+#26 sha256:e8c613e07b0b7ff33893b694f7759a10d42e180f2b4dc349fb57dc6b71dcab00
+#26 exporting layers
+#26 exporting layers 3.7s done
+#26 writing image sha256:7a08377639016a810149f3434e18a9bb1165a12607e94ad88589191df2fbcd94 0.0s done
+#26 naming to armdocker.rnd.ericsson.se/proj-mxe/argoproj/argocd-applicationset:v0.4.1-ubuntu-20220801 done
+#26 DONE 3.7s
+The push refers to repository [armdocker.rnd.ericsson.se/proj-mxe/argoproj/argocd-applicationset]
+6dff3b71d425: Preparing
+3f2c57520c74: Preparing
+a792578bde58: Preparing
+6e970f551dd2: Preparing
+99b9ab482270: Preparing
+28d0f877ba87: Preparing
+f101110b1ec6: Preparing
+3418a550b2d1: Preparing
+6b6f536a800d: Preparing
+c3f11d77a5de: Preparing
+28d0f877ba87: Waiting
+f101110b1ec6: Waiting
+3418a550b2d1: Waiting
+6b6f536a800d: Waiting
+c3f11d77a5de: Waiting
+a792578bde58: Pushed
+3f2c57520c74: Pushed
+6e970f551dd2: Pushed
+f101110b1ec6: Pushed
+99b9ab482270: Pushed
+c3f11d77a5de: Layer already exists
+28d0f877ba87: Pushed
+3418a550b2d1: Pushed
+6dff3b71d425: Pushed
+6b6f536a800d: Pushed
+v0.4.1-ubuntu-20220801: digest: sha256:02342ad94bf967bc652a480397ff1d939eb1e3c064aab1c7f223943d27b5b342 size: 2402

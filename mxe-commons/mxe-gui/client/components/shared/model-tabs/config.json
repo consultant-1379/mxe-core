@@ -1,0 +1,10 @@
+{
+  "script": "model-tabs/ModelTabs",
+  "id": "ModelTabs",
+  "data": {},
+  "dependencies": {
+    "@eui/component": "^0.9.0",
+    "@eui/lit-component": "^0.9.0",
+    "@eui/app": "^0.9.1"
+  }
+}

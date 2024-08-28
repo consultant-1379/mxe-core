@@ -1,0 +1,133 @@
+= Jupyter Lab User Guide
+:author: Kristóf Nékám
+:signature: EKRINKM
+:department: BDGSJBAK
+:doc-name: USER GUIDE
+:doc-no: 3/1553-AVA 901 53
+:revnumber: PA1
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+//Template updated 2018-08-21 (keep to track template history)
+
+[[Introduction]]
+== Introduction
+
+MXE comes with an internal Python Package Index (PyPI) service that enables using `pip install` in MXE managed Jupyter Notebooks to install Python packages in an offline environment. Jupyter Notebooks created in MXE are configured to use this service as the default package index. If one wants to install a package from a different source then the `--index-url` argument has to be used with `pip install` to override the default index URL. The service is only accessible from within the MXE cluster.
+
+To populate it with the necessary packages the corresponding Python Wheel files need to be copied into the pod's `/data/packages/` directory. The default name of the service is `eric-mxe-pypiserver` and its pod's name also starts with `eric-mxe-pypiserver`. Use `kubectl cp` to copy the files into a running pypiserver instance.
+
+It is important that the dependencies of a given library must be available in the internal PyPI pod. Only by downloading a library wheel file from https://pypi.org[pypi.org] does not include its dependencies. With the `pip download` command it is possible to collect the packages of a requirement (library) and all its dependencies into a given directory. With the `--platform`, `--python-version`, `--implementation`, and `--abi` arguments it is possible to download packages for a system different than the one which the command is issued on. To download packages for the MXE Jupyter Notebooks use `pip download` with the following arguments:
+
+....
+python3 -m pip download --platform manylinux1_x86_64 --python-version 37 --implementation cp --abi cp37m --only-binary :all: <requirement>
+....
+
+There's an option of creating a custom init container, which will be used to automatically pre-populate the pypiserver with the desired packages. Such an init container image just needs to have all the Python Wheel files under the `/data/packages` directory and needs to have the `/bin/sh` shell and the `cp` command in place. See an example `Dockerfile` below which can be used to create one.
+
+....
+FROM pypiserver/pypiserver:v1.3.2 AS builder
+COPY requirements.txt /
+RUN python3 -m pip download \
+    --dest /data/packages --disable-pip-version-check \
+    --platform manylinux1_x86_64 --python-version 37 --implementation cp --abi cp37m --only-binary \
+    :all: -r /requirements.txt
+
+FROM alpine:3.10
+COPY --from=builder /data /data
+....
+
+The `/data/packages` directory must be accessible for the pypiserver user (UID: 9898, GID: 9898), the example above takes care of this, as it is using the same pypiserver image to collect the packages.
+
+The init container image name and tag can be configured in the `values.yaml` file used for MXE installation.
+
+[[JupyterLabSupport]]
+== JupyterLab Support
+
+Each MXE user is given their own JupyterLab instance. The instances started during the first access, so it can take longer to start. If the JupyterLab instance is not used or accessed in any way, the instance is shut down, although the data stored in it will be persisted. If JupyterLab is opened again a new instance will be created and the user can continue where they left off.
+
+The JupyterLab can only be accessed from the MXE GUI. Select the *Notebooks* menu item from the left menu. On the *Notebooks* page there is one card accessible. Clicking on that opens the user's JupyterLab instance.
+
+image::gui_notebooks.png[title="Notebooks Tab",scalefit="1"]
+
+Once the JupyterLab instance is started the user will be greeted with the standard JupyterLab launcher page.
+
+image::jupyterlab_launcher.png[title="JupyterLab Launcher",scalefit="1"]
+
+More information about JupyterLab can be found in the https://jupyterlab.readthedocs.io/en/stable/user/interface.html[JupyterLab User Guide].
+
+[[InstallingpipPackagesinJupyterLab]]
+=== Installing pip Packages in JupyterLab
+
+The user can use the terminal built into JupyterLab to install pip packages. These packages have to be installed the following way to ensure the persistence of the packages installed by the user:
+
+....
+pip install --user <package_name>
+....
+
+[[UsingGitinJupyterLab]]
+=== Using Git in JupyterLab
+
+The JupyterLab image that comes with MXE has additional support for Git version control. The repository cloning itself can be done through the git plugin, but the additional setup must be done through the terminal using the git command. To clone a git repository click on the *Git Clone* icon underneath the horizontal menu bar on the Launcher panel. It will open a new popup where the user can enter the git repository URL. The URL needs to be in `+https://... .git+` format. Currently clone and push operations are only supported using https, there is no possibility to use SSH. This means that when executing a push or pull operation, a popup will appear asking for user credentials every time. If the cloning was successful, users will see their repository on the left side in the folder view.
+
+After cloning the repository, a few additional steps are necessary for git user setup, gerrit configuration and push configuration.
+
+First, initialize the git repository from the terminal after stepping in the repository root folder:
+
+....
+$ git init
+....
+
+This can be done from the horizontal menu bar as well, with opening the Git pane and selecting Init. For this to work, double click on the repository folder.
+
+Set up the global git user name and email:
+
+....
+$ git config --global user.name "John Doe"
+$ git config --global user.email "johndoe@example.com"
+....
+
+Set up the git configuration of the repository to send the code for review in Gerrit. For this to work, the git commit hooks needs to be set up for the repository:
+
+....
+cd <repository_folder> && \
+mkdir -p .git/hooks && \
+wget -Lo `git rev-parse --git-dir`/hooks/commit-msg https://<user_name>@gerrit.ericsson.se/tools/hooks/commit-msg && \
+mv commit-msg `git rev-parse --git-dir`/hooks/commit-msg && \
+chmod +x `git rev-parse --git-dir`/hooks/commit-msg
+....
+
+After the commit hook setup is done, change the repository's git configuration:
+
+....
+echo \
+"[core]
+    repositoryformatversion = 0
+    filemode = true
+    bare = false
+    logallrefupdates = true
+[remote \"origin\"]
+    url = <repository_url>
+    fetch = +refs/heads/*:refs/remotes/origin/*
+    fetch = refs/notes/*:refs/notes/*
+    pushurl = <repository_url>
+    push = HEAD:refs/for/master
+[branch \"master\"]
+    remote = origin
+    merge = refs/heads/master" > .git/config
+....
+
+With this setup, the commit can be sent for review in gerrit.
+
+The first push needs to be done using the terminal, with the following git command:
+
+....
+$ git commit -a -m "first commit"
+$ git push
+....
+
+After the first push, the pull and push buttons are available on the Git pane from the UI as well. After this, the commits can be performed from the UI. However, please be aware that the push button force pushes the commit into the repository, bypassing the code review in Gerrit. For code review, the terminal git push command must be used.
+
+image::jupyterlab_git.png[title="Using Git in JupyterLab",scalefit="1"]

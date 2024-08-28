@@ -1,0 +1,11 @@
+productName: "MXE"
+productNumber: "CXD 101 0215"
+
+images:
+  guiService:
+    productName: "MXE"
+    productNumber: "CXU 101 0050"
+    registry:  "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-gui"
+    tag: "VERSION"

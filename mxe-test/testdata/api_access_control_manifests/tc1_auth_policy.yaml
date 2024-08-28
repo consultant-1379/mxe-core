@@ -1,0 +1,20 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: mxe-training-admin-authorization-policy
+  namespace: mxe-ci
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: ingress-controller
+      app.kubernetes.io/name: eric-mxe-ingress-controller
+  action: ALLOW
+  rules:
+  - to:
+    - operation:
+        paths: ["/v1/training-packages", "/v1/training-packages/*"]
+    when:
+    - key: request.auth.claims[iss]
+      values: ["https://oauth.mxe.hahn081.rnd.gic.ericsson.se/auth/realms/mxe"]
+    - key: request.auth.claims[roles]
+      values: ["mxe_training_admin"]

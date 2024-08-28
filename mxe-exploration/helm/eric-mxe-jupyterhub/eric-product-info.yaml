@@ -1,0 +1,39 @@
+productName: "MXE"
+productNumber: "CXD 101 0234"
+
+images:
+  hub:
+    productName: "MXE Exploration Jupyterhub IMAGE"
+    productNumber: "CXU 101 0075"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-jupyterhub"
+    tag: "VERSION"
+  lab:
+    productName: "MXE Exploration Jupyterlab IMAGE"
+    productNumber: "CXU 101 0076"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-jupyterlab"
+    tag: "VERSION"
+  proxy:
+    productName: "MXE Exploration Configurable HTTP Proxy IMAGE"
+    productNumber: "CXU 101 0077"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-configurable-http-proxy"
+    tag: "VERSION"
+  singleuser:
+    productName: "MXE Exploration Jupyterlab IMAGE"
+    productNumber: "CXU 101 0076"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-jupyterlab"
+    tag: "VERSION"
+  networkTools:
+    productName: "MXE Exploration Configurable HTTP Proxy IMAGE"
+    productNumber: "CXU 101 0077"
+    registry: "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-configurable-http-proxy"
+    tag: "VERSION"

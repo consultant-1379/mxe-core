@@ -1,0 +1,16 @@
+{
+  "script": "model-service-detail/ModelServiceDetail",
+  "title": "MODEL_SERVICE_DETAIL_TITLE",
+  "route": "model-services/model-service-detail",
+  "menu": {
+    "id": "MODEL_SERVICE_DETAIL",
+    "data": {
+      "path": "model-services/model-service-detail"
+    }
+  },
+  "dependencies": {
+    "@eui/component": "^0.9.0",
+    "@eui/lit-component": "^0.9.0",
+    "@eui/app": "^0.9.1"
+  }
+}

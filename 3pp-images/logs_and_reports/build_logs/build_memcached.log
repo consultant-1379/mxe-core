@@ -1,0 +1,402 @@
++ set -e
++ case "$(uname -s)" in
+++ uname -s
+++ readlink -f /home/eragxxx/MXE/mxe-core/3pp-images/memcached/build_memcached_image.sh
++ SCRIPT=/home/eragxxx/MXE/mxe-core/3pp-images/memcached/build_memcached_image.sh
+++ dirname /home/eragxxx/MXE/mxe-core/3pp-images/memcached/build_memcached_image.sh
++ BASEDIR=/home/eragxxx/MXE/mxe-core/3pp-images/memcached
+++ dirname /home/eragxxx/MXE/mxe-core/3pp-images/memcached
++ MODULEROOT=/home/eragxxx/MXE/mxe-core/3pp-images
++ source /home/eragxxx/MXE/mxe-core/3pp-images/base_image.sh
+++ export LATEST_DATE_TAG=20230624
+++ LATEST_DATE_TAG=20230624
+++ export BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:focal-20230624
+++ BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:focal-20230624
+++ export MINICONDA_VERSION=py38_4.12.0
+++ MINICONDA_VERSION=py38_4.12.0
+++ export S2I_MINICONDA_DOWNLOAD_VERSION=4.13.0
+++ S2I_MINICONDA_DOWNLOAD_VERSION=4.13.0
+++ export MINICONDA_UBUNTU_IMAGE=armdocker.rnd.ericsson.se/proj-mxe/continuumio/miniconda3:py38_4.12.0-ubuntu-20230624
+++ MINICONDA_UBUNTU_IMAGE=armdocker.rnd.ericsson.se/proj-mxe/continuumio/miniconda3:py38_4.12.0-ubuntu-20230624
+++ export SELDON_JAVA_RUNTIME_IMAGE_SOURCE=openjdk
+++ SELDON_JAVA_RUNTIME_IMAGE_SOURCE=openjdk
+++ export SELDON_JAVA_RUNTIME_IMAGE_VERSION=13.0.1-jdk-buster
+++ SELDON_JAVA_RUNTIME_IMAGE_VERSION=13.0.1-jdk-buster
+++ export SELDON_JAVA_BUILD_IMAGE_SOURCE=seldonio/core-builder
+++ SELDON_JAVA_BUILD_IMAGE_SOURCE=seldonio/core-builder
+++ export SELDON_JAVA_BUILD_IMAGE_VERSION=0.19
+++ SELDON_JAVA_BUILD_IMAGE_VERSION=0.19
+++ export LATEST_ALPINE_TAG=3.18.2
+++ LATEST_ALPINE_TAG=3.18.2
+++ export PYTHON_ALPINE_TAG=3.9.17-alpine3.18
+++ PYTHON_ALPINE_TAG=3.9.17-alpine3.18
+++ export ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
+++ ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
++ echo 'Base image is  armdockerhub.rnd.ericsson.se/ubuntu:focal-20230624'
+Base image is  armdockerhub.rnd.ericsson.se/ubuntu:focal-20230624
++ REPO_URL=https://github.com/bitnami/containers.git
++ RELEASE_TAG=1.6.9-debian-10-r159
++ RELEASE_VERSION=1.6.9-r159
++ IMAGE=armdocker.rnd.ericsson.se/proj-mxe/memcached/mxe-memcached:1.6.9-r159-ubuntu-20230624
++ COMMIT_SHA=c5aa61e8c5aa9f868c0bd53a6310eff0417571b5
++ GIT_REPO_DIR=/home/eragxxx/MXE/mxe-core/3pp-images/memcached/containers
++ BUILD_CONTEXT=/home/eragxxx/MXE/mxe-core/3pp-images/memcached/containers/bitnami/memcached/1/debian-10
++ [[ -d /home/eragxxx/MXE/mxe-core/3pp-images/memcached/containers ]]
++ git clone https://github.com/bitnami/containers.git /home/eragxxx/MXE/mxe-core/3pp-images/memcached/containers
+Cloning into '/home/eragxxx/MXE/mxe-core/3pp-images/memcached/containers'...
++ cd /home/eragxxx/MXE/mxe-core/3pp-images/memcached/containers
++ git reset --hard c5aa61e8c5aa9f868c0bd53a6310eff0417571b5
+HEAD is now at c5aa61e8c5a 1.6.9-debian-10-r159 release
++ cd /home/eragxxx/MXE/mxe-core/3pp-images/memcached
++ DOCKER_BUILDKIT=1
++ docker build --no-cache --build-arg BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:focal-20230624 -t armdocker.rnd.ericsson.se/proj-mxe/memcached/mxe-memcached:1.6.9-r159-ubuntu-20230624 -f /home/eragxxx/MXE/mxe-core/3pp-images/memcached/Dockerfile /home/eragxxx/MXE/mxe-core/3pp-images/memcached/containers/bitnami/memcached/1/debian-10
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.45kB done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for armdockerhub.rnd.ericsson.se/ubuntu:focal-20230624
+#3 DONE 3.1s
+
+#4 [1/8] FROM armdockerhub.rnd.ericsson.se/ubuntu:focal-20230624@sha256:c9820a44b950956a790c354700c1166a7ec648bc0d215fa438d3a339812f1d01
+#4 CACHED
+
+#5 [internal] load build context
+#5 transferring context: 68.52kB done
+#5 DONE 0.0s
+
+#6 [2/8] COPY prebuildfs /
+#6 DONE 0.1s
+
+#7 [3/8] RUN install_packages acl ca-certificates curl gzip libc6 libsasl2-2 libsasl2-modules procps sasl2-bin tar   && curl -o /tmp/libevent-2.1-6_2.1.8-stable-4build1_amd64.deb http://archive.ubuntu.com/ubuntu/pool/main/libe/libevent/libevent-2.1-6_2.1.8-stable-4build1_amd64.deb   && dpkg -i /tmp/libevent-2.1-6_2.1.8-stable-4build1_amd64.deb
+#7 7.322 Reading package lists...
+#7 7.993 Building dependency tree...
+#7 8.134 Reading state information...
+#7 8.277 gzip is already the newest version (1.10-0ubuntu4.1).
+#7 8.277 libc6 is already the newest version (2.31-0ubuntu9.9).
+#7 8.277 procps is already the newest version (2:3.3.16-1ubuntu2.3).
+#7 8.277 tar is already the newest version (1.30+dfsg-7ubuntu0.20.04.3).
+#7 8.277 The following additional packages will be installed:
+#7 8.278   db-util db5.3-util libasn1-8-heimdal libbrotli1 libcurl4 libgssapi-krb5-2
+#7 8.278   libgssapi3-heimdal libhcrypto4-heimdal libheimbase1-heimdal
+#7 8.278   libheimntlm0-heimdal libhx509-5-heimdal libk5crypto3 libkeyutils1
+#7 8.278   libkrb5-26-heimdal libkrb5-3 libkrb5support0 libldap-2.4-2 libldap-common
+#7 8.278   libnghttp2-14 libpsl5 libroken18-heimdal librtmp1 libsasl2-modules-db
+#7 8.279   libsqlite3-0 libssh-4 libssl1.1 libwind0-heimdal openssl
+#7 8.280 Suggested packages:
+#7 8.280   krb5-doc krb5-user libsasl2-modules-gssapi-mit
+#7 8.280   | libsasl2-modules-gssapi-heimdal libsasl2-modules-ldap libsasl2-modules-otp
+#7 8.280   libsasl2-modules-sql
+#7 8.280 Recommended packages:
+#7 8.280   krb5-locales publicsuffix
+#7 8.338 The following NEW packages will be installed:
+#7 8.338   acl ca-certificates curl db-util db5.3-util libasn1-8-heimdal libbrotli1
+#7 8.338   libcurl4 libgssapi-krb5-2 libgssapi3-heimdal libhcrypto4-heimdal
+#7 8.338   libheimbase1-heimdal libheimntlm0-heimdal libhx509-5-heimdal libk5crypto3
+#7 8.338   libkeyutils1 libkrb5-26-heimdal libkrb5-3 libkrb5support0 libldap-2.4-2
+#7 8.338   libldap-common libnghttp2-14 libpsl5 libroken18-heimdal librtmp1 libsasl2-2
+#7 8.339   libsasl2-modules libsasl2-modules-db libsqlite3-0 libssh-4 libssl1.1
+#7 8.339   libwind0-heimdal openssl sasl2-bin
+#7 8.876 0 upgraded, 34 newly installed, 0 to remove and 3 not upgraded.
+#7 8.876 Need to get 5544 kB of archives.
+#7 8.876 After this operation, 17.2 MB of additional disk space will be used.
+#7 8.876 Get:1 http://archive.ubuntu.com/ubuntu focal/main amd64 db5.3-util amd64 5.3.28+dfsg1-0.6ubuntu2 [65.3 kB]
+#7 9.814 Get:2 http://archive.ubuntu.com/ubuntu focal/main amd64 db-util all 1:5.3.21~exp1ubuntu2 [2718 B]
+#7 9.820 Get:3 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libsasl2-modules-db amd64 2.1.27+dfsg-2ubuntu0.1 [14.7 kB]
+#7 9.868 Get:4 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libsasl2-2 amd64 2.1.27+dfsg-2ubuntu0.1 [49.3 kB]
+#7 10.03 Get:5 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libkrb5support0 amd64 1.17-6ubuntu4.3 [31.1 kB]
+#7 10.13 Get:6 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libk5crypto3 amd64 1.17-6ubuntu4.3 [80.2 kB]
+#7 10.34 Get:7 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libkeyutils1 amd64 1.6-6ubuntu1.1 [10.3 kB]
+#7 10.34 Get:8 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libssl1.1 amd64 1.1.1f-1ubuntu2.19 [1321 kB]
+#7 11.05 Get:9 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libkrb5-3 amd64 1.17-6ubuntu4.3 [330 kB]
+#7 11.12 Get:10 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libroken18-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [42.5 kB]
+#7 11.13 Get:11 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libasn1-8-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [181 kB]
+#7 11.17 Get:12 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libheimbase1-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [30.4 kB]
+#7 11.17 Get:13 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libhcrypto4-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [88.1 kB]
+#7 11.20 Get:14 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libwind0-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [47.7 kB]
+#7 11.21 Get:15 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libhx509-5-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [107 kB]
+#7 11.22 Get:16 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libsqlite3-0 amd64 3.31.1-4ubuntu0.5 [549 kB]
+#7 11.29 Get:17 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libkrb5-26-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [207 kB]
+#7 11.32 Get:18 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libheimntlm0-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [15.1 kB]
+#7 11.54 Get:19 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libgssapi3-heimdal amd64 7.7.0+dfsg-1ubuntu1.4 [96.5 kB]
+#7 11.54 Get:20 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libldap-common all 2.4.49+dfsg-2ubuntu1.9 [16.6 kB]
+#7 11.54 Get:21 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libldap-2.4-2 amd64 2.4.49+dfsg-2ubuntu1.9 [155 kB]
+#7 11.55 Get:22 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 sasl2-bin amd64 2.1.27+dfsg-2ubuntu0.1 [105 kB]
+#7 11.57 Get:23 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 openssl amd64 1.1.1f-1ubuntu2.19 [621 kB]
+#7 12.34 Get:24 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 ca-certificates all 20230311ubuntu0.20.04.1 [152 kB]
+#7 12.84 Get:25 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libgssapi-krb5-2 amd64 1.17-6ubuntu4.3 [121 kB]
+#7 13.09 Get:26 http://archive.ubuntu.com/ubuntu focal/main amd64 libpsl5 amd64 0.21.0-1ubuntu1 [51.5 kB]
+#7 13.32 Get:27 http://archive.ubuntu.com/ubuntu focal/main amd64 acl amd64 2.2.53-6 [37.8 kB]
+#7 13.33 Get:28 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libbrotli1 amd64 1.0.7-6ubuntu0.1 [267 kB]
+#7 13.34 Get:29 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libnghttp2-14 amd64 1.40.0-1ubuntu0.1 [78.5 kB]
+#7 13.57 Get:30 http://archive.ubuntu.com/ubuntu focal/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2build1 [54.9 kB]
+#7 13.58 Get:31 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libssh-4 amd64 0.9.3-2ubuntu2.3 [170 kB]
+#7 13.58 Get:32 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libcurl4 amd64 7.68.0-1ubuntu2.19 [235 kB]
+#7 13.63 Get:33 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 curl amd64 7.68.0-1ubuntu2.19 [161 kB]
+#7 13.63 Get:34 http://archive.ubuntu.com/ubuntu focal-updates/main amd64 libsasl2-modules amd64 2.1.27+dfsg-2ubuntu0.1 [48.8 kB]
+#7 13.97 debconf: delaying package configuration, since apt-utils is not installed
+#7 13.99 Fetched 5544 kB in 5s (1015 kB/s)
+#7 14.02 Selecting previously unselected package db5.3-util.
+#7 14.02 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 4126 files and directories currently installed.)
+#7 14.04 Preparing to unpack .../00-db5.3-util_5.3.28+dfsg1-0.6ubuntu2_amd64.deb ...
+#7 14.05 Unpacking db5.3-util (5.3.28+dfsg1-0.6ubuntu2) ...
+#7 14.09 Selecting previously unselected package db-util.
+#7 14.09 Preparing to unpack .../01-db-util_1%3a5.3.21~exp1ubuntu2_all.deb ...
+#7 14.09 Unpacking db-util (1:5.3.21~exp1ubuntu2) ...
+#7 14.13 Selecting previously unselected package libsasl2-modules-db:amd64.
+#7 14.13 Preparing to unpack .../02-libsasl2-modules-db_2.1.27+dfsg-2ubuntu0.1_amd64.deb ...
+#7 14.13 Unpacking libsasl2-modules-db:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#7 14.17 Selecting previously unselected package libsasl2-2:amd64.
+#7 14.17 Preparing to unpack .../03-libsasl2-2_2.1.27+dfsg-2ubuntu0.1_amd64.deb ...
+#7 14.18 Unpacking libsasl2-2:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#7 14.23 Selecting previously unselected package libkrb5support0:amd64.
+#7 14.23 Preparing to unpack .../04-libkrb5support0_1.17-6ubuntu4.3_amd64.deb ...
+#7 14.23 Unpacking libkrb5support0:amd64 (1.17-6ubuntu4.3) ...
+#7 14.27 Selecting previously unselected package libk5crypto3:amd64.
+#7 14.27 Preparing to unpack .../05-libk5crypto3_1.17-6ubuntu4.3_amd64.deb ...
+#7 14.28 Unpacking libk5crypto3:amd64 (1.17-6ubuntu4.3) ...
+#7 14.33 Selecting previously unselected package libkeyutils1:amd64.
+#7 14.33 Preparing to unpack .../06-libkeyutils1_1.6-6ubuntu1.1_amd64.deb ...
+#7 14.33 Unpacking libkeyutils1:amd64 (1.6-6ubuntu1.1) ...
+#7 14.39 Selecting previously unselected package libssl1.1:amd64.
+#7 14.39 Preparing to unpack .../07-libssl1.1_1.1.1f-1ubuntu2.19_amd64.deb ...
+#7 14.40 Unpacking libssl1.1:amd64 (1.1.1f-1ubuntu2.19) ...
+#7 14.53 Selecting previously unselected package libkrb5-3:amd64.
+#7 14.53 Preparing to unpack .../08-libkrb5-3_1.17-6ubuntu4.3_amd64.deb ...
+#7 14.54 Unpacking libkrb5-3:amd64 (1.17-6ubuntu4.3) ...
+#7 14.61 Selecting previously unselected package libroken18-heimdal:amd64.
+#7 14.61 Preparing to unpack .../09-libroken18-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#7 14.62 Unpacking libroken18-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 14.67 Selecting previously unselected package libasn1-8-heimdal:amd64.
+#7 14.67 Preparing to unpack .../10-libasn1-8-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#7 14.67 Unpacking libasn1-8-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 14.73 Selecting previously unselected package libheimbase1-heimdal:amd64.
+#7 14.73 Preparing to unpack .../11-libheimbase1-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#7 14.73 Unpacking libheimbase1-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 14.78 Selecting previously unselected package libhcrypto4-heimdal:amd64.
+#7 14.78 Preparing to unpack .../12-libhcrypto4-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#7 14.78 Unpacking libhcrypto4-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 14.83 Selecting previously unselected package libwind0-heimdal:amd64.
+#7 14.83 Preparing to unpack .../13-libwind0-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#7 14.84 Unpacking libwind0-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 14.88 Selecting previously unselected package libhx509-5-heimdal:amd64.
+#7 14.88 Preparing to unpack .../14-libhx509-5-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#7 14.89 Unpacking libhx509-5-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 14.94 Selecting previously unselected package libsqlite3-0:amd64.
+#7 14.94 Preparing to unpack .../15-libsqlite3-0_3.31.1-4ubuntu0.5_amd64.deb ...
+#7 14.94 Unpacking libsqlite3-0:amd64 (3.31.1-4ubuntu0.5) ...
+#7 15.03 Selecting previously unselected package libkrb5-26-heimdal:amd64.
+#7 15.03 Preparing to unpack .../16-libkrb5-26-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#7 15.03 Unpacking libkrb5-26-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 15.09 Selecting previously unselected package libheimntlm0-heimdal:amd64.
+#7 15.09 Preparing to unpack .../17-libheimntlm0-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#7 15.10 Unpacking libheimntlm0-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 15.14 Selecting previously unselected package libgssapi3-heimdal:amd64.
+#7 15.14 Preparing to unpack .../18-libgssapi3-heimdal_7.7.0+dfsg-1ubuntu1.4_amd64.deb ...
+#7 15.14 Unpacking libgssapi3-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 15.18 Selecting previously unselected package libldap-common.
+#7 15.18 Preparing to unpack .../19-libldap-common_2.4.49+dfsg-2ubuntu1.9_all.deb ...
+#7 15.19 Unpacking libldap-common (2.4.49+dfsg-2ubuntu1.9) ...
+#7 15.22 Selecting previously unselected package libldap-2.4-2:amd64.
+#7 15.22 Preparing to unpack .../20-libldap-2.4-2_2.4.49+dfsg-2ubuntu1.9_amd64.deb ...
+#7 15.23 Unpacking libldap-2.4-2:amd64 (2.4.49+dfsg-2ubuntu1.9) ...
+#7 15.29 Selecting previously unselected package sasl2-bin.
+#7 15.29 Preparing to unpack .../21-sasl2-bin_2.1.27+dfsg-2ubuntu0.1_amd64.deb ...
+#7 15.30 Unpacking sasl2-bin (2.1.27+dfsg-2ubuntu0.1) ...
+#7 15.35 Selecting previously unselected package openssl.
+#7 15.35 Preparing to unpack .../22-openssl_1.1.1f-1ubuntu2.19_amd64.deb ...
+#7 15.36 Unpacking openssl (1.1.1f-1ubuntu2.19) ...
+#7 15.47 Selecting previously unselected package ca-certificates.
+#7 15.47 Preparing to unpack .../23-ca-certificates_20230311ubuntu0.20.04.1_all.deb ...
+#7 15.48 Unpacking ca-certificates (20230311ubuntu0.20.04.1) ...
+#7 15.56 Selecting previously unselected package libgssapi-krb5-2:amd64.
+#7 15.56 Preparing to unpack .../24-libgssapi-krb5-2_1.17-6ubuntu4.3_amd64.deb ...
+#7 15.56 Unpacking libgssapi-krb5-2:amd64 (1.17-6ubuntu4.3) ...
+#7 15.61 Selecting previously unselected package libpsl5:amd64.
+#7 15.61 Preparing to unpack .../25-libpsl5_0.21.0-1ubuntu1_amd64.deb ...
+#7 15.62 Unpacking libpsl5:amd64 (0.21.0-1ubuntu1) ...
+#7 15.65 Selecting previously unselected package acl.
+#7 15.65 Preparing to unpack .../26-acl_2.2.53-6_amd64.deb ...
+#7 15.66 Unpacking acl (2.2.53-6) ...
+#7 15.70 Selecting previously unselected package libbrotli1:amd64.
+#7 15.70 Preparing to unpack .../27-libbrotli1_1.0.7-6ubuntu0.1_amd64.deb ...
+#7 15.71 Unpacking libbrotli1:amd64 (1.0.7-6ubuntu0.1) ...
+#7 15.77 Selecting previously unselected package libnghttp2-14:amd64.
+#7 15.77 Preparing to unpack .../28-libnghttp2-14_1.40.0-1ubuntu0.1_amd64.deb ...
+#7 15.78 Unpacking libnghttp2-14:amd64 (1.40.0-1ubuntu0.1) ...
+#7 15.82 Selecting previously unselected package librtmp1:amd64.
+#7 15.82 Preparing to unpack .../29-librtmp1_2.4+20151223.gitfa8646d.1-2build1_amd64.deb ...
+#7 15.83 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build1) ...
+#7 15.87 Selecting previously unselected package libssh-4:amd64.
+#7 15.87 Preparing to unpack .../30-libssh-4_0.9.3-2ubuntu2.3_amd64.deb ...
+#7 15.88 Unpacking libssh-4:amd64 (0.9.3-2ubuntu2.3) ...
+#7 15.93 Selecting previously unselected package libcurl4:amd64.
+#7 15.93 Preparing to unpack .../31-libcurl4_7.68.0-1ubuntu2.19_amd64.deb ...
+#7 15.94 Unpacking libcurl4:amd64 (7.68.0-1ubuntu2.19) ...
+#7 15.98 Selecting previously unselected package curl.
+#7 15.99 Preparing to unpack .../32-curl_7.68.0-1ubuntu2.19_amd64.deb ...
+#7 15.99 Unpacking curl (7.68.0-1ubuntu2.19) ...
+#7 16.05 Selecting previously unselected package libsasl2-modules:amd64.
+#7 16.05 Preparing to unpack .../33-libsasl2-modules_2.1.27+dfsg-2ubuntu0.1_amd64.deb ...
+#7 16.05 Unpacking libsasl2-modules:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#7 16.10 Setting up libkeyutils1:amd64 (1.6-6ubuntu1.1) ...
+#7 16.12 Setting up libpsl5:amd64 (0.21.0-1ubuntu1) ...
+#7 16.13 Setting up libssl1.1:amd64 (1.1.1f-1ubuntu2.19) ...
+#7 16.21 Setting up libbrotli1:amd64 (1.0.7-6ubuntu0.1) ...
+#7 16.23 Setting up libsqlite3-0:amd64 (3.31.1-4ubuntu0.5) ...
+#7 16.24 Setting up libsasl2-modules:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#7 16.26 Setting up libnghttp2-14:amd64 (1.40.0-1ubuntu0.1) ...
+#7 16.28 Setting up libldap-common (2.4.49+dfsg-2ubuntu1.9) ...
+#7 16.30 Setting up acl (2.2.53-6) ...
+#7 16.32 Setting up libkrb5support0:amd64 (1.17-6ubuntu4.3) ...
+#7 16.33 Setting up libsasl2-modules-db:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#7 16.35 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build1) ...
+#7 16.36 Setting up db5.3-util (5.3.28+dfsg1-0.6ubuntu2) ...
+#7 16.38 Setting up libk5crypto3:amd64 (1.17-6ubuntu4.3) ...
+#7 16.39 Setting up libsasl2-2:amd64 (2.1.27+dfsg-2ubuntu0.1) ...
+#7 16.41 Setting up libroken18-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 16.42 Setting up libkrb5-3:amd64 (1.17-6ubuntu4.3) ...
+#7 16.44 Setting up openssl (1.1.1f-1ubuntu2.19) ...
+#7 16.46 Setting up libheimbase1-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 16.48 Setting up db-util (1:5.3.21~exp1ubuntu2) ...
+#7 16.49 Setting up libasn1-8-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 16.51 Setting up libhcrypto4-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 16.52 Setting up ca-certificates (20230311ubuntu0.20.04.1) ...
+#7 16.85 Updating certificates in /etc/ssl/certs...
+#7 17.27 137 added, 0 removed; done.
+#7 17.30 Setting up libwind0-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 17.32 Setting up libgssapi-krb5-2:amd64 (1.17-6ubuntu4.3) ...
+#7 17.34 Setting up libssh-4:amd64 (0.9.3-2ubuntu2.3) ...
+#7 17.36 Setting up libhx509-5-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 17.37 Setting up libkrb5-26-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 17.39 Setting up libheimntlm0-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 17.40 Setting up libgssapi3-heimdal:amd64 (7.7.0+dfsg-1ubuntu1.4) ...
+#7 17.42 Setting up libldap-2.4-2:amd64 (2.4.49+dfsg-2ubuntu1.9) ...
+#7 17.43 Setting up libcurl4:amd64 (7.68.0-1ubuntu2.19) ...
+#7 17.44 Setting up curl (7.68.0-1ubuntu2.19) ...
+#7 17.46 Setting up sasl2-bin (2.1.27+dfsg-2ubuntu0.1) ...
+#7 17.58 invoke-rc.d: could not determine current runlevel
+#7 17.58 invoke-rc.d: policy-rc.d denied execution of start.
+#7 17.61 Processing triggers for libc-bin (2.31-0ubuntu9.9) ...
+#7 17.66 Processing triggers for ca-certificates (20230311ubuntu0.20.04.1) ...
+#7 17.66 Updating certificates in /etc/ssl/certs...
+#7 17.97 0 added, 0 removed; done.
+#7 17.97 Running hooks in /etc/ca-certificates/update.d...
+#7 17.98 done.
+#7 18.01   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+#7 18.01                                  Dload  Upload   Total   Spent    Left  Speed
+#7 18.01   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0 40  130k   40 54356    0     0  40624      0  0:00:03  0:00:01  0:00:02 40594100  130k  100  130k    0     0  79079      0  0:00:01  0:00:01 --:--:-- 79032
+#7 19.75 Selecting previously unselected package libevent-2.1-6:amd64.
+#7 19.75 (Reading database ... 4753 files and directories currently installed.)
+#7 19.75 Preparing to unpack .../libevent-2.1-6_2.1.8-stable-4build1_amd64.deb ...
+#7 19.77 Unpacking libevent-2.1-6:amd64 (2.1.8-stable-4build1) ...
+#7 19.80 Setting up libevent-2.1-6:amd64 (2.1.8-stable-4build1) ...
+#7 19.82 Processing triggers for libc-bin (2.31-0ubuntu9.9) ...
+#7 DONE 19.9s
+
+#8 [4/8] RUN set -ex && . /opt/bitnami/scripts/libcomponent.sh && component_unpack "memcached" "1.6.9-0" --checksum ba34c1a7f77068678199d5975d45132fab0e6f2fec923150ff94d145340c37af
+#8 0.403 + . /opt/bitnami/scripts/libcomponent.sh
+#8 0.403 + CACHE_ROOT=/tmp/bitnami/pkg/cache
+#8 0.403 + DOWNLOAD_URL=https://downloads.bitnami.com/files/stacksmith
+#8 0.403 + component_unpack memcached 1.6.9-0 --checksum ba34c1a7f77068678199d5975d45132fab0e6f2fec923150ff94d145340c37af
+#8 0.403 + local name=memcached
+#8 0.403 + local version=1.6.9-0
+#8 0.403 + local base_name=memcached-1.6.9-0-linux-amd64-debian-10
+#8 0.403 + local package_sha256=
+#8 0.403 + local directory=/opt/bitnami
+#8 0.403 + shift 2
+#8 0.403 + [ 2 -gt 0 ]
+#8 0.403 + shift
+#8 0.403 + package_sha256=ba34c1a7f77068678199d5975d45132fab0e6f2fec923150ff94d145340c37af
+#8 0.403 + shift
+#8 0.403 + [ 0 -gt 0 ]
+#8 0.403 + echo Downloading memcached-1.6.9-0-linux-amd64-debian-10 package
+#8 0.403 + [ -f /tmp/bitnami/pkg/cache/memcached-1.6.9-0-linux-amd64-debian-10.tar.gz ]
+#8 0.403 Downloading memcached-1.6.9-0-linux-amd64-debian-10 package
+#8 0.403 + curl --remote-name --silent https://downloads.bitnami.com/files/stacksmith/memcached-1.6.9-0-linux-amd64-debian-10.tar.gz
+#8 2.152 Verifying package integrity
+#8 2.152 + [ -n ba34c1a7f77068678199d5975d45132fab0e6f2fec923150ff94d145340c37af ]
+#8 2.152 + echo Verifying package integrity
+#8 2.152 + echo ba34c1a7f77068678199d5975d45132fab0e6f2fec923150ff94d145340c37af  memcached-1.6.9-0-linux-amd64-debian-10.tar.gz
+#8 2.153 + sha256sum --check -
+#8 2.156 memcached-1.6.9-0-linux-amd64-debian-10.tar.gz: OK
+#8 2.156 + tar --directory /opt/bitnami --extract --gunzip --file memcached-1.6.9-0-linux-amd64-debian-10.tar.gz --no-same-owner --strip-components=2 memcached-1.6.9-0-linux-amd64-debian-10/files/
+#8 2.162 + rm memcached-1.6.9-0-linux-amd64-debian-10.tar.gz
+#8 DONE 2.2s
+
+#9 [5/8] RUN set -ex && . /opt/bitnami/scripts/libcomponent.sh && component_unpack "gosu" "1.12.0-2" --checksum 4d858ac600c38af8de454c27b7f65c0074ec3069880cb16d259a6e40a46bbc50
+#9 0.539 + . /opt/bitnami/scripts/libcomponent.sh
+#9 0.539 + CACHE_ROOT=/tmp/bitnami/pkg/cache
+#9 0.539 + DOWNLOAD_URL=https://downloads.bitnami.com/files/stacksmith
+#9 0.539 + component_unpack gosu 1.12.0-2 --checksum 4d858ac600c38af8de454c27b7f65c0074ec3069880cb16d259a6e40a46bbc50
+#9 0.539 + local name=gosu
+#9 0.539 + local version=1.12.0-2
+#9 0.539 + local base_name=gosu-1.12.0-2-linux-amd64-debian-10
+#9 0.539 + local package_sha256=
+#9 0.539 + local directory=/opt/bitnami
+#9 0.539 + shift 2
+#9 0.539 + [ 2 -gt 0 ]
+#9 0.539 + shift
+#9 0.539 + package_sha256=4d858ac600c38af8de454c27b7f65c0074ec3069880cb16d259a6e40a46bbc50
+#9 0.539 + shift
+#9 0.539 + [ 0 -gt 0 ]
+#9 0.539 + echo Downloading gosu-1.12.0-2-linux-amd64-debian-10 package
+#9 0.539 + [ -f /tmp/bitnami/pkg/cache/gosu-1.12.0-2-linux-amd64-debian-10.tar.gz ]
+#9 0.539 Downloading gosu-1.12.0-2-linux-amd64-debian-10 package
+#9 0.539 + curl --remote-name --silent https://downloads.bitnami.com/files/stacksmith/gosu-1.12.0-2-linux-amd64-debian-10.tar.gz
+#9 0.672 + [ -n 4d858ac600c38af8de454c27b7f65c0074ec3069880cb16d259a6e40a46bbc50 ]
+#9 0.672 + echo Verifying package integrity
+#9 0.672 Verifying package integrity
+#9 0.672 + echo 4d858ac600c38af8de454c27b7f65c0074ec3069880cb16d259a6e40a46bbc50  gosu-1.12.0-2-linux-amd64-debian-10.tar.gz
+#9 0.672 + sha256sum --check -
+#9 0.678 gosu-1.12.0-2-linux-amd64-debian-10.tar.gz: OK
+#9 0.678 + tar --directory /opt/bitnami --extract --gunzip --file gosu-1.12.0-2-linux-amd64-debian-10.tar.gz --no-same-owner --strip-components=2 gosu-1.12.0-2-linux-amd64-debian-10/files/
+#9 0.697 + rm gosu-1.12.0-2-linux-amd64-debian-10.tar.gz
+#9 DONE 0.7s
+
+#10 [6/8] RUN chmod g+rwX /opt/bitnami   && ln -s /opt/bitnami/scripts/memcached/entrypoint.sh /entrypoint.sh   && ln -s /opt/bitnami/scripts/memcached/run.sh /run.sh
+#10 DONE 0.6s
+
+#11 [7/8] COPY rootfs /
+#11 DONE 0.0s
+
+#12 [8/8] RUN /opt/bitnami/scripts/memcached/postunpack.sh
+#12 DONE 0.5s
+
+#13 exporting to image
+#13 exporting layers
+#13 exporting layers 0.2s done
+#13 writing image sha256:e436c61b2037e938ef6e5a1de915b568ca16d7793be41808409ea8db1084338c done
+#13 naming to armdocker.rnd.ericsson.se/proj-mxe/memcached/mxe-memcached:1.6.9-r159-ubuntu-20230624 done
+#13 DONE 0.2s
++ docker push armdocker.rnd.ericsson.se/proj-mxe/memcached/mxe-memcached:1.6.9-r159-ubuntu-20230624
+The push refers to repository [armdocker.rnd.ericsson.se/proj-mxe/memcached/mxe-memcached]
+7fe89ca661b5: Preparing
+3e819a7fbcb5: Preparing
+045874411e4b: Preparing
+4cd984700b74: Preparing
+ddd89033bed0: Preparing
+f003257b7497: Preparing
+88b2913b9e6d: Preparing
+f5bb4f853c84: Preparing
+f003257b7497: Waiting
+88b2913b9e6d: Waiting
+f5bb4f853c84: Waiting
+045874411e4b: Pushed
+7fe89ca661b5: Pushed
+ddd89033bed0: Pushed
+3e819a7fbcb5: Pushed
+4cd984700b74: Pushed
+f5bb4f853c84: Layer already exists
+88b2913b9e6d: Pushed
+f003257b7497: Pushed
+1.6.9-r159-ubuntu-20230624: digest: sha256:99c6646ad60cbe8583a9690f53bb2af5b2401a748e827fbe823141802c75d4f4 size: 1991
++ pushed=0
++ [[ 0 == 0 ]]
++ [[ -d /home/eragxxx/MXE/mxe-core/3pp-images/memcached/containers ]]
++ rm -rf /home/eragxxx/MXE/mxe-core/3pp-images/memcached/containers

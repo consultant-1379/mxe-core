@@ -1,0 +1,34 @@
+{{- if not .Values.global.mxeDisableDefaultIngressControllerUse -}}
+{{- if  .Values.config.argocd.ui.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "eric-mxe-deployer-service.mxe-argocd.server.httpingress-default.name" . }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: mxe-deployer-argocd-server-default"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-deployer-service.mxe-argocd.server.httpingress-default.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-deployer-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-deployer-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $ingressAnn := include "eric-mxe-deployer-service.ingress-annotations" . | fromYaml -}}
+    {{- $annotations := include "eric-mxe-deployer-service.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-deployer-service.mergeAnnotations" (dict "location" .Template.Name "sources" (list $ingressAnn $annotations )) | trim | nindent 4 }}
+spec:
+  ingressClassName: {{ index .Values "config" "argocd" "ingress" "clusterWideIngressClass" | quote }}
+  rules:
+    - http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "eric-mxe-deployer-service.mesh-ingress-gw-svc-name" . | quote }}
+              port: 
+                number: {{ include "eric-mxe-deployer-service.mesh-ingress-gw-port" . }}
+      host: {{ include "eric-mxe-deployer-service.mxe-argocd.argocd-ui-ingress-host" . | quote }}
+  tls:
+    - secretName: {{ include "eric-mxe-deployer-service.mxe-argocd.argocd-ui-tls" . | quote}}
+      hosts:
+        - {{ include "eric-mxe-deployer-service.mxe-argocd.argocd-ui-ingress-host" . | quote}}
+{{- end }}
+{{- end }}

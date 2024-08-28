@@ -1,0 +1,155 @@
+pipeline {
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '200', artifactNumToKeepStr: '50'))
+    }
+
+    agent {
+        node {
+            label 'docker'
+        }
+    }
+
+    parameters {
+        string(name: 'TEST_INSTALL_VERSION', defaultValue: getInstallVersion(), description: 'MXE Version to install before test in case install is selected')
+        booleanParam(name: 'CLUSTER_INSTALL', defaultValue: true, description: 'Install cluster before testing')
+        booleanParam(name: 'CLUSTER_CLEANUP', defaultValue: true, description: 'Cleanup cluster after testing')
+        extendedChoice(
+                defaultValue: '',
+                description: 'Choose what test to run',
+                multiSelectDelimiter: ' ',
+                name: 'TCS_TO_RUN',
+                quoteValue: false,
+                saveJSONParameterToFile: false,
+                type: 'PT_MULTI_SELECT',
+                value: 'mxeBaselinePerfTestInception3.xml,mxePerfTestInception3.xml,mxeBaselinePerfTestUBCluster.xml,mxePerfTestUBClustering.xml,mxeBaselinePerfTestEmpty.xml,mxePerfTestEmpty.xml,mxePerformanceTestSuite.xml,mxeScalabilitySuite.xml',
+                visibleItemCount: 10)
+        extendedChoice(
+                defaultValue: 'cluster3',
+                description: 'Choose which cluster you want to use for test (for a CI cluster select bob-ci)',
+                multiSelectDelimiter: ',',
+                name: 'CLUSTER_TO_USE',
+                quoteValue: false,
+                saveJSONParameterToFile: false,
+                type: 'PT_SINGLE_SELECT',
+                value: 'cluster3,bob-ci',
+                visibleItemCount: 10)
+        booleanParam(name: 'FETCH_MODEL_AND_IMAGES', defaultValue: true, description: 'Download the model file and images before starting the test')
+    }
+
+    environment {
+        GIT_AUTHOR_NAME = "mxecifunc"
+        GIT_AUTHOR_EMAIL = "PDLMMECIMM@pdl.internal.ericsson.com"
+        GIT_COMMITTER_NAME = "${USER}"
+        GIT_COMMITTER_EMAIL = "${GIT_AUTHOR_EMAIL}"
+        RELEASE = 'true'
+        GERRIT_CREDENTIALS_ID = 'gerrit-http-password-mxecifunc'
+        RUN_MODEL_FEED = "${params.RUN_MODEL_FEED}"
+        TEST_BASE_VERSION = "${params.TEST_INSTALL_VERSION}"
+        TEST_BASE_VALUES_YAML = "values.yaml"
+        TEST_SUITES_TO_RUN = "${params.TCS_TO_RUN}"
+    }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                sshagent(credentials: ['ssh-key-mxecifunc']) {
+                    sh 'git clean -xdff'
+                    sh 'git submodule sync'
+                    sh 'git submodule update --init --recursive'
+
+                    sh './bob/bob clean'
+                }
+            }
+        }
+
+        stage('Init') {
+            steps {
+                sh './bob/bob init'
+                sh './bob/bob generate-requirements'
+                sh './bob/bob init-dev'
+            }
+        }
+
+        stage('Build JCAT code') {
+            steps {
+                sh './bob/bob build:mxe-jcat'
+            }
+        }
+
+        stage('Lock k8s cluster') {
+            options {
+                lock(resource: null, label: "${params.CLUSTER_TO_USE}", quantity: 1, variable: 'SYSTEM')
+            }
+            stages {
+                stage('Traffic test') {
+                    steps {
+                        echo "Traffic test on target kubernetes system: ${env.SYSTEM}"
+                        withCredentials([
+                                file(credentialsId: 'kubeconfig-' + env.SYSTEM, variable: 'KUBECONFIG'),
+                                string(credentialsId: 'secure-mxeendpoint-' + env.SYSTEM, variable: 'TESTMXEENDPOINT'),
+                                string(credentialsId: 'arm-api-token-mxecifunc', variable: 'API_TOKEN'),
+                        ]) {
+                            echo "Choosen tests: ${params.TCS_TO_RUN}"
+                            script {
+                                sh './bob/bob -d run-jcat-suites:init-install-version-var'
+                                if (params.FETCH_MODEL_AND_IMAGES) {
+                                    sh './bob/bob prepare-baseline-perf-tests'
+                                }
+                                if (params.CLUSTER_INSTALL) {
+                                    sh './bob/bob -d helm-install'
+                                }
+                                sh './bob/bob -d upgrade-test:get-cli'
+                                sh './bob/bob -d run-jcat-suites'
+                                if (params.CLUSTER_CLEANUP) {
+                                    sh './bob/bob -d do-helm-delete'
+                                }
+                            }
+                        }
+                    }
+                    post {
+                        unsuccessful {
+                            withCredentials([
+                                    file(credentialsId: 'kubeconfig-' + env.SYSTEM, variable: 'KUBECONFIG'),
+                            ]) {
+                                catchError {
+                                    sh './bob/bob fetch-logs'
+                                    archiveArtifacts artifacts: 'logs/**', allowEmptyArchive: true
+                                }
+                                script {
+                                    if (params.CLUSTER_CLEANUP) {
+                                        sh './bob/bob -d do-helm-delete'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts 'mxe-jcat-test-log/**/*.*'
+            publishHTML(target: [
+                    allowMissing         : true,
+                    alwaysLinkToLastBuild: false,
+                    keepAll              : true,
+                    reportDir            : 'mxe-jcat-test-log',
+                    reportFiles          : '*/*/index.html',
+                    reportName           : "JCAT System Test Report"
+            ])
+            junit 'mxe-jcat-test-log/*/*/jenkins.xml'
+        }
+        failure {
+                emailext \
+                  to: 'PDLMMECIMM@pdl.internal.ericsson.com',
+                  subject: "MXE Traffic Job Failure for ${currentBuild.fullDisplayName}",
+                  body: "MXE Traffic failed for ${currentBuild.fullDisplayName}, build URL: ${env.BUILD_URL}, \nGerrit change: ${env.GERRIT_CHANGE_URL}"
+        }
+    }
+}
+
+def getInstallVersion() {
+    return Jenkins.instance.getItem('mxe-core-master-pipeline').lastSuccessfulBuild.displayName.replaceAll("\\s", "")
+}

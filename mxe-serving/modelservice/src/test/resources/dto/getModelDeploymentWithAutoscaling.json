@@ -1,0 +1,27 @@
+{
+  "name": "iot-model-a",
+  "type": "model",
+  "created": "2019-03-04T22:14:35Z",
+  "status": "running",
+  "message": null,
+  "models": [
+    {
+      "id": "IoT model A",
+      "version": "0.0.1",
+      "endpointType": "REST",
+      "weight": null
+    }
+  ],
+  "autoScaling": {
+    "minReplicas": 1,
+    "maxReplicas": 3,
+    "metrics": [ {
+      "name": "cpuMilliCores",
+      "targetAverageValue": 12
+    } ]
+  },
+  "replicas": 1,
+  "createdByUserId": "1234-5678-9012",
+  "createdByUserName": "mxe-user"
+}
+

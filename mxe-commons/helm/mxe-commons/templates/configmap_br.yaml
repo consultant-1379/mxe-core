@@ -1,0 +1,30 @@
+{{- if or ((.Values.global.documentDatabasePg).operator).enabled .Values.global.documentDatabasePG.operator.enabled -}}
+{{- if .Values.documentDatabasePG.customObject.enabled -}}
+{{- if .Values.documentDatabasePG.customObject.backupRestore.enabled }}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mxe-commons.pg-br-configmap-name" . }}
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "eric-data-document-database-pg"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-commons.pg-br-configmap-name" . | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    ericsson.com/backup-types-cfg: br-types
+  annotations:
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+data:
+  backup-types-cfg: |
+    version: 1.0.0
+    backupTypes:
+    - name: {{ include "mxe-commons.pg-backup-type-name" . }}
+      dataSets:
+      - name: fullPGClusterBackup
+
+{{- end }}
+{{- end }}
+{{- end }}

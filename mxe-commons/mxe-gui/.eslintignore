@@ -1,0 +1,3 @@
+test/coverage/**/*
+node_modules/**/*
+client/assets/vendor/**/*

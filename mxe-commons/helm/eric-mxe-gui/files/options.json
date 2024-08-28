@@ -1,0 +1,5 @@
+{
+    "prometheusBasePath": {{ .Values.prometheusBasePath | quote }},
+    "mode": {{ include "eric-mxe-gui.gui-mode" . }},
+    "inferencingPath" :  {{ .Values.modelServicePath | quote }}
+}

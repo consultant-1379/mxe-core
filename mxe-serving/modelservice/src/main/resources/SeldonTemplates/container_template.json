@@ -1,0 +1,27 @@
+{
+  "image": "<MXE_MODEL_IMAGE>",
+  "livenessProbe": {
+    "failureThreshold": 6,
+    "tcpSocket": {
+      "port": "http"
+    },
+    "initialDelaySeconds": 10,
+    "periodSeconds": 10,
+    "successThreshold": 1,
+    "timeoutSeconds": 1
+  },
+  "name": "<MXE_MODEL_CONTAINER_NAME>",
+  "readinessProbe": {
+    "failureThreshold": 6,
+    "tcpSocket": {
+      "port": "http"
+    },
+    "initialDelaySeconds": 10,
+    "periodSeconds": 10,
+    "successThreshold": 1,
+    "timeoutSeconds": 1
+  },
+  "volumeMounts": [
+  ],
+  "env": [<MXE_MODEL_CONTAINER_ENVS>]
+}

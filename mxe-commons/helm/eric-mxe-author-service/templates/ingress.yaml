@@ -1,0 +1,36 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "eric-mxe-author-service.name" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: author-service-ingress"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-author-service.name" .)  | fromYaml -}}
+    {{- $authSrvLabels := include "eric-mxe-author-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-author-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $authSrvLabels )) | trim | nindent 4 }}
+  annotations:
+    {{- $authSrvAnn := include "eric-mxe-author-service.annotations" . | fromYaml -}}
+    {{- $ingressAnn := include "eric-mxe-author-service.ingress-annotation" . | fromYaml -}}
+    {{- include "eric-mxe-author-service.mergeAnnotations" (dict "location" .Template.Name "sources" (list $authSrvAnn $ingressAnn)) | trim | nindent 4 }}
+spec:
+  ingressClassName: {{ include "eric-mxe-author-service.ingress-class" . | quote }}
+  defaultBackend:
+    service:
+      name: {{ include "eric-mxe-author-service.defaultbackend" . | quote }}
+      port:
+        name: "http"
+  {{- include "eric-mxe-author-service.ingress-tls" . | nindent 2 -}}
+  rules:
+    - http:
+        paths:
+          - path: /v1/authors
+            backend:
+              service:
+                name: {{ include "eric-mxe-author-service.name" . | quote }}
+                port:
+                  name: "http"
+            pathType: ImplementationSpecific
+      {{- if or .Values.global.mxeApiHostname .Values.ingress.hostname }}
+      host: {{ default .Values.global.mxeApiHostname .Values.ingress.hostname | quote }}
+      {{- end }}
+{{ end }}

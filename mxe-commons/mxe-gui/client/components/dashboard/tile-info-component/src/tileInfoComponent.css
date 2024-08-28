@@ -1,0 +1,35 @@
+.container {
+  border: 1px solid var(--layer1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px 128px;
+  max-height: 148px;
+  height: 132px;
+  background-color: var(--card-color-background, var(--card-color-background, #fafafa));
+}
+
+.data {
+  opacity: 0.8;
+  font-size: 68px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  color: var(--text);
+}
+
+.text {
+  opacity: 0.8;
+  font-size: 24px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  margin-right: 32px;
+  color: var(--text);
+}
+
+.clickable {
+  cursor: pointer;
+}

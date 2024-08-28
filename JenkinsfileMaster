@@ -1,0 +1,363 @@
+def SLAVE_NODE = null
+def onlyDocModified = true
+
+node(label: 'mxe-core') {
+    stage('Nominating build node') {
+        SLAVE_NODE = "${NODE_NAME}"
+        echo "Executing build on ${SLAVE_NODE}"
+    }
+}
+
+pipeline {
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '200', artifactNumToKeepStr: '50'))
+        // Due to how versioning works
+        disableConcurrentBuilds()
+    }
+
+    agent {
+        node {
+            label "${SLAVE_NODE}"
+        }
+    }
+
+    environment {
+        GIT_AUTHOR_NAME = "mxecifunc"
+        GIT_AUTHOR_EMAIL = "PDLMMECIMM@pdl.internal.ericsson.com"
+        GIT_COMMITTER_NAME = "${USER}"
+        GIT_COMMITTER_EMAIL = "${GIT_AUTHOR_EMAIL}"
+        GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GSSAPIAuthentication=no -o PubKeyAuthentication=yes"
+        RELEASE = 'true'
+        CREDENTIALS_SERO_ARTIFACTORY = credentials('mxecifunc-passwd')
+        SERO_ARTIFACTORY_REPO_USER = "${env.CREDENTIALS_SERO_ARTIFACTORY_USR}"
+        SERO_ARTIFACTORY_REPO_PASS = "${env.CREDENTIALS_SERO_ARTIFACTORY_PSW}"
+        // $HOME/.docker for local runs, otherwise set to Jenkins workspace
+        DOCKER_CONFIG="$WORKSPACE"
+    }
+
+    stages {
+        stage('Environment info') {
+            steps {
+                sh 'printenv | sort'
+            }
+        }
+
+        stage('Prepare') {
+            steps {
+                sshagent(credentials: ['ssh-key-mxecifunc']) {
+                    sh 'git clean -xdff'
+                    sh 'git submodule sync'
+                    sh 'git submodule update --init --recursive'
+
+                    sh './bob/bob clean'
+                    script {
+                        final String modifiedFiles = sh script: 'git diff-tree --no-commit-id --name-only -r `git rev-parse HEAD`', returnStdout: true
+                        println modifiedFiles
+                        for (String modifiedFile : modifiedFiles.split('\\R')) {
+                            if (!modifiedFile.startsWith('doc/')) {
+                                println 'Found non document modification: ' + modifiedFile
+                                onlyDocModified = false
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Init') {
+            steps {
+                sh './bob/bob init'
+                sh './bob/bob generate-requirements'
+                sh './bob/bob init-drop'
+                script {
+                    currentBuild.displayName = readFile('.bob/var.version')
+                    gerritReview labels: [:], message: 'Build version: ' + currentBuild.displayName
+                    withCredentials([file(credentialsId: 'ARM_DOCKER_CONFIG', variable: 'DOCKER_CONFIG_FILE')]) {
+                        writeFile file: 'config.json', text: readFile(DOCKER_CONFIG_FILE)
+                    }
+                }
+            }
+        }
+
+        stage('Lint') {
+            steps {
+                sh './bob/bob lint'
+            }
+        }
+
+        stage('Generate docs') {
+            steps {
+                sh './bob/bob generate-docs'
+                archiveArtifacts 'build/doc/**/*'
+            }
+        }
+
+        stage('Build source code') {
+            when { expression { !onlyDocModified } }
+            stages {
+                stage("Parallel Build CLI"){
+                    steps {
+                        parallel(
+                            'cli-go-linux': {
+                                sh './bob/bob go-linux-build'
+                            },
+                            'cli-go-windows':{
+                                sh './bob/bob go-windows-build'
+                            },
+                            "cli-go-macos":{
+                                sh './bob/bob go-macos-build'
+                            },
+                            "cli-go-mxe-generate":{
+                                    sh './bob/bob go-linux-build-mxe-generate'
+                            }
+                        )
+                    }
+                }
+
+                stage("Parallel Build Source"){
+                    steps {
+                        parallel(
+                            'backend-java': {
+                                sh './bob/bob build-java-backend'
+                            },
+                            'gui-nodejs': {
+                                sh './bob/bob build:gui'
+                            },
+                            'keycloak-gatekeeper-go': {
+                                sh './bob/bob build:keycloak-gatekeeper'
+                            },
+                            'jupyterhub-extension' : {
+                                sh './bob/bob build:mxe-jupyter-hub-extension'
+                            }
+                        )
+                    }
+                }
+
+                stage("Archive artifacts"){
+                    steps {
+                        sh './bob/bob build:make-essentials-zip'
+                        script {
+                            archiveArtifacts 'cli/bin/*/mxe-cli-*'
+                            archiveArtifacts 'essentials/mxe-essentials*.zip'
+                        }
+                    }
+                }
+            }
+        }
+
+
+        stage('Lock slave') {
+            options {
+                lock(resource: "${SLAVE_NODE}")
+            }
+            stages {
+                stage('Build Docker images') {
+                    steps {
+                        parallel(
+                                'modelservice': {
+                                    sh './bob/bob image:modelservice'
+                                },
+                                'model-catalogue-service': {
+                                    sh './bob/bob image:model-catalogue-service'
+                                },
+                                'model-training-service': {
+                                    sh './bob/bob image:model-training-service'
+                                },
+                                'pre-upgrade-job': {
+                                    sh './bob/bob image:pre-upgrade-job'
+                                },
+                                'default-backend': {
+                                    sh './bob/bob image:default-backend'
+                                },
+                                'db-init': {
+                                    sh './bob/bob image:db-init'
+                                },
+                                'gui': {
+                                    sh './bob/bob image:gui'
+                                },
+                                'mxe-jupyterlab': {
+                                    sh './bob/bob image:eric-mxe-jupyterlab'
+                                },
+                                'kubernetes-modifier': {
+                                    sh './bob/bob image:kubernetes-modifier'
+                                },
+                                'keycloak-init': {
+                                    sh './bob/bob image:keycloak-init'
+                                },
+                                'keycloak-gatekeeper': {
+                                    sh './bob/bob image:keycloak-gatekeeper'
+                                },
+                                'jupyterhub': {
+                                    sh './bob/bob image:eric-mxe-jupyterhub'
+                                },
+                                'configurable-http-proxy': {
+                                    sh './bob/bob image:eric-mxe-chp'
+                                },
+                                'author-service': {
+                                    sh './bob/bob image:author-service'
+                                },
+                                'kafka-pyconsumer': {
+                                    sh './bob/bob image:kafka-pyconsumer'
+                                },
+                                'deployment-manager':{
+                                    sh './bob/bob image:deployment-manager'
+                                },
+                                'deployment-manager-init':{
+                                    sh './bob/bob image:mxe-deployer-init'
+                                },
+                                'packager':{
+                                    sh './bob/bob image:build-packager'
+                                },
+                                'model-base':{
+                                    sh './bob/bob image:build-model-base'
+                                },
+                                'mxe-cli-image':{
+                                    sh './bob/bob image:build-mxe-cli-image'
+                                }
+                        )
+                    }
+                }
+
+                stage('Publish local') {
+                    steps {
+                        withCredentials([
+                                string(credentialsId: 'arm-api-token-mxecifunc', variable: 'API_TOKEN'),
+                                file(credentialsId: 'helm-credentials', variable: 'HELM_REPO_CREDENTIALS'),
+                        ]) {
+                            sh './bob/bob publish-local'
+                        }
+                    }
+                }
+
+                /*
+                stage('Validate Helm Chart Design Rules') {
+                    steps {
+                        sh './bob/bob validate-helm-design-rules'
+                        archiveArtifacts '.bob/design-rule-check-report.*'
+                    }
+                }*/
+
+
+                stage('Lock k8s') {
+                    when {
+                        expression { !onlyDocModified }
+                        beforeOptions true
+                    }
+                    options {
+                        lock(resource: null, label: 'bob-ci-test', quantity: 1, variable: 'SYSTEM')
+                    }
+                    environment{
+                        KUBECONFIG=credentials("kubeconfig-${env.SYSTEM}")
+                        MXESECRETS=credentials("mxek8ssecrets-${env.SYSTEM}")
+                        TESTMXEENDPOINT=credentials("secure-mxeendpoint-${env.SYSTEM}")
+                        TESTDEPLOYERENDPOINT=credentials("secure-deployerendpoint-${env.SYSTEM}")
+                        TESTDEPLOYERAUTHENDPOINT=credentials("secure-oauthendpoint-${env.SYSTEM}")
+                        GITOPS_REPO=credentials("secure-gitopsrepoendpoint-${env.SYSTEM}")
+                    }
+                    stages {
+                        stage("Print Cluster Info") {
+                            steps {
+                                echo "Target kubernetes system: ${env.SYSTEM}"
+                                sh './bob/bob test-cluster:print-info'
+                            }
+                        }
+
+                        stage('Install Helm Charts'){
+                            steps{
+                                sh './bob/bob install-helm-charts'
+                            }
+                        }
+
+                        stage('Deploy MXE Serving Application'){
+                            steps{
+                                sh './bob/bob install-mxe-serving-package'
+                            }
+                        }
+                        
+                        stage('Deploy MXE Optional Applications'){
+                            steps {
+                                parallel(
+                                        'mxe-worklow': {
+                                            sh './bob/bob install-optional-packages:mxe-workflow'
+                                        },
+                                        'mxe-training': {
+                                            sh './bob/bob install-optional-packages:mxe-training'
+                                        },
+                                        'mxe-exploration': {
+                                            sh './bob/bob install-optional-packages:mxe-exploration'
+                                        }
+                                )
+                            }
+                        }
+                        stage('System test') {
+                            steps {
+                                    sh './bob/bob -d test-master'
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            archiveArtifacts artifacts: 'mxe-test-reports/**/*.*', allowEmptyArchive: true
+                            publishHTML(target: [
+                                    allowMissing         : true,
+                                    alwaysLinkToLastBuild: false,
+                                    keepAll              : true,
+                                    reportDir            : 'mxe-test-reports',
+                                    reportFiles          : '*/report.html',
+                                    reportName           : "MXE Test Report"
+                                    ])
+                            
+                        }
+                        success {
+                            gerritReview labels: ['System-Test': 1]
+                        }
+                        unsuccessful {
+                            gerritReview labels: ['System-Test': -1]
+                            withCredentials([
+                                    file(credentialsId: 'kubeconfig-' + env.SYSTEM, variable: 'KUBECONFIG'),
+                            ]) {
+                                catchError {
+                                    // sh './bob/bob fetch-logs'
+                                    // archiveArtifacts artifacts: 'logs/**', allowEmptyArchive: true
+                                    sh "./bob/bob collect-k8s-logs || true"
+                                    archiveArtifacts allowEmptyArchive: true, artifacts: "k8s-logs/*"
+                                    sh './bob/bob mxe-cleanup'
+                                }
+                            }
+                        }
+                    }
+                }
+
+                stage('Publish artifacts and tag git repo') {
+                    steps {
+                        withCredentials([
+                                string(credentialsId: 'arm-api-token-mxecifunc', variable: 'API_TOKEN'),
+                                file(credentialsId: 'helm-credentials', variable: 'HELM_REPO_CREDENTIALS'),
+                        ]) {
+                            sshagent(credentials: ['ssh-key-mxecifunc']) {
+                                sh './bob/bob publish'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            junit '''mxe-serving/modelservice/target/surefire-reports/TEST-*.xml,
+                     mxe-serving/model-catalogue-service/target/surefire-reports/TEST-*.xml,
+                     mxe-training/model-training-service/target/surefire-reports/TEST-*.xml,
+                     cli/test-output/TEST-*.xml'''
+        }
+        failure {
+                emailext \
+                  to: 'PDLMMECIMM@pdl.internal.ericsson.com',
+                  subject: "MXE Master Job Failure for ${currentBuild.fullDisplayName}",
+                  body: "MXE Master failed for ${currentBuild.fullDisplayName}, build URL: ${env.BUILD_URL}, \nGerrit change: ${env.GERRIT_CHANGE_URL}"
+        }
+    }
+
+}

@@ -1,0 +1,2497 @@
++ set -e
++ case "$(uname -s)" in
+++ uname -s
+++ readlink -f /home/evatsiv/gitViews/mxe-core/3pp-images/gitea/build_gitea_image.sh
++ SCRIPT=/home/evatsiv/gitViews/mxe-core/3pp-images/gitea/build_gitea_image.sh
+++ dirname /home/evatsiv/gitViews/mxe-core/3pp-images/gitea/build_gitea_image.sh
++ BASEDIR=/home/evatsiv/gitViews/mxe-core/3pp-images/gitea
+++ dirname /home/evatsiv/gitViews/mxe-core/3pp-images/gitea
++ MODULEROOT=/home/evatsiv/gitViews/mxe-core/3pp-images
++ source /home/evatsiv/gitViews/mxe-core/3pp-images/base_image.sh
+++ export LATEST_DATE_TAG=20240405
+++ LATEST_DATE_TAG=20240405
+++ export BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
+++ BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
+++ export LATEST_ALPINE_TAG=3.19.1
+++ LATEST_ALPINE_TAG=3.19.1
+++ export PYTHON_ALPINE_TAG=3.12.3-alpine3.19
+++ PYTHON_ALPINE_TAG=3.12.3-alpine3.19
+++ export ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
+++ ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
++ echo 'Base image is  armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405'
+Base image is  armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
++ REPO_URL=https://github.com/go-gitea/gitea.git
++ RELEASE_TAG=v1.20.2
++ IMAGE=armdocker.rnd.ericsson.se/proj-mxe/gitea/mxe-gitea:v1.20.2-ubuntu-20240405-rootless
++ [[ -d /home/evatsiv/gitViews/mxe-core/3pp-images/gitea/gitea ]]
++ git clone https://github.com/go-gitea/gitea.git /home/evatsiv/gitViews/mxe-core/3pp-images/gitea/gitea
+Cloning into '/home/evatsiv/gitViews/mxe-core/3pp-images/gitea/gitea'...
++ DOCKER_BUILDKIT=1
++ docker build --no-cache --build-arg BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405 --build-arg GITEA_VERSION=v1.20.2 --build-arg 'TAGS=bindata sqlite sqlite_unlock_notify' -t armdocker.rnd.ericsson.se/proj-mxe/gitea/mxe-gitea:v1.20.2-ubuntu-20240405-rootless -f /home/evatsiv/gitViews/mxe-core/3pp-images/gitea/Dockerfile.rootless /home/evatsiv/gitViews/mxe-core/3pp-images/gitea/gitea
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.rootless
+#1 transferring dockerfile: 3.05kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/golang:1.20-alpine3.18
+#2 ...
+
+#3 [internal] load metadata for armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
+#3 ...
+
+#4 [auth] dockerhub-ericsson-remote/golang:pull golang:pull token for armdocker.rnd.ericsson.se
+#4 DONE 0.0s
+
+#3 [internal] load metadata for armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
+#3 DONE 17.5s
+
+#2 [internal] load metadata for armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/golang:1.20-alpine3.18
+#2 DONE 23.6s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 2.01kB done
+#5 DONE 0.0s
+
+#6 [stage-1  1/13] FROM armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405@sha256:1b8d8ff4777f36f19bfe73ee4df61e3a0b789caeff29caa019539ec7c9a57f95
+#6 CACHED
+
+#7 [build-env 1/6] FROM armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/golang:1.20-alpine3.18@sha256:67b24c125a2563407c3af701882d07706b0558bd5ae04dd775d4740b1539c096
+#7 CACHED
+
+#8 [internal] load build context
+#8 transferring context: 328.36MB 1.3s done
+#8 DONE 1.3s
+
+#9 [build-env 2/6] RUN apk --no-cache add build-base git nodejs npm
+#9 0.600 fetch https://dl-cdn.alpinelinux.org/alpine/v3.18/main/x86_64/APKINDEX.tar.gz
+#9 1.139 fetch https://dl-cdn.alpinelinux.org/alpine/v3.18/community/x86_64/APKINDEX.tar.gz
+#9 1.473 (1/34) Installing libgcc (12.2.1_git20220924-r10)
+#9 1.483 (2/34) Installing libstdc++ (12.2.1_git20220924-r10)
+#9 1.545 (3/34) Installing zstd-libs (1.5.5-r4)
+#9 1.579 (4/34) Installing binutils (2.40-r7)
+#9 1.710 (5/34) Installing libmagic (5.45-r0)
+#9 1.742 (6/34) Installing file (5.45-r0)
+#9 1.748 (7/34) Installing libgomp (12.2.1_git20220924-r10)
+#9 1.761 (8/34) Installing libatomic (12.2.1_git20220924-r10)
+#9 1.767 (9/34) Installing gmp (6.2.1-r3)
+#9 1.786 (10/34) Installing isl26 (0.26-r1)
+#9 1.839 (11/34) Installing mpfr4 (4.2.0_p12-r0)
+#9 1.859 (12/34) Installing mpc1 (1.3.1-r1)
+#9 1.868 (13/34) Installing gcc (12.2.1_git20220924-r10)
+#9 3.584 (14/34) Installing libstdc++-dev (12.2.1_git20220924-r10)
+#9 4.116 (15/34) Installing musl-dev (1.2.4-r2)
+#9 4.283 (16/34) Installing libc-dev (0.7.2-r5)
+#9 4.289 (17/34) Installing g++ (12.2.1_git20220924-r10)
+#9 4.931 (18/34) Installing make (4.4.1-r1)
+#9 4.944 (19/34) Installing fortify-headers (1.1-r3)
+#9 4.950 (20/34) Installing patch (2.7.6-r10)
+#9 4.966 (21/34) Installing build-base (0.5-r3)
+#9 4.971 (22/34) Installing brotli-libs (1.0.9-r14)
+#9 5.006 (23/34) Installing libunistring (1.1-r1)
+#9 5.045 (24/34) Installing libidn2 (2.3.4-r1)
+#9 5.057 (25/34) Installing nghttp2-libs (1.57.0-r0)
+#9 5.068 (26/34) Installing libcurl (8.5.0-r0)
+#9 5.096 (27/34) Installing libexpat (2.6.2-r0)
+#9 5.107 (28/34) Installing pcre2 (10.42-r1)
+#9 5.160 (29/34) Installing git (2.40.1-r0)
+#9 5.314 (30/34) Installing c-ares (1.19.1-r1)
+#9 5.323 (31/34) Installing icu-data-en (73.2-r2)
+#9 5.389 Executing icu-data-en-73.2-r2.post-install
+#9 5.391 *
+#9 5.391 * If you need ICU with non-English locales and legacy charset support, install
+#9 5.391 * package icu-data-full.
+#9 5.391 *
+#9 5.391 (32/34) Installing icu-libs (73.2-r2)
+#9 5.476 (33/34) Installing nodejs (18.20.1-r0)
+#9 6.050 (34/34) Installing npm (9.6.6-r0)
+#9 6.193 Executing busybox-1.36.1-r5.trigger
+#9 6.197 OK: 313 MiB in 50 packages
+#9 ...
+
+#10 [stage-1  2/13] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y     bash     ca-certificates     dumb-init     gettext     git     curl     gnupg     wget     telnet     netcat     postgresql-client     musl-dev     && ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+#10 6.187 Get:1 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]
+#10 6.415 Get:2 http://security.ubuntu.com/ubuntu jammy-security InRelease [110 kB]
+#10 7.094 Get:3 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [119 kB]
+#10 7.302 Get:4 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [109 kB]
+#10 7.519 Get:5 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]
+#10 7.617 Get:6 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1792 kB]
+#10 7.617 Get:7 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [2265 kB]
+#10 8.062 Get:8 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
+#10 8.063 Get:9 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]
+#10 9.142 Get:10 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1369 kB]
+#10 9.143 Get:11 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [44.7 kB]
+#10 9.147 Get:12 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1077 kB]
+#10 9.344 Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [2339 kB]
+#10 9.568 Get:14 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [1755 kB]
+#10 9.632 Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [51.1 kB]
+#10 9.729 Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [2035 kB]
+#10 15.10 Get:17 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [31.9 kB]
+#10 15.50 Get:18 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [81.0 kB]
+#10 16.13 Fetched 31.4 MB in 15s (2061 kB/s)
+#10 16.13 Reading package lists...
+#10 ...
+
+#9 [build-env 2/6] RUN apk --no-cache add build-base git nodejs npm
+#9 DONE 16.3s
+
+#11 [build-env 3/6] COPY . /go/src/code.gitea.io/gitea
+#11 DONE 3.5s
+
+#10 [stage-1  2/13] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y     bash     ca-certificates     dumb-init     gettext     git     curl     gnupg     wget     telnet     netcat     postgresql-client     musl-dev     && ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+#10 16.13 Reading package lists...
+#10 17.00 Reading package lists...
+#10 17.65 Building dependency tree...
+#10 17.78 Reading state information...
+#10 17.95 bash is already the newest version (5.1-6ubuntu1.1).
+#10 17.95 The following additional packages will be installed:
+#10 17.95   binutils binutils-common binutils-x86-64-linux-gnu cpp cpp-11 dirmngr
+#10 17.95   fontconfig-config fonts-dejavu-core gcc gcc-11 gcc-11-base gettext-base
+#10 17.95   git-man gnupg-l10n gnupg-utils gpg gpg-agent gpg-wks-client gpg-wks-server
+#10 17.95   gpgconf gpgsm less libasan6 libassuan0 libatomic1 libbinutils libbrotli1
+#10 17.95   libbsd0 libc-dev-bin libc-devtools libc6 libc6-dev libcbor0.8 libcc1-0
+#10 17.95   libcrypt-dev libctf-nobfd0 libctf0 libcurl3-gnutls libcurl4 libdeflate0
+#10 17.95   libedit2 liberror-perl libexpat1 libfido2-1 libfontconfig1 libfreetype6
+#10 17.95   libgcc-11-dev libgd3 libgdbm-compat4 libgdbm6 libgomp1 libicu70 libisl23
+#10 17.95   libitm1 libjbig0 libjpeg-turbo8 libjpeg8 libksba8 libldap-2.5-0
+#10 17.95   libldap-common liblsan0 libmd0 libmpc3 libmpfr6 libnghttp2-14 libnpth0
+#10 17.95   libnsl-dev libperl5.34 libpng16-16 libpq5 libpsl5 libquadmath0 libreadline8
+#10 17.95   librtmp1 libsasl2-2 libsasl2-modules libsasl2-modules-db libsqlite3-0
+#10 17.95   libssh-4 libtiff5 libtirpc-dev libtsan0 libubsan1 libwebp7 libx11-6
+#10 17.95   libx11-data libxau6 libxcb1 libxdmcp6 libxext6 libxml2 libxmuu1 libxpm4
+#10 17.95   linux-libc-dev manpages manpages-dev musl netbase netcat-openbsd
+#10 17.95   openssh-client openssl patch perl perl-modules-5.34 pinentry-curses
+#10 17.95   postgresql-client-14 postgresql-client-common publicsuffix readline-common
+#10 17.95   rpcsvc-proto ucf xauth
+#10 17.95 Suggested packages:
+#10 17.95   binutils-doc cpp-doc gcc-11-locales dbus-user-session libpam-systemd
+#10 17.95   pinentry-gnome3 tor gcc-multilib make autoconf automake libtool flex bison
+#10 17.95   gdb gcc-doc gcc-11-multilib gcc-11-doc gettext-doc autopoint libasprintf-dev
+#10 17.95   libgettextpo-dev git-daemon-run | git-daemon-sysvinit git-doc git-email
+#10 17.95   git-gui gitk gitweb git-cvs git-mediawiki git-svn parcimonie xloadimage
+#10 17.95   scdaemon glibc-doc locales libgd-tools gdbm-l10n libsasl2-modules-gssapi-mit
+#10 17.95   | libsasl2-modules-gssapi-heimdal libsasl2-modules-ldap libsasl2-modules-otp
+#10 17.95   libsasl2-modules-sql man-browser keychain libpam-ssh monkeysphere
+#10 17.95   ssh-askpass ed diffutils-doc perl-doc libterm-readline-gnu-perl
+#10 17.95   | libterm-readline-perl-perl libtap-harness-archive-perl pinentry-doc
+#10 17.95   postgresql-14 postgresql-doc-14 readline-doc
+#10 17.95 Recommended packages:
+#10 17.95   libnss-nis libnss-nisplus linux-musl-dev
+#10 18.08 The following NEW packages will be installed:
+#10 18.08   binutils binutils-common binutils-x86-64-linux-gnu ca-certificates cpp
+#10 18.08   cpp-11 curl dirmngr dumb-init fontconfig-config fonts-dejavu-core gcc gcc-11
+#10 18.08   gcc-11-base gettext gettext-base git git-man gnupg gnupg-l10n gnupg-utils
+#10 18.08   gpg gpg-agent gpg-wks-client gpg-wks-server gpgconf gpgsm less libasan6
+#10 18.08   libassuan0 libatomic1 libbinutils libbrotli1 libbsd0 libc-dev-bin
+#10 18.08   libc-devtools libc6-dev libcbor0.8 libcc1-0 libcrypt-dev libctf-nobfd0
+#10 18.08   libctf0 libcurl3-gnutls libcurl4 libdeflate0 libedit2 liberror-perl
+#10 18.08   libexpat1 libfido2-1 libfontconfig1 libfreetype6 libgcc-11-dev libgd3
+#10 18.08   libgdbm-compat4 libgdbm6 libgomp1 libicu70 libisl23 libitm1 libjbig0
+#10 18.08   libjpeg-turbo8 libjpeg8 libksba8 libldap-2.5-0 libldap-common liblsan0
+#10 18.08   libmd0 libmpc3 libmpfr6 libnghttp2-14 libnpth0 libnsl-dev libperl5.34
+#10 18.08   libpng16-16 libpq5 libpsl5 libquadmath0 libreadline8 librtmp1 libsasl2-2
+#10 18.08   libsasl2-modules libsasl2-modules-db libsqlite3-0 libssh-4 libtiff5
+#10 18.08   libtirpc-dev libtsan0 libubsan1 libwebp7 libx11-6 libx11-data libxau6
+#10 18.08   libxcb1 libxdmcp6 libxext6 libxml2 libxmuu1 libxpm4 linux-libc-dev manpages
+#10 18.08   manpages-dev musl musl-dev netbase netcat netcat-openbsd openssh-client
+#10 18.08   openssl patch perl perl-modules-5.34 pinentry-curses postgresql-client
+#10 18.08   postgresql-client-14 postgresql-client-common publicsuffix readline-common
+#10 18.08   rpcsvc-proto telnet ucf wget xauth
+#10 18.08 The following packages will be upgraded:
+#10 18.08   libc6
+#10 ...
+
+#12 [build-env 4/6] WORKDIR /go/src/code.gitea.io/gitea
+#12 DONE 0.1s
+
+#13 [build-env 5/6] RUN if [ -n "v1.20.2" ]; then git checkout "v1.20.2"; fi  && make clean-all build
+#13 1.162 Note: switching to 'v1.20.2'.
+#13 1.162 
+#13 1.162 You are in 'detached HEAD' state. You can look around, make experimental
+#13 1.162 changes and commit them, and you can discard any commits you make in this
+#13 1.162 state without impacting any branches by switching back to a branch.
+#13 1.162 
+#13 1.162 If you want to create a new branch to retain commits you create, you may
+#13 1.162 do so (now or later) by using -c with the switch command. Example:
+#13 1.162 
+#13 1.162   git switch -c <new-branch-name>
+#13 1.162 
+#13 1.162 Or undo this operation with:
+#13 1.162 
+#13 1.162   git switch -
+#13 1.162 
+#13 1.162 Turn off this advice by setting config variable advice.detachedHead to false
+#13 1.162 
+#13 1.162 HEAD is now at 09814117e Add changelog for 1.20.2 (#26208) (#26217)
+#13 1.217 go clean -i ./...
+#13 1.439 go: downloading github.com/google/go-github/v52 v52.0.0
+#13 1.439 go: downloading gopkg.in/yaml.v3 v3.0.1
+#13 1.440 go: downloading github.com/urfave/cli v1.22.13
+#13 1.445 go: downloading xorm.io/builder v0.3.13
+#13 1.445 go: downloading xorm.io/xorm v1.3.3-0.20230725140238-59b727260d35
+#13 1.451 go: downloading github.com/go-webauthn/webauthn v0.8.2
+#13 1.455 go: downloading github.com/google/uuid v1.3.0
+#13 3.167 go: downloading github.com/hashicorp/golang-lru v0.6.0
+#13 3.404 go: downloading github.com/minio/sha256-simd v1.0.0
+#13 3.423 go: downloading github.com/pquerna/otp v1.4.0
+#13 4.004 go: downloading golang.org/x/crypto v0.11.0
+#13 5.223 go: downloading github.com/denisenkom/go-mssqldb v0.12.3
+#13 7.387 go: downloading github.com/go-sql-driver/mysql v1.7.1
+#13 8.712 go: downloading github.com/lib/pq v1.10.9
+#13 10.95 go: downloading github.com/gobwas/glob v0.2.3
+#13 12.79 go: downloading github.com/stretchr/testify v1.8.2
+#13 12.81 go: downloading code.gitea.io/actions-proto-go v0.2.1
+#13 ...
+
+#10 [stage-1  2/13] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y     bash     ca-certificates     dumb-init     gettext     git     curl     gnupg     wget     telnet     netcat     postgresql-client     musl-dev     && ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+#10 23.54 1 upgraded, 122 newly installed, 0 to remove and 2 not upgraded.
+#10 23.54 Need to get 95.0 MB of archives.
+#10 23.54 After this operation, 318 MB of additional disk space will be used.
+#10 23.54 Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 perl-modules-5.34 all 5.34.0-3ubuntu1.3 [2976 kB]
+#10 24.99 Get:2 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libc6 amd64 2.35-0ubuntu3.7 [3235 kB]
+#10 25.17 Get:3 http://archive.ubuntu.com/ubuntu jammy/main amd64 libgdbm6 amd64 1.23-1 [33.9 kB]
+#10 25.17 Get:4 http://archive.ubuntu.com/ubuntu jammy/main amd64 libgdbm-compat4 amd64 1.23-1 [6606 B]
+#10 25.17 Get:5 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libperl5.34 amd64 5.34.0-3ubuntu1.3 [4820 kB]
+#10 25.43 Get:6 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 perl amd64 5.34.0-3ubuntu1.3 [232 kB]
+#10 25.48 Get:7 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 openssl amd64 3.0.2-0ubuntu1.15 [1186 kB]
+#10 25.53 Get:8 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 ca-certificates all 20230311ubuntu0.22.04.1 [155 kB]
+#10 25.55 Get:9 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 less amd64 590-1ubuntu0.22.04.2 [143 kB]
+#10 25.56 Get:10 http://archive.ubuntu.com/ubuntu jammy/main amd64 libmd0 amd64 1.0.4-1build1 [23.0 kB]
+#10 25.56 Get:11 http://archive.ubuntu.com/ubuntu jammy/main amd64 libbsd0 amd64 0.11.5-1 [44.8 kB]
+#10 30.88 Get:12 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libexpat1 amd64 2.4.7-1ubuntu0.3 [91.0 kB]
+#10 31.51 Get:13 http://archive.ubuntu.com/ubuntu jammy/main amd64 libicu70 amd64 70.1-2 [10.6 MB]
+#10 33.02 Get:14 http://archive.ubuntu.com/ubuntu jammy/main amd64 readline-common all 8.1.2-1 [53.5 kB]
+#10 33.02 Get:15 http://archive.ubuntu.com/ubuntu jammy/main amd64 libreadline8 amd64 8.1.2-1 [153 kB]
+#10 33.02 Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsqlite3-0 amd64 3.37.2-2ubuntu0.3 [641 kB]
+#10 33.09 Get:17 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libxml2 amd64 2.9.13+dfsg-1ubuntu0.4 [763 kB]
+#10 33.12 Get:18 http://archive.ubuntu.com/ubuntu jammy/main amd64 netbase all 6.3 [12.9 kB]
+#10 33.12 Get:19 http://archive.ubuntu.com/ubuntu jammy/main amd64 netcat-openbsd amd64 1.218-4ubuntu1 [39.4 kB]
+#10 33.12 Get:20 http://archive.ubuntu.com/ubuntu jammy/main amd64 ucf all 3.0043 [56.1 kB]
+#10 33.13 Get:21 http://archive.ubuntu.com/ubuntu jammy/main amd64 gettext-base amd64 0.21-4ubuntu4 [37.8 kB]
+#10 33.13 Get:22 http://archive.ubuntu.com/ubuntu jammy/main amd64 libcbor0.8 amd64 0.8.0-2ubuntu1 [24.6 kB]
+#10 ...
+
+#13 [build-env 5/6] RUN if [ -n "v1.20.2" ]; then git checkout "v1.20.2"; fi  && make clean-all build
+#13 14.80 go: downloading gitea.com/gitea/act v0.243.4
+#13 ...
+
+#10 [stage-1  2/13] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y     bash     ca-certificates     dumb-init     gettext     git     curl     gnupg     wget     telnet     netcat     postgresql-client     musl-dev     && ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+#10 38.47 Get:23 http://archive.ubuntu.com/ubuntu jammy/main amd64 libedit2 amd64 3.1-20210910-1build1 [96.8 kB]
+#10 39.12 Get:24 http://archive.ubuntu.com/ubuntu jammy/main amd64 libfido2-1 amd64 1.10.0-1 [82.8 kB]
+#10 39.21 Get:25 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libnghttp2-14 amd64 1.43.0-1ubuntu0.1 [76.7 kB]
+#10 39.33 Get:26 http://archive.ubuntu.com/ubuntu jammy/main amd64 libpng16-16 amd64 1.6.37-3build5 [191 kB]
+#10 39.47 Get:27 http://archive.ubuntu.com/ubuntu jammy/main amd64 libpsl5 amd64 0.21.0-1.2build2 [58.4 kB]
+#10 39.50 Get:28 http://archive.ubuntu.com/ubuntu jammy/main amd64 libxau6 amd64 1:1.0.9-1build5 [7634 B]
+#10 39.50 Get:29 http://archive.ubuntu.com/ubuntu jammy/main amd64 libxdmcp6 amd64 1:1.1.3-0ubuntu5 [10.9 kB]
+#10 39.51 Get:30 http://archive.ubuntu.com/ubuntu jammy/main amd64 libxcb1 amd64 1.14-3ubuntu3 [49.0 kB]
+#10 39.53 Get:31 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libx11-data all 2:1.7.5-1ubuntu0.3 [120 kB]
+#10 39.59 Get:32 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libx11-6 amd64 2:1.7.5-1ubuntu0.3 [667 kB]
+#10 39.75 Get:33 http://archive.ubuntu.com/ubuntu jammy/main amd64 libxext6 amd64 2:1.3.4-1build1 [31.8 kB]
+#10 45.09 Get:34 http://archive.ubuntu.com/ubuntu jammy/main amd64 libxmuu1 amd64 2:1.1.3-3 [10.2 kB]
+#10 45.25 Get:35 http://archive.ubuntu.com/ubuntu jammy/main amd64 manpages all 5.10-1ubuntu1 [1375 kB]
+#10 46.27 Get:36 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 openssh-client amd64 1:8.9p1-3ubuntu0.7 [906 kB]
+#10 46.38 Get:37 http://archive.ubuntu.com/ubuntu jammy/main amd64 publicsuffix all 20211207.1025-1 [129 kB]
+#10 46.40 Get:38 http://archive.ubuntu.com/ubuntu jammy/main amd64 telnet amd64 0.17-44build1 [66.9 kB]
+#10 46.40 Get:39 http://archive.ubuntu.com/ubuntu jammy/main amd64 wget amd64 1.21.2-2ubuntu1 [367 kB]
+#10 46.44 Get:40 http://archive.ubuntu.com/ubuntu jammy/main amd64 xauth amd64 1:1.1-1build2 [27.5 kB]
+#10 46.44 Get:41 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 binutils-common amd64 2.38-4ubuntu2.6 [222 kB]
+#10 46.46 Get:42 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libbinutils amd64 2.38-4ubuntu2.6 [662 kB]
+#10 46.50 Get:43 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libctf-nobfd0 amd64 2.38-4ubuntu2.6 [108 kB]
+#10 46.51 Get:44 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libctf0 amd64 2.38-4ubuntu2.6 [103 kB]
+#10 ...
+
+#13 [build-env 5/6] RUN if [ -n "v1.20.2" ]; then git checkout "v1.20.2"; fi  && make clean-all build
+#13 20.03 go: downloading google.golang.org/protobuf v1.30.0
+#13 22.09 go: downloading gitea.com/go-chi/session v0.0.0-20230415140235-3182bcc14852
+#13 22.09 go: downloading github.com/felixge/fgprof v0.9.3
+#13 22.09 go: downloading github.com/caddyserver/certmagic v0.17.2
+#13 22.09 go: downloading github.com/golang-jwt/jwt/v4 v4.5.0
+#13 22.09 go: downloading github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
+#13 22.09 go: downloading github.com/klauspost/cpuid/v2 v2.2.4
+#13 23.65 go: downloading github.com/mattn/go-isatty v0.0.18
+#13 23.90 go: downloading github.com/mholt/archiver/v3 v3.5.1
+#13 23.93 go: downloading github.com/42wim/sshsig v0.0.0-20211121163825-841cf5bbc121
+#13 23.98 go: downloading github.com/keybase/go-crypto v0.0.0-20200123153347-de78d2cb44f4
+#13 25.01 go: downloading github.com/tstranex/u2f v1.0.0
+#13 25.51 go: downloading github.com/6543/go-version v1.3.1
+#13 25.67 go: downloading github.com/go-fed/httpsig v1.1.1-0.20201223112313-55836744818e
+#13 25.84 go: downloading strk.kbt.io/projects/go/libravatar v0.0.0-20191008002943-06d1c002b251
+#13 26.49 go: downloading github.com/go-testfixtures/testfixtures/v3 v3.9.0
+#13 26.49 go: downloading github.com/yohcop/openid-go v1.0.1
+#13 26.49 go: downloading github.com/fsnotify/fsnotify v1.6.0
+#13 26.75 go: downloading github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
+#13 27.18 go: downloading github.com/oliamb/cutter v0.2.2
+#13 27.24 go: downloading golang.org/x/image v0.7.0
+#13 28.19 go: downloading golang.org/x/text v0.11.0
+#13 28.38 go: downloading github.com/dustin/go-humanize v1.0.1
+#13 28.41 go: downloading gitea.com/go-chi/cache v0.2.0
+#13 29.10 go: downloading github.com/redis/go-redis/v9 v9.0.4
+#13 29.45 go: downloading github.com/gogs/chardet v0.0.0-20211120154057-b7413eaefb8f
+#13 29.45 go: downloading golang.org/x/net v0.12.0
+#13 31.36 go: downloading github.com/go-enry/go-enry/v2 v2.8.4
+#13 31.44 go: downloading github.com/alecthomas/chroma/v2 v2.7.0
+#13 ...
+
+#10 [stage-1  2/13] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y     bash     ca-certificates     dumb-init     gettext     git     curl     gnupg     wget     telnet     netcat     postgresql-client     musl-dev     && ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+#10 51.86 Get:45 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 binutils-x86-64-linux-gnu amd64 2.38-4ubuntu2.6 [2326 kB]
+#10 53.33 Get:46 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 binutils amd64 2.38-4ubuntu2.6 [3200 B]
+#10 53.33 Get:47 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gcc-11-base amd64 11.4.0-1ubuntu1~22.04 [20.2 kB]
+#10 53.33 Get:48 http://archive.ubuntu.com/ubuntu jammy/main amd64 libisl23 amd64 0.24-2build1 [727 kB]
+#10 53.37 Get:49 http://archive.ubuntu.com/ubuntu jammy/main amd64 libmpfr6 amd64 4.1.0-3build3 [1425 kB]
+#10 53.44 Get:50 http://archive.ubuntu.com/ubuntu jammy/main amd64 libmpc3 amd64 1.2.1-2build1 [46.9 kB]
+#10 53.44 Get:51 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 cpp-11 amd64 11.4.0-1ubuntu1~22.04 [10.0 MB]
+#10 54.16 Get:52 http://archive.ubuntu.com/ubuntu jammy/main amd64 cpp amd64 4:11.2.0-1ubuntu1 [27.7 kB]
+#10 54.16 Get:53 http://archive.ubuntu.com/ubuntu jammy/main amd64 libbrotli1 amd64 1.0.9-2build6 [315 kB]
+#10 54.19 Get:54 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsasl2-modules-db amd64 2.1.27+dfsg2-3ubuntu1.2 [20.5 kB]
+#10 54.20 Get:55 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsasl2-2 amd64 2.1.27+dfsg2-3ubuntu1.2 [53.8 kB]
+#10 ...
+
+#13 [build-env 5/6] RUN if [ -n "v1.20.2" ]; then git checkout "v1.20.2"; fi  && make clean-all build
+#13 33.13 go: downloading gitea.com/go-chi/captcha v0.0.0-20230415143339-2c0754df4384
+#13 33.44 go: downloading github.com/editorconfig/editorconfig-core-go/v2 v2.5.2
+#13 34.25 go: downloading github.com/go-chi/chi/v5 v5.0.8
+#13 34.25 go: downloading github.com/blevesearch/bleve/v2 v2.3.7
+#13 34.25 go: downloading github.com/json-iterator/go v1.1.12
+#13 34.26 go: downloading gitea.com/go-chi/binding v0.0.0-20230415142243-04b515c6d669
+#13 34.50 go: downloading github.com/buildkite/terminal-to-html/v3 v3.7.0
+#13 34.95 go: downloading github.com/microcosm-cc/bluemonday v1.0.25
+#13 34.95 go: downloading github.com/yuin/goldmark v1.5.4
+#13 35.45 go: downloading mvdan.cc/xurls/v2 v2.4.0
+#13 36.77 go: downloading github.com/ethantkoenig/rupture v1.0.1
+#13 36.77 go: downloading github.com/olivere/elastic/v7 v7.0.32
+#13 36.77 go: downloading github.com/niklasfasching/go-org v1.6.5
+#13 36.77 go: downloading codeberg.org/gusted/mcaptcha v0.0.0-20220723083913-4f3072e1d570
+#13 36.77 go: downloading github.com/meilisearch/meilisearch-go v0.24.0
+#13 36.79 go: downloading github.com/prometheus/client_golang v1.15.1
+#13 36.95 go: downloading github.com/yuin/goldmark-highlighting/v2 v2.0.0-20220924101305-151362477c87
+#13 38.51 go: downloading github.com/yuin/goldmark-meta v1.1.0
+#13 38.57 go: downloading github.com/syndtr/goleveldb v1.0.0
+#13 38.97 go: downloading github.com/santhosh-tekuri/jsonschema/v5 v5.3.0
+#13 39.11 go: downloading github.com/opencontainers/image-spec v1.1.0-rc3
+#13 ...
+
+#10 [stage-1  2/13] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y     bash     ca-certificates     dumb-init     gettext     git     curl     gnupg     wget     telnet     netcat     postgresql-client     musl-dev     && ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+#10 59.53 Get:56 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libldap-2.5-0 amd64 2.5.17+dfsg-0ubuntu0.22.04.1 [183 kB]
+#10 60.35 Get:57 http://archive.ubuntu.com/ubuntu jammy/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2build4 [58.2 kB]
+#10 60.38 Get:58 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libssh-4 amd64 0.9.6-2ubuntu0.22.04.3 [186 kB]
+#10 60.53 Get:59 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libcurl4 amd64 7.81.0-1ubuntu1.16 [290 kB]
+#10 60.69 Get:60 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 curl amd64 7.81.0-1ubuntu1.16 [194 kB]
+#10 60.74 Get:61 http://archive.ubuntu.com/ubuntu jammy/main amd64 libassuan0 amd64 2.5.5-1build1 [38.2 kB]
+#10 60.75 Get:62 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gpgconf amd64 2.2.27-3ubuntu2.1 [94.2 kB]
+#10 60.77 Get:63 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libksba8 amd64 1.6.0-2ubuntu0.2 [119 kB]
+#10 60.81 Get:64 http://archive.ubuntu.com/ubuntu jammy/main amd64 libnpth0 amd64 1.6-3build2 [8664 B]
+#10 60.81 Get:65 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 dirmngr amd64 2.2.27-3ubuntu2.1 [293 kB]
+#10 60.87 Get:66 http://archive.ubuntu.com/ubuntu jammy/main amd64 fonts-dejavu-core all 2.37-2build1 [1041 kB]
+#10 66.57 Get:67 http://archive.ubuntu.com/ubuntu jammy/main amd64 fontconfig-config all 2.13.1-4.2ubuntu5 [29.1 kB]
+#10 66.96 Get:68 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libcc1-0 amd64 12.3.0-1ubuntu1~22.04 [48.3 kB]
+#10 67.13 Get:69 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libgomp1 amd64 12.3.0-1ubuntu1~22.04 [126 kB]
+#10 67.42 Get:70 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libitm1 amd64 12.3.0-1ubuntu1~22.04 [30.2 kB]
+#10 67.48 Get:71 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libatomic1 amd64 12.3.0-1ubuntu1~22.04 [10.4 kB]
+#10 67.48 Get:72 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libasan6 amd64 11.4.0-1ubuntu1~22.04 [2282 kB]
+#10 68.17 Get:73 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 liblsan0 amd64 12.3.0-1ubuntu1~22.04 [1069 kB]
+#10 68.25 Get:74 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libtsan0 amd64 11.4.0-1ubuntu1~22.04 [2260 kB]
+#10 68.43 Get:75 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libubsan1 amd64 12.3.0-1ubuntu1~22.04 [976 kB]
+#10 68.51 Get:76 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libquadmath0 amd64 12.3.0-1ubuntu1~22.04 [154 kB]
+#10 68.51 Get:77 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libgcc-11-dev amd64 11.4.0-1ubuntu1~22.04 [2517 kB]
+#10 ...
+
+#13 [build-env 5/6] RUN if [ -n "v1.20.2" ]; then git checkout "v1.20.2"; fi  && make clean-all build
+#13 40.22 go: downloading github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
+#13 40.52 go: downloading github.com/klauspost/compress v1.16.5
+#13 40.52 go: downloading github.com/ulikunitz/xz v0.5.11
+#13 40.52 go: downloading github.com/sassoftware/go-rpmutils v0.2.0
+#13 40.88 go: downloading github.com/google/pprof v0.0.0-20230502171905-255e3b9b56de
+#13 41.79 go: downloading github.com/gliderlabs/ssh v0.3.5
+#13 41.96 go: downloading github.com/djherbis/buffer v1.2.0
+#13 42.27 go: downloading github.com/djherbis/nio/v3 v3.0.1
+#13 42.79 go: downloading github.com/minio/minio-go/v7 v7.0.52
+#13 43.77 go: downloading gitea.com/lunny/levelqueue v0.4.2-0.20220729054728-f020868cc2f7
+#13 43.88 go: downloading github.com/huandu/xstrings v1.4.0
+#13 43.98 go: downloading github.com/bufbuild/connect-go v1.7.0
+#13 44.10 go: downloading google.golang.org/grpc v1.53.0
+#13 44.90 go: downloading github.com/dsnet/compress v0.0.2-0.20210315054119-f66993602bf5
+#13 45.03 go: downloading golang.org/x/sys v0.10.0
+#13 45.03 go: downloading github.com/opencontainers/go-digest v1.0.0
+#13 45.68 go: downloading gopkg.in/ini.v1 v1.67.0
+#13 46.09 go: downloading github.com/go-ap/activitypub v0.0.0-20230331173947-f5b96d9450d4
+#13 46.89 go: downloading github.com/go-ap/jsonld v0.0.0-20221030091449-f2a191312c73
+#13 47.15 go: downloading github.com/go-chi/cors v1.2.1
+#13 48.83 go: downloading github.com/chi-middleware/proxy v1.1.1
+#13 48.85 go: downloading github.com/markbates/goth v1.77.0
+#13 49.09 go: downloading golang.org/x/oauth2 v0.8.0
+#13 49.09 go: downloading github.com/gorilla/feeds v1.1.1
+#13 49.72 go: downloading github.com/NYTimes/gziphandler v1.1.1
+#13 50.16 go: downloading github.com/go-ldap/ldap/v3 v3.4.4
+#13 50.22 go: downloading github.com/gorilla/sessions v1.2.1
+#13 50.98 go: downloading github.com/gogs/cron v0.0.0-20171120032916-9f6c956d3e14
+#13 50.98 go: downloading github.com/emersion/go-imap v1.2.1
+#13 50.98 go: downloading github.com/dimiro1/reply v0.0.0-20200315094148-d0136a4c9e21
+#13 51.44 go: downloading github.com/jhillyerd/enmime v0.11.1
+#13 51.95 go: downloading github.com/sergi/go-diff v1.3.1
+#13 52.01 go: downloading code.gitea.io/sdk/gitea v0.15.1
+#13 52.80 go: downloading github.com/gogs/go-gogs-client v0.0.0-20210131175652-1d7215cd8d85
+#13 52.91 go: downloading github.com/xanzy/go-gitlab v0.83.0
+#13 52.91 go: downloading github.com/pkg/errors v0.9.1
+#13 52.92 go: downloading github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358
+#13 53.38 go: downloading github.com/jaytaylor/html2text v0.0.0-20230321000545-74c2419ad056
+#13 53.52 go: downloading gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
+#13 ...
+
+#10 [stage-1  2/13] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y     bash     ca-certificates     dumb-init     gettext     git     curl     gnupg     wget     telnet     netcat     postgresql-client     musl-dev     && ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+#10 73.98 Get:78 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gcc-11 amd64 11.4.0-1ubuntu1~22.04 [20.1 MB]
+#10 77.13 Get:79 http://archive.ubuntu.com/ubuntu jammy/main amd64 gcc amd64 4:11.2.0-1ubuntu1 [5112 B]
+#10 77.14 Get:80 http://archive.ubuntu.com/ubuntu jammy/main amd64 gettext amd64 0.21-4ubuntu4 [868 kB]
+#10 77.19 Get:81 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libcurl3-gnutls amd64 7.81.0-1ubuntu1.16 [284 kB]
+#10 77.23 Get:82 http://archive.ubuntu.com/ubuntu jammy/main amd64 liberror-perl all 0.17029-1 [26.5 kB]
+#10 77.23 Get:83 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 git-man all 1:2.34.1-1ubuntu1.10 [954 kB]
+#10 77.29 Get:84 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 git amd64 1:2.34.1-1ubuntu1.10 [3166 kB]
+#10 77.63 Get:85 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gnupg-l10n all 2.2.27-3ubuntu2.1 [54.4 kB]
+#10 77.63 Get:86 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gnupg-utils amd64 2.2.27-3ubuntu2.1 [308 kB]
+#10 77.84 Get:87 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gpg amd64 2.2.27-3ubuntu2.1 [519 kB]
+#10 77.84 Get:88 http://archive.ubuntu.com/ubuntu jammy/main amd64 pinentry-curses amd64 1.1.1-1build2 [34.4 kB]
+#10 ...
+
+#13 [build-env 5/6] RUN if [ -n "v1.20.2" ]; then git checkout "v1.20.2"; fi  && make clean-all build
+#13 54.56 go: downloading gitea.com/lunny/dingtalk_webhook v0.0.0-20171025031554-e3534c89ef96
+#13 54.59 go: downloading github.com/PuerkitoBio/goquery v1.8.1
+#13 54.73 go: downloading github.com/cpuguy83/go-md2man/v2 v2.0.2
+#13 54.82 go: downloading github.com/ProtonMail/go-crypto v0.0.0-20230528122434-6f98819771a1
+#13 54.83 go: downloading github.com/google/go-querystring v1.1.0
+#13 55.06 go: downloading github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9
+#13 55.46 go: downloading github.com/golang-sql/sqlexp v0.1.0
+#13 55.50 go: downloading github.com/davecgh/go-spew v1.1.1
+#13 55.51 go: downloading github.com/pmezard/go-difflib v1.0.0
+#13 56.77 go: downloading github.com/unknwon/com v1.0.1
+#13 56.78 go: downloading github.com/libdns/libdns v0.2.1
+#13 57.05 go: downloading github.com/mholt/acmez v1.1.0
+#13 57.34 go: downloading github.com/miekg/dns v1.1.54
+#13 58.10 go: downloading go.uber.org/zap v1.24.0
+#13 58.75 go: downloading github.com/andybalholm/brotli v1.0.5
+#13 58.76 go: downloading github.com/golang/snappy v0.0.4
+#13 59.33 go: downloading github.com/klauspost/pgzip v1.2.6
+#13 59.33 go: downloading github.com/nwaples/rardecode v1.1.3
+#13 60.01 go: downloading github.com/pierrec/lz4/v4 v4.1.17
+#13 60.88 go: downloading github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8
+#13 61.14 go: downloading github.com/google/go-tpm v0.3.3
+#13 61.28 go: downloading github.com/mitchellh/mapstructure v1.5.0
+#13 62.08 go: downloading github.com/sirupsen/logrus v1.9.0
+#13 63.09 go: downloading github.com/ClickHouse/clickhouse-go/v2 v2.9.1
+#13 63.31 go: downloading github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b
+#13 63.59 go: downloading github.com/cespare/xxhash/v2 v2.2.0
+#13 63.62 go: downloading github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f
+#13 ...
+
+#10 [stage-1  2/13] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y     bash     ca-certificates     dumb-init     gettext     git     curl     gnupg     wget     telnet     netcat     postgresql-client     musl-dev     && ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+#10 83.81 Get:89 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gpg-agent amd64 2.2.27-3ubuntu2.1 [209 kB]
+#10 84.98 Get:90 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gpg-wks-client amd64 2.2.27-3ubuntu2.1 [62.7 kB]
+#10 85.01 Get:91 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gpg-wks-server amd64 2.2.27-3ubuntu2.1 [57.5 kB]
+#10 85.05 Get:92 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gpgsm amd64 2.2.27-3ubuntu2.1 [197 kB]
+#10 85.20 Get:93 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gnupg all 2.2.27-3ubuntu2.1 [315 kB]
+#10 85.33 Get:94 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libc-dev-bin amd64 2.35-0ubuntu3.7 [20.3 kB]
+#10 85.33 Get:95 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libfreetype6 amd64 2.11.1+dfsg-1ubuntu0.2 [389 kB]
+#10 85.43 Get:96 http://archive.ubuntu.com/ubuntu jammy/main amd64 libfontconfig1 amd64 2.13.1-4.2ubuntu5 [131 kB]
+#10 85.46 Get:97 http://archive.ubuntu.com/ubuntu jammy/main amd64 libjpeg-turbo8 amd64 2.1.2-0ubuntu1 [134 kB]
+#10 85.51 Get:98 http://archive.ubuntu.com/ubuntu jammy/main amd64 libjpeg8 amd64 8c-2ubuntu10 [2264 B]
+#10 85.51 Get:99 http://archive.ubuntu.com/ubuntu jammy/main amd64 libdeflate0 amd64 1.10-2 [70.9 kB]
+#10 90.86 Get:100 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libjbig0 amd64 2.1-3.1ubuntu0.22.04.1 [29.2 kB]
+#10 91.25 Get:101 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libwebp7 amd64 1.2.2-2ubuntu0.22.04.2 [206 kB]
+#10 91.74 Get:102 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libtiff5 amd64 4.3.0-6ubuntu0.8 [185 kB]
+#10 91.89 Get:103 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libxpm4 amd64 1:3.5.12-1ubuntu0.22.04.2 [36.7 kB]
+#10 91.90 Get:104 http://archive.ubuntu.com/ubuntu jammy/main amd64 libgd3 amd64 2.3.0-2ubuntu2 [129 kB]
+#10 91.96 Get:105 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libc-devtools amd64 2.35-0ubuntu3.7 [29.0 kB]
+#10 91.97 Get:106 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 linux-libc-dev amd64 5.15.0-105.115 [1330 kB]
+#10 92.25 Get:107 http://archive.ubuntu.com/ubuntu jammy/main amd64 libcrypt-dev amd64 1:4.4.27-1 [112 kB]
+#10 92.26 Get:108 http://archive.ubuntu.com/ubuntu jammy/main amd64 rpcsvc-proto amd64 1.4.2-0ubuntu6 [68.5 kB]
+#10 92.27 Get:109 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libtirpc-dev amd64 1.3.2-2ubuntu0.1 [192 kB]
+#10 92.30 Get:110 http://archive.ubuntu.com/ubuntu jammy/main amd64 libnsl-dev amd64 1.3.0-2build2 [71.3 kB]
+#10 ...
+
+#13 [build-env 5/6] RUN if [ -n "v1.20.2" ]; then git checkout "v1.20.2"; fi  && make clean-all build
+#13 64.05 go: downloading github.com/dlclark/regexp2 v1.9.0
+#13 65.29 go: downloading github.com/hashicorp/go-multierror v1.1.1
+#13 65.35 go: downloading golang.org/x/mod v0.10.0
+#13 65.39 go: downloading github.com/goccy/go-json v0.10.2
+#13 67.07 go: downloading github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+#13 67.21 go: downloading github.com/modern-go/reflect2 v1.0.2
+#13 67.24 go: downloading github.com/blevesearch/bleve_index_api v1.0.5
+#13 67.24 go: downloading github.com/blevesearch/segment v0.9.1
+#13 67.40 go: downloading github.com/blevesearch/upsidedown_store_api v1.0.2
+#13 67.46 go: downloading github.com/golang/protobuf v1.5.3
+#13 67.54 go: downloading github.com/aymerick/douceur v0.2.0
+#13 68.80 go: downloading github.com/mailru/easyjson v0.7.7
+#13 69.23 go: downloading github.com/valyala/fasthttp v1.47.0
+#13 69.43 go: downloading github.com/beorn7/perks v1.0.1
+#13 69.75 go: downloading github.com/prometheus/client_model v0.3.0
+#13 69.86 go: downloading github.com/prometheus/common v0.42.0
+#13 70.74 go: downloading github.com/prometheus/procfs v0.9.0
+#13 70.74 go: downloading gopkg.in/yaml.v2 v2.4.0
+#13 71.15 go: downloading github.com/couchbase/go-couchbase v0.0.0-20210224140812-5740cd35f448
+#13 71.57 go: downloading github.com/DataDog/zstd v1.4.5
+#13 71.62 go: downloading github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be
+#13 71.80 go: downloading github.com/minio/md5-simd v1.1.2
+#13 71.80 go: downloading git.sr.ht/~mariusor/go-xsd-duration v0.0.0-20220703122237-02e73435a078
+#13 73.24 go: downloading github.com/go-ap/errors v0.0.0-20221205040414-01c1adfc98ea
+#13 73.34 go: downloading github.com/valyala/fastjson v1.6.4
+#13 73.56 go: downloading google.golang.org/genproto v0.0.0-20230306155012-7f2fa6fef1f4
+#13 73.68 go: downloading github.com/boombuler/barcode v1.0.1
+#13 75.06 go: downloading github.com/markbates/going v1.0.0
+#13 75.47 go: downloading github.com/mrjones/oauth v0.0.0-20190623134757-126b35219450
+#13 75.47 go: downloading github.com/gorilla/mux v1.8.0
+#13 75.86 go: downloading github.com/go-asn1-ber/asn1-ber v1.5.4
+#13 76.95 go: downloading github.com/gorilla/securecookie v1.1.1
+#13 77.34 go: downloading github.com/emersion/go-sasl v0.0.0-20200509203442-7bfe0ed36a21
+#13 77.37 go: downloading github.com/olekukonko/tablewriter v0.0.5
+#13 77.52 go: downloading github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf
+#13 ...
+
+#10 [stage-1  2/13] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y     bash     ca-certificates     dumb-init     gettext     git     curl     gnupg     wget     telnet     netcat     postgresql-client     musl-dev     && ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+#10 97.67 Get:111 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libc6-dev amd64 2.35-0ubuntu3.7 [2100 kB]
+#10 99.42 Get:112 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libldap-common all 2.5.17+dfsg-0ubuntu0.22.04.1 [15.8 kB]
+#10 99.42 Get:113 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libpq5 amd64 14.11-0ubuntu0.22.04.1 [144 kB]
+#10 99.43 Get:114 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsasl2-modules amd64 2.1.27+dfsg2-3ubuntu1.2 [68.8 kB]
+#10 99.43 Get:115 http://archive.ubuntu.com/ubuntu jammy/main amd64 manpages-dev all 5.10-1ubuntu1 [2309 kB]
+#10 99.70 Get:116 http://archive.ubuntu.com/ubuntu jammy/universe amd64 netcat all 1.218-4ubuntu1 [2044 B]
+#10 99.70 Get:117 http://archive.ubuntu.com/ubuntu jammy/main amd64 patch amd64 2.7.6-7build2 [109 kB]
+#10 99.70 Get:118 http://archive.ubuntu.com/ubuntu jammy/main amd64 postgresql-client-common all 238 [29.6 kB]
+#10 99.70 Get:119 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 postgresql-client-14 amd64 14.11-0ubuntu0.22.04.1 [1222 kB]
+#10 99.79 Get:120 http://archive.ubuntu.com/ubuntu jammy/main amd64 postgresql-client all 14+238 [3292 B]
+#10 99.79 Get:121 http://archive.ubuntu.com/ubuntu jammy/universe amd64 dumb-init amd64 1.2.5-2 [14.1 kB]
+#10 105.1 Get:122 http://archive.ubuntu.com/ubuntu jammy/universe amd64 musl amd64 1.2.2-4 [407 kB]
+#10 ...
+
+#13 [build-env 5/6] RUN if [ -n "v1.20.2" ]; then git checkout "v1.20.2"; fi  && make clean-all build
+#13 77.72 go: downloading github.com/hashicorp/go-cleanhttp v0.5.2
+#13 79.26 go: downloading github.com/hashicorp/go-retryablehttp v0.7.2
+#13 79.32 go: downloading golang.org/x/time v0.3.0
+#13 79.56 go: downloading github.com/russross/blackfriday/v2 v2.1.0
+#13 79.61 go: downloading github.com/andybalholm/cascadia v1.3.2
+#13 79.66 go: downloading github.com/go-git/go-git/v5 v5.6.1
+#13 79.78 go: downloading github.com/rhysd/actionlint v1.6.24
+#13 79.98 go: downloading github.com/go-webauthn/revoke v0.1.9
+#13 80.47 go: downloading github.com/fxamacker/cbor/v2 v2.4.0
+#13 82.76 go: downloading github.com/hashicorp/errwrap v1.1.0
+#13 82.76 go: downloading github.com/RoaringBitmap/roaring v1.2.3
+#13 82.76 go: downloading github.com/blevesearch/scorch_segment_api/v2 v2.1.4
+#13 82.76 go: downloading github.com/blevesearch/geo v0.1.17
+#13 82.76 go: downloading go.uber.org/multierr v1.11.0
+#13 82.76 go: downloading go.uber.org/atomic v1.11.0
+#13 83.17 go: downloading github.com/blevesearch/vellum v1.0.9
+#13 84.90 go: downloading github.com/blevesearch/zapx/v11 v11.3.7
+#13 84.92 go: downloading github.com/blevesearch/zapx/v12 v12.3.7
+#13 85.45 go: downloading github.com/blevesearch/zapx/v13 v13.3.7
+#13 ...
+
+#10 [stage-1  2/13] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y     bash     ca-certificates     dumb-init     gettext     git     curl     gnupg     wget     telnet     netcat     postgresql-client     musl-dev     && ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+#10 106.1 Get:123 http://archive.ubuntu.com/ubuntu jammy/universe amd64 musl-dev amd64 1.2.2-4 [605 kB]
+#10 106.6 debconf: delaying package configuration, since apt-utils is not installed
+#10 106.6 Fetched 95.0 MB in 1min 28s (1077 kB/s)
+#10 106.6 Selecting previously unselected package perl-modules-5.34.
+#10 106.6 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 4393 files and directories currently installed.)
+#10 106.6 Preparing to unpack .../perl-modules-5.34_5.34.0-3ubuntu1.3_all.deb ...
+#10 106.7 Unpacking perl-modules-5.34 (5.34.0-3ubuntu1.3) ...
+#10 106.9 Preparing to unpack .../libc6_2.35-0ubuntu3.7_amd64.deb ...
+#10 107.1 Unpacking libc6:amd64 (2.35-0ubuntu3.7) over (2.35-0ubuntu3.6) ...
+#10 108.9 Setting up libc6:amd64 (2.35-0ubuntu3.7) ...
+#10 110.2 Selecting previously unselected package libgdbm6:amd64.
+#10 110.2 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5794 files and directories currently installed.)
+#10 110.2 Preparing to unpack .../000-libgdbm6_1.23-1_amd64.deb ...
+#10 110.2 Unpacking libgdbm6:amd64 (1.23-1) ...
+#10 110.3 Selecting previously unselected package libgdbm-compat4:amd64.
+#10 110.3 Preparing to unpack .../001-libgdbm-compat4_1.23-1_amd64.deb ...
+#10 110.3 Unpacking libgdbm-compat4:amd64 (1.23-1) ...
+#10 110.4 Selecting previously unselected package libperl5.34:amd64.
+#10 110.4 Preparing to unpack .../002-libperl5.34_5.34.0-3ubuntu1.3_amd64.deb ...
+#10 110.4 Unpacking libperl5.34:amd64 (5.34.0-3ubuntu1.3) ...
+#10 110.6 Selecting previously unselected package perl.
+#10 110.6 Preparing to unpack .../003-perl_5.34.0-3ubuntu1.3_amd64.deb ...
+#10 110.6 Unpacking perl (5.34.0-3ubuntu1.3) ...
+#10 110.7 Selecting previously unselected package openssl.
+#10 110.7 Preparing to unpack .../004-openssl_3.0.2-0ubuntu1.15_amd64.deb ...
+#10 110.7 Unpacking openssl (3.0.2-0ubuntu1.15) ...
+#10 110.8 Selecting previously unselected package ca-certificates.
+#10 110.8 Preparing to unpack .../005-ca-certificates_20230311ubuntu0.22.04.1_all.deb ...
+#10 110.8 Unpacking ca-certificates (20230311ubuntu0.22.04.1) ...
+#10 110.9 Selecting previously unselected package less.
+#10 110.9 Preparing to unpack .../006-less_590-1ubuntu0.22.04.2_amd64.deb ...
+#10 110.9 Unpacking less (590-1ubuntu0.22.04.2) ...
+#10 111.0 Selecting previously unselected package libmd0:amd64.
+#10 111.0 Preparing to unpack .../007-libmd0_1.0.4-1build1_amd64.deb ...
+#10 111.0 Unpacking libmd0:amd64 (1.0.4-1build1) ...
+#10 111.1 Selecting previously unselected package libbsd0:amd64.
+#10 111.1 Preparing to unpack .../008-libbsd0_0.11.5-1_amd64.deb ...
+#10 111.1 Unpacking libbsd0:amd64 (0.11.5-1) ...
+#10 111.2 Selecting previously unselected package libexpat1:amd64.
+#10 111.2 Preparing to unpack .../009-libexpat1_2.4.7-1ubuntu0.3_amd64.deb ...
+#10 111.3 Unpacking libexpat1:amd64 (2.4.7-1ubuntu0.3) ...
+#10 111.4 Selecting previously unselected package libicu70:amd64.
+#10 111.4 Preparing to unpack .../010-libicu70_70.1-2_amd64.deb ...
+#10 111.4 Unpacking libicu70:amd64 (70.1-2) ...
+#10 111.6 Selecting previously unselected package readline-common.
+#10 111.6 Preparing to unpack .../011-readline-common_8.1.2-1_all.deb ...
+#10 111.6 Unpacking readline-common (8.1.2-1) ...
+#10 111.7 Selecting previously unselected package libreadline8:amd64.
+#10 111.7 Preparing to unpack .../012-libreadline8_8.1.2-1_amd64.deb ...
+#10 111.7 Unpacking libreadline8:amd64 (8.1.2-1) ...
+#10 111.8 Selecting previously unselected package libsqlite3-0:amd64.
+#10 111.8 Preparing to unpack .../013-libsqlite3-0_3.37.2-2ubuntu0.3_amd64.deb ...
+#10 111.9 Unpacking libsqlite3-0:amd64 (3.37.2-2ubuntu0.3) ...
+#10 111.9 Selecting previously unselected package libxml2:amd64.
+#10 111.9 Preparing to unpack .../014-libxml2_2.9.13+dfsg-1ubuntu0.4_amd64.deb ...
+#10 112.0 Unpacking libxml2:amd64 (2.9.13+dfsg-1ubuntu0.4) ...
+#10 112.0 Selecting previously unselected package netbase.
+#10 112.0 Preparing to unpack .../015-netbase_6.3_all.deb ...
+#10 112.0 Unpacking netbase (6.3) ...
+#10 112.1 Selecting previously unselected package netcat-openbsd.
+#10 112.1 Preparing to unpack .../016-netcat-openbsd_1.218-4ubuntu1_amd64.deb ...
+#10 112.1 Unpacking netcat-openbsd (1.218-4ubuntu1) ...
+#10 112.2 Selecting previously unselected package ucf.
+#10 112.2 Preparing to unpack .../017-ucf_3.0043_all.deb ...
+#10 112.2 Moving old data out of the way
+#10 112.2 Unpacking ucf (3.0043) ...
+#10 112.3 Selecting previously unselected package gettext-base.
+#10 112.3 Preparing to unpack .../018-gettext-base_0.21-4ubuntu4_amd64.deb ...
+#10 112.3 Unpacking gettext-base (0.21-4ubuntu4) ...
+#10 112.4 Selecting previously unselected package libcbor0.8:amd64.
+#10 112.4 Preparing to unpack .../019-libcbor0.8_0.8.0-2ubuntu1_amd64.deb ...
+#10 112.4 Unpacking libcbor0.8:amd64 (0.8.0-2ubuntu1) ...
+#10 112.5 Selecting previously unselected package libedit2:amd64.
+#10 112.5 Preparing to unpack .../020-libedit2_3.1-20210910-1build1_amd64.deb ...
+#10 112.5 Unpacking libedit2:amd64 (3.1-20210910-1build1) ...
+#10 112.6 Selecting previously unselected package libfido2-1:amd64.
+#10 112.6 Preparing to unpack .../021-libfido2-1_1.10.0-1_amd64.deb ...
+#10 112.6 Unpacking libfido2-1:amd64 (1.10.0-1) ...
+#10 112.7 Selecting previously unselected package libnghttp2-14:amd64.
+#10 112.7 Preparing to unpack .../022-libnghttp2-14_1.43.0-1ubuntu0.1_amd64.deb ...
+#10 112.7 Unpacking libnghttp2-14:amd64 (1.43.0-1ubuntu0.1) ...
+#10 112.9 Selecting previously unselected package libpng16-16:amd64.
+#10 112.9 Preparing to unpack .../023-libpng16-16_1.6.37-3build5_amd64.deb ...
+#10 112.9 Unpacking libpng16-16:amd64 (1.6.37-3build5) ...
+#10 113.0 Selecting previously unselected package libpsl5:amd64.
+#10 113.0 Preparing to unpack .../024-libpsl5_0.21.0-1.2build2_amd64.deb ...
+#10 113.0 Unpacking libpsl5:amd64 (0.21.0-1.2build2) ...
+#10 113.1 Selecting previously unselected package libxau6:amd64.
+#10 113.1 Preparing to unpack .../025-libxau6_1%3a1.0.9-1build5_amd64.deb ...
+#10 113.1 Unpacking libxau6:amd64 (1:1.0.9-1build5) ...
+#10 113.2 Selecting previously unselected package libxdmcp6:amd64.
+#10 113.2 Preparing to unpack .../026-libxdmcp6_1%3a1.1.3-0ubuntu5_amd64.deb ...
+#10 113.3 Unpacking libxdmcp6:amd64 (1:1.1.3-0ubuntu5) ...
+#10 113.3 Selecting previously unselected package libxcb1:amd64.
+#10 113.3 Preparing to unpack .../027-libxcb1_1.14-3ubuntu3_amd64.deb ...
+#10 113.4 Unpacking libxcb1:amd64 (1.14-3ubuntu3) ...
+#10 113.4 Selecting previously unselected package libx11-data.
+#10 113.4 Preparing to unpack .../028-libx11-data_2%3a1.7.5-1ubuntu0.3_all.deb ...
+#10 113.4 Unpacking libx11-data (2:1.7.5-1ubuntu0.3) ...
+#10 113.6 Selecting previously unselected package libx11-6:amd64.
+#10 113.6 Preparing to unpack .../029-libx11-6_2%3a1.7.5-1ubuntu0.3_amd64.deb ...
+#10 113.6 Unpacking libx11-6:amd64 (2:1.7.5-1ubuntu0.3) ...
+#10 113.7 Selecting previously unselected package libxext6:amd64.
+#10 113.7 Preparing to unpack .../030-libxext6_2%3a1.3.4-1build1_amd64.deb ...
+#10 113.7 Unpacking libxext6:amd64 (2:1.3.4-1build1) ...
+#10 113.8 Selecting previously unselected package libxmuu1:amd64.
+#10 113.8 Preparing to unpack .../031-libxmuu1_2%3a1.1.3-3_amd64.deb ...
+#10 113.8 Unpacking libxmuu1:amd64 (2:1.1.3-3) ...
+#10 113.9 Selecting previously unselected package manpages.
+#10 113.9 Preparing to unpack .../032-manpages_5.10-1ubuntu1_all.deb ...
+#10 113.9 Unpacking manpages (5.10-1ubuntu1) ...
+#10 114.1 Selecting previously unselected package openssh-client.
+#10 114.1 Preparing to unpack .../033-openssh-client_1%3a8.9p1-3ubuntu0.7_amd64.deb ...
+#10 114.1 Unpacking openssh-client (1:8.9p1-3ubuntu0.7) ...
+#10 114.2 Selecting previously unselected package publicsuffix.
+#10 114.2 Preparing to unpack .../034-publicsuffix_20211207.1025-1_all.deb ...
+#10 114.2 Unpacking publicsuffix (20211207.1025-1) ...
+#10 114.3 Selecting previously unselected package telnet.
+#10 114.3 Preparing to unpack .../035-telnet_0.17-44build1_amd64.deb ...
+#10 114.3 Unpacking telnet (0.17-44build1) ...
+#10 114.8 Selecting previously unselected package wget.
+#10 114.8 Preparing to unpack .../036-wget_1.21.2-2ubuntu1_amd64.deb ...
+#10 114.9 Unpacking wget (1.21.2-2ubuntu1) ...
+#10 115.1 Selecting previously unselected package xauth.
+#10 115.1 Preparing to unpack .../037-xauth_1%3a1.1-1build2_amd64.deb ...
+#10 115.1 Unpacking xauth (1:1.1-1build2) ...
+#10 115.2 Selecting previously unselected package binutils-common:amd64.
+#10 115.2 Preparing to unpack .../038-binutils-common_2.38-4ubuntu2.6_amd64.deb ...
+#10 115.2 Unpacking binutils-common:amd64 (2.38-4ubuntu2.6) ...
+#10 115.3 Selecting previously unselected package libbinutils:amd64.
+#10 115.3 Preparing to unpack .../039-libbinutils_2.38-4ubuntu2.6_amd64.deb ...
+#10 115.3 Unpacking libbinutils:amd64 (2.38-4ubuntu2.6) ...
+#10 115.4 Selecting previously unselected package libctf-nobfd0:amd64.
+#10 115.4 Preparing to unpack .../040-libctf-nobfd0_2.38-4ubuntu2.6_amd64.deb ...
+#10 115.4 Unpacking libctf-nobfd0:amd64 (2.38-4ubuntu2.6) ...
+#10 115.4 Selecting previously unselected package libctf0:amd64.
+#10 115.4 Preparing to unpack .../041-libctf0_2.38-4ubuntu2.6_amd64.deb ...
+#10 115.5 Unpacking libctf0:amd64 (2.38-4ubuntu2.6) ...
+#10 115.5 Selecting previously unselected package binutils-x86-64-linux-gnu.
+#10 115.5 Preparing to unpack .../042-binutils-x86-64-linux-gnu_2.38-4ubuntu2.6_amd64.deb ...
+#10 115.5 Unpacking binutils-x86-64-linux-gnu (2.38-4ubuntu2.6) ...
+#10 115.6 Selecting previously unselected package binutils.
+#10 115.6 Preparing to unpack .../043-binutils_2.38-4ubuntu2.6_amd64.deb ...
+#10 115.6 Unpacking binutils (2.38-4ubuntu2.6) ...
+#10 115.7 Selecting previously unselected package gcc-11-base:amd64.
+#10 115.7 Preparing to unpack .../044-gcc-11-base_11.4.0-1ubuntu1~22.04_amd64.deb ...
+#10 115.7 Unpacking gcc-11-base:amd64 (11.4.0-1ubuntu1~22.04) ...
+#10 115.8 Selecting previously unselected package libisl23:amd64.
+#10 115.8 Preparing to unpack .../045-libisl23_0.24-2build1_amd64.deb ...
+#10 115.8 Unpacking libisl23:amd64 (0.24-2build1) ...
+#10 115.9 Selecting previously unselected package libmpfr6:amd64.
+#10 115.9 Preparing to unpack .../046-libmpfr6_4.1.0-3build3_amd64.deb ...
+#10 115.9 Unpacking libmpfr6:amd64 (4.1.0-3build3) ...
+#10 116.0 Selecting previously unselected package libmpc3:amd64.
+#10 116.0 Preparing to unpack .../047-libmpc3_1.2.1-2build1_amd64.deb ...
+#10 116.0 Unpacking libmpc3:amd64 (1.2.1-2build1) ...
+#10 116.1 Selecting previously unselected package cpp-11.
+#10 116.1 Preparing to unpack .../048-cpp-11_11.4.0-1ubuntu1~22.04_amd64.deb ...
+#10 116.1 Unpacking cpp-11 (11.4.0-1ubuntu1~22.04) ...
+#10 116.3 Selecting previously unselected package cpp.
+#10 116.3 Preparing to unpack .../049-cpp_4%3a11.2.0-1ubuntu1_amd64.deb ...
+#10 116.3 Unpacking cpp (4:11.2.0-1ubuntu1) ...
+#10 116.4 Selecting previously unselected package libbrotli1:amd64.
+#10 116.4 Preparing to unpack .../050-libbrotli1_1.0.9-2build6_amd64.deb ...
+#10 116.6 Unpacking libbrotli1:amd64 (1.0.9-2build6) ...
+#10 116.7 Selecting previously unselected package libsasl2-modules-db:amd64.
+#10 116.7 Preparing to unpack .../051-libsasl2-modules-db_2.1.27+dfsg2-3ubuntu1.2_amd64.deb ...
+#10 116.7 Unpacking libsasl2-modules-db:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#10 116.8 Selecting previously unselected package libsasl2-2:amd64.
+#10 116.8 Preparing to unpack .../052-libsasl2-2_2.1.27+dfsg2-3ubuntu1.2_amd64.deb ...
+#10 116.9 Unpacking libsasl2-2:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#10 116.9 Selecting previously unselected package libldap-2.5-0:amd64.
+#10 116.9 Preparing to unpack .../053-libldap-2.5-0_2.5.17+dfsg-0ubuntu0.22.04.1_amd64.deb ...
+#10 116.9 Unpacking libldap-2.5-0:amd64 (2.5.17+dfsg-0ubuntu0.22.04.1) ...
+#10 ...
+
+#13 [build-env 5/6] RUN if [ -n "v1.20.2" ]; then git checkout "v1.20.2"; fi  && make clean-all build
+#13 86.83 go: downloading github.com/blevesearch/zapx/v14 v14.3.7
+#13 86.83 go: downloading github.com/blevesearch/zapx/v15 v15.3.10
+#13 86.83 go: downloading go.etcd.io/bbolt v1.3.7
+#13 89.59 go: downloading github.com/blevesearch/gtreap v0.1.1
+#13 91.40 go: downloading github.com/ClickHouse/ch-go v0.55.0
+#13 93.03 go: downloading go.opentelemetry.io/otel/trace v1.15.1
+#13 93.05 go: downloading github.com/gorilla/css v1.0.0
+#13 93.05 go: downloading github.com/josharian/intern v1.0.0
+#13 93.07 go: downloading github.com/valyala/bytebufferpool v1.0.0
+#13 94.28 go: downloading github.com/matttproud/golang_protobuf_extensions v1.0.4
+#13 94.78 go: downloading github.com/rs/xid v1.5.0
+#13 94.83 go: downloading github.com/couchbase/gomemcached v0.1.2
+#13 95.23 go: downloading github.com/couchbase/goutils v0.0.0-20210118111533-e33d3ffb5401
+#13 95.23 go: downloading cloud.google.com/go/compute/metadata v0.2.3
+#13 96.07 go: downloading github.com/cention-sany/utf7 v0.0.0-20170124080048-26cad61bd60a
+#13 96.64 go: downloading github.com/mattn/go-runewidth v0.0.14
+#13 96.72 go: downloading github.com/cloudflare/circl v1.3.3
+#13 ...
+
+#10 [stage-1  2/13] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y     bash     ca-certificates     dumb-init     gettext     git     curl     gnupg     wget     telnet     netcat     postgresql-client     musl-dev     && ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+#10 117.0 Selecting previously unselected package librtmp1:amd64.
+#10 117.1 Preparing to unpack .../054-librtmp1_2.4+20151223.gitfa8646d.1-2build4_amd64.deb ...
+#10 117.1 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build4) ...
+#10 117.2 Selecting previously unselected package libssh-4:amd64.
+#10 117.2 Preparing to unpack .../055-libssh-4_0.9.6-2ubuntu0.22.04.3_amd64.deb ...
+#10 117.2 Unpacking libssh-4:amd64 (0.9.6-2ubuntu0.22.04.3) ...
+#10 117.3 Selecting previously unselected package libcurl4:amd64.
+#10 117.3 Preparing to unpack .../056-libcurl4_7.81.0-1ubuntu1.16_amd64.deb ...
+#10 117.3 Unpacking libcurl4:amd64 (7.81.0-1ubuntu1.16) ...
+#10 117.4 Selecting previously unselected package curl.
+#10 117.4 Preparing to unpack .../057-curl_7.81.0-1ubuntu1.16_amd64.deb ...
+#10 117.4 Unpacking curl (7.81.0-1ubuntu1.16) ...
+#10 117.5 Selecting previously unselected package libassuan0:amd64.
+#10 117.5 Preparing to unpack .../058-libassuan0_2.5.5-1build1_amd64.deb ...
+#10 117.5 Unpacking libassuan0:amd64 (2.5.5-1build1) ...
+#10 117.6 Selecting previously unselected package gpgconf.
+#10 117.6 Preparing to unpack .../059-gpgconf_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 117.6 Unpacking gpgconf (2.2.27-3ubuntu2.1) ...
+#10 117.7 Selecting previously unselected package libksba8:amd64.
+#10 117.7 Preparing to unpack .../060-libksba8_1.6.0-2ubuntu0.2_amd64.deb ...
+#10 117.7 Unpacking libksba8:amd64 (1.6.0-2ubuntu0.2) ...
+#10 117.8 Selecting previously unselected package libnpth0:amd64.
+#10 117.8 Preparing to unpack .../061-libnpth0_1.6-3build2_amd64.deb ...
+#10 117.8 Unpacking libnpth0:amd64 (1.6-3build2) ...
+#10 117.9 Selecting previously unselected package dirmngr.
+#10 117.9 Preparing to unpack .../062-dirmngr_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 117.9 Unpacking dirmngr (2.2.27-3ubuntu2.1) ...
+#10 118.1 Selecting previously unselected package fonts-dejavu-core.
+#10 118.1 Preparing to unpack .../063-fonts-dejavu-core_2.37-2build1_all.deb ...
+#10 118.1 Unpacking fonts-dejavu-core (2.37-2build1) ...
+#10 118.4 Selecting previously unselected package fontconfig-config.
+#10 118.4 Preparing to unpack .../064-fontconfig-config_2.13.1-4.2ubuntu5_all.deb ...
+#10 118.5 Unpacking fontconfig-config (2.13.1-4.2ubuntu5) ...
+#10 118.6 Selecting previously unselected package libcc1-0:amd64.
+#10 118.6 Preparing to unpack .../065-libcc1-0_12.3.0-1ubuntu1~22.04_amd64.deb ...
+#10 118.6 Unpacking libcc1-0:amd64 (12.3.0-1ubuntu1~22.04) ...
+#10 118.7 Selecting previously unselected package libgomp1:amd64.
+#10 118.7 Preparing to unpack .../066-libgomp1_12.3.0-1ubuntu1~22.04_amd64.deb ...
+#10 118.7 Unpacking libgomp1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#10 118.8 Selecting previously unselected package libitm1:amd64.
+#10 118.8 Preparing to unpack .../067-libitm1_12.3.0-1ubuntu1~22.04_amd64.deb ...
+#10 118.8 Unpacking libitm1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#10 119.0 Selecting previously unselected package libatomic1:amd64.
+#10 119.0 Preparing to unpack .../068-libatomic1_12.3.0-1ubuntu1~22.04_amd64.deb ...
+#10 119.0 Unpacking libatomic1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#10 119.1 Selecting previously unselected package libasan6:amd64.
+#10 119.1 Preparing to unpack .../069-libasan6_11.4.0-1ubuntu1~22.04_amd64.deb ...
+#10 119.1 Unpacking libasan6:amd64 (11.4.0-1ubuntu1~22.04) ...
+#10 119.2 Selecting previously unselected package liblsan0:amd64.
+#10 119.2 Preparing to unpack .../070-liblsan0_12.3.0-1ubuntu1~22.04_amd64.deb ...
+#10 119.2 Unpacking liblsan0:amd64 (12.3.0-1ubuntu1~22.04) ...
+#10 119.3 Selecting previously unselected package libtsan0:amd64.
+#10 119.3 Preparing to unpack .../071-libtsan0_11.4.0-1ubuntu1~22.04_amd64.deb ...
+#10 119.3 Unpacking libtsan0:amd64 (11.4.0-1ubuntu1~22.04) ...
+#10 119.6 Selecting previously unselected package libubsan1:amd64.
+#10 119.6 Preparing to unpack .../072-libubsan1_12.3.0-1ubuntu1~22.04_amd64.deb ...
+#10 119.6 Unpacking libubsan1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#10 119.7 Selecting previously unselected package libquadmath0:amd64.
+#10 119.7 Preparing to unpack .../073-libquadmath0_12.3.0-1ubuntu1~22.04_amd64.deb ...
+#10 119.8 Unpacking libquadmath0:amd64 (12.3.0-1ubuntu1~22.04) ...
+#10 119.8 Selecting previously unselected package libgcc-11-dev:amd64.
+#10 119.8 Preparing to unpack .../074-libgcc-11-dev_11.4.0-1ubuntu1~22.04_amd64.deb ...
+#10 119.8 Unpacking libgcc-11-dev:amd64 (11.4.0-1ubuntu1~22.04) ...
+#10 120.0 Selecting previously unselected package gcc-11.
+#10 120.0 Preparing to unpack .../075-gcc-11_11.4.0-1ubuntu1~22.04_amd64.deb ...
+#10 120.0 Unpacking gcc-11 (11.4.0-1ubuntu1~22.04) ...
+#10 120.3 Selecting previously unselected package gcc.
+#10 120.3 Preparing to unpack .../076-gcc_4%3a11.2.0-1ubuntu1_amd64.deb ...
+#10 120.4 Unpacking gcc (4:11.2.0-1ubuntu1) ...
+#10 120.5 Selecting previously unselected package gettext.
+#10 120.5 Preparing to unpack .../077-gettext_0.21-4ubuntu4_amd64.deb ...
+#10 120.5 Unpacking gettext (0.21-4ubuntu4) ...
+#10 120.7 Selecting previously unselected package libcurl3-gnutls:amd64.
+#10 120.7 Preparing to unpack .../078-libcurl3-gnutls_7.81.0-1ubuntu1.16_amd64.deb ...
+#10 120.7 Unpacking libcurl3-gnutls:amd64 (7.81.0-1ubuntu1.16) ...
+#10 120.9 Selecting previously unselected package liberror-perl.
+#10 120.9 Preparing to unpack .../079-liberror-perl_0.17029-1_all.deb ...
+#10 121.0 Unpacking liberror-perl (0.17029-1) ...
+#10 121.1 Selecting previously unselected package git-man.
+#10 121.1 Preparing to unpack .../080-git-man_1%3a2.34.1-1ubuntu1.10_all.deb ...
+#10 121.1 Unpacking git-man (1:2.34.1-1ubuntu1.10) ...
+#10 121.2 Selecting previously unselected package git.
+#10 121.2 Preparing to unpack .../081-git_1%3a2.34.1-1ubuntu1.10_amd64.deb ...
+#10 121.2 Unpacking git (1:2.34.1-1ubuntu1.10) ...
+#10 121.4 Selecting previously unselected package gnupg-l10n.
+#10 121.4 Preparing to unpack .../082-gnupg-l10n_2.2.27-3ubuntu2.1_all.deb ...
+#10 121.4 Unpacking gnupg-l10n (2.2.27-3ubuntu2.1) ...
+#10 121.4 Selecting previously unselected package gnupg-utils.
+#10 121.5 Preparing to unpack .../083-gnupg-utils_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 121.5 Unpacking gnupg-utils (2.2.27-3ubuntu2.1) ...
+#10 121.6 Selecting previously unselected package gpg.
+#10 121.6 Preparing to unpack .../084-gpg_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 122.1 Unpacking gpg (2.2.27-3ubuntu2.1) ...
+#10 122.4 Selecting previously unselected package pinentry-curses.
+#10 122.4 Preparing to unpack .../085-pinentry-curses_1.1.1-1build2_amd64.deb ...
+#10 122.4 Unpacking pinentry-curses (1.1.1-1build2) ...
+#10 122.5 Selecting previously unselected package gpg-agent.
+#10 122.5 Preparing to unpack .../086-gpg-agent_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 122.5 Unpacking gpg-agent (2.2.27-3ubuntu2.1) ...
+#10 122.5 Selecting previously unselected package gpg-wks-client.
+#10 122.5 Preparing to unpack .../087-gpg-wks-client_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 122.6 Unpacking gpg-wks-client (2.2.27-3ubuntu2.1) ...
+#10 122.7 Selecting previously unselected package gpg-wks-server.
+#10 122.7 Preparing to unpack .../088-gpg-wks-server_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 122.7 Unpacking gpg-wks-server (2.2.27-3ubuntu2.1) ...
+#10 122.8 Selecting previously unselected package gpgsm.
+#10 122.8 Preparing to unpack .../089-gpgsm_2.2.27-3ubuntu2.1_amd64.deb ...
+#10 122.8 Unpacking gpgsm (2.2.27-3ubuntu2.1) ...
+#10 122.9 Selecting previously unselected package gnupg.
+#10 122.9 Preparing to unpack .../090-gnupg_2.2.27-3ubuntu2.1_all.deb ...
+#10 122.9 Unpacking gnupg (2.2.27-3ubuntu2.1) ...
+#10 123.0 Selecting previously unselected package libc-dev-bin.
+#10 123.0 Preparing to unpack .../091-libc-dev-bin_2.35-0ubuntu3.7_amd64.deb ...
+#10 123.0 Unpacking libc-dev-bin (2.35-0ubuntu3.7) ...
+#10 123.1 Selecting previously unselected package libfreetype6:amd64.
+#10 123.1 Preparing to unpack .../092-libfreetype6_2.11.1+dfsg-1ubuntu0.2_amd64.deb ...
+#10 123.1 Unpacking libfreetype6:amd64 (2.11.1+dfsg-1ubuntu0.2) ...
+#10 123.2 Selecting previously unselected package libfontconfig1:amd64.
+#10 123.2 Preparing to unpack .../093-libfontconfig1_2.13.1-4.2ubuntu5_amd64.deb ...
+#10 123.2 Unpacking libfontconfig1:amd64 (2.13.1-4.2ubuntu5) ...
+#10 123.3 Selecting previously unselected package libjpeg-turbo8:amd64.
+#10 123.3 Preparing to unpack .../094-libjpeg-turbo8_2.1.2-0ubuntu1_amd64.deb ...
+#10 123.3 Unpacking libjpeg-turbo8:amd64 (2.1.2-0ubuntu1) ...
+#10 123.4 Selecting previously unselected package libjpeg8:amd64.
+#10 123.4 Preparing to unpack .../095-libjpeg8_8c-2ubuntu10_amd64.deb ...
+#10 123.4 Unpacking libjpeg8:amd64 (8c-2ubuntu10) ...
+#10 123.5 Selecting previously unselected package libdeflate0:amd64.
+#10 123.5 Preparing to unpack .../096-libdeflate0_1.10-2_amd64.deb ...
+#10 123.5 Unpacking libdeflate0:amd64 (1.10-2) ...
+#10 123.6 Selecting previously unselected package libjbig0:amd64.
+#10 123.6 Preparing to unpack .../097-libjbig0_2.1-3.1ubuntu0.22.04.1_amd64.deb ...
+#10 123.6 Unpacking libjbig0:amd64 (2.1-3.1ubuntu0.22.04.1) ...
+#10 123.7 Selecting previously unselected package libwebp7:amd64.
+#10 123.7 Preparing to unpack .../098-libwebp7_1.2.2-2ubuntu0.22.04.2_amd64.deb ...
+#10 123.7 Unpacking libwebp7:amd64 (1.2.2-2ubuntu0.22.04.2) ...
+#10 123.8 Selecting previously unselected package libtiff5:amd64.
+#10 123.8 Preparing to unpack .../099-libtiff5_4.3.0-6ubuntu0.8_amd64.deb ...
+#10 123.8 Unpacking libtiff5:amd64 (4.3.0-6ubuntu0.8) ...
+#10 123.9 Selecting previously unselected package libxpm4:amd64.
+#10 123.9 Preparing to unpack .../100-libxpm4_1%3a3.5.12-1ubuntu0.22.04.2_amd64.deb ...
+#10 123.9 Unpacking libxpm4:amd64 (1:3.5.12-1ubuntu0.22.04.2) ...
+#10 124.0 Selecting previously unselected package libgd3:amd64.
+#10 124.0 Preparing to unpack .../101-libgd3_2.3.0-2ubuntu2_amd64.deb ...
+#10 124.1 Unpacking libgd3:amd64 (2.3.0-2ubuntu2) ...
+#10 124.1 Selecting previously unselected package libc-devtools.
+#10 124.1 Preparing to unpack .../102-libc-devtools_2.35-0ubuntu3.7_amd64.deb ...
+#10 124.1 Unpacking libc-devtools (2.35-0ubuntu3.7) ...
+#10 124.2 Selecting previously unselected package linux-libc-dev:amd64.
+#10 124.2 Preparing to unpack .../103-linux-libc-dev_5.15.0-105.115_amd64.deb ...
+#10 124.2 Unpacking linux-libc-dev:amd64 (5.15.0-105.115) ...
+#10 124.4 Selecting previously unselected package libcrypt-dev:amd64.
+#10 124.4 Preparing to unpack .../104-libcrypt-dev_1%3a4.4.27-1_amd64.deb ...
+#10 124.4 Unpacking libcrypt-dev:amd64 (1:4.4.27-1) ...
+#10 124.5 Selecting previously unselected package rpcsvc-proto.
+#10 124.5 Preparing to unpack .../105-rpcsvc-proto_1.4.2-0ubuntu6_amd64.deb ...
+#10 124.5 Unpacking rpcsvc-proto (1.4.2-0ubuntu6) ...
+#10 124.6 Selecting previously unselected package libtirpc-dev:amd64.
+#10 124.6 Preparing to unpack .../106-libtirpc-dev_1.3.2-2ubuntu0.1_amd64.deb ...
+#10 124.6 Unpacking libtirpc-dev:amd64 (1.3.2-2ubuntu0.1) ...
+#10 124.7 Selecting previously unselected package libnsl-dev:amd64.
+#10 124.7 Preparing to unpack .../107-libnsl-dev_1.3.0-2build2_amd64.deb ...
+#10 124.7 Unpacking libnsl-dev:amd64 (1.3.0-2build2) ...
+#10 124.8 Selecting previously unselected package libc6-dev:amd64.
+#10 124.8 Preparing to unpack .../108-libc6-dev_2.35-0ubuntu3.7_amd64.deb ...
+#10 124.8 Unpacking libc6-dev:amd64 (2.35-0ubuntu3.7) ...
+#10 124.9 Selecting previously unselected package libldap-common.
+#10 124.9 Preparing to unpack .../109-libldap-common_2.5.17+dfsg-0ubuntu0.22.04.1_all.deb ...
+#10 125.0 Unpacking libldap-common (2.5.17+dfsg-0ubuntu0.22.04.1) ...
+#10 125.1 Selecting previously unselected package libpq5:amd64.
+#10 125.1 Preparing to unpack .../110-libpq5_14.11-0ubuntu0.22.04.1_amd64.deb ...
+#10 125.1 Unpacking libpq5:amd64 (14.11-0ubuntu0.22.04.1) ...
+#10 125.2 Selecting previously unselected package libsasl2-modules:amd64.
+#10 125.2 Preparing to unpack .../111-libsasl2-modules_2.1.27+dfsg2-3ubuntu1.2_amd64.deb ...
+#10 125.2 Unpacking libsasl2-modules:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#10 125.2 Selecting previously unselected package manpages-dev.
+#10 125.3 Preparing to unpack .../112-manpages-dev_5.10-1ubuntu1_all.deb ...
+#10 125.3 Unpacking manpages-dev (5.10-1ubuntu1) ...
+#10 125.6 Selecting previously unselected package netcat.
+#10 125.6 Preparing to unpack .../113-netcat_1.218-4ubuntu1_all.deb ...
+#10 125.6 Unpacking netcat (1.218-4ubuntu1) ...
+#10 125.6 Selecting previously unselected package patch.
+#10 125.7 Preparing to unpack .../114-patch_2.7.6-7build2_amd64.deb ...
+#10 125.7 Unpacking patch (2.7.6-7build2) ...
+#10 125.8 Selecting previously unselected package postgresql-client-common.
+#10 125.8 Preparing to unpack .../115-postgresql-client-common_238_all.deb ...
+#10 125.8 Unpacking postgresql-client-common (238) ...
+#10 125.9 Selecting previously unselected package postgresql-client-14.
+#10 125.9 Preparing to unpack .../116-postgresql-client-14_14.11-0ubuntu0.22.04.1_amd64.deb ...
+#10 125.9 Unpacking postgresql-client-14 (14.11-0ubuntu0.22.04.1) ...
+#10 126.1 Selecting previously unselected package postgresql-client.
+#10 126.1 Preparing to unpack .../117-postgresql-client_14+238_all.deb ...
+#10 126.1 Unpacking postgresql-client (14+238) ...
+#10 126.2 Selecting previously unselected package dumb-init.
+#10 126.2 Preparing to unpack .../118-dumb-init_1.2.5-2_amd64.deb ...
+#10 126.2 Unpacking dumb-init (1.2.5-2) ...
+#10 126.3 Selecting previously unselected package musl:amd64.
+#10 126.3 Preparing to unpack .../119-musl_1.2.2-4_amd64.deb ...
+#10 126.3 Unpacking musl:amd64 (1.2.2-4) ...
+#10 126.4 Selecting previously unselected package musl-dev:amd64.
+#10 126.4 Preparing to unpack .../120-musl-dev_1.2.2-4_amd64.deb ...
+#10 126.4 Unpacking musl-dev:amd64 (1.2.2-4) ...
+#10 127.2 Setting up libksba8:amd64 (1.6.0-2ubuntu0.2) ...
+#10 127.5 Setting up libexpat1:amd64 (2.4.7-1ubuntu0.3) ...
+#10 127.5 Setting up dumb-init (1.2.5-2) ...
+#10 127.5 Setting up gcc-11-base:amd64 (11.4.0-1ubuntu1~22.04) ...
+#10 127.6 Setting up libxau6:amd64 (1:1.0.9-1build5) ...
+#10 127.6 Setting up libpsl5:amd64 (0.21.0-1.2build2) ...
+#10 127.7 Setting up wget (1.21.2-2ubuntu1) ...
+#10 127.7 Setting up manpages (5.10-1ubuntu1) ...
+#10 127.8 Setting up libcbor0.8:amd64 (0.8.0-2ubuntu1) ...
+#10 127.8 Setting up libbrotli1:amd64 (1.0.9-2build6) ...
+#10 127.9 Setting up libsqlite3-0:amd64 (3.37.2-2ubuntu0.3) ...
+#10 128.0 Setting up libsasl2-modules:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#10 128.1 Setting up binutils-common:amd64 (2.38-4ubuntu2.6) ...
+#10 128.2 Setting up libnghttp2-14:amd64 (1.43.0-1ubuntu0.1) ...
+#10 128.2 Setting up libdeflate0:amd64 (1.10-2) ...
+#10 128.2 Setting up less (590-1ubuntu0.22.04.2) ...
+#10 128.3 Setting up linux-libc-dev:amd64 (5.15.0-105.115) ...
+#10 128.3 Setting up libctf-nobfd0:amd64 (2.38-4ubuntu2.6) ...
+#10 128.4 Setting up gettext-base (0.21-4ubuntu4) ...
+#10 128.4 Setting up libnpth0:amd64 (1.6-3build2) ...
+#10 128.4 Setting up libassuan0:amd64 (2.5.5-1build1) ...
+#10 128.5 Setting up libgomp1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#10 128.5 Setting up perl-modules-5.34 (5.34.0-3ubuntu1.3) ...
+#10 128.6 Setting up libldap-common (2.5.17+dfsg-0ubuntu0.22.04.1) ...
+#10 128.6 Setting up libjbig0:amd64 (2.1-3.1ubuntu0.22.04.1) ...
+#10 ...
+
+#13 [build-env 5/6] RUN if [ -n "v1.20.2" ]; then git checkout "v1.20.2"; fi  && make clean-all build
+#13 98.47 go: downloading github.com/x448/float16 v0.8.4
+#13 100.4 go: downloading github.com/go-git/go-billy/v5 v5.4.1
+#13 100.4 go: downloading github.com/imdario/mergo v0.3.15
+#13 100.4 go: downloading github.com/fatih/color v1.15.0
+#13 102.1 go: downloading go.opentelemetry.io/otel v1.15.1
+#13 102.2 go: downloading github.com/mattn/go-colorable v0.1.13
+#13 102.2 go: downloading github.com/robfig/cron v1.2.0
+#13 102.2 go: downloading golang.org/x/sync v0.2.0
+#13 102.3 go: downloading github.com/golang/geo v0.0.0-20230421003525-6adc56603217
+#13 102.5 go: downloading github.com/bits-and-blooms/bitset v1.7.0
+#13 103.1 go: downloading github.com/blevesearch/mmap-go v1.0.4
+#13 103.1 go: downloading github.com/paulmach/orb v0.9.1
+#13 103.9 go: downloading github.com/shopspring/decimal v1.3.1
+#13 104.1 go: downloading github.com/blevesearch/snowballstem v0.9.0
+#13 104.7 go: downloading github.com/go-faster/city v1.0.1
+#13 104.8 go: downloading github.com/go-faster/errors v0.6.1
+#13 105.8 go: downloading github.com/segmentio/asm v1.2.0
+#13 106.0 go: downloading github.com/rivo/uniseg v0.4.4
+#13 106.0 go: downloading github.com/go-git/gcfg v1.5.0
+#13 106.3 go: downloading github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99
+#13 106.8 go: downloading github.com/emirpasic/gods v1.18.1
+#13 106.9 go: downloading github.com/pjbgf/sha1cd v0.3.0
+#13 107.0 go: downloading cloud.google.com/go/compute v1.18.0
+#13 107.9 go: downloading github.com/blevesearch/go-porterstemmer v1.0.3
+#13 107.9 go: downloading github.com/kevinburke/ssh_config v1.2.0
+#13 108.1 go: downloading github.com/skeema/knownhosts v1.1.0
+#13 108.3 go: downloading github.com/xanzy/ssh-agent v0.3.3
+#13 ...
+
+#10 [stage-1  2/13] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y     bash     ca-certificates     dumb-init     gettext     git     curl     gnupg     wget     telnet     netcat     postgresql-client     musl-dev     && ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+#10 128.7 Setting up libasan6:amd64 (11.4.0-1ubuntu1~22.04) ...
+#10 128.7 Setting up libsasl2-modules-db:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#10 128.7 Setting up libtirpc-dev:amd64 (1.3.2-2ubuntu0.1) ...
+#10 128.8 Setting up rpcsvc-proto (1.4.2-0ubuntu6) ...
+#10 128.8 Setting up libx11-data (2:1.7.5-1ubuntu0.3) ...
+#10 128.9 Setting up libmpfr6:amd64 (4.1.0-3build3) ...
+#10 128.9 Setting up gnupg-l10n (2.2.27-3ubuntu2.1) ...
+#10 128.9 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2build4) ...
+#10 129.0 Setting up libquadmath0:amd64 (12.3.0-1ubuntu1~22.04) ...
+#10 129.0 Setting up libpng16-16:amd64 (1.6.37-3build5) ...
+#10 129.1 Setting up libmpc3:amd64 (1.2.1-2build1) ...
+#10 129.1 Setting up libatomic1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#10 129.1 Setting up patch (2.7.6-7build2) ...
+#10 129.2 Setting up fonts-dejavu-core (2.37-2build1) ...
+#10 129.4 Setting up ucf (3.0043) ...
+#10 129.5 Setting up libjpeg-turbo8:amd64 (2.1.2-0ubuntu1) ...
+#10 129.5 Setting up libsasl2-2:amd64 (2.1.27+dfsg2-3ubuntu1.2) ...
+#10 129.6 Setting up libssh-4:amd64 (0.9.6-2ubuntu0.22.04.3) ...
+#10 129.6 Setting up libwebp7:amd64 (1.2.2-2ubuntu0.22.04.2) ...
+#10 129.6 Setting up libubsan1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#10 129.7 Setting up libmd0:amd64 (1.0.4-1build1) ...
+#10 129.7 Setting up musl:amd64 (1.2.2-4) ...
+#10 129.8 Setting up libnsl-dev:amd64 (1.3.0-2build2) ...
+#10 129.8 Setting up libcrypt-dev:amd64 (1:4.4.27-1) ...
+#10 129.9 Setting up git-man (1:2.34.1-1ubuntu1.10) ...
+#10 129.9 Setting up netbase (6.3) ...
+#10 130.0 Setting up libbinutils:amd64 (2.38-4ubuntu2.6) ...
+#10 130.0 Setting up libfido2-1:amd64 (1.10.0-1) ...
+#10 130.1 Setting up libisl23:amd64 (0.24-2build1) ...
+#10 130.1 Setting up libc-dev-bin (2.35-0ubuntu3.7) ...
+#10 130.2 Setting up openssl (3.0.2-0ubuntu1.15) ...
+#10 130.2 Setting up libbsd0:amd64 (0.11.5-1) ...
+#10 130.3 Setting up readline-common (8.1.2-1) ...
+#10 130.3 Setting up publicsuffix (20211207.1025-1) ...
+#10 130.3 Setting up libcc1-0:amd64 (12.3.0-1ubuntu1~22.04) ...
+#10 130.4 Setting up liblsan0:amd64 (12.3.0-1ubuntu1~22.04) ...
+#10 130.4 Setting up libitm1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#10 130.4 Setting up libgdbm6:amd64 (1.23-1) ...
+#10 130.5 Setting up libicu70:amd64 (70.1-2) ...
+#10 130.9 Setting up libtsan0:amd64 (11.4.0-1ubuntu1~22.04) ...
+#10 131.2 Setting up libctf0:amd64 (2.38-4ubuntu2.6) ...
+#10 131.3 Setting up libjpeg8:amd64 (8c-2ubuntu10) ...
+#10 131.6 Setting up pinentry-curses (1.1.1-1build2) ...
+#10 131.7 Setting up cpp-11 (11.4.0-1ubuntu1~22.04) ...
+#10 131.8 Setting up manpages-dev (5.10-1ubuntu1) ...
+#10 131.8 Setting up libxdmcp6:amd64 (1:1.1.3-0ubuntu5) ...
+#10 132.0 Setting up libxcb1:amd64 (1.14-3ubuntu3) ...
+#10 132.2 Setting up telnet (0.17-44build1) ...
+#10 132.2 update-alternatives: using /usr/bin/telnet.netkit to provide /usr/bin/telnet (telnet) in auto mode
+#10 132.2 update-alternatives: warning: skip creation of /usr/share/man/man1/telnet.1.gz because associated file /usr/share/man/man1/telnet.netkit.1.gz (of link group telnet) doesn't exist
+#10 132.2 Setting up fontconfig-config (2.13.1-4.2ubuntu5) ...
+#10 132.8 Setting up libedit2:amd64 (3.1-20210910-1build1) ...
+#10 132.8 Setting up libreadline8:amd64 (8.1.2-1) ...
+#10 132.8 Setting up netcat-openbsd (1.218-4ubuntu1) ...
+#10 132.9 update-alternatives: using /bin/nc.openbsd to provide /bin/nc (nc) in auto mode
+#10 132.9 update-alternatives: warning: skip creation of /usr/share/man/man1/nc.1.gz because associated file /usr/share/man/man1/nc_openbsd.1.gz (of link group nc) doesn't exist
+#10 132.9 update-alternatives: warning: skip creation of /usr/share/man/man1/netcat.1.gz because associated file /usr/share/man/man1/nc_openbsd.1.gz (of link group nc) doesn't exist
+#10 132.9 Setting up netcat (1.218-4ubuntu1) ...
+#10 132.9 Setting up libldap-2.5-0:amd64 (2.5.17+dfsg-0ubuntu0.22.04.1) ...
+#10 133.0 Setting up ca-certificates (20230311ubuntu0.22.04.1) ...
+#10 133.4 Updating certificates in /etc/ssl/certs...
+#10 133.9 137 added, 0 removed; done.
+#10 133.9 Setting up libfreetype6:amd64 (2.11.1+dfsg-1ubuntu0.2) ...
+#10 134.0 Setting up libgdbm-compat4:amd64 (1.23-1) ...
+#10 134.0 Setting up libgcc-11-dev:amd64 (11.4.0-1ubuntu1~22.04) ...
+#10 134.1 Setting up cpp (4:11.2.0-1ubuntu1) ...
+#10 134.1 Setting up gpgconf (2.2.27-3ubuntu2.1) ...
+#10 134.2 Setting up libcurl4:amd64 (7.81.0-1ubuntu1.16) ...
+#10 134.2 Setting up libc6-dev:amd64 (2.35-0ubuntu3.7) ...
+#10 134.3 Setting up libx11-6:amd64 (2:1.7.5-1ubuntu0.3) ...
+#10 134.3 Setting up libtiff5:amd64 (4.3.0-6ubuntu0.8) ...
+#10 134.4 Setting up curl (7.81.0-1ubuntu1.16) ...
+#10 134.4 Setting up libfontconfig1:amd64 (2.13.1-4.2ubuntu5) ...
+#10 134.5 Setting up libxml2:amd64 (2.9.13+dfsg-1ubuntu0.4) ...
+#10 134.5 Setting up libxmuu1:amd64 (2:1.1.3-3) ...
+#10 134.5 Setting up gpg (2.2.27-3ubuntu2.1) ...
+#10 134.6 Setting up gnupg-utils (2.2.27-3ubuntu2.1) ...
+#10 134.7 Setting up binutils-x86-64-linux-gnu (2.38-4ubuntu2.6) ...
+#10 134.7 Setting up libperl5.34:amd64 (5.34.0-3ubuntu1.3) ...
+#10 134.8 Setting up gettext (0.21-4ubuntu4) ...
+#10 134.8 Setting up gpg-agent (2.2.27-3ubuntu2.1) ...
+#10 135.2 Setting up libxpm4:amd64 (1:3.5.12-1ubuntu0.22.04.2) ...
+#10 135.3 Setting up openssh-client (1:8.9p1-3ubuntu0.7) ...
+#10 135.5 update-alternatives: using /usr/bin/ssh to provide /usr/bin/rsh (rsh) in auto mode
+#10 135.5 update-alternatives: warning: skip creation of /usr/share/man/man1/rsh.1.gz because associated file /usr/share/man/man1/ssh.1.gz (of link group rsh) doesn't exist
+#10 135.5 update-alternatives: using /usr/bin/slogin to provide /usr/bin/rlogin (rlogin) in auto mode
+#10 135.5 update-alternatives: warning: skip creation of /usr/share/man/man1/rlogin.1.gz because associated file /usr/share/man/man1/slogin.1.gz (of link group rlogin) doesn't exist
+#10 135.5 update-alternatives: using /usr/bin/scp to provide /usr/bin/rcp (rcp) in auto mode
+#10 135.5 update-alternatives: warning: skip creation of /usr/share/man/man1/rcp.1.gz because associated file /usr/share/man/man1/scp.1.gz (of link group rcp) doesn't exist
+#10 135.5 Setting up gpgsm (2.2.27-3ubuntu2.1) ...
+#10 135.6 Setting up libpq5:amd64 (14.11-0ubuntu0.22.04.1) ...
+#10 135.6 Setting up libxext6:amd64 (2:1.3.4-1build1) ...
+#10 135.6 Setting up libcurl3-gnutls:amd64 (7.81.0-1ubuntu1.16) ...
+#10 135.7 Setting up binutils (2.38-4ubuntu2.6) ...
+#10 135.7 Setting up dirmngr (2.2.27-3ubuntu2.1) ...
+#10 135.9 Setting up perl (5.34.0-3ubuntu1.3) ...
+#10 135.9 Setting up libgd3:amd64 (2.3.0-2ubuntu2) ...
+#10 136.0 Setting up gpg-wks-server (2.2.27-3ubuntu2.1) ...
+#10 136.0 Setting up gcc-11 (11.4.0-1ubuntu1~22.04) ...
+#10 136.1 Setting up xauth (1:1.1-1build2) ...
+#10 136.1 Setting up libc-devtools (2.35-0ubuntu3.7) ...
+#10 136.2 Setting up postgresql-client-common (238) ...
+#10 136.2 Setting up gpg-wks-client (2.2.27-3ubuntu2.1) ...
+#10 136.3 Setting up postgresql-client-14 (14.11-0ubuntu0.22.04.1) ...
+#10 136.6 update-alternatives: using /usr/share/postgresql/14/man/man1/psql.1.gz to provide /usr/share/man/man1/psql.1.gz (psql.1.gz) in auto mode
+#10 136.7 Setting up gcc (4:11.2.0-1ubuntu1) ...
+#10 136.7 Setting up liberror-perl (0.17029-1) ...
+#10 136.8 Setting up musl-dev:amd64 (1.2.2-4) ...
+#10 136.8 Setting up git (1:2.34.1-1ubuntu1.10) ...
+#10 136.9 Setting up gnupg (2.2.27-3ubuntu2.1) ...
+#10 137.0 Setting up postgresql-client (14+238) ...
+#10 137.4 Processing triggers for libc-bin (2.35-0ubuntu3.6) ...
+#10 137.5 Processing triggers for ca-certificates (20230311ubuntu0.22.04.1) ...
+#10 137.5 Updating certificates in /etc/ssl/certs...
+#10 137.8 0 added, 0 removed; done.
+#10 137.8 Running hooks in /etc/ca-certificates/update.d...
+#10 137.8 done.
+#10 ...
+
+#13 [build-env 5/6] RUN if [ -n "v1.20.2" ]; then git checkout "v1.20.2"; fi  && make clean-all build
+#13 109.4 go: downloading gopkg.in/warnings.v0 v0.1.2
+#13 ...
+
+#10 [stage-1  2/13] RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y     bash     ca-certificates     dumb-init     gettext     git     curl     gnupg     wget     telnet     netcat     postgresql-client     musl-dev     && ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+#10 DONE 144.2s
+
+#14 [stage-1  3/13] RUN addgroup     --system --gid 1000     git &&   adduser     --system --no-create-home --disabled-password     --home /var/lib/gitea/git     --shell /bin/bash     --uid 1000     --gid 1000     git &&   echo "git:$(dd if=/dev/urandom bs=24 count=1 status=none | base64)" | chpasswd
+#14 0.713 Adding group `git' (GID 1000) ...
+#14 0.760 Done.
+#14 0.781 Warning: The home dir /var/lib/gitea/git you specified can't be accessed: No such file or directory
+#14 0.781 Adding system user `git' (UID 1000) ...
+#14 0.781 Adding new user `git' (UID 1000) with group `git' ...
+#14 0.918 Not creating home directory `/var/lib/gitea/git'.
+#14 DONE 1.0s
+
+#13 [build-env 5/6] RUN if [ -n "v1.20.2" ]; then git checkout "v1.20.2"; fi  && make clean-all build
+#13 ...
+
+#15 [stage-1  4/13] RUN mkdir -p /var/lib/gitea /var/lib/gitea/git /etc/gitea
+#15 DONE 0.7s
+
+#13 [build-env 5/6] RUN if [ -n "v1.20.2" ]; then git checkout "v1.20.2"; fi  && make clean-all build
+#13 ...
+
+#16 [stage-1  5/13] RUN chown git:git /var/lib/gitea /var/lib/gitea/git /etc/gitea
+#16 DONE 0.9s
+
+#13 [build-env 5/6] RUN if [ -n "v1.20.2" ]; then git checkout "v1.20.2"; fi  && make clean-all build
+#13 ...
+
+#17 [stage-1  6/13] COPY docker/rootless /
+#17 DONE 0.3s
+
+#13 [build-env 5/6] RUN if [ -n "v1.20.2" ]; then git checkout "v1.20.2"; fi  && make clean-all build
+#13 147.0 rm -rf gitea dist modules/public/bindata.go modules/options/bindata.go modules/templates/bindata.go modules/public/bindata.go.hash modules/options/bindata.go.hash modules/templates/bindata.go.hash \
+#13 147.0 	integrations*.test \
+#13 147.0 	e2e*.test \
+#13 147.0 	tests/integration/gitea-integration-pgsql/ tests/integration/gitea-integration-mysql/ tests/integration/gitea-integration-mysql8/ tests/integration/gitea-integration-sqlite/ \
+#13 147.0 	tests/integration/gitea-integration-mssql/ tests/integration/indexers-mysql/ tests/integration/indexers-mysql8/ tests/integration/indexers-pgsql tests/integration/indexers-sqlite \
+#13 147.0 	tests/integration/indexers-mssql tests/mysql.ini tests/mysql8.ini tests/pgsql.ini tests/mssql.ini man/ \
+#13 147.0 	tests/e2e/gitea-e2e-pgsql/ tests/e2e/gitea-e2e-mysql/ tests/e2e/gitea-e2e-mysql8/ tests/e2e/gitea-e2e-sqlite/ \
+#13 147.0 	tests/e2e/gitea-e2e-mssql/ tests/e2e/indexers-mysql/ tests/e2e/indexers-mysql8/ tests/e2e/indexers-pgsql/ tests/e2e/indexers-sqlite/ \
+#13 147.0 	tests/e2e/indexers-mssql/ tests/e2e/reports/ tests/e2e/test-artifacts/ tests/e2e/test-snapshots/
+#13 147.0 rm -rf public/js public/css public/fonts public/img/webpack node_modules
+#13 150.6 npm WARN deprecated sourcemap-codec@1.4.8: Please use @jridgewell/sourcemap-codec instead
+#13 160.6 
+#13 160.6 added 942 packages in 13s
+#13 160.6 rm -rf public/js public/css public/fonts public/img/webpack
+#13 160.6 npx webpack
+#13 161.6 Browserslist: caniuse-lite is outdated. Please run:
+#13 161.6   npx update-browserslist-db@latest
+#13 161.6   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+#13 182.8 hidden assets 541 KiB 82 assets
+#13 182.8 assets by path [1m[32m.[39m[22m 20 MiB
+#13 182.8   assets by path [1m[32mjs/[39m[22m 18.7 MiB
+#13 182.8     asset [1m[32mjs/-.bb0e7599.js[39m[22m 321 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: -) (id hint: vendors)
+#13 182.8     asset [1m[32mjs/asciinema-player.a5780950.js[39m[22m 145 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: asciinema-player) (id hint: vendors)
+#13 182.8     asset [1m[32mjs/citation-js-bibtex.52279aa7.js[39m[22m 66.5 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: citation-js-bibtex) (id hint: vendors)
+#13 182.8     asset [1m[32mjs/citation-js-core-citation-js-formats-citation-js-bibtex-citation-js-csl.081e50bd.js[39m[22m 87.6 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: citation-js-core-citation-js-formats-citation-js-bibtex-citation-js-csl) (id hint: vendors)
+#13 182.8     asset [1m[32mjs/citation-js-csl.862c58a8.js[39m[22m 549 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: citation-js-csl) (id hint: vendors)
+#13 182.8     asset [1m[32mjs/citation-js-formats.1ba55eab.js[39m[22m 68.1 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: citation-js-formats) (id hint: vendors)
+#13 182.8     asset [1m[32mjs/dropzone.55783234.js[39m[22m 37.2 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: dropzone) (id hint: vendors)
+#13 182.8     asset [1m[32mjs/easymde.9fd3ea59.js[39m[22m 325 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: easymde) (id hint: vendors)
+#13 182.8     asset [1m[32mjs/eventsource.sharedworker.js[39m[22m 1.7 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: eventsource.sharedworker)
+#13 182.8     asset [1m[32mjs/index.js[39m[22m 1.15 MiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: index)
+#13 182.8     asset [1m[32mjs/katex.c40d7840.js[39m[22m 264 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: katex) (id hint: vendors)
+#13 182.8     asset [1m[32mjs/licenses.txt[39m[22m 1.15 MiB [1m[32m[emitted][39m[22m
+#13 182.8     asset [1m[32mjs/mcaptcha-vanilla-glue.e82cd5ce.js[39m[22m 3.5 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: mcaptcha-vanilla-glue)
+#13 182.8     asset [1m[32mjs/mermaid.3798f62a.js[39m[22m 308 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: mermaid) (id hint: vendors)
+#13 182.8     asset [1m[32mjs/minicolors.e369f43d.js[39m[22m 15.4 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: minicolors) (id hint: vendors)
+#13 182.8     asset [1m[32mjs/monaco-css.d8ef7a22.worker.js[39m[22m 1010 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m
+#13 182.8     asset [1m[32mjs/monaco-editor.afbd84bf.worker.js[39m[22m 250 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m
+#13 182.8     asset [1m[32mjs/monaco-html.900c9b5d.worker.js[39m[22m 685 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m
+#13 182.8     asset [1m[32mjs/monaco-json.4214e3af.worker.js[39m[22m 376 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m
+#13 182.8     asset [1m[32mjs/monaco-ts.94b72dd4.worker.js[39m[22m 4.67 MiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m
+#13 182.8     asset [1m[32mjs/monaco.a41a8f35.js[39m[22m 3.3 MiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: monaco) (id hint: vendors)
+#13 182.8     asset [1m[32mjs/node_modules_mermaid_dist_classDiagram-bc733c3b_js.f53c7dac.js[39m[22m 4.28 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m
+#13 182.8     asset [1m[32mjs/node_modules_mermaid_dist_classDiagram-v2-8931bdaf_js.61cee992.js[39m[22m 6.03 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m
+#13 182.8     asset [1m[32mjs/node_modules_mermaid_dist_flowDiagram-v2-476db779_js.f23a133b.js[39m[22m 1.01 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m
+#13 182.8     asset [1m[32mjs/node_modules_mermaid_dist_infoDiagram-264bed3e_js.83b374e9.js[39m[22m 9.13 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m
+#13 182.8     asset [1m[32mjs/node_modules_mermaid_dist_stateDiagram-133e3642_js.9be0b16f.js[39m[22m 11 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m
+#13 182.8     asset [1m[32mjs/node_modules_mermaid_dist_stateDiagram-v2-6371a76b_js.63d9f689.js[39m[22m 5.36 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m
+#13 182.8     asset [1m[32mjs/pdfobject.cefebff4.js[39m[22m 3.52 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: pdfobject)
+#13 182.8     asset [1m[32mjs/swagger.js[39m[22m 1.38 MiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: swagger)
+#13 182.8     asset [1m[32mjs/theme-arc-green.js[39m[22m 39 bytes [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: theme-arc-green)
+#13 182.8     asset [1m[32mjs/theme-auto.js[39m[22m 39 bytes [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: theme-auto)
+#13 182.8     asset [1m[32mjs/tribute.1ca3c8e4.js[39m[22m 30 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: tribute) (id hint: vendors)
+#13 182.8     asset [1m[32mjs/vendors-node_modules_mermaid_dist_c4Diagram-9cddb37f_js.4cf90939.js[39m[22m 70.3 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (id hint: vendors)
+#13 182.8     asset [1m[32mjs/vendors-node_modules_mermaid_dist_erDiagram-f6946109_js.f536a526.js[39m[22m 105 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (id hint: vendors)
+#13 182.8     asset [1m[32mjs/vendors-node_modules_mermaid_dist_flowDiagram-93327f21_js.7890056d.js[39m[22m 21.7 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (id hint: vendors)
+#13 182.8     asset [1m[32mjs/vendors-node_modules_mermaid_dist_flowchart-elk-definition-5082a990_js.eb85fd36.js[39m[22m 1.48 MiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (id hint: vendors)
+#13 182.8     asset [1m[32mjs/vendors-node_modules_mermaid_dist_ganttDiagram-7ce12d6b_js.b16d9e2e.js[39m[22m 39.5 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (id hint: vendors)
+#13 182.8     asset [1m[32mjs/vendors-node_modules_mermaid_dist_gitGraphDiagram-1e960c50_js.882b43cf.js[39m[22m 36.9 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (id hint: vendors)
+#13 182.8     asset [1m[32mjs/vendors-node_modules_mermaid_dist_journeyDiagram-31be0096_js.dfb987fb.js[39m[22m 24.6 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (id hint: vendors)
+#13 182.8     asset [1m[32mjs/vendors-node_modules_mermaid_dist_mindmap-definition-4fc2557c_js.bf5ab109.js[39m[22m 524 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (id hint: vendors)
+#13 182.8     asset [1m[32mjs/vendors-node_modules_mermaid_dist_pieDiagram-157505fe_js.e82b315a.js[39m[22m 15.7 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (id hint: vendors)
+#13 182.8     asset [1m[32mjs/vendors-node_modules_mermaid_dist_quadrantDiagram-fd70f2d0_js.02587bd7.js[39m[22m 31 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (id hint: vendors)
+#13 182.8     asset [1m[32mjs/vendors-node_modules_mermaid_dist_requirementDiagram-19c99588_js.e697d97d.js[39m[22m 98.8 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (id hint: vendors)
+#13 182.8     asset [1m[32mjs/vendors-node_modules_mermaid_dist_sequenceDiagram-5dfd0049_js.c59751cb.js[39m[22m 80.4 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (id hint: vendors)
+#13 182.8     asset [1m[32mjs/vendors-node_modules_mermaid_dist_timeline-definition-5ed366f4_js.7788cbe4.js[39m[22m 24.2 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (id hint: vendors)
+#13 182.8     asset [1m[32mjs/webcomponents.js[39m[22m 33.4 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: webcomponents)
+#13 182.8   assets by path [1m[32mfonts/[39m[22m 325 KiB
+#13 182.8     asset [1m[32mfonts/KaTeX_AMS-Regular.73ea273a.woff2[39m[22m 27.4 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_AMS-Regular.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Caligraphic-Bold.a1abf90d.woff2[39m[22m 6.75 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Caligraphic-Bold.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Caligraphic-Regular.d6484fce.woff2[39m[22m 6.75 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Caligraphic-Regular.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Fraktur-Bold.931d67ea.woff2[39m[22m 11.1 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Fraktur-Bold.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Fraktur-Regular.172d3529.woff2[39m[22m 11.1 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Fraktur-Regular.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Main-Bold.39890742.woff2[39m[22m 24.7 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Main-Bold.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Main-BoldItalic.20f389c4.woff2[39m[22m 16.4 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Main-BoldItalic.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Main-Italic.fe2176f7.woff2[39m[22m 16.6 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Main-Italic.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Main-Regular.f650f111.woff2[39m[22m 25.7 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Main-Regular.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Math-BoldItalic.dcbcbd93.woff2[39m[22m 16 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Math-BoldItalic.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Math-Italic.6d3d25f4.woff2[39m[22m 16.1 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Math-Italic.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_SansSerif-Bold.95591a92.woff2[39m[22m 11.9 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_SansSerif-Bold.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_SansSerif-Italic.7d393d38.woff2[39m[22m 11.7 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_SansSerif-Italic.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_SansSerif-Regular.cd5e231e.woff2[39m[22m 10.1 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_SansSerif-Regular.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Script-Regular.c81d1b2a.woff2[39m[22m 9.42 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Script-Regular.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Size1-Regular.6eec866c.woff2[39m[22m 5.34 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Size1-Regular.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Size2-Regular.2960900c.woff2[39m[22m 5.09 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Size2-Regular.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Size3-Regular.e1951519.woff2[39m[22m 3.54 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Size3-Regular.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Size4-Regular.e418bf25.woff2[39m[22m 4.81 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Size4-Regular.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/KaTeX_Typewriter-Regular.c295e7f7.woff2[39m[22m 13.3 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/katex/dist/fonts/KaTeX_Typewriter-Regular.woff2] (auxiliary name: katex) (auxiliary id hint: vendors)
+#13 182.8     asset [1m[32mfonts/codicon.4a477f66.ttf[39m[22m 71.7 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/monaco-editor/esm/vs/base/browser/ui/codicons/codicon/codicon.ttf]
+#13 182.8   assets by path [1m[32mcss/*.css[39m[22m 958 KiB
+#13 182.8     asset [1m[32mcss/asciinema-player.7733117c.css[39m[22m 41.5 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: asciinema-player) (id hint: vendors)
+#13 182.8     asset [1m[32mcss/dropzone.0142b04d.css[39m[22m 4.51 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: dropzone) (id hint: vendors)
+#13 182.8     asset [1m[32mcss/index.css[39m[22m 608 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: index)
+#13 182.8     asset [1m[32mcss/katex.23434044.css[39m[22m 22.8 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: katex) (id hint: vendors)
+#13 182.8     asset [1m[32mcss/minicolors.6d617d3d.css[39m[22m 8.1 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: minicolors) (id hint: vendors)
+#13 182.8     asset [1m[32mcss/monaco.97a43310.css[39m[22m 104 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [1m[32m[minimized][39m[22m (name: monaco) (id hint: vendors)
+#13 182.8     asset [1m[32mcss/swagger.css[39m[22m 146 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: swagger)
+#13 182.8     asset [1m[32mcss/theme-arc-green.css[39m[22m 11.1 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: theme-arc-green)
+#13 182.8     asset [1m[32mcss/theme-auto.css[39m[22m 11.2 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: theme-auto)
+#13 182.8   asset [1m[32mimg/webpack/jquery.minicolors.0e614115.png[39m[22m 67 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: node_modules/@claviska/jquery-minicolors/jquery.minicolors.png] (auxiliary name: minicolors) (auxiliary id hint: vendors)
+#13 182.8 webpack 5.87.0 compiled [1m[32msuccessfully[39m[22m in 21042 ms
+#13 184.1 Running go generate...
+#13 184.3 go: downloading github.com/mattn/go-sqlite3 v1.14.16
+#13 193.0 go: downloading github.com/lunny/vfsgen v0.0.0-20220105142115-2c99e1ffdfa0
+#13 194.9 go: downloading github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749
+#13 200.7 generating bindata for migration
+#13 200.9 generating bindata for options
+#13 201.6 generating bindata for public
+#13 202.8 generating bindata for templates
+#13 204.0 CGO_CFLAGS="-O2 -g -DSQLITE_MAX_VARIABLE_NUMBER=32766" go build -v  -tags 'bindata timetzdata bindata sqlite sqlite_unlock_notify' -ldflags '-s -w  -X "main.MakeVersion=GNU Make 4.4.1" -X "main.Version=v1.20.2" -X "main.Tags=bindata timetzdata bindata sqlite sqlite_unlock_notify"' -o gitea
+#13 206.7 google.golang.org/protobuf/internal/flags
+#13 206.7 code.gitea.io/gitea/modules/container
+#13 206.7 google.golang.org/protobuf/internal/set
+#13 206.7 golang.org/x/crypto/internal/alias
+#13 206.7 github.com/gobwas/glob/util/runes
+#13 206.7 github.com/lib/pq/oid
+#13 206.7 image/color
+#13 206.7 github.com/dgryski/go-rendezvous
+#13 206.7 code.gitea.io/gitea/modules/git/internal
+#13 206.7 github.com/denisenkom/go-mssqldb/internal/cp
+#13 206.8 hash/fnv
+#13 206.8 google.golang.org/protobuf/internal/pragma
+#13 206.8 regexp/syntax
+#13 206.8 time/tzdata
+#13 206.8 internal/saferio
+#13 206.8 golang.org/x/text/internal/tag
+#13 206.8 golang.org/x/text/transform
+#13 206.8 runtime/cgo
+#13 206.8 code.gitea.io/gitea/modules/graceful/releasereopen
+#13 206.8 golang.org/x/crypto/blowfish
+#13 206.8 golang.org/x/crypto/pbkdf2
+#13 206.8 golang.org/x/crypto/scrypt
+#13 206.8 golang.org/x/crypto/ripemd160
+#13 206.9 time
+#13 206.9 golang.org/x/crypto/sha3
+#13 206.9 golang.org/x/crypto/chacha20
+#13 206.9 golang.org/x/crypto/internal/poly1305
+#13 206.9 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
+#13 207.0 github.com/gobwas/glob/util/strings
+#13 207.0 github.com/kballard/go-shellquote
+#13 207.0 regexp
+#13 207.0 github.com/denisenkom/go-mssqldb/internal/querytext
+#13 207.0 golang.org/x/crypto/md4
+#13 207.0 github.com/syndtr/goleveldb/leveldb/comparer
+#13 207.0 github.com/golang/snappy
+#13 207.0 xorm.io/xorm/names
+#13 207.0 golang.org/x/text/internal/stringset
+#13 207.0 html
+#13 207.1 encoding/base32
+#13 207.1 github.com/x448/float16
+#13 207.1 github.com/hashicorp/golang-lru/simplelru
+#13 207.2 internal/sysinfo
+#13 207.2 image
+#13 207.2 internal/poll
+#13 207.2 context
+#13 207.2 io/fs
+#13 207.2 golang.org/x/sys/unix
+#13 207.2 github.com/cespare/xxhash/v2
+#13 207.2 embed
+#13 207.3 github.com/redis/go-redis/v9/internal/rand
+#13 207.3 github.com/redis/go-redis/v9/internal/util
+#13 207.3 github.com/redis/go-redis/v9/internal/hashtag
+#13 207.3 github.com/go-enry/go-enry/v2/regex
+#13 207.3 os
+#13 207.3 crypto/internal/nistec
+#13 207.3 github.com/djherbis/buffer/limio
+#13 207.3 github.com/go-enry/go-enry/v2/data/rule
+#13 207.3 github.com/djherbis/nio/v3
+#13 207.4 github.com/go-enry/go-enry/v2/internal/tokenizer
+#13 207.4 github.com/go-enry/go-enry/v2/data
+#13 207.4 golang.org/x/net/html/atom
+#13 207.4 github.com/nfnt/resize
+#13 207.4 image/internal/imageutil
+#13 207.5 image/draw
+#13 207.6 fmt
+#13 207.6 google.golang.org/protobuf/internal/detrand
+#13 207.6 io/ioutil
+#13 207.6 path/filepath
+#13 207.7 crypto/ecdh
+#13 207.7 golang.org/x/sys/cpu
+#13 207.7 os/exec
+#13 207.8 golang.org/x/crypto/curve25519
+#13 207.8 golang.org/x/crypto/blake2b
+#13 207.9 golang.org/x/crypto/blake2s
+#13 207.9 vendor/golang.org/x/sys/cpu
+#13 207.9 google.golang.org/protobuf/internal/errors
+#13 207.9 go/token
+#13 207.9 compress/flate
+#13 207.9 google.golang.org/protobuf/encoding/protowire
+#13 208.0 encoding/json
+#13 208.0 google.golang.org/protobuf/internal/version
+#13 208.0 google.golang.org/protobuf/reflect/protoreflect
+#13 208.0 log
+#13 208.0 runtime/debug
+#13 208.0 math/big
+#13 208.1 encoding/hex
+#13 208.1 compress/gzip
+#13 208.1 net
+#13 208.1 github.com/modern-go/concurrent
+#13 208.2 github.com/google/pprof/profile
+#13 208.2 runtime/pprof
+#13 208.3 google.golang.org/protobuf/internal/descfmt
+#13 208.3 google.golang.org/protobuf/internal/descopts
+#13 208.4 google.golang.org/protobuf/internal/strs
+#13 208.5 google.golang.org/protobuf/internal/encoding/text
+#13 208.5 google.golang.org/protobuf/internal/encoding/messageset
+#13 208.5 google.golang.org/protobuf/internal/genid
+#13 208.6 google.golang.org/protobuf/internal/order
+#13 208.6 google.golang.org/protobuf/reflect/protoregistry
+#13 208.7 google.golang.org/protobuf/runtime/protoiface
+#13 208.7 google.golang.org/protobuf/internal/encoding/json
+#13 208.8 net/url
+#13 208.9 google.golang.org/protobuf/internal/encoding/defval
+#13 208.9 google.golang.org/protobuf/proto
+#13 209.0 encoding/gob
+#13 209.0 github.com/json-iterator/go
+#13 209.0 crypto/rand
+#13 209.1 crypto/internal/bigmod
+#13 209.2 crypto/internal/boring/bbig
+#13 209.2 code.gitea.io/gitea/modules/process
+#13 209.2 crypto/dsa
+#13 209.2 crypto/rsa
+#13 209.3 crypto/elliptic
+#13 209.3 google.golang.org/protobuf/internal/filedesc
+#13 209.4 google.golang.org/protobuf/encoding/prototext
+#13 209.5 encoding/asn1
+#13 209.5 crypto/ed25519
+#13 209.6 flag
+#13 209.8 github.com/yuin/goldmark/util
+#13 209.9 github.com/klauspost/cpuid/v2
+#13 209.9 golang.org/x/text/internal/language
+#13 209.9 vendor/golang.org/x/crypto/cryptobyte
+#13 210.1 google.golang.org/protobuf/internal/encoding/tag
+#13 210.3 google.golang.org/protobuf/encoding/protojson
+#13 210.3 google.golang.org/protobuf/internal/impl
+#13 210.6 crypto/ecdsa
+#13 210.7 crypto/x509/pkix
+#13 210.7 code.gitea.io/gitea/modules/json
+#13 210.8 github.com/minio/sha256-simd
+#13 210.9 golang.org/x/text/internal/language/compact
+#13 210.9 golang.org/x/text/unicode/norm
+#13 210.9 github.com/mattn/go-isatty
+#13 211.0 golang.org/x/crypto/argon2
+#13 211.0 golang.org/x/crypto/bcrypt
+#13 211.0 golang.org/x/text/language
+#13 211.1 gopkg.in/yaml.v3
+#13 211.1 os/user
+#13 211.3 golang.org/x/text/internal
+#13 211.4 github.com/dustin/go-humanize
+#13 211.6 golang.org/x/crypto/ed25519
+#13 211.6 vendor/golang.org/x/crypto/chacha20poly1305
+#13 211.6 golang.org/x/text/cases
+#13 212.1 vendor/golang.org/x/text/unicode/bidi
+#13 212.1 vendor/golang.org/x/text/unicode/norm
+#13 212.6 code.gitea.io/gitea/modules/structs
+#13 212.7 vendor/golang.org/x/text/secure/bidirule
+#13 212.8 vendor/golang.org/x/net/http2/hpack
+#13 213.0 mime
+#13 213.1 crypto/x509
+#13 213.1 google.golang.org/protobuf/internal/filetype
+#13 213.1 code.gitea.io/gitea/modules/user
+#13 213.1 net/textproto
+#13 213.1 vendor/golang.org/x/net/idna
+#13 213.1 mime/quotedprintable
+#13 213.2 google.golang.org/protobuf/runtime/protoimpl
+#13 213.2 net/http/internal
+#13 213.3 github.com/gobwas/glob/match
+#13 213.3 google.golang.org/protobuf/types/known/structpb
+#13 213.3 google.golang.org/protobuf/types/known/timestamppb
+#13 213.3 mime/multipart
+#13 213.4 github.com/gobwas/glob/syntax/lexer
+#13 213.4 code.gitea.io/actions-proto-go/runner/v1
+#13 213.5 github.com/gobwas/glob/syntax/ast
+#13 213.5 database/sql/driver
+#13 213.5 gopkg.in/ini.v1
+#13 213.6 github.com/gobwas/glob/compiler
+#13 213.6 vendor/golang.org/x/net/http/httpguts
+#13 213.6 vendor/golang.org/x/net/http/httpproxy
+#13 213.7 github.com/gobwas/glob/syntax
+#13 213.7 database/sql
+#13 213.7 net/mail
+#13 213.7 github.com/gobwas/glob
+#13 213.8 text/template/parse
+#13 213.8 github.com/denisenkom/go-mssqldb/internal/decimal
+#13 213.8 github.com/golang-sql/civil
+#13 213.9 github.com/lib/pq/scram
+#13 214.0 github.com/syndtr/goleveldb/leveldb/util
+#13 214.0 github.com/syndtr/goleveldb/leveldb/storage
+#13 214.0 github.com/golang-jwt/jwt/v4
+#13 214.1 golang.org/x/crypto/ssh
+#13 214.2 crypto/tls
+#13 214.3 text/template
+#13 214.4 github.com/golang-sql/sqlexp
+#13 214.4 github.com/mattn/go-sqlite3
+#13 214.5 xorm.io/builder
+#13 214.5 github.com/syndtr/goleveldb/leveldb/cache
+#13 214.6 github.com/syndtr/goleveldb/leveldb/errors
+#13 214.7 github.com/syndtr/goleveldb/leveldb/filter
+#13 214.7 github.com/syndtr/goleveldb/leveldb/iterator
+#13 214.9 github.com/syndtr/goleveldb/leveldb/journal
+#13 215.0 github.com/syndtr/goleveldb/leveldb/memdb
+#13 215.0 github.com/syndtr/goleveldb/leveldb/opt
+#13 215.1 xorm.io/xorm/contexts
+#13 215.2 xorm.io/xorm/internal/utils
+#13 215.2 github.com/syndtr/goleveldb/leveldb/table
+#13 215.2 log/syslog
+#13 215.3 xorm.io/xorm/schemas
+#13 215.4 xorm.io/xorm/convert
+#13 215.6 xorm.io/xorm/log
+#13 215.6 github.com/syndtr/goleveldb/leveldb
+#13 215.7 xorm.io/xorm/core
+#13 215.8 xorm.io/xorm/internal/json
+#13 215.8 code.gitea.io/gitea/models/perm
+#13 215.9 code.gitea.io/gitea/modules/secret
+#13 216.0 github.com/fsnotify/fsnotify
+#13 216.2 golang.org/x/text/internal/catmsg
+#13 216.2 golang.org/x/text/internal/number
+#13 216.2 net/http/httptrace
+#13 216.2 xorm.io/xorm/dialects
+#13 216.2 net/http
+#13 216.3 github.com/denisenkom/go-mssqldb/msdsn
+#13 216.4 github.com/denisenkom/go-mssqldb
+#13 216.5 code.gitea.io/gitea/modules/util
+#13 216.5 github.com/go-sql-driver/mysql
+#13 216.8 code.gitea.io/gitea/modules/util/rotatingfilewriter
+#13 217.0 code.gitea.io/gitea/modules/log
+#13 217.1 code.gitea.io/gitea/modules/generate
+#13 217.2 github.com/lib/pq
+#13 217.3 code.gitea.io/gitea/modules/auth/password/hash
+#13 217.4 xorm.io/xorm/caches
+#13 217.5 golang.org/x/text/message/catalog
+#13 217.5 golang.org/x/text/internal/format
+#13 217.6 xorm.io/xorm/tags
+#13 217.6 html/template
+#13 217.6 golang.org/x/text/feature/plural
+#13 217.7 xorm.io/xorm/internal/statements
+#13 217.7 golang.org/x/text/message
+#13 217.8 golang.org/x/text/number
+#13 218.0 golang.org/x/crypto/ocsp
+#13 218.3 github.com/fxamacker/cbor/v2
+#13 218.3 github.com/google/go-tpm/tpmutil
+#13 218.5 github.com/google/uuid
+#13 218.7 github.com/google/go-tpm/tpm2
+#13 218.8 github.com/mitchellh/mapstructure
+#13 218.8 xorm.io/xorm
+#13 218.8 runtime/trace
+#13 219.0 testing
+#13 219.1 github.com/boombuler/barcode
+#13 219.2 github.com/boombuler/barcode/utils
+#13 219.4 github.com/boombuler/barcode/qr
+#13 219.7 github.com/go-webauthn/webauthn/protocol/webauthncbor
+#13 219.7 github.com/pquerna/otp/internal
+#13 219.7 github.com/go-webauthn/webauthn/protocol/webauthncose
+#13 219.8 code.gitea.io/gitea/modules/proxyprotocol
+#13 219.8 github.com/pquerna/otp
+#13 219.9 github.com/pquerna/otp/hotp
+#13 219.9 os/signal
+#13 220.0 github.com/redis/go-redis/v9/internal
+#13 220.0 github.com/pquerna/otp/totp
+#13 220.0 github.com/hashicorp/golang-lru
+#13 220.0 github.com/redis/go-redis/v9/internal/hscan
+#13 220.0 github.com/redis/go-redis/v9/internal/proto
+#13 220.0 gitea.com/go-chi/cache
+#13 220.1 github.com/bradfitz/gomemcache/memcache
+#13 220.1 archive/tar
+#13 220.3 encoding/xml
+#13 220.3 github.com/redis/go-redis/v9/internal/pool
+#13 220.3 github.com/go-fed/httpsig
+#13 220.4 code.gitea.io/gitea/modules/assetfs
+#13 220.5 github.com/go-webauthn/revoke
+#13 220.5 github.com/redis/go-redis/v9
+#13 220.7 github.com/unknwon/com
+#13 220.7 github.com/go-webauthn/webauthn/metadata
+#13 220.8 github.com/klauspost/compress/s2
+#13 220.8 github.com/minio/md5-simd
+#13 220.8 github.com/go-webauthn/webauthn/protocol
+#13 220.8 github.com/minio/minio-go/v7/pkg/s3utils
+#13 220.9 gitea.com/go-chi/cache/memcache
+#13 221.0 github.com/minio/minio-go/v7/pkg/encrypt
+#13 221.0 github.com/minio/minio-go/v7/pkg/lifecycle
+#13 221.0 github.com/minio/minio-go/v7/pkg/signer
+#13 221.1 github.com/minio/minio-go/v7/pkg/set
+#13 221.2 github.com/rs/xid
+#13 221.3 github.com/minio/minio-go/v7/pkg/notification
+#13 221.3 github.com/minio/minio-go/v7/pkg/credentials
+#13 221.3 github.com/go-webauthn/webauthn/webauthn
+#13 221.4 github.com/minio/minio-go/v7/pkg/replication
+#13 221.5 github.com/minio/minio-go/v7/pkg/sse
+#13 221.5 github.com/minio/minio-go/v7/pkg/tags
+#13 221.5 golang.org/x/text/unicode/bidi
+#13 221.6 net/http/cookiejar
+#13 221.7 golang.org/x/net/publicsuffix
+#13 221.7 net/http/httputil
+#13 221.7 strk.kbt.io/projects/go/libravatar
+#13 221.8 code.gitea.io/gitea/modules/git/foreachref
+#13 221.8 code.gitea.io/gitea/modules/git/url
+#13 221.9 code.gitea.io/gitea/modules/typesniffer
+#13 221.9 github.com/djherbis/buffer/wrapio
+#13 222.0 github.com/djherbis/buffer
+#13 222.1 github.com/hashicorp/go-version
+#13 222.1 golang.org/x/net/html
+#13 222.1 golang.org/x/text/secure/bidirule
+#13 222.1 code.gitea.io/gitea/modules/avatar/identicon
+#13 222.2 golang.org/x/net/idna
+#13 222.2 github.com/oliamb/cutter
+#13 222.2 golang.org/x/image/riff
+#13 222.2 golang.org/x/image/vp8
+#13 222.3 golang.org/x/image/vp8l
+#13 222.3 compress/lzw
+#13 222.4 image/color/palette
+#13 222.5 image/jpeg
+#13 222.5 image/gif
+#13 222.5 golang.org/x/image/webp
+#13 222.6 hash/adler32
+#13 222.7 compress/zlib
+#13 222.7 golang.org/x/net/http/httpguts
+#13 222.7 image/png
+#13 222.7 code.gitea.io/gitea/modules/auth
+#13 222.8 github.com/goccy/go-json/internal/errors
+#13 222.8 github.com/minio/minio-go/v7
+#13 222.8 github.com/goccy/go-json/internal/runtime
+#13 222.8 code.gitea.io/gitea/modules/emoji
+#13 222.9 github.com/yohcop/openid-go
+#13 222.9 github.com/goccy/go-json/internal/decoder
+#13 223.0 github.com/goccy/go-json/internal/encoder
+#13 223.0 code.gitea.io/gitea/modules/auth/openid
+#13 223.1 github.com/yuin/goldmark/text
+#13 223.3 github.com/yuin/goldmark/ast
+#13 223.5 mvdan.cc/xurls/v2
+#13 223.7 code.gitea.io/gitea/modules/regexplru
+#13 223.8 code.gitea.io/gitea/modules/templates/vars
+#13 223.9 github.com/aymerick/douceur/css
+#13 224.1 github.com/goccy/go-json/internal/encoder/vm_color_indent
+#13 224.1 github.com/gorilla/css/scanner
+#13 224.3 github.com/aymerick/douceur/parser
+#13 224.3 github.com/yuin/goldmark/parser
+#13 224.4 github.com/yuin/goldmark/renderer
+#13 224.5 github.com/yuin/goldmark/renderer/html
+#13 224.7 github.com/yuin/goldmark/extension/ast
+#13 224.8 github.com/microcosm-cc/bluemonday/css
+#13 225.1 code.gitea.io/gitea/modules/webhook
+#13 225.1 github.com/go-git/go-billy/v5
+#13 225.2 github.com/go-git/gcfg/token
+#13 225.2 github.com/go-git/gcfg/types
+#13 225.3 github.com/yuin/goldmark
+#13 225.3 github.com/go-git/gcfg/scanner
+#13 225.4 gopkg.in/warnings.v0
+#13 225.4 code.gitea.io/gitea/modules/markup/common
+#13 225.4 github.com/yuin/goldmark/extension
+#13 225.5 github.com/go-git/gcfg
+#13 225.6 github.com/microcosm-cc/bluemonday
+#13 225.7 golang.org/x/net/context
+#13 225.7 github.com/go-git/go-git/v5/plumbing/format/config
+#13 225.8 github.com/jbenet/go-context/io
+#13 225.9 github.com/go-git/go-git/v5/utils/ioutil
+#13 226.0 github.com/sirupsen/logrus
+#13 226.0 github.com/go-git/go-git/v5/plumbing/format/gitignore
+#13 226.1 github.com/ProtonMail/go-crypto/openpgp/errors
+#13 226.1 github.com/ProtonMail/go-crypto/openpgp/aes/keywrap
+#13 226.2 github.com/ProtonMail/go-crypto/openpgp/armor
+#13 226.2 github.com/ProtonMail/go-crypto/internal/byteutil
+#13 226.2 golang.org/x/crypto/cast5
+#13 226.2 github.com/ProtonMail/go-crypto/eax
+#13 226.2 github.com/ProtonMail/go-crypto/ocb
+#13 226.3 github.com/ProtonMail/go-crypto/bitcurves
+#13 226.3 github.com/ProtonMail/go-crypto/brainpool
+#13 226.4 github.com/ProtonMail/go-crypto/openpgp/internal/algorithm
+#13 226.4 github.com/ProtonMail/go-crypto/openpgp/internal/encoding
+#13 226.4 github.com/cloudflare/circl/internal/conv
+#13 226.4 github.com/cloudflare/circl/math
+#13 226.4 github.com/nektos/act/pkg/common
+#13 226.5 github.com/cloudflare/circl/sign
+#13 226.5 github.com/cloudflare/circl/math/fp25519
+#13 226.5 github.com/cloudflare/circl/math/fp448
+#13 226.5 github.com/cloudflare/circl/math/mlsbset
+#13 226.6 github.com/cloudflare/circl/internal/sha3
+#13 226.6 compress/bzip2
+#13 226.7 github.com/cloudflare/circl/dh/x25519
+#13 226.7 github.com/cloudflare/circl/sign/ed25519
+#13 226.7 github.com/ProtonMail/go-crypto/openpgp/elgamal
+#13 226.8 github.com/cloudflare/circl/dh/x448
+#13 226.8 github.com/cloudflare/circl/ecc/goldilocks
+#13 227.0 github.com/ProtonMail/go-crypto/openpgp/s2k
+#13 227.0 golang.org/x/crypto/hkdf
+#13 227.1 github.com/go-git/go-billy/v5/helper/polyfill
+#13 227.1 github.com/go-git/go-billy/v5/util
+#13 227.1 github.com/cloudflare/circl/sign/ed448
+#13 227.1 github.com/go-git/go-billy/v5/helper/chroot
+#13 227.2 github.com/go-git/go-git/v5/internal/url
+#13 227.2 github.com/pjbgf/sha1cd/internal
+#13 227.2 github.com/pjbgf/sha1cd/ubc
+#13 227.2 github.com/go-git/go-billy/v5/osfs
+#13 227.3 github.com/go-git/go-git/v5/internal/revision
+#13 227.4 github.com/go-git/go-git/v5/plumbing/filemode
+#13 227.4 github.com/pjbgf/sha1cd
+#13 227.4 github.com/ProtonMail/go-crypto/openpgp/internal/ecc
+#13 227.4 github.com/go-git/go-git/v5/utils/sync
+#13 227.4 github.com/emirpasic/gods/utils
+#13 227.5 github.com/go-git/go-git/v5/plumbing/color
+#13 227.5 github.com/emirpasic/gods/containers
+#13 227.5 github.com/sergi/go-diff/diffmatchpatch
+#13 227.5 github.com/go-git/go-git/v5/plumbing/hash
+#13 227.5 github.com/emirpasic/gods/lists
+#13 227.6 github.com/go-git/go-git/v5/plumbing
+#13 227.6 github.com/ProtonMail/go-crypto/openpgp/ecdh
+#13 227.6 github.com/ProtonMail/go-crypto/openpgp/ecdsa
+#13 227.7 github.com/ProtonMail/go-crypto/openpgp/eddsa
+#13 227.7 github.com/emirpasic/gods/lists/arraylist
+#13 227.7 github.com/emirpasic/gods/trees
+#13 227.7 github.com/ProtonMail/go-crypto/openpgp/packet
+#13 227.8 github.com/go-git/go-git/v5/config
+#13 227.8 code.gitea.io/gitea/modules/nosql
+#13 227.8 github.com/go-git/go-git/v5/plumbing/cache
+#13 227.8 github.com/go-git/go-git/v5/utils/binary
+#13 227.8 github.com/go-git/go-git/v5/plumbing/format/index
+#13 227.8 github.com/go-git/go-git/v5/plumbing/format/idxfile
+#13 228.0 github.com/emirpasic/gods/trees/binaryheap
+#13 228.2 github.com/go-git/go-git/v5/plumbing/format/diff
+#13 228.2 github.com/go-git/go-git/v5/plumbing/storer
+#13 228.3 github.com/go-git/go-git/v5/utils/diff
+#13 228.4 github.com/go-git/go-git/v5/utils/merkletrie/noder
+#13 228.4 github.com/go-git/go-git/v5/plumbing/format/packfile
+#13 228.5 github.com/go-git/go-git/v5/storage
+#13 228.5 github.com/go-git/go-git/v5/utils/merkletrie/internal/frame
+#13 228.5 github.com/go-git/go-git/v5/plumbing/format/pktline
+#13 228.5 github.com/go-git/go-git/v5/utils/merkletrie
+#13 228.5 github.com/go-git/go-git/v5/plumbing/protocol/packp/capability
+#13 228.6 github.com/go-git/go-git/v5/plumbing/protocol/packp/sideband
+#13 228.6 github.com/go-git/go-git/v5/storage/memory
+#13 228.6 golang.org/x/sys/execabs
+#13 228.7 github.com/kevinburke/ssh_config
+#13 228.7 golang.org/x/crypto/ssh/knownhosts
+#13 228.7 github.com/ProtonMail/go-crypto/openpgp
+#13 228.8 github.com/go-git/go-git/v5/plumbing/protocol/packp
+#13 228.8 github.com/skeema/knownhosts
+#13 228.9 golang.org/x/crypto/ssh/agent
+#13 228.9 golang.org/x/net/internal/socks
+#13 228.9 github.com/go-git/go-git/v5/plumbing/format/objfile
+#13 229.0 github.com/go-git/go-git/v5/storage/filesystem/dotgit
+#13 229.0 golang.org/x/net/proxy
+#13 229.1 github.com/go-git/go-git/v5/plumbing/object
+#13 229.1 github.com/go-git/go-git/v5/utils/merkletrie/filesystem
+#13 229.2 github.com/goccy/go-json/internal/encoder/vm_color
+#13 229.2 github.com/go-git/go-git/v5/plumbing/transport
+#13 229.2 github.com/xanzy/ssh-agent
+#13 229.2 github.com/go-git/go-git/v5/utils/merkletrie/index
+#13 229.2 github.com/imdario/mergo
+#13 229.2 github.com/go-git/go-git/v5/plumbing/transport/internal/common
+#13 229.3 github.com/mattn/go-colorable
+#13 229.3 github.com/fatih/color
+#13 229.4 github.com/go-git/go-git/v5/plumbing/transport/git
+#13 229.4 github.com/go-git/go-git/v5/storage/filesystem
+#13 229.4 github.com/go-git/go-git/v5/plumbing/transport/http
+#13 229.4 github.com/go-git/go-git/v5/plumbing/transport/ssh
+#13 229.5 github.com/rivo/uniseg
+#13 229.6 github.com/robfig/cron
+#13 229.8 golang.org/x/sync/errgroup
+#13 229.8 golang.org/x/sync/semaphore
+#13 229.8 github.com/go-git/go-git/v5/plumbing/revlist
+#13 229.8 text/scanner
+#13 229.8 github.com/42wim/sshsig/pem
+#13 229.8 github.com/keybase/go-crypto/openpgp/errors
+#13 229.9 github.com/keybase/go-crypto/openpgp/armor
+#13 229.9 github.com/go-git/go-git/v5/plumbing/transport/server
+#13 229.9 github.com/42wim/sshsig
+#13 230.0 github.com/keybase/go-crypto/brainpool
+#13 230.0 github.com/keybase/go-crypto/cast5
+#13 230.0 github.com/keybase/go-crypto/curve25519
+#13 230.0 github.com/go-git/go-git/v5/plumbing/transport/file
+#13 230.1 github.com/keybase/go-crypto/ed25519/internal/edwards25519
+#13 230.1 github.com/keybase/go-crypto/openpgp/elgamal
+#13 230.1 github.com/go-git/go-git/v5/plumbing/transport/client
+#13 230.2 github.com/keybase/go-crypto/openpgp/s2k
+#13 230.2 github.com/keybase/go-crypto/openpgp/ecdh
+#13 230.2 github.com/go-git/go-git/v5
+#13 230.2 github.com/keybase/go-crypto/rsa
+#13 230.4 github.com/go-faster/city
+#13 230.4 github.com/mattn/go-runewidth
+#13 230.4 github.com/keybase/go-crypto/ed25519
+#13 230.4 github.com/go-faster/errors
+#13 230.4 github.com/keybase/go-crypto/openpgp/packet
+#13 230.5 github.com/rhysd/actionlint
+#13 230.5 github.com/klauspost/compress
+#13 230.5 github.com/klauspost/compress/fse
+#13 230.6 github.com/klauspost/compress/internal/cpuinfo
+#13 230.6 github.com/klauspost/compress/internal/snapref
+#13 230.7 github.com/klauspost/compress/zstd/internal/xxhash
+#13 230.7 github.com/klauspost/compress/huff0
+#13 230.8 github.com/pierrec/lz4/v4/internal/lz4errors
+#13 230.9 github.com/pierrec/lz4/v4/internal/lz4block
+#13 231.2 github.com/pierrec/lz4/v4/internal/xxh32
+#13 231.2 github.com/keybase/go-crypto/openpgp
+#13 231.2 github.com/pierrec/lz4/v4/internal/lz4stream
+#13 231.2 github.com/klauspost/compress/zstd
+#13 231.3 github.com/nektos/act/pkg/common/git
+#13 231.3 github.com/pierrec/lz4/v4
+#13 231.4 github.com/segmentio/asm/cpu/cpuid
+#13 231.5 github.com/segmentio/asm/cpu/arm
+#13 231.5 github.com/segmentio/asm/cpu/arm64
+#13 231.5 github.com/segmentio/asm/cpu/x86
+#13 231.5 github.com/nektos/act/pkg/model
+#13 231.6 go.opentelemetry.io/otel/internal
+#13 231.6 github.com/segmentio/asm/cpu
+#13 231.6 go.opentelemetry.io/otel/internal/attribute
+#13 231.6 github.com/segmentio/asm/bswap
+#13 231.7 go.opentelemetry.io/otel/attribute
+#13 231.8 go.opentelemetry.io/otel/codes
+#13 231.8 github.com/ClickHouse/clickhouse-go/v2/contributors
+#13 231.9 github.com/ClickHouse/clickhouse-go/v2/lib/binary
+#13 231.9 github.com/ClickHouse/clickhouse-go/v2/lib/timezone
+#13 231.9 github.com/paulmach/orb
+#13 232.0 github.com/shopspring/decimal
+#13 232.0 go.opentelemetry.io/otel/trace
+#13 232.2 github.com/andybalholm/brotli
+#13 232.3 github.com/pkg/errors
+#13 232.5 github.com/davecgh/go-spew/spew
+#13 232.7 github.com/pmezard/go-difflib/difflib
+#13 232.9 net/http/internal/testcert
+#13 232.9 code.gitea.io/gitea/modules/queue/lqinternal
+#13 233.0 net/http/httptest
+#13 233.1 gitea.com/lunny/levelqueue
+#13 233.2 github.com/stretchr/testify/assert
+#13 233.3 github.com/tstranex/u2f
+#13 233.4 github.com/ClickHouse/ch-go/compress
+#13 233.4 archive/zip
+#13 233.6 github.com/ClickHouse/ch-go/proto
+#13 233.9 code.gitea.io/gitea/modules/packages/conan
+#13 233.9 code.gitea.io/gitea/modules/packages/container/helm
+#13 234.0 github.com/opencontainers/go-digest
+#13 234.0 github.com/opencontainers/image-spec/specs-go
+#13 234.1 code.gitea.io/gitea/modules/packages/cran
+#13 234.1 github.com/opencontainers/image-spec/specs-go/v1
+#13 234.1 github.com/blakesmith/ar
+#13 234.1 github.com/ulikunitz/xz/internal/xlog
+#13 234.2 github.com/ulikunitz/xz/internal/hash
+#13 234.2 hash/crc64
+#13 234.3 github.com/ulikunitz/xz/lzma
+#13 234.3 golang.org/x/text/encoding/internal/identifier
+#13 234.3 golang.org/x/text/encoding
+#13 234.4 golang.org/x/text/encoding/internal
+#13 234.4 golang.org/x/text/encoding/charmap
+#13 234.5 github.com/nektos/act/pkg/exprparser
+#13 234.8 github.com/goccy/go-json/internal/encoder/vm_indent
+#13 234.8 github.com/nektos/act/pkg/jobparser
+#13 234.9 github.com/ulikunitz/xz
+#13 235.0 golang.org/x/text/encoding/japanese
+#13 235.2 golang.org/x/text/encoding/korean
+#13 235.5 golang.org/x/text/encoding/simplifiedchinese
+#13 236.0 golang.org/x/text/encoding/traditionalchinese
+#13 236.6 golang.org/x/text/internal/utf8internal
+#13 236.7 golang.org/x/text/runes
+#13 238.7 golang.org/x/text/encoding/unicode
+#13 238.7 code.gitea.io/gitea/modules/util/filebuffer
+#13 238.7 code.gitea.io/gitea/modules/packages/pypi
+#13 238.8 github.com/DataDog/zstd
+#13 238.8 github.com/sassoftware/go-rpmutils/fileutil
+#13 238.8 golang.org/x/text/encoding/htmlindex
+#13 238.8 github.com/sassoftware/go-rpmutils/cpio
+#13 238.9 golang.org/x/net/html/charset
+#13 238.9 github.com/xi2/xz
+#13 238.9 golang.org/x/crypto/openpgp/errors
+#13 238.9 golang.org/x/crypto/openpgp/elgamal
+#13 238.9 golang.org/x/crypto/openpgp/armor
+#13 239.0 golang.org/x/crypto/openpgp/s2k
+#13 239.1 code.gitea.io/gitea/modules/markup/markdown/math
+#13 239.1 golang.org/x/crypto/openpgp/packet
+#13 239.2 code.gitea.io/gitea/modules/html
+#13 239.2 github.com/dlclark/regexp2/syntax
+#13 239.2 gopkg.in/yaml.v2
+#13 239.5 github.com/ClickHouse/clickhouse-go/v2/lib/column
+#13 239.8 golang.org/x/crypto/openpgp
+#13 240.2 github.com/dlclark/regexp2
+#13 240.4 github.com/yuin/goldmark-meta
+#13 240.5 code.gitea.io/gitea/models/migrations/v1_7
+#13 240.6 github.com/santhosh-tekuri/jsonschema/v5
+#13 240.9 github.com/alecthomas/chroma/v2
+#13 241.0 github.com/nektos/act/pkg/workflowpattern
+#13 241.0 github.com/go-enry/go-enry/v2
+#13 241.1 github.com/huandu/xstrings
+#13 241.1 code.gitea.io/gitea/modules/analyze
+#13 241.1 github.com/gogs/chardet
+#13 241.3 expvar
+#13 241.4 github.com/blevesearch/bleve_index_api
+#13 241.4 github.com/blevesearch/bleve/v2/numeric
+#13 241.4 container/heap
+#13 241.5 github.com/golang/geo/r1
+#13 241.5 github.com/golang/geo/s1
+#13 241.5 github.com/blevesearch/bleve/v2/analysis
+#13 241.6 github.com/golang/geo/r2
+#13 241.6 github.com/alecthomas/chroma/v2/formatters/html
+#13 241.6 github.com/alecthomas/chroma/v2/lexers
+#13 241.7 github.com/alecthomas/chroma/v2/styles
+#13 241.7 github.com/golang/geo/r3
+#13 241.8 github.com/blevesearch/bleve/v2/size
+#13 241.8 github.com/blevesearch/upsidedown_store_api
+#13 241.8 github.com/RoaringBitmap/roaring/internal
+#13 241.9 github.com/RoaringBitmap/roaring
+#13 241.9 github.com/blevesearch/geo/s2
+#13 241.9 github.com/blevesearch/bleve/v2/index/scorch/mergeplan
+#13 244.6 github.com/bits-and-blooms/bitset
+#13 244.7 github.com/goccy/go-json/internal/encoder/vm
+#13 244.8 github.com/blevesearch/scorch_segment_api/v2
+#13 244.8 github.com/blevesearch/mmap-go
+#13 244.8 github.com/blevesearch/vellum/levenshtein
+#13 244.9 github.com/yuin/goldmark-highlighting/v2
+#13 244.9 github.com/blevesearch/vellum
+#13 244.9 github.com/blevesearch/geo/geojson
+#13 245.0 github.com/blevesearch/vellum/utf8
+#13 245.1 github.com/blevesearch/vellum/regexp
+#13 245.1 go.etcd.io/bbolt
+#13 245.2 github.com/blevesearch/zapx/v11
+#13 245.2 github.com/ClickHouse/clickhouse-go/v2/lib/proto
+#13 245.2 github.com/blevesearch/zapx/v12
+#13 245.3 github.com/blevesearch/bleve/v2/geo
+#13 245.4 github.com/ClickHouse/clickhouse-go/v2/ext
+#13 245.5 github.com/ClickHouse/clickhouse-go/v2/lib/driver
+#13 245.6 github.com/ClickHouse/clickhouse-go/v2/resources
+#13 245.6 github.com/blevesearch/bleve/v2/search
+#13 245.7 github.com/ClickHouse/clickhouse-go/v2
+#13 245.9 github.com/blevesearch/bleve/v2/document
+#13 246.0 github.com/blevesearch/zapx/v13
+#13 246.1 github.com/blevesearch/bleve/v2/search/highlight
+#13 246.1 github.com/blevesearch/zapx/v14
+#13 246.1 github.com/blevesearch/bleve/v2/registry
+#13 246.3 github.com/blevesearch/zapx/v15
+#13 246.3 github.com/blevesearch/bleve/v2/analysis/datetime/flexible
+#13 246.4 github.com/blevesearch/bleve/v2/analysis/datetime/optional
+#13 246.5 google.golang.org/protobuf/types/descriptorpb
+#13 246.8 github.com/blevesearch/bleve/v2/index/upsidedown/store/boltdb
+#13 247.1 github.com/blevesearch/gtreap
+#13 247.2 github.com/blevesearch/bleve/v2/index/upsidedown/store/gtreap
+#13 247.2 github.com/blevesearch/bleve/v2/analysis/tokenizer/single
+#13 247.3 github.com/blevesearch/bleve/v2/analysis/analyzer/keyword
+#13 247.3 google.golang.org/protobuf/reflect/protodesc
+#13 247.4 github.com/blevesearch/bleve/v2/analysis/token/lowercase
+#13 247.4 github.com/blevesearch/go-porterstemmer
+#13 247.4 github.com/blevesearch/bleve/v2/index/scorch
+#13 247.4 github.com/blevesearch/bleve/v2/analysis/token/stop
+#13 247.5 github.com/blevesearch/segment
+#13 247.6 github.com/go-testfixtures/testfixtures/v3
+#13 247.9 github.com/golang/protobuf/proto
+#13 247.9 github.com/blevesearch/bleve/v2/analysis/token/porter
+#13 248.0 github.com/blevesearch/snowballstem
+#13 248.2 github.com/blevesearch/snowballstem/english
+#13 248.3 github.com/blevesearch/bleve/v2/search/collector
+#13 248.4 github.com/blevesearch/bleve/v2/search/facet
+#13 248.5 github.com/blevesearch/bleve/v2/search/highlight/format/html
+#13 248.6 github.com/blevesearch/bleve/v2/search/highlight/fragmenter/simple
+#13 248.6 github.com/blevesearch/bleve/v2/search/highlight/highlighter/simple
+#13 248.6 github.com/blevesearch/bleve/v2/search/scorer
+#13 248.7 github.com/blevesearch/bleve/v2/search/highlight/highlighter/html
+#13 248.7 github.com/blevesearch/bleve/v2/search/searcher
+#13 248.7 github.com/blevesearch/bleve/v2/analysis/analyzer/custom
+#13 248.8 github.com/blevesearch/bleve/v2/index/upsidedown
+#13 248.8 github.com/blevesearch/bleve/v2/analysis/token/camelcase
+#13 248.8 github.com/blevesearch/bleve/v2/analysis/token/unicodenorm
+#13 248.9 github.com/josharian/intern
+#13 248.9 github.com/mailru/easyjson/buffer
+#13 248.9 github.com/mailru/easyjson/jlexer
+#13 249.0 github.com/mailru/easyjson/jwriter
+#13 249.3 github.com/olivere/elastic/v7/config
+#13 249.3 github.com/mailru/easyjson
+#13 249.3 github.com/olivere/elastic/v7/uritemplates
+#13 249.4 encoding/csv
+#13 249.4 github.com/klauspost/compress/flate
+#13 249.5 github.com/valyala/bytebufferpool
+#13 249.5 github.com/olivere/elastic/v7
+#13 249.6 github.com/valyala/fasthttp/fasthttputil
+#13 249.6 github.com/valyala/fasthttp/stackless
+#13 249.6 github.com/blevesearch/bleve/v2/analysis/tokenizer/unicode
+#13 249.6 code.gitea.io/gitea/modules/templates/eval
+#13 249.6 code.gitea.io/gitea/modules/templates/scopedtmpl
+#13 249.7 github.com/blevesearch/bleve/v2/analysis/lang/en
+#13 249.7 github.com/blevesearch/bleve/v2/analysis/analyzer/standard
+#13 249.7 github.com/hashicorp/errwrap
+#13 249.8 github.com/blevesearch/bleve/v2/mapping
+#13 249.8 github.com/hashicorp/go-multierror
+#13 249.9 golang.org/x/mod/semver
+#13 250.1 github.com/editorconfig/editorconfig-core-go/v2
+#13 250.1 github.com/Azure/go-ntlmssp
+#13 250.2 github.com/blevesearch/bleve/v2/search/query
+#13 250.3 github.com/klauspost/compress/gzip
+#13 250.3 github.com/klauspost/compress/zlib
+#13 250.4 github.com/olekukonko/tablewriter
+#13 250.4 github.com/ssor/bom
+#13 250.4 net/smtp
+#13 250.4 github.com/valyala/fasthttp
+#13 250.5 gopkg.in/gomail.v2
+#13 250.6 github.com/jaytaylor/html2text
+#13 250.8 code.gitea.io/gitea/modules/sync
+#13 250.9 code.gitea.io/gitea/modules/pprof
+#13 250.9 codeberg.org/gusted/mcaptcha
+#13 250.9 github.com/blevesearch/bleve/v2
+#13 250.9 code.gitea.io/gitea/modules/paginator
+#13 251.0 gitea.com/go-chi/session
+#13 251.0 gitea.com/go-chi/captcha
+#13 251.2 github.com/go-chi/chi/v5
+#13 251.2 github.com/anmitsu/go-shlex
+#13 251.3 github.com/gliderlabs/ssh
+#13 251.4 code.gitea.io/actions-proto-go/ping/v1
+#13 251.5 google.golang.org/protobuf/types/known/anypb
+#13 251.5 code.gitea.io/gitea/modules/indexer/bleve
+#13 251.6 github.com/ethantkoenig/rupture
+#13 251.6 google.golang.org/grpc/codes
+#13 251.6 github.com/bufbuild/connect-go/internal/gen/connectext/grpc/status/v1
+#13 251.6 google.golang.org/genproto/googleapis/rpc/status
+#13 251.7 github.com/bufbuild/connect-go
+#13 251.7 github.com/golang/protobuf/ptypes/any
+#13 251.7 google.golang.org/protobuf/types/known/durationpb
+#13 251.8 github.com/golang/protobuf/ptypes/timestamp
+#13 251.9 github.com/golang/protobuf/ptypes/duration
+#13 251.9 github.com/couchbase/gomemcached
+#13 252.0 github.com/golang/protobuf/ptypes
+#13 252.2 google.golang.org/grpc/internal/status
+#13 252.4 github.com/couchbase/goutils/logging
+#13 252.4 google.golang.org/grpc/status
+#13 252.5 github.com/couchbase/goutils/scramsha
+#13 252.6 gitea.com/go-chi/session/memcache
+#13 252.7 github.com/couchbase/gomemcached/client
+#13 252.7 gitea.com/go-chi/session/mysql
+#13 252.8 gitea.com/go-chi/session/postgres
+#13 252.9 github.com/go-asn1-ber/asn1-ber
+#13 253.0 code.gitea.io/actions-proto-go/ping/v1/pingv1connect
+#13 253.2 code.gitea.io/actions-proto-go/runner/v1/runnerv1connect
+#13 253.2 code.gitea.io/gitea/routers/api/actions/ping
+#13 253.3 github.com/go-ldap/ldap/v3
+#13 253.5 github.com/meilisearch/meilisearch-go
+#13 253.5 github.com/couchbase/go-couchbase
+#13 253.7 github.com/gorilla/securecookie
+#13 253.9 github.com/gorilla/sessions
+#13 254.2 golang.org/x/oauth2/internal
+#13 254.3 github.com/gorilla/mux
+#13 254.4 golang.org/x/oauth2
+#13 254.6 cloud.google.com/go/compute/metadata
+#13 254.6 github.com/markbates/goth
+#13 254.7 gitea.com/go-chi/session/couchbase
+#13 254.7 github.com/markbates/goth/gothic
+#13 254.8 github.com/markbates/goth/providers/azuread
+#13 254.8 github.com/markbates/goth/providers/azureadv2
+#13 254.9 github.com/markbates/goth/providers/bitbucket
+#13 254.9 github.com/markbates/goth/providers/discord
+#13 255.0 github.com/markbates/goth/providers/dropbox
+#13 255.1 github.com/markbates/goth/providers/facebook
+#13 255.2 github.com/markbates/goth/providers/gitea
+#13 255.2 github.com/markbates/goth/providers/github
+#13 255.3 github.com/markbates/goth/providers/gitlab
+#13 255.4 golang.org/x/oauth2/authhandler
+#13 255.4 golang.org/x/oauth2/google/internal/externalaccount
+#13 255.5 golang.org/x/oauth2/jws
+#13 255.5 github.com/markbates/goth/providers/mastodon
+#13 255.6 github.com/markbates/going/defaults
+#13 255.6 golang.org/x/oauth2/jwt
+#13 255.7 github.com/markbates/goth/providers/microsoftonline
+#13 255.7 github.com/markbates/goth/providers/nextcloud
+#13 255.7 github.com/markbates/goth/providers/openidConnect
+#13 255.7 github.com/mrjones/oauth
+#13 255.7 golang.org/x/oauth2/google
+#13 255.9 github.com/markbates/goth/providers/yandex
+#13 255.9 github.com/markbates/goth/providers/google
+#13 256.0 code.gitea.io/gitea/modules/auth/pam
+#13 256.0 github.com/dsnet/compress/bzip2/internal/sais
+#13 256.0 github.com/dsnet/compress/internal
+#13 256.1 github.com/dsnet/compress/internal/errors
+#13 256.1 github.com/keybase/go-crypto/openpgp/clearsign
+#13 256.2 github.com/markbates/goth/providers/twitter
+#13 256.2 github.com/dsnet/compress
+#13 256.2 code.gitea.io/gitea/modules/packages/goproxy
+#13 256.2 github.com/dsnet/compress/internal/prefix
+#13 256.3 git.sr.ht/~mariusor/go-xsd-duration
+#13 256.3 github.com/go-ap/jsonld
+#13 256.3 github.com/valyala/fastjson/fastfloat
+#13 256.4 code.gitea.io/gitea/modules/hostmatcher
+#13 256.5 github.com/valyala/fastjson
+#13 256.5 gitea.com/lunny/dingtalk_webhook
+#13 256.5 github.com/dsnet/compress/bzip2
+#13 256.6 github.com/chi-middleware/proxy
+#13 256.8 code.gitea.io/gitea/modules/uri
+#13 256.8 github.com/gogs/go-gogs-client
+#13 256.8 code.gitea.io/sdk/gitea
+#13 256.9 github.com/google/go-querystring/query
+#13 257.3 github.com/google/go-github/v52/github
+#13 257.4 github.com/hashicorp/go-cleanhttp
+#13 257.4 github.com/go-ap/errors
+#13 257.5 github.com/hashicorp/go-retryablehttp
+#13 260.5 github.com/go-ap/activitypub
+#13 260.5 golang.org/x/time/rate
+#13 260.7 github.com/xanzy/go-gitlab
+#13 261.1 github.com/gogs/cron
+#13 262.9 github.com/go-chi/cors
+#13 265.0 internal/profile
+#13 265.2 github.com/beorn7/perks/quantile
+#13 265.3 github.com/prometheus/client_model/go
+#13 265.3 github.com/prometheus/common/model
+#13 265.4 runtime/metrics
+#13 265.4 github.com/goccy/go-json
+#13 265.5 github.com/matttproud/golang_protobuf_extensions/pbutil
+#13 265.6 github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg
+#13 265.7 github.com/prometheus/procfs/internal/fs
+#13 265.8 github.com/prometheus/procfs/internal/util
+#13 265.8 code.gitea.io/gitea/modules/sitemap
+#13 265.9 github.com/prometheus/client_golang/prometheus/internal
+#13 265.9 gitea.com/go-chi/binding
+#13 265.9 github.com/prometheus/common/expfmt
+#13 265.9 github.com/prometheus/procfs
+#13 266.1 github.com/gorilla/feeds
+#13 266.2 net/http/pprof
+#13 266.2 github.com/NYTimes/gziphandler
+#13 266.3 github.com/go-chi/chi/v5/middleware
+#13 266.3 github.com/dimiro1/reply
+#13 266.3 github.com/emersion/go-imap/utf7
+#13 266.4 github.com/emersion/go-sasl
+#13 266.4 github.com/emersion/go-imap
+#13 266.5 github.com/cention-sany/utf7
+#13 266.5 github.com/jhillyerd/enmime/internal/stringutil
+#13 266.6 github.com/jhillyerd/enmime/internal/coding
+#13 266.6 github.com/jhillyerd/enmime/internal/textproto
+#13 266.8 github.com/libdns/libdns
+#13 266.9 github.com/jhillyerd/enmime/mediatype
+#13 266.9 go.uber.org/atomic
+#13 266.9 go.uber.org/multierr
+#13 267.1 go.uber.org/zap/buffer
+#13 267.2 go.uber.org/zap/internal/color
+#13 267.2 go.uber.org/zap/internal/bufferpool
+#13 267.2 github.com/jhillyerd/enmime
+#13 267.3 go.uber.org/zap/internal/exit
+#13 267.3 golang.org/x/crypto/cryptobyte/asn1
+#13 267.4 github.com/emersion/go-imap/commands
+#13 267.4 github.com/emersion/go-imap/responses
+#13 267.5 go.uber.org/zap/zapcore
+#13 267.6 golang.org/x/crypto/cryptobyte
+#13 267.7 github.com/emersion/go-imap/client
+#13 267.7 golang.org/x/net/bpf
+#13 267.8 github.com/prometheus/client_golang/prometheus
+#13 267.9 golang.org/x/net/internal/iana
+#13 267.9 golang.org/x/net/internal/socket
+#13 267.9 github.com/felixge/fgprof
+#13 268.1 github.com/klauspost/compress/zip
+#13 268.1 github.com/klauspost/pgzip
+#13 268.2 github.com/nwaples/rardecode
+#13 268.3 golang.org/x/net/ipv4
+#13 268.3 golang.org/x/net/ipv6
+#13 268.4 go.uber.org/zap/internal
+#13 268.5 go.uber.org/zap
+#13 268.9 github.com/russross/blackfriday/v2
+#13 268.9 net/http/cgi
+#13 269.2 net/http/fcgi
+#13 269.2 github.com/miekg/dns
+#13 269.4 github.com/mholt/archiver/v3
+#13 269.5 github.com/prometheus/client_golang/prometheus/promhttp
+#13 269.5 github.com/mholt/acmez/acme
+#13 269.5 github.com/buildkite/terminal-to-html/v3
+#13 269.8 github.com/mholt/acmez
+#13 269.9 github.com/niklasfasching/go-org/org
+#13 270.0 github.com/cpuguy83/go-md2man/v2/md2man
+#13 270.0 github.com/urfave/cli
+#13 271.7 github.com/caddyserver/certmagic
+#13 301.7 code.gitea.io/gitea/modules/setting
+#13 302.1 code.gitea.io/gitea/modules/translation/i18n
+#13 302.1 code.gitea.io/gitea/modules/proxy
+#13 302.1 code.gitea.io/gitea/modules/storage
+#13 302.1 code.gitea.io/gitea/models/unit
+#13 302.1 code.gitea.io/gitea/models/db
+#13 302.1 code.gitea.io/gitea/modules/graceful
+#13 302.1 code.gitea.io/gitea/modules/avatar
+#13 302.1 code.gitea.io/gitea/modules/markup/mdstripper
+#13 302.1 code.gitea.io/gitea/modules/httpcache
+#13 302.1 code.gitea.io/gitea/modules/options
+#13 302.2 code.gitea.io/gitea/modules/auth/password/pwn
+#13 302.2 code.gitea.io/gitea/modules/references
+#13 302.2 code.gitea.io/gitea/modules/highlight
+#13 302.3 code.gitea.io/gitea/modules/hcaptcha
+#13 302.3 code.gitea.io/gitea/modules/packages
+#13 302.4 code.gitea.io/gitea/modules/mcaptcha
+#13 302.4 code.gitea.io/gitea/modules/recaptcha
+#13 302.4 code.gitea.io/gitea/modules/turnstile
+#13 302.4 code.gitea.io/gitea/routers/utils
+#13 302.5 code.gitea.io/gitea/models/dbfs
+#13 302.5 code.gitea.io/gitea/models/db/install
+#13 302.5 code.gitea.io/gitea/modules/cache
+#13 302.5 code.gitea.io/gitea/modules/queue
+#13 302.6 code.gitea.io/gitea/routers/web/healthcheck
+#13 302.6 code.gitea.io/gitea/modules/git
+#13 302.8 code.gitea.io/gitea/modules/testlogger
+#13 302.8 code.gitea.io/gitea/modules/mirror
+#13 303.7 code.gitea.io/gitea/modules/base
+#13 303.7 code.gitea.io/gitea/modules/git/pipeline
+#13 303.7 code.gitea.io/gitea/modules/validation
+#13 303.7 code.gitea.io/gitea/modules/migration
+#13 303.7 code.gitea.io/gitea/modules/packages/alpine
+#13 303.7 code.gitea.io/gitea/modules/packages/cargo
+#13 303.7 code.gitea.io/gitea/modules/packages/chef
+#13 303.7 code.gitea.io/gitea/modules/packages/composer
+#13 303.8 code.gitea.io/gitea/modules/lfs
+#13 303.8 code.gitea.io/gitea/modules/packages/conda
+#13 303.8 code.gitea.io/gitea/modules/packages/container
+#13 303.8 code.gitea.io/gitea/modules/packages/debian
+#13 303.8 code.gitea.io/gitea/modules/packages/helm
+#13 303.8 code.gitea.io/gitea/modules/packages/maven
+#13 303.9 code.gitea.io/gitea/modules/packages/npm
+#13 303.9 code.gitea.io/gitea/modules/packages/nuget
+#13 303.9 code.gitea.io/gitea/modules/packages/pub
+#13 303.9 code.gitea.io/gitea/modules/packages/rubygems
+#13 303.9 code.gitea.io/gitea/modules/packages/swift
+#13 303.9 code.gitea.io/gitea/modules/packages/vagrant
+#13 305.0 code.gitea.io/gitea/modules/translation
+#13 305.0 code.gitea.io/gitea/modules/label
+#13 305.1 code.gitea.io/gitea/models/shared/types
+#13 305.1 code.gitea.io/gitea/modules/auth/password
+#13 305.1 code.gitea.io/gitea/modules/timeutil
+#13 305.1 code.gitea.io/gitea/modules/web/middleware
+#13 305.1 code.gitea.io/gitea/modules/markup
+#13 305.1 code.gitea.io/gitea/modules/charset
+#13 305.1 code.gitea.io/gitea/models/auth
+#13 305.1 code.gitea.io/gitea/models/migrations/v1_10
+#13 305.1 code.gitea.io/gitea/models/secret
+#13 305.1 code.gitea.io/gitea/models/system
+#13 305.1 code.gitea.io/gitea/models/migrations/v1_12
+#13 305.3 code.gitea.io/gitea/models/migrations/v1_19
+#13 305.3 code.gitea.io/gitea/models/avatars
+#13 305.4 code.gitea.io/gitea/models/unittest
+#13 305.4 code.gitea.io/gitea/models/webhook
+#13 305.4 code.gitea.io/gitea/modules/public
+#13 305.4 code.gitea.io/gitea/modules/httplib
+#13 305.4 code.gitea.io/gitea/modules/markup/external
+#13 305.5 code.gitea.io/gitea/models/user
+#13 305.5 code.gitea.io/gitea/modules/system
+#13 305.6 code.gitea.io/gitea/modules/session
+#13 305.6 code.gitea.io/gitea/services/auth/source/sspi
+#13 305.6 code.gitea.io/gitea/modules/updatechecker
+#13 305.6 code.gitea.io/gitea/modules/csv
+#13 305.6 code.gitea.io/gitea/modules/markup/asciicast
+#13 305.6 code.gitea.io/gitea/modules/markup/console
+#13 305.7 code.gitea.io/gitea/modules/markup/csv
+#13 305.7 code.gitea.io/gitea/models/migrations/base
+#13 305.7 code.gitea.io/gitea/modules/markup/orgmode
+#13 306.1 code.gitea.io/gitea/models/migrations/v1_13
+#13 306.1 code.gitea.io/gitea/models/migrations/v1_16
+#13 306.1 code.gitea.io/gitea/models/migrations/v1_14
+#13 306.1 code.gitea.io/gitea/models/migrations/v1_11
+#13 306.1 code.gitea.io/gitea/models/migrations/v1_15
+#13 306.2 code.gitea.io/gitea/models/repo
+#13 306.3 code.gitea.io/gitea/models/migrations/v1_6
+#13 306.3 code.gitea.io/gitea/models/migrations/v1_20
+#13 306.3 code.gitea.io/gitea/models/migrations/v1_8
+#13 306.3 code.gitea.io/gitea/models/migrations/v1_9
+#13 306.3 code.gitea.io/gitea/services/mailer/token
+#13 306.4 code.gitea.io/gitea/modules/auth/webauthn
+#13 306.4 code.gitea.io/gitea/services/auth/source/db
+#13 306.4 code.gitea.io/gitea/services/auth/source/pam
+#13 306.5 code.gitea.io/gitea/services/auth/source/smtp
+#13 306.5 code.gitea.io/gitea/modules/activitypub
+#13 306.9 code.gitea.io/gitea/models/pull
+#13 306.9 code.gitea.io/gitea/models/organization
+#13 306.9 code.gitea.io/gitea/models/admin
+#13 306.9 code.gitea.io/gitea/models/actions
+#13 306.9 code.gitea.io/gitea/models/project
+#13 306.9 code.gitea.io/gitea/models/asymkey
+#13 307.0 code.gitea.io/gitea/modules/indexer/code
+#13 307.0 code.gitea.io/gitea/modules/indexer/stats
+#13 307.3 code.gitea.io/gitea/services/repository/archiver
+#13 307.5 code.gitea.io/gitea/models/perm/access
+#13 307.7 code.gitea.io/gitea/modules/actions
+#13 307.7 code.gitea.io/gitea/modules/ssh
+#13 307.7 code.gitea.io/gitea/modules/private
+#13 307.7 code.gitea.io/gitea/models/git
+#13 308.2 code.gitea.io/gitea/modules/gitgraph
+#13 308.3 code.gitea.io/gitea/modules/svg
+#13 308.3 code.gitea.io/gitea/modules/markup/markdown
+#13 308.3 code.gitea.io/gitea/services/auth/source/oauth2
+#13 308.6 code.gitea.io/gitea/modules/issue/template
+#13 308.6 code.gitea.io/gitea/models/issues
+#13 309.5 code.gitea.io/gitea/services/mailer/incoming/payload
+#13 309.5 code.gitea.io/gitea/modules/indexer/issues
+#13 309.5 code.gitea.io/gitea/models/migrations/v1_18
+#13 309.5 code.gitea.io/gitea/services/gitdiff
+#13 309.5 code.gitea.io/gitea/models/activities
+#13 309.9 code.gitea.io/gitea/modules/metrics
+#13 309.9 code.gitea.io/gitea/models
+#13 310.2 code.gitea.io/gitea/services/auth/source
+#13 310.2 code.gitea.io/gitea/services/externalaccount
+#13 310.2 code.gitea.io/gitea/services/asymkey
+#13 310.3 code.gitea.io/gitea/modules/repository
+#13 310.6 code.gitea.io/gitea/services/wiki
+#13 310.6 code.gitea.io/gitea/modules/templates
+#13 311.2 code.gitea.io/gitea/services/mailer
+#13 311.4 github.com/sassoftware/go-rpmutils
+#13 311.5 code.gitea.io/gitea/modules/packages/rpm
+#13 311.5 code.gitea.io/gitea/models/packages
+#13 311.7 code.gitea.io/gitea/modules/notification/base
+#13 311.7 code.gitea.io/gitea/models/packages/container
+#13 311.7 code.gitea.io/gitea/models/packages/alpine
+#13 311.7 code.gitea.io/gitea/models/migrations/v1_17
+#13 311.7 code.gitea.io/gitea/models/packages/conan
+#13 311.7 code.gitea.io/gitea/models/packages/conda
+#13 311.7 code.gitea.io/gitea/models/packages/cran
+#13 311.7 code.gitea.io/gitea/modules/context
+#13 311.7 code.gitea.io/gitea/models/packages/debian
+#13 311.8 code.gitea.io/gitea/models/migrations
+#13 311.8 code.gitea.io/gitea/services/packages/container
+#13 311.8 code.gitea.io/gitea/modules/notification/indexer
+#13 311.8 code.gitea.io/gitea/modules/notification/action
+#13 311.8 code.gitea.io/gitea/modules/notification/mail
+#13 311.8 code.gitea.io/gitea/modules/notification/mirror
+#13 311.8 code.gitea.io/gitea/modules/notification/ui
+#13 312.4 code.gitea.io/gitea/modules/notification
+#13 312.6 code.gitea.io/gitea/services/release
+#13 312.6 code.gitea.io/gitea/services/issue
+#13 312.6 code.gitea.io/gitea/services/mirror
+#13 312.6 code.gitea.io/gitea/services/packages
+#13 312.9 code.gitea.io/gitea/modules/web/routing
+#13 312.9 code.gitea.io/gitea/routers/api/packages/helper
+#13 312.9 code.gitea.io/gitea/services/context
+#13 312.9 code.gitea.io/gitea/services/convert
+#13 312.9 code.gitea.io/gitea/services/packages/alpine
+#13 312.9 code.gitea.io/gitea/services/packages/debian
+#13 313.1 code.gitea.io/gitea/modules/web
+#13 313.1 code.gitea.io/gitea/services/pull
+#13 313.1 code.gitea.io/gitea/services/packages/rpm
+#13 313.1 code.gitea.io/gitea/routers/api/v1/activitypub
+#13 313.1 code.gitea.io/gitea/modules/upload
+#13 313.1 code.gitea.io/gitea/routers/api/packages/alpine
+#13 313.2 code.gitea.io/gitea/routers/api/packages/conda
+#13 313.3 code.gitea.io/gitea/routers/api/packages/cran
+#13 313.4 code.gitea.io/gitea/routers/api/packages/debian
+#13 313.4 code.gitea.io/gitea/routers/api/packages/generic
+#13 313.5 code.gitea.io/gitea/routers/api/packages/goproxy
+#13 313.5 code.gitea.io/gitea/routers/api/packages/helm
+#13 313.5 code.gitea.io/gitea/routers/api/packages/maven
+#13 313.5 code.gitea.io/gitea/routers/api/packages/npm
+#13 313.6 code.gitea.io/gitea/routers/api/packages/pub
+#13 313.6 code.gitea.io/gitea/modules/eventsource
+#13 313.7 code.gitea.io/gitea/services/actions
+#13 313.7 code.gitea.io/gitea/routers/api/packages/composer
+#13 313.7 code.gitea.io/gitea/routers/api/packages/pypi
+#13 313.8 code.gitea.io/gitea/routers/api/packages/rpm
+#13 313.8 code.gitea.io/gitea/routers/api/packages/rubygems
+#13 313.9 code.gitea.io/gitea/routers/api/packages/swift
+#13 314.0 code.gitea.io/gitea/routers/api/packages/vagrant
+#13 314.1 code.gitea.io/gitea/services/webhook
+#13 314.1 code.gitea.io/gitea/routers/common
+#13 314.1 code.gitea.io/gitea/services/attachment
+#13 314.2 code.gitea.io/gitea/routers/api/v1/settings
+#13 314.3 code.gitea.io/gitea/routers/web/explore
+#13 314.3 code.gitea.io/gitea/routers/web/devtest
+#13 314.3 code.gitea.io/gitea/routers/web/feed
+#13 314.5 code.gitea.io/gitea/routers/api/v1/misc
+#13 314.6 code.gitea.io/gitea/routers/web/misc
+#13 314.6 code.gitea.io/gitea/routers/web/shared/user
+#13 314.6 code.gitea.io/gitea/routers/api/actions/runner
+#13 314.7 code.gitea.io/gitea/routers/web/org/setting
+#13 314.7 code.gitea.io/gitea/services/repository
+#13 314.7 code.gitea.io/gitea/services/automerge
+#13 314.7 code.gitea.io/gitea/services/agit
+#13 314.8 code.gitea.io/gitea/services/migrations
+#13 314.8 code.gitea.io/gitea/routers/web/repo/actions
+#13 314.8 code.gitea.io/gitea/services/lfs
+#13 314.9 code.gitea.io/gitea/services/user
+#13 315.0 code.gitea.io/gitea/routers/api/actions
+#13 315.0 code.gitea.io/gitea/services/repository/files
+#13 315.1 code.gitea.io/gitea/services/mailer/incoming
+#13 315.3 code.gitea.io/gitea/services/markup
+#13 315.3 code.gitea.io/gitea/services/auth/source/ldap
+#13 315.4 code.gitea.io/gitea/modules/doctor
+#13 315.4 code.gitea.io/gitea/services/org
+#13 315.4 code.gitea.io/gitea/routers/api/v1/utils
+#13 315.4 code.gitea.io/gitea/services/forms
+#13 315.6 code.gitea.io/gitea/services/auth
+#13 315.7 code.gitea.io/gitea/routers/api/v1/packages
+#13 315.7 code.gitea.io/gitea/routers/api/v1/notify
+#13 315.8 code.gitea.io/gitea/services/packages/cargo
+#13 316.0 code.gitea.io/gitea/routers/api/packages/cargo
+#13 316.0 code.gitea.io/gitea/services/packages/cleanup
+#13 316.0 code.gitea.io/gitea/routers/api/packages/chef
+#13 316.0 code.gitea.io/gitea/routers/api/packages/conan
+#13 316.0 code.gitea.io/gitea/routers/api/packages/container
+#13 316.0 code.gitea.io/gitea/routers/api/packages/nuget
+#13 316.0 code.gitea.io/gitea/routers/api/v1/swagger
+#13 316.1 code.gitea.io/gitea/routers/web/shared/packages
+#13 316.2 code.gitea.io/gitea/routers/web/auth
+#13 316.2 code.gitea.io/gitea/routers/web/shared/actions
+#13 316.3 code.gitea.io/gitea/routers/web/shared/secrets
+#13 316.4 code.gitea.io/gitea/routers/web/user/setting
+#13 316.4 code.gitea.io/gitea/routers/web/user/setting/security
+#13 316.4 code.gitea.io/gitea/routers/install
+#13 316.4 code.gitea.io/gitea/routers/api/packages
+#13 316.5 code.gitea.io/gitea/services/cron
+#13 316.5 code.gitea.io/gitea/routers/api/v1/repo
+#13 316.5 code.gitea.io/gitea/routers/private
+#13 316.7 code.gitea.io/gitea/services/task
+#13 316.7 code.gitea.io/gitea/routers/web/repo/setting
+#13 316.9 code.gitea.io/gitea/routers/web/events
+#13 317.0 code.gitea.io/gitea/routers/web/org
+#13 317.0 code.gitea.io/gitea/routers/web/admin
+#13 317.1 code.gitea.io/gitea/routers/web/repo
+#13 317.5 code.gitea.io/gitea/routers/web/user
+#13 317.8 code.gitea.io/gitea/routers/api/v1/user
+#13 318.0 code.gitea.io/gitea/routers/api/v1/admin
+#13 318.0 code.gitea.io/gitea/routers/api/v1/org
+#13 318.2 code.gitea.io/gitea/routers/api/v1
+#13 319.1 code.gitea.io/gitea/routers/web
+#13 319.5 code.gitea.io/gitea/routers
+#13 319.6 code.gitea.io/gitea/cmd
+#13 319.9 code.gitea.io/gitea
+#13 DONE 324.5s
+
+#18 [build-env 6/6] RUN go build contrib/environment-to-ini/environment-to-ini.go
+#18 DONE 6.8s
+
+#19 [stage-1  7/13] COPY --from=build-env --chown=root:root /go/src/code.gitea.io/gitea/gitea /app/gitea/gitea
+#19 DONE 1.3s
+
+#20 [stage-1  8/13] COPY --from=build-env --chown=root:root /go/src/code.gitea.io/gitea/environment-to-ini /usr/local/bin/environment-to-ini
+#20 DONE 0.2s
+
+#21 [stage-1  9/13] COPY --from=build-env /go/src/code.gitea.io/gitea/contrib/autocompletion/bash_autocomplete /etc/profile.d/gitea_bash_autocomplete.sh
+#21 DONE 0.1s
+
+#22 [stage-1 10/13] RUN chmod 755 /usr/local/bin/docker-entrypoint.sh /usr/local/bin/docker-setup.sh /app/gitea/gitea /usr/local/bin/gitea /usr/local/bin/environment-to-ini
+#22 DONE 1.0s
+
+#23 [stage-1 11/13] RUN chmod 644 /etc/profile.d/gitea_bash_autocomplete.sh
+#23 DONE 0.6s
+
+#24 [stage-1 12/13] WORKDIR /var/lib/gitea
+#24 DONE 0.1s
+
+#25 [stage-1 13/13] RUN wget http://pki.ericsson.se/CertData/EGADIssuingCA3.crt -P /usr/local/share/ca-certificates       && wget http://pki.ericsson.se/CertData/EGADRootCA.crt -P /usr/local/share/ca-certificates        && update-ca-certificates
+#25 0.404 --2024-04-25 13:23:34--  http://pki.ericsson.se/CertData/EGADIssuingCA3.crt
+#25 0.404 Resolving pki.ericsson.se (pki.ericsson.se)... 153.88.74.78, 153.88.74.76
+#25 5.579 Connecting to pki.ericsson.se (pki.ericsson.se)|153.88.74.78|:80... connected.
+#25 5.752 HTTP request sent, awaiting response... 200 OK
+#25 5.931 Length: 2358 (2.3K) [application/x-x509-ca-cert]
+#25 5.932 Saving to: '/usr/local/share/ca-certificates/EGADIssuingCA3.crt'
+#25 5.932 
+#25 5.932      0K ..                                                    100% 40.2M=0s
+#25 5.932 
+#25 5.932 2024-04-25 13:23:40 (40.2 MB/s) - '/usr/local/share/ca-certificates/EGADIssuingCA3.crt' saved [2358/2358]
+#25 5.932 
+#25 5.936 --2024-04-25 13:23:40--  http://pki.ericsson.se/CertData/EGADRootCA.crt
+#25 5.936 Resolving pki.ericsson.se (pki.ericsson.se)... 153.88.74.78, 153.88.74.76
+#25 10.96 Connecting to pki.ericsson.se (pki.ericsson.se)|153.88.74.78|:80... connected.
+#25 11.13 HTTP request sent, awaiting response... 200 OK
+#25 11.31 Length: 2004 (2.0K) [application/x-x509-ca-cert]
+#25 11.31 Saving to: '/usr/local/share/ca-certificates/EGADRootCA.crt'
+#25 11.31 
+#25 11.31      0K .                                                     100% 78.6M=0s
+#25 11.31 
+#25 11.31 2024-04-25 13:23:45 (78.6 MB/s) - '/usr/local/share/ca-certificates/EGADRootCA.crt' saved [2004/2004]
+#25 11.31 
+#25 11.31 Updating certificates in /etc/ssl/certs...
+#25 11.81 rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+#25 11.81 2 added, 0 removed; done.
+#25 11.81 Running hooks in /etc/ca-certificates/update.d...
+#25 11.82 done.
+#25 DONE 11.9s
+
+#26 exporting to image
+#26 exporting layers
+#26 exporting layers 1.4s done
+#26 writing image sha256:ed50dcfa91779442996cfe4bd56f7a4e2ad7f3bc3564a767cf422dda17757eb7 done
+#26 naming to armdocker.rnd.ericsson.se/proj-mxe/gitea/mxe-gitea:v1.20.2-ubuntu-20240405-rootless 0.0s done
+#26 DONE 1.5s
++ docker push armdocker.rnd.ericsson.se/proj-mxe/gitea/mxe-gitea:v1.20.2-ubuntu-20240405-rootless
+The push refers to repository [armdocker.rnd.ericsson.se/proj-mxe/gitea/mxe-gitea]
+4fcefdf14873: Preparing
+5f70bf18a086: Preparing
+ddc01228d485: Preparing
+48542a3fb02a: Preparing
+58e078eeadbe: Preparing
+6f13040bcf20: Preparing
+2462794f45d5: Preparing
+cf06da7506ef: Preparing
+a98c215e79e1: Preparing
+cae59321916f: Preparing
+a1951b3d23b2: Preparing
+32d40d36a307: Preparing
+e0a9f5911802: Preparing
+6f13040bcf20: Waiting
+a1951b3d23b2: Waiting
+cae59321916f: Waiting
+a98c215e79e1: Waiting
+2462794f45d5: Waiting
+cf06da7506ef: Waiting
+32d40d36a307: Waiting
+e0a9f5911802: Waiting
+5f70bf18a086: Layer already exists
+ddc01228d485: Pushed
+4fcefdf14873: Pushed
+58e078eeadbe: Pushed
+6f13040bcf20: Pushed
+48542a3fb02a: Pushed
+cf06da7506ef: Pushed
+a98c215e79e1: Pushed
+2462794f45d5: Pushed
+cae59321916f: Pushed
+a1951b3d23b2: Pushed
+e0a9f5911802: Layer already exists
+32d40d36a307: Pushed
+v1.20.2-ubuntu-20240405-rootless: digest: sha256:d6fda6ac00d5a86c0245362247863e25c7b4aa4e276b142cd4334ab3bcc28bd2 size: 3037
++ pushed=0
++ [[ 0 == 0 ]]
++ [[ -d /home/evatsiv/gitViews/mxe-core/3pp-images/gitea/gitea ]]
++ rm -rf /home/evatsiv/gitViews/mxe-core/3pp-images/gitea/gitea

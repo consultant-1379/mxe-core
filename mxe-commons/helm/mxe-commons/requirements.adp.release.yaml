@@ -1,0 +1,26 @@
+dependencies:
+  - condition: eric-data-document-database-pg.enabled
+    name: eric-data-document-database-pg
+    repository: https://arm.sero.gic.ericsson.se/artifactory/proj-adp-gs-all-helm/
+    version: 9.1.0+9
+  - condition: eric-lcm-container-registry.enabled
+    name: eric-lcm-container-registry
+    repository: https://arm.sero.gic.ericsson.se/artifactory/proj-adp-gs-all-helm/
+    version: 8.1.0+35
+  - condition: eric-sec-access-mgmt.enabled
+    name: eric-sec-access-mgmt
+    repository: https://arm.sero.gic.ericsson.se/artifactory/proj-adp-gs-all-helm/
+    version: 21.1.0+14
+  - condition: eric-pm-server.enabled
+    name: eric-pm-server
+    repository: https://arm.sero.gic.ericsson.se/artifactory/proj-adp-gs-all-helm/
+    version: 13.1.0+41
+  - condition: eric-data-object-storage-mn.enabled
+    name: eric-data-object-storage-mn
+    repository: https://arm.sero.gic.ericsson.se/artifactory/proj-pc-gs-released-helm/
+    version: 2.12.0+34
+  - alias: eric-mesh-ingressgateway
+    condition: eric-mesh-ingressgateway.enabled
+    name: eric-mesh-gateways
+    repository: https://arm.sero.gic.ericsson.se/artifactory/proj-adp-gs-all-helm/
+    version: 14.0.0+73

@@ -1,0 +1,49 @@
+/* style goes here */
+:host {
+  display: block;
+}
+
+.link::after {
+  content: '';
+  display: block;
+  border-bottom: 1px dashed #242424;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-bottom 300ms ease-in-out;
+}
+.link:hover::after {
+  border-bottom: 1px solid #1174e6;
+}
+
+tbody tr .actions {
+  visibility: hidden;
+  opacity: 0;
+  transition: all 300ms ease-in-out;
+}
+
+tbody tr:hover .actions {
+  visibility: visible;
+  opacity: 1;
+}
+
+tbody tr .status {
+  display: flex;
+  align-items: center;
+}
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.status .rotating {
+  animation: rotating 5s ease-in-out infinite;
+}
+
+.status span {
+  margin-left: 8px;
+}

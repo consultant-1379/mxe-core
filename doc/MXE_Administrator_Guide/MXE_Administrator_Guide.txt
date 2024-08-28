@@ -1,0 +1,285 @@
+= Administrator Guide
+:author: Kristóf Nékám
+:signature: EKRINKM
+:department: BDGSJBAK
+:doc-name: SYSTEM ADM. GUIDE
+:doc-no: 1/1543-AVA 901 53
+:revnumber: PF2
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+//Template updated 2018-08-21 (keep to track template history)
+
+[[AccessControlSetup]]
+== Access Control Setup
+
+For information about access control see the *Access Control Administration* section of the doc-ref:[GUI Guide].
+
+.This example shows how to setup access control for two users with the following access rights:
+* User *test-user-a* can execute all available operations on all models and model services in the *com.ericsson.test* domain and all of its subdomains.
+* User *test-user-a* can get, list, onboard, delete models, but can only get and list model services in the *com.ericsson.example* domain and all of its subdomains.
+* User *test-user-b* can execute all available operations on all models and model services in the *com.ericsson.example* domain and all of its subdomains.
+* User *test-user-b* can get, list models, but do not have any access rights to model services in the *com.ericsson.test* domain and all of its subdomains.
+
+[[AccessControlManagementPage]]
+=== Access Control Management Page
+
+Access control management is available on the Keycloak administration page at path `/auth/admin`.
+
+The credentials of the admin user are set in a secret prior to installation. See the doc-ref:[Installation Guide] for more information.
+
+[[CreatingRoles]]
+==== Creating Roles
+
+.Create a role:
+. Make sure you are in the MXE realm by checking in the top left corner.
+. Click the *Roles* menu on the left.
+. Click the *Add Role* button.
+. Give the role a name and an arbitrary description.
++
+NOTE: Roles meant to be used for access control must start with the `mxe_` prefix.
++
+. Select the *Attributes* tab to setup access privileges.
+. Assign this role directly to the user or create a group then add the role to it and join the user to the that group. See sections below.
+
+[[Pre-createdRoles]]
+===== Pre-created Roles
+
+Two roles are created automatically when MXE is installed:
+
+* `mxe_default_role`: Allows access to all actions to all targets.
+* `mxe_administrator_role`: Allows access to MXE administrator settings, for example public key management.
+
+[[CreatingTestRoles]]
+==== Creating Test Roles
+
+.Perform the above mentioned steps to create test roles, with the following names and attributes:
+* `mxe_test_all`
+** *Key*: `com.ericsson.test`
+** *Value*: `all`
+* `mxe_test_models_read`
+** *Key*: `com.ericsson.test`
+** *Value*: `models:read`
+* `mxe_example_all`
+** *Key*: `com.ericsson.example`
+** *Value*: `models:all;model-services:all`
+* `mxe_example_models_all`
+** *Key*: `com.ericsson.example`
+** *Value*: `models:all`
+* `mxe_example_services_read`
+** *Key*: `com.ericsson.example`
+** *Value*: `model-services:read`
+
+image::mxe_add_role.png[title="Keycloak - Add Role",scalefit="1"]
+
+image::mxe_role_attributes.png[title="Keycloak - Role Attributes",scalefit="1"]
+
+[[CreatingUsers]]
+==== Creating Users
+
+.Create a user:
+. Make sure you are in the MXE realm by checking in the top left corner.
+. Click the *Users* menu on the left.
+. Click the *Add User* button.
+. Set the `Username` and click the *Save* button.
+. Select the *Credentials* tab.
+. Set the password, set `Temporary` to `off`, and click the *Set password* button.
+
+[[CreatingTestUsers]]
+==== Creating Test Users
+
+Perform the above mentioned steps for `test-user-a` and `test-user-b`.
+
+image::mxe_add_user.png[title="Keycloak - Add User",scalefit="1"]
+
+image::mxe_user_credentials.png[title="Keycloak - User Credentials",scalefit="1"]
+
+[[AssigningRolestoUsers]]
+==== Assigning Roles to Users
+
+.Assign a role to a user:
+. Make sure you are in the MXE realm by checking in the top left corner.
+. Go to the *Users* menu on the left.
+. Click the *View all users* button.
+. Click the *Edit* button in the row of the user you are looking for.
+. Select the *Role Mappings* tab.
+. Select a set of roles in the *Available Roles* section.
+. Click the *Add selected* button.
+
+[[AssigningTestRolestoUsers]]
+==== Assigning Test Roles to Users
+
+.Perform the above mentioned steps and add the following roles to users:
+* `test-user-a` roles:
+** *mxe_test_all*
+** *mxe_example_models_all*
+** *mxe_example_services_read*
+* `test-user-b` roles:
+** *mxe_example_all*
+** *mxe_test_models_read*
+
+image::mxe_add_roles.png[title="Keycloak - Add Roles",scalefit="1"]
+
+image::mxe_add_roles_successful.png[title="Keycloak - Add Roles Successful",scalefit="1"]
+
+image::mxe_add_roles_2.png[title="Keycloak - Add Roles",scalefit="1"]
+
+image::mxe_add_roles_successful_2.png[title="Keycloak - Add Roles Successful",scalefit="1"]
+
+[[TestingtheAccessControlSetup]]
+== Testing the Access Control Setup
+
+Test that user `test-user-a` can execute all available operations on all targets in the `com.ericsson.test` domain.
+
+Log in with `test-user-a` (remove `mxeTokenFile` from `$HOME/.mxe`), perform a cli command and type `test-user-a credentials`.
+
+Onboard a model in domain `com.ericsson.test`:
+
+....
+$ mxe-model onboard --id "com.ericsson.test.inception3" --description "Image recognition model inception 3" --author "MXE test" --title "Image Recognition Inception3" --version "0.0.1" --docker "armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:0.0.1"
+
+Success: Model "armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:0.0.1" has been onboarded to cluster "vmx-cea024-secure" with ID "com.ericsson.test.inception3" and version "0.0.1".
+....
+
+List models and check if model in domain `com.ericsson.test` is visible:
+
+....
+$ mxe-model list
+
+ONBOARDED  USER         ID                            VERSION  IMAGE_NAME                                                             TITLE                         AUTHOR    STATUS
+14:36      test-user-a  com.ericsson.test.inception3  0.0.1    armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:0.0.1  Image Recognition Inception3  MXE test  available
+....
+
+Create a model service from previously onboarded model in domain `com.ericsson.test`:
+
+....
+$ mxe-service create --name "test-a-service" --models "com.ericsson.test.inception3:0.0.1" --domain "com.ericsson.test"
+
+Success: Model service "test-a-service" has been created with model "com.ericsson.test.inception3:0.0.1", with 1 instance in domain com.ericsson.test
+....
+
+List model services and check if model service in domain `com.ericsson.test` is visible:
+
+....
+$ mxe-service list
+
+STARTED  NAME            DOMAIN             INSTANCES  TYPE   STATUS   USER         MODEL                               ENDPOINT
+14:38    test-a-service  com.ericsson.test  1          model  running  test-user-a  com.ericsson.test.inception3:0.0.1  <mxe-host>/model-endpoints/test-a-service
+....
+
+Test that user `test-user-b` can execute all available operations on all targets in the `com.ericsson.example` domain.
+
+Login with `test-user-b` (remove `mxeTokenFile` from `$HOME/.mxe`), perform a cli command and type `test-user-b credentials`.
+
+Onboard a model in domain `com.ericsson.example`:
+
+....
+$ mxe-model onboard --id "com.ericsson.example.inception3" --description "Image recognition model inception 3" --author "MXE test" --title "Image Recognition Inception3" --version "0.0.2" --docker "armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:0.0.2"
+
+Success: Model "armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:0.0.2" has been onboarded to cluster "vmx-cea024-secure" with ID "com.ericsson.example.inception3" and version "0.0.2"
+....
+
+Create a model service from previously onboarded model in domain `com.ericsson.test`:
+
+....
+$ mxe-service create --name "test-b-service" --models "com.ericsson.example.inception3:0.0.2" --domain "com.ericsson.example"
+
+Success: Model service "test-b-service" has been created with model "com.ericsson.example.inception3:0.0.2", with 1 instance in domain com.ericsson.example
+....
+
+List model services and check if model service in domain `com.ericsson.test` is visible:
+
+....
+$ mxe-service list
+STARTED  NAME            DOMAIN             INSTANCES  TYPE   STATUS   USER         MODEL                               ENDPOINT
+14:38    test-a-service  com.ericsson.test  1          model  running  test-user-a  com.ericsson.test.inception3:0.0.1  <mxe-host>/model-endpoints/test-a-service
+....
+
+Test that user `test-user-b` can get, list models, but do not have any access rights to model services in the `com.ericsson.test` domain.
+
+Login with `test-user-b` (remove `mxeTokenFile` from `$HOME/.mxe`), perform a cli command and type `test-user-b credentials`.
+
+List models and check if models are both visible in domain `com.ericsson.test` and `com.ericsson.example`.
+
+....
+$ mxe-model list
+
+ONBOARDED  USER         ID                               VERSION  IMAGE_NAME                                                             TITLE                         AUTHOR    STATUS
+14:36      test-user-a  com.ericsson.test.inception3     0.0.1    armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:v0.0.1  Image Recognition Inception3  MXE test  available
+14:43      test-user-b  com.ericsson.example.inception3  0.0.2    armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:0.0.2   Image Recognition Inception3  MXE test  available
+....
+
+List model services and check if model service is visible only in domain `com.ericsson.example`, the user do not have `mxe-models:read` rights in `com.ericsson.test`:
+
+....
+$ mxe-service list
+
+STARTED  NAME            DOMAIN                INSTANCES  TYPE   STATUS   USER         MODEL                                  ENDPOINT
+14:47    test-b-service  com.ericsson.example  1          model  running  test-user-b  com.ericsson.example.inception3:0.0.2  <mxe-host>/model-endpoints/test-b-service
+....
+
+Try to onboard a model in domain `com.ericsson.test`, where the user do not have all rights:
+
+....
+$ mxe-model onboard --id "com.ericsson.test.inception3" --description "Image recognition model inception 3" --author "MXE test" --title "Image Recognition Inception3" --version "0.0.2" --docker "armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:0.0.2"
+
+Error: There is no permission to onboard model com.ericsson.test.inception3
+....
+
+Try to create a service in `com.ericsson.test`, where the user do not have all rights:
+
+....
+$ mxe-service create --name "test-b-service" --models "com.ericsson.example.inception3:0.0.2" --domain "com.ericsson.test"
+
+Error: There is no permission to create model service test-b-service in domain com.ericsson.test
+....
+
+Test that user `test-user-a` can get, list, onboard, delete models, but can only get and list model services in the `com.ericsson.example` domain.
+
+Login with `test-user-a` (remove `mxeTokenFile` from `$HOME/.mxe`), perform a cli command and type `test-user-a` credentials.
+
+List models and check if models are both visible in domain `com.ericsson.test` and `com.ericsson.example`:
+
+....
+$ mxe-model list
+
+ONBOARDED  USER         ID                               VERSION  IMAGE_NAME                                                             TITLE                         AUTHOR    STATUS
+14:36      test-user-a  com.ericsson.test.inception3     0.0.1    armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:v0.0.1  Image Recognition Inception3  MXE test  available
+14:43      test-user-b  com.ericsson.example.inception3  0.0.2    armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:0.0.2   Image Recognition Inception3  MXE test  available
+....
+
+Onboard model in domain `com.ericsson.example`:
+
+....
+$ mxe-model onboard --id "com.ericsson.example.inception3" --description "Image recognition model inception 3" --author "MXE test" --title "Image Recognition Inception3" --version "0.0.1" --docker "armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:0.0.1"
+
+Success: Model "armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:0.0.1" has been onboarded to cluster "vmx-cea024-secure" with ID "com.ericsson.example.inception3" and version "0.0.1"
+....
+
+Delete a model from domain `com.ericsson.example`:
+
+....
+$ mxe-model delete --id "com.ericsson.example.inception3" --version "0.0.1"
+
+Success: Model "com.ericsson.example.inception3" version "0.0.1" has been deleted from cluster
+....
+
+List model services and check if model services are both visible in domain `com.ericsson.test` and `com.ericsson.example`:
+
+....
+$ mxe-service list
+
+STARTED  NAME            DOMAIN                INSTANCES  TYPE   STATUS   USER         MODEL                                  ENDPOINT
+14:38    test-a-service  com.ericsson.test     1          model  running  test-user-a  com.ericsson.test.inception3:0.0.1     <mxe-host>/model-endpoints/test-a-service
+14:47    test-b-service  com.ericsson.example  1          model  running  test-user-b  com.ericsson.example.inception3:0.0.2  <mxe-host>/model-endpoints/test-b-service
+....
+
+Try to create a service in `com.ericsson.test`, where the user do not have all rights:
+
+....
+$ mxe-service create --name "test-a-service-in-domain-b" --models "com.ericsson.example.inception3:0.0.2" --domain "com.ericsson.example"
+
+Error: There is no permission to create model service test-a-service-in-domain-b in domain com.ericsson.example
+....

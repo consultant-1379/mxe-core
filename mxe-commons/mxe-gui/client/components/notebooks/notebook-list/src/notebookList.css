@@ -1,0 +1,66 @@
+/* style goes here */
+:host {
+  display: block;
+}
+
+.notebook-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  overflow: auto;
+}
+
+.notebook-card {
+  margin: 0 16px 16px 0;
+  width: calc((100% / 4) - 12px);
+}
+
+.notebook-card:nth-child(4n) {
+  margin-right: 0;
+}
+
+@media (max-width: 1360px) {
+  .notebook-card {
+    width: calc((100% / 3) - 16px);
+  }
+
+  .notebook-card:nth-child(3n) {
+    margin-right: 0;
+  }
+
+  .notebook-card:nth-child(4n) {
+    margin-right: 16px;
+  }
+}
+
+@media (max-width: 1020px) {
+  .notebook-card {
+    width: calc((100% / 2) - 16px);
+  }
+
+  .notebook-card:nth-child(2n) {
+    margin-right: 0;
+  }
+
+  .notebook-card:nth-child(3n) {
+    margin-right: 16px;
+  }
+
+  .notebook-card:nth-child(4n) {
+    margin-right: 16px;
+  }
+}
+
+@media (max-width: 750px) {
+  .notebook-card {
+    width: calc(100% - 16px);
+  }
+
+  .notebook-card {
+    margin-right: 0;
+  }
+
+  :host {
+    flex-direction: column;
+  }
+}

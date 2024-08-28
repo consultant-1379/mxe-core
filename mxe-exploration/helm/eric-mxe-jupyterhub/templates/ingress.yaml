@@ -1,0 +1,39 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "eric-mxe-jupyterhub.ingress-name" . | quote }}
+  labels:
+    app.kubernetes.io/component: "jupyterhub-ingress"
+    app.kubernetes.io/name: {{ include "eric-mxe-jupyterhub.ingress-name" . | quote }}
+    {{- include "eric-mxe-jupyterhub.labels" . | nindent 4 }}
+  annotations:
+    {{- $annotations := include "eric-mxe-jupyterhub.annotations" . | fromYaml -}}
+    {{- $ingressAnnotations := include "eric-mxe-jupyterhub.ingress-annotations" . | fromYaml -}}
+    {{- include "eric-mxe-jupyterhub.mergeAnnotations" (dict "location" .Template.Name "sources" (list $ingressAnnotations $annotations )) | trim | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClass | quote }}
+  defaultBackend:
+    service:
+      name: {{ include "eric-mxe-jupyterhub.proxy-service-public-name" . | quote }}
+      port:
+        name: "http"
+  {{- include "eric-mxe-jupyterhub.ingress-tls" . | nindent 2 -}}
+  rules:
+    - http:
+        paths:
+        - path: /jupyter
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: {{ include "eric-mxe-jupyterhub.proxy-service-public-name" . | quote }}
+              port:
+                name: "http"
+      {{- if or .Values.global.mxeApiHostname .Values.ingress.hostname }}
+      host: {{ default .Values.global.mxeApiHostname .Values.ingress.hostname | quote }}
+      {{- end }}
+  {{- with .Values.ingress.tls }}
+  tls:
+    {{- . | toYaml | nindent 4 }}
+  {{- end }}
+{{ end }}

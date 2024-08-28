@@ -1,0 +1,12 @@
+{
+  "name" : "iot-model-a",
+  "type" : "model",
+  "autoScaling": {
+    "minReplicas" : 2,
+    "maxReplicas" : 4,
+    "metrics": [{
+      "name": "memoryMegaBytes",
+      "targetAverageValue" : 10
+    }]
+  }
+}

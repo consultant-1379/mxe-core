@@ -1,0 +1,27 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="MxeSuite">
+
+    <listeners>
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGTestListener" />
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGSuiteListener" />
+    </listeners>
+
+    <parameter name="cluster" value="cluster3" />
+    <test name="Model Baseline Performance Test for Inception3">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeBaselinePerformanceTest">
+                <parameter name="testScriptName" value="predict_imagenet_for_baseline.py" />
+                <parameter name="modelBaseDir" value="models/inception3" />
+                <parameter name="imagedir" value="models/images/n02077923" />
+                <parameter name="workdir" value="/tmp/testmxebaseline/" />
+                <parameter name="requirements" value="requirements.txt" />
+                <parameter name="pip" value="pip3" />
+                <parameter name="python" value="python3" />
+                <methods>
+                    <include name="performBaselineInception3Test" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>

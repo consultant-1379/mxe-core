@@ -1,0 +1,17 @@
+{
+  "script": "training-jobs/TrainingJobs",
+  "title": "TRAINING_JOBS_TITLE",
+  "route": "training-jobs",
+  "menu": {
+    "id": "TRAINING_JOBS",
+    "data": {
+      "path": "training-jobs"
+    }
+  },
+  "dependencies": {
+    "@eui/component": "^0.9.0",
+    "@eui/lit-component": "^0.9.0",
+    "@eui/app": "^0.9.1"
+  },
+  "components": {}
+}

@@ -1,0 +1,21 @@
+{{- if .Values.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "eric-mxe-ingress-controller.nginx-configmap" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: ingress-nginx-configmap"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-ingress-controller.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-ingress-controller.labels" . | fromYaml -}}
+    {{- include "eric-mxe-ingress-controller.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations: {{ include "eric-mxe-ingress-controller.annotations" . | nindent 4 }}
+data:
+  http-snippet: |-
+    map $http_host $real_port {
+      "~^.*:(?<hport>\d+)" $hport;
+      default '443';
+    }
+  proxy-redirect-from: http://eric-sec-access-mgmt-http:8080/ https://$http_host/
+  ssl-redirect: "false"
+  use-forwarded-headers: "true"
+{{- end }}

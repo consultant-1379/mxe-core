@@ -1,0 +1,25 @@
+{{- if .Values.global.security.tls.enabled -}}
+apiVersion: siptls.sec.ericsson.com/v1
+kind: InternalCertificate
+metadata:
+  name: {{ include "eric-mxe-prometheus.name" . }}-cert
+  labels:
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-prometheus.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-prometheus.labels" . | fromYaml -}}
+    {{- include "eric-mxe-prometheus.mergeLabels" (dict "location" .Template.Name "sources" (list $name $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-prometheus.annotations" . | nindent 4 }}
+spec:
+  kubernetes:
+    generatedSecretName: {{ include "eric-mxe-prometheus.pm-gen-secret-name" . }}
+    certificateName: {{ include "eric-mxe-prometheus.pm-cert-name" . }}
+    privateKeyName: {{ include "eric-mxe-prometheus.pm-private-key" . }}
+  certificate:
+    subject:
+      cn: {{ include "eric-mxe-prometheus.pm-service-name" .  }}
+    issuer:
+      reference: {{ include "eric-mxe-prometheus.pm-ca-issuer" . | quote}}
+    extendedKeyUsage:
+      tlsClientAuth: true
+      tlsServerAuth: false
+{{- end -}}

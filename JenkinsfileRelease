@@ -1,0 +1,340 @@
+def SLAVE_NODE = null
+def getGitTags = '''
+	def command = 'git ls-remote --tags ssh://mxecifunc@gerrit.ericsson.se:29418/MXE/mxe-core.git | sort --field-separator=/ --key=3 --version-sort --reverse | head -25'
+	def proc = ['bash', '-c', command].execute()
+	proc.waitForOrKill(5000)
+
+	def tagList = proc.in.text
+	    .readLines()
+	    .collect { it.split()[1].replaceAll('refs/tags/', '') }
+	    .findAll { it.matches('\\\\d+\\\\.\\\\d+\\\\.\\\\d+\\\\-\\\\d+')}
+	return tagList
+'''
+
+def getGitBranches = '''
+	def command = 'git ls-remote --heads ssh://mxecifunc@gerrit.ericsson.se:29418/MXE/mxe-core.git | sort --field-separator=/ --key=3 --version-sort --reverse'
+	def proc = ['bash', '-c', command].execute()
+	proc.waitForOrKill(5000)
+
+	def branchList = proc.in.text
+	    .readLines()
+	    .collect { it.split()[1].replaceAll('refs/heads/', '') }
+	    .findAll { it.matches('master') || it.matches('ep.*')}
+	return branchList
+'''
+
+node(label: 'docker') {
+    stage('Nominating build node') {
+        SLAVE_NODE = "${NODE_NAME}"
+        echo "Executing build on ${SLAVE_NODE}"
+    }
+    properties([
+            parameters([
+                    [
+                            $class      : 'ChoiceParameter',
+                            name        : 'RELEASE_CANDIDATE_VERSION',
+                            choiceType  : 'PT_SINGLE_SELECT',
+                            description : 'Release candidate version (tag from Git)',
+                            filterLength: 1,
+                            filterable  : true,
+                            randomName  : 'choice-parameter-5631314439613978',
+                            script      : [
+                                    $class: 'GroovyScript',
+                                    script: [
+                                            classpath: [],
+                                            sandbox  : false,
+                                            script   : getGitTags
+                                    ]
+                            ]
+                    ],
+                    [
+                            $class              : 'DynamicReferenceParameter',
+                            name                : 'RELEASE_VERSION',
+                            choiceType          : 'ET_FORMATTED_HTML',
+                            description         : 'Auto-generated release helm chart version',
+                            omitValueField      : false,
+                            randomName          : 'choice-parameter-5633384460832175',
+                            referencedParameters: 'RELEASE_CANDIDATE_VERSION',
+                            script              : [
+                                    $class: 'GroovyScript',
+                                    script: [
+                                            classpath: [],
+                                            sandbox  : false,
+                                            script   :
+                                                    'return RELEASE_CANDIDATE_VERSION.replace(\'-\', \'+\')'
+                                    ]
+                            ]
+                    ],
+                    [
+                            $class                 : 'ValidatingStringParameterDefinition',
+                            name                   : 'NEXT_VERSION_PREFIX',
+                            defaultValue           : "",
+                            regex                  : "^\\d+\\.\\d+\\.\\d+\$",
+                            failedValidationMessage: "Invalid version prefix!",
+                            description            : "Next version prefix"
+                    ],
+                    [
+                            $class      : 'ChoiceParameter',
+                            name        : 'RELEASE_BRANCH',
+                            choiceType  : 'PT_SINGLE_SELECT',
+                            description : 'Release branch from Git',
+                            filterLength: 1,
+                            filterable  : true,
+                            randomName  : 'choice-parameter-5631314439613987',
+                            script      : [
+                                    $class: 'GroovyScript',
+                                    script: [
+                                            classpath: [],
+                                            sandbox  : false,
+                                            script   : getGitBranches
+                                    ]
+                            ]
+                    ],
+                    
+            ])
+    ])
+}
+
+pipeline {
+    options {
+        disableConcurrentBuilds()
+    }
+
+    agent {
+        node {
+            label "${SLAVE_NODE}"
+        }
+    }
+
+    environment {
+        GIT_AUTHOR_NAME = "mxecifunc"
+        GIT_AUTHOR_EMAIL = "PDLMMECIMM@pdl.internal.ericsson.com"
+        GIT_COMMITTER_NAME = "${USER}"
+        GIT_COMMITTER_EMAIL = "${GIT_AUTHOR_EMAIL}"
+        GIT_SSH_COMMAND = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GSSAPIAuthentication=no -o PubKeyAuthentication=yes"
+        RELEASE = 'true'
+        RELEASE_CANDIDATE_VERSION = "${params.RELEASE_CANDIDATE_VERSION}"
+        RELEASE_VERSION = "${params.RELEASE_CANDIDATE_VERSION}".replace('-', '+')
+        RELEASE_ARTIFACTS_FOLDER = "release-${env.RELEASE_VERSION}"
+        NEXT_VERSION_PREFIX = "${params.NEXT_VERSION_PREFIX}"
+        RELEASE_BRANCH = "${params.RELEASE_BRANCH}"
+        // $HOME/.docker for local runs, otherwise set to Jenkins workspace
+        DOCKER_CONFIG="$WORKSPACE"
+    }
+
+    stages {
+        stage('Environment info') {
+            steps {
+                sh 'printenv | sort'
+            }
+        }
+
+        stage('Init') {
+            steps {
+                script {
+                    currentBuild.displayName = env.RELEASE_VERSION
+                    withCredentials([file(credentialsId: 'ARM_DOCKER_CONFIG', variable: 'DOCKER_CONFIG_FILE')]) {
+                        writeFile file: 'config.json', text: readFile(DOCKER_CONFIG_FILE)
+                    }
+                }
+                sshagent(credentials: ['ssh-key-mxecifunc']) {
+                    sh "git checkout ${env.RELEASE_BRANCH}"
+                    sh 'git clean -xdff'
+                    sh 'git submodule sync'
+                    sh 'git submodule update --init --recursive'
+
+                    sh './bob/bob clean'
+
+                    sh './bob/bob init-release'
+                    sh './bob/bob pra-release:init'
+                }
+            }
+        }
+
+        stage('Prepare PRA release helm chart') {
+            steps {
+                withCredentials([
+                        file(credentialsId: 'helm-credentials', variable: 'HELM_REPO_CREDENTIALS'),
+                ]) {
+                    sh './bob/bob pra-release:prepare-commons-chart'
+                    sh './bob/bob pra-release:prepare-deployer-chart'
+                    sh './bob/bob pra-release:prepare-serving-chart'
+                    sh './bob/bob pra-release:prepare-training-chart'
+                    sh './bob/bob pra-release:prepare-workflow-chart'
+                    sh './bob/bob pra-release:prepare-exploration-chart'
+
+                }
+            }
+        }
+
+        stage('Prepare PRA release CLI packages') {
+            steps {
+                withCredentials([string(credentialsId: 'arm-api-token-mxecifunc', variable: 'API_TOKEN')]) {
+                    sh './bob/bob pra-release:prepare-cli'
+                    sh './bob/bob pra-release:prepare-essentials'
+                }
+            }
+        }
+
+        stage('Lock slave') {
+            options {
+                lock(resource: "${SLAVE_NODE}")
+            }
+            stages {
+                stage('Prepare PRA release docker images') {
+                    steps {
+                            sh './bob/bob pra-release:prepare-images'
+                            sh './bob/bob pra-release:prepare-iam-image'
+                        }
+                }
+
+                stage('Publish PRA release packages') {
+                    steps {
+                        parallel(
+                                'Docker images': {
+                                        sh './bob/bob pra-release:publish-images'
+                                        sh './bob/bob pra-release:publish-iam-image'
+                                },
+                                'Helm chart': {
+                                    withCredentials([
+                                            string(credentialsId: 'arm-api-token-mxecifunc', variable: 'API_TOKEN'),
+                                    ]) {
+                                        sh './bob/bob pra-release:publish-commons-chart'
+                                        sh './bob/bob pra-release:publish-deployer-chart'
+                                        sh './bob/bob pra-release:publish-serving-chart'
+                                        sh './bob/bob pra-release:publish-training-chart'
+                                        sh './bob/bob pra-release:publish-workflow-chart'
+                                        sh './bob/bob pra-release:publish-exploration-chart'
+                                    }
+                                },
+                                'CLI packages': {
+                                    withCredentials([
+                                            string(credentialsId: 'arm-api-token-mxecifunc', variable: 'API_TOKEN'),
+                                    ]) {
+                                        sh './bob/bob pra-release:publish-cli'
+                                        sh './bob/bob pra-release:publish-essentials'
+                                    }
+                                }
+                        )
+                    }
+                }
+            }
+        }
+
+        stage('Prepare PRA offline installer package') {
+            steps {
+                withCredentials([
+                        string(credentialsId: 'arm-api-token-mxecifunc', variable: 'API_TOKEN'),
+                ]) {
+                    sh './bob/bob package-offline-images'
+                }
+            }
+        }
+
+        stage('Publish PRA offline installer package') {
+            steps {
+                withCredentials([
+                        string(credentialsId: 'arm-api-token-mxecifunc', variable: 'API_TOKEN'),
+                ]) {
+                    sh './bob/bob pra-release:publish-offline-installer'
+                }
+            }
+        }
+
+        stage('Check release packages') {
+            steps {
+                timeout(time: 12, unit: "HOURS") {
+                    input message: 'Release packages are OK', ok: 'Yes'
+                }
+            }
+        }
+
+        stage('Lock k8s cluster') {
+            options {
+                lock(resource: null, label: 'bob-ci-test', quantity: 1, variable: 'SYSTEM')
+            }
+            environment{
+                        KUBECONFIG=credentials("kubeconfig-${env.SYSTEM}")
+                        MXESECRETS=credentials("mxek8ssecrets-${env.SYSTEM}")
+                        TESTMXEENDPOINT=credentials("secure-mxeendpoint-${env.SYSTEM}")
+                        TESTDEPLOYERENDPOINT=credentials("secure-deployerendpoint-${env.SYSTEM}")
+                        TESTDEPLOYERAUTHENDPOINT=credentials("secure-oauthendpoint-${env.SYSTEM}")
+                        GITOPS_REPO=credentials("secure-gitopsrepoendpoint-${env.SYSTEM}")
+                        API_TOKEN=credentials("arm-api-token-mxecifunc")
+            }
+            stages {
+                stage('PRA pakcage system test') {       
+                    steps {
+                            echo "Target kubernetes system: ${env.SYSTEM}"
+                            sh './bob/bob -d system-test-pra-package'
+                    }
+                    post {
+                        always {
+                            archiveArtifacts artifacts: 'mxe-test-reports/**/*.*', allowEmptyArchive: true
+                            publishHTML(target: [
+                                    allowMissing         : true,
+                                    alwaysLinkToLastBuild: false,
+                                    keepAll              : true,
+                                    reportDir            : 'mxe-test-reports',
+                                    reportFiles          : '*/report.html',
+                                    reportName           : "MXE Test Report"
+                                    ])
+                        }
+                        unsuccessful {
+                            withCredentials([
+                                    file(credentialsId: 'kubeconfig-' + env.SYSTEM, variable: 'KUBECONFIG'),
+                            ]) {
+                                catchError {
+                                    sh './bob/bob mxe-cleanup'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            sshagent(credentials: ['ssh-key-mxecifunc']) {
+                sh './bob/bob pra-release:post-actions'
+            }
+            script {
+                def (version) = "${env.RELEASE_CANDIDATE_VERSION}".tokenize('-')
+                def emailBody = "<html><p>MXE ${version} release packages are available in <a href=\"https://armdocker.rnd.ericsson.se/artifactory\">Artifactory</a>.</p>\n" +
+                        "<ul>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-generic/${env.RELEASE_CANDIDATE_VERSION}/mxe-cli-linux-${env.RELEASE_CANDIDATE_VERSION}.tgz\">MXE CLI package (linux)</a></li>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-generic/${env.RELEASE_CANDIDATE_VERSION}/mxe-cli-windows-${env.RELEASE_CANDIDATE_VERSION}.zip\">MXE CLI package (windows)</a></li>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-generic/${env.RELEASE_CANDIDATE_VERSION}/mxe-cli-macos-${env.RELEASE_CANDIDATE_VERSION}.zip\">MXE CLI package (macos)</a></li>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-generic/${env.RELEASE_CANDIDATE_VERSION}/mxe-essentials.zip\">MXE Essentials package</a></li>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-generic/${env.RELEASE_CANDIDATE_VERSION}/mxe-commons-offline-installer-images-${env.RELEASE_CANDIDATE_VERSION}.tar\">MXE Commons offline installer package</a></li>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-generic/${env.RELEASE_CANDIDATE_VERSION}/mxe-serving-offline-installer-images-${env.RELEASE_CANDIDATE_VERSION}.tar\">MXE Serving offline installer package</a></li>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-generic/${env.RELEASE_CANDIDATE_VERSION}/mxe-workflow-offline-installer-images-${env.RELEASE_CANDIDATE_VERSION}.tar\">MXE Workflow offline installer package</a></li>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-generic/${env.RELEASE_CANDIDATE_VERSION}/mxe-training-offline-installer-images-${env.RELEASE_CANDIDATE_VERSION}.tar\">MXE Training offline installer package</a></li>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-generic/${env.RELEASE_CANDIDATE_VERSION}/mxe-exploration-offline-installer-images-${env.RELEASE_CANDIDATE_VERSION}.tar\">MXE Exploration offline installer package</a></li>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-generic/${env.RELEASE_CANDIDATE_VERSION}/mxe-deployer-offline-installer-images-${env.RELEASE_CANDIDATE_VERSION}.tar\">MXE Deployer offline installer package</a></li>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-helm/mxe-commons-${env.RELEASE_VERSION}.tgz\">MXE Commons helm package</a></li>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-helm/mxe-deployer-${env.RELEASE_VERSION}.tgz\">MXE Deployer helm package</a></li>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-helm/mxe-serving-${env.RELEASE_VERSION}.tgz\">MXE Serving helm package</a></li>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-helm/mxe-workflow-${env.RELEASE_VERSION}.tgz\">MXE Workflow helm package</a></li>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-helm/mxe-training-${env.RELEASE_VERSION}.tgz\">MXE Training helm package</a></li>\n" +
+                        "<li><a href=\"https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-helm/mxe-exploration-${env.RELEASE_VERSION}.tgz\">MXE Exploration helm package</a></li>\n" +
+                        "</ul>\n" +
+                        "<p>&nbsp;</p></html>"
+                emailext(
+                        to: 'PDLMXEGAIA@pdl.internal.ericsson.com',
+                        mimeType: 'text/html',
+                        subject: "MXE ${version} release packages are available",
+                        body: emailBody)
+            }
+        }
+        unsuccessful {
+            sshagent(credentials: ['ssh-key-mxecifunc']) {
+                withCredentials([string(credentialsId: 'arm-api-token-mxecifunc', variable: 'API_TOKEN')]) {
+                    sh './bob/bob pra-release:revert'
+                }
+            }
+        }
+    }
+}

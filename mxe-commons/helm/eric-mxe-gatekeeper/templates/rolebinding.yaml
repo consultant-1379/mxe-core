@@ -1,0 +1,18 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "eric-mxe-gatekeeper.rolebinding" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: gatekeeper-role-binding"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-gatekeeper.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-gatekeeper.labels" . | fromYaml -}}
+    {{- include "eric-mxe-gatekeeper.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations: {{ include "eric-mxe-gatekeeper.annotations" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "eric-mxe-gatekeeper.role" . | quote }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "eric-mxe-gatekeeper.serviceaccount" . | quote }}
+    namespace: {{ .Release.Namespace | quote }}

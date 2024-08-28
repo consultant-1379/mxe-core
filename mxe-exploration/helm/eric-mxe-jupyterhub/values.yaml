@@ -1,0 +1,531 @@
+# fullnameOverride and nameOverride distinguishes blank strings, null values,
+# and non-blank strings. For more details, see the configuration reference.
+fullnameOverride: ""
+nameOverride:
+
+# custom can contain anything you want to pass to the hub pod, as all passed
+# Helm template values will be made available there.
+custom: {}
+
+persistence:
+  persistentVolumeClaim:
+    annotations: {}
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: null
+    size: "5Gi"
+
+images:
+  hub:
+    name: "mxe/eric-mxe-jupyterhub"
+    tag: "VERSION"
+  proxy:
+    name: "mxe/eric-mxe-configurable-http-proxy"
+    tag: "VERSION"
+  singleuser:
+    name: &singleuserImageName "mxe/eric-mxe-jupyterlab"
+    tag: &singleuserImageTag "VERSION"
+    pullPolicy: &singleuserImagePullPolicy IfNotPresent
+  networkTools:
+    name: &singleuserNetworkToolsImageName "mxe/eric-mxe-configurable-http-proxy"
+    tag: &singleuserNetworkToolsImageTag "VERSION"
+
+ingress:
+  enabled: true
+  hostname: null
+  secretName: null
+  ingressClass: eric-mxe-ingress-controller-class
+  annotationPrefix: null
+  defaultBackendFullNameOverride: null
+  defaultBackendNameOverride: null
+  owasp:
+    enabled: true
+
+
+imageCredentials:
+  repoPath:
+  pullSecret:
+  registry:
+    url:
+    pullSecret:
+  hub:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+  proxy:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+  singleuser:
+    repoPath: "REPO_PATH"
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+  networkTools:
+    repoPath: "REPO_PATH"
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+
+productInfo:
+  rstate: "-"
+
+
+
+affinity:
+  hub:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            topologyKey: "kubernetes.io/hostname"
+            labelSelector:
+              matchExpressions:
+                - key: "app.kubernetes.io/part-of"
+                  operator: "In"
+                  values:
+                    - "mxe"
+                - key: "app.kubernetes.io/component"
+                  operator: "In"
+                  values:
+                    - "jupyterhub-hub"
+                - key: "app.kubernetes.io/instance"
+                  operator: "In"
+                  values:
+                    - "{{ .Release.Name }}"
+  proxy:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            topologyKey: "kubernetes.io/hostname"
+            labelSelector:
+              matchExpressions:
+                - key: "app.kubernetes.io/part-of"
+                  operator: "In"
+                  values:
+                    - "mxe"
+                - key: "app.kubernetes.io/component"
+                  operator: "In"
+                  values:
+                    - "jupyterhub-proxy"
+                - key: "app.kubernetes.io/instance"
+                  operator: "In"
+                  values:
+                    - "{{ .Release.Name }}"
+
+# DR-D1121-011 - Present in Top Level Helm Chart Values.yaml
+#global:
+#  safeToShowValues: false
+#  pullSecret:
+#  registry:
+#    url: "armdocker.rnd.ericsson.se"
+#    pullSecret:
+#  mxeApiTlsSecretName:
+#  mxeApiHostname:
+#  mxeDisableDefaultIngressControllerUse: false
+#  fsGroup:
+#    manual:
+#  labels: {}
+#  annotations: {}
+
+hub:
+  config:
+    JupyterHub:
+      admin_access: true
+      authenticator_class: dummy
+  service:
+    type: ClusterIP
+    annotations: {}
+    ports:
+      nodePort:
+    extraPorts: []
+    loadBalancerIP:
+  baseUrl: /
+  publicURL:
+  uid: 297324
+  cookieSecret:
+  initContainers: []
+  nodeSelector: {}
+  tolerations: []
+  concurrentSpawnLimit: 64
+  consecutiveFailureLimit: 5
+  activeServerLimit:
+  deploymentStrategy:
+    ## type: Recreate
+    ## - sqlite-pvc backed hubs require the Recreate deployment strategy as a
+    ##   typical PVC storage can only be bound to one pod at the time.
+    ## - JupyterHub isn't designed to support being run in parallell. More work
+    ##   needs to be done in JupyterHub itself for a fully highly available (HA)
+    ##   deployment of JupyterHub on k8s is to be possible.
+    type: Recreate
+    # This is required for upgrading to work
+    rollingUpdate:
+  db:
+    type: sqlite-memory
+    upgrade:
+    pvc:
+      annotations: {}
+      selector: {}
+      accessModes:
+        - ReadWriteOnce
+      storage: 1Gi
+      subPath:
+      storageClassName:
+    url:
+    password:
+  labels: {}
+  annotations: {}
+  command: []
+  args: []
+  extraConfig: {}
+  extraConfigMap: {}
+  extraFiles: {}
+  extraEnv: {}
+  extraContainers: []
+  extraVolumes: []
+  extraVolumeMounts: []
+  containerSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    allowPrivilegeEscalation: false
+  lifecycle: {}
+  services: {}
+  pdb:
+    enabled: false
+    maxUnavailable:
+    minAvailable: 1
+  networkPolicy:
+    enabled: false
+    ingress: []
+    ## egress for JupyterHub already includes Kubernetes internal DNS and
+    ## access to the proxy, but can be restricted further, but ensure to allow
+    ## access to the Kubernetes API server that couldn't be pinned ahead of
+    ## time.
+    ##
+    ## ref: https://stackoverflow.com/a/59016417/2220152
+    egress:
+      - to:
+          - ipBlock:
+              cidr: 0.0.0.0/0
+    interNamespaceAccessLabels: ignore
+    allowedIngressPorts: []
+  allowNamedServers: false
+  namedServerLimitPerUser:
+  authenticatePrometheus:
+  redirectToServer:
+  shutdownOnLogout:
+  templatePaths: []
+  templateVars: {}
+  livenessProbe:
+    # The livenessProbe's aim to give JupyterHub sufficient time to startup but
+    # be able to restart if it becomes unresponsive for ~5 min.
+    enabled: true
+    initialDelaySeconds: 300
+    periodSeconds: 10
+    failureThreshold: 30
+    timeoutSeconds: 3
+  readinessProbe:
+    # The readinessProbe's aim is to provide a successful startup indication,
+    # but following that never become unready before its livenessProbe fail and
+    # restarts it if needed. To become unready following startup serves no
+    # purpose as there are no other pod to fallback to in our non-HA deployment.
+    enabled: true
+    initialDelaySeconds: 0
+    periodSeconds: 2
+    failureThreshold: 1000
+    timeoutSeconds: 1
+  existingSecret:
+  serviceAccount:
+    annotations: {}
+  extraPodSpec: {}
+
+rbac:
+  enabled: true
+
+# proxy relates to the proxy pod, the proxy-public service, and the autohttps
+# pod and proxy-http service.
+proxy:
+  secretToken: "to-be-overridden-by-mxe-exploration-chart-values"
+  annotations: {}
+  deploymentStrategy:
+    ## type: Recreate
+    ## - JupyterHub's interaction with the CHP proxy becomes a lot more robust
+    ##   with this configuration. To understand this, consider that JupyterHub
+    ##   during startup will interact a lot with the k8s service to reach a
+    ##   ready proxy pod. If the hub pod during a helm upgrade is restarting
+    ##   directly while the proxy pod is making a rolling upgrade, the hub pod
+    ##   could end up running a sequence of interactions with the old proxy pod
+    ##   and finishing up the sequence of interactions with the new proxy pod.
+    ##   As CHP proxy pods carry individual state this is very error prone. One
+    ##   outcome when not using Recreate as a strategy has been that user pods
+    ##   have been deleted by the hub pod because it considered them unreachable
+    ##   as it only configured the old proxy pod but not the new before trying
+    ##   to reach them.
+    type: Recreate
+    ## rollingUpdate:
+    ## - WARNING:
+    ##   This is required to be set explicitly blank! Without it being
+    ##   explicitly blank, k8s will let eventual old values under rollingUpdate
+    ##   remain and then the Deployment becomes invalid and a helm upgrade would
+    ##   fail with an error like this:
+    ##
+    ##     UPGRADE FAILED
+    ##     Error: Deployment.apps "proxy" is invalid: spec.strategy.rollingUpdate: Forbidden: may not be specified when strategy `type` is 'Recreate'
+    ##     Error: UPGRADE FAILED: Deployment.apps "proxy" is invalid: spec.strategy.rollingUpdate: Forbidden: may not be specified when strategy `type` is 'Recreate'
+    rollingUpdate:
+  # service relates to the proxy-public service
+  service:
+    type: ClusterIP
+    labels: {}
+    annotations: {}
+    nodePorts:
+      http:
+      https:
+    disableHttpPort: false
+    extraPorts: []
+    loadBalancerIP:
+    loadBalancerSourceRanges: []
+  # chp relates to the proxy pod, which is responsible for routing traffic based
+  # on dynamic configuration sent from JupyterHub to CHP's REST API.
+  chp:
+    containerSecurityContext:
+      runAsUser: 65534 # nobody user
+      runAsGroup: 65534 # nobody group
+      allowPrivilegeEscalation: false
+    extraCommandLineFlags: []
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 60
+      periodSeconds: 10
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 0
+      periodSeconds: 2
+      failureThreshold: 1000
+    defaultTarget:
+    errorTarget:
+    extraEnv: {}
+    nodeSelector: {}
+    tolerations: []
+    networkPolicy:
+      enabled: false
+      ingress: []
+      egress:
+        - to:
+            - ipBlock:
+                cidr: 0.0.0.0/0
+      interNamespaceAccessLabels: ignore
+      allowedIngressPorts: [http, https]
+    pdb:
+      enabled: false
+      maxUnavailable:
+      minAvailable: 1
+    extraPodSpec: {}
+  secretSync:
+    containerSecurityContext:
+      runAsUser: 65534 # nobody user
+      runAsGroup: 65534 # nobody group
+      allowPrivilegeEscalation: false
+    resources: {}
+  labels: {}
+
+
+auth:
+  type: dummy
+  whitelist:
+    users:
+  admin:
+    access: true
+    users:
+  dummy:
+    password:
+  ldap:
+    dn:
+      search: {}
+      user: {}
+    user: {}
+  state:
+    enabled: false
+    cryptoKey:
+
+# singleuser relates to the configuration of KubeSpawner which runs in the hub
+# pod, and its spawning of user pods such as jupyter-myusername.
+singleuser:
+  podNameTemplate:
+  image:
+    name: *singleuserImageName
+    tag: *singleuserImageTag
+    pullPolicy: *singleuserImagePullPolicy
+  extraTolerations: []
+  nodeSelector: {}
+  extraNodeAffinity:
+    required: []
+    preferred: []
+  extraPodAffinity:
+    required: []
+    preferred: []
+  extraPodAntiAffinity:
+    required: []
+    preferred:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchExpressions:
+              - key: "app.kubernetes.io/part-of"
+                operator: "In"
+                values:
+                  - "mxe"
+              - key: "app.kubernetes.io/component"
+                operator: "In"
+                values:
+                  - "jupyterhub-instance"
+              - key: "release"
+                operator: "In"
+                values:
+                  - "{{ .Release.Name }}"
+  networkTools:
+    image:
+      name: *singleuserNetworkToolsImageName
+      tag: *singleuserNetworkToolsImageTag
+  cloudMetadata:
+    enabled: false
+    # block set to true will append a privileged initContainer using the
+    # iptables to block the sensitive metadata server at the provided ip.
+    blockWithIptables: true
+    ip: 169.254.169.254
+  networkPolicy:
+    enabled: false
+    ingress: []
+    egress:
+      # Required egress to communicate with the hub and DNS servers will be
+      # augmented to these egress rules.
+      #
+      # This default rule explicitly allows all outbound traffic from singleuser
+      # pods, except to a typical IP used to return metadata that can be used by
+      # someone with malicious intent.
+      - to:
+          - ipBlock:
+              cidr: 0.0.0.0/0
+              except:
+                - 169.254.169.254/32
+    interNamespaceAccessLabels: ignore
+    allowedIngressPorts: []
+  events: true
+  extraAnnotations: {}
+  extraFiles: {}
+  extraLabels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "jupyterhub-instance"
+    hub.jupyter.org/network-access-hub: 'true'
+  extraEnv: {}
+  lifecycleHooks: {}
+  initContainers: []
+  extraContainers: []
+  uid: 219438
+  fsGid: 100
+  serviceAccountName:
+  storage:
+    type: dynamic
+    extraLabels: {}
+    extraVolumes: []
+    extraVolumeMounts: []
+    static:
+      pvcName:
+      subPath: "{username}"
+    capacity: 10Gi
+    homeMountPath: /home/eric-mxe-jupyterlab
+    dynamic:
+      storageClass:
+      pvcNameTemplate: claim-{username}{servername}
+      volumeNameTemplate: volume-{username}{servername}
+      storageAccessModes: [ReadWriteOnce]
+  startTimeout: 300
+  cpu:
+    limit:
+    guarantee:
+  memory:
+    limit:
+    guarantee: 1G
+  extraResource:
+    limits: {}
+    guarantees: {}
+  cmd: jupyterhub-singleuser
+  defaultUrl:
+  extraPodConfig: {}
+  profileList: []
+  webSocket:
+     pingInterval: 60
+     pingTimeout: 120
+
+# cull relates to the jupyterhub-idle-culler service, responsible for evicting
+# inactive singleuser pods.
+#
+# The configuration below, except for enabled, corresponds to command-line flags
+# for jupyterhub-idle-culler as documented here:
+# https://github.com/jupyterhub/jupyterhub-idle-culler#as-a-standalone-script
+#
+cull:
+  enabled: true
+  users: false # --cull-users
+  adminUsers: true # --cull-admin-users
+  removeNamedServers: false # --remove-named-servers
+  timeout: 3600 # --timeout
+  every: 600 # --cull-every
+  concurrency: 10 # --concurrency
+  maxAge: 0 # --max-age
+
+debug:
+  enabled: false
+
+pypiServer:
+    internal: http://eric-mxe-pypiserver:8080/simple
+    external:
+
+terminationGracePeriodSeconds: 60
+
+updateStrategy:
+  type: "RollingUpdate"
+
+resources:
+  hub:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+  proxy:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+
+tolerations: []
+
+podPriority:
+  mxeJupyterhubHub:
+    priorityClassName:
+  mxeJupyterhubProxy:
+    priorityClassName:
+
+labels: {}
+nodeSelector: {}
+
+appArmorProfile:
+  type:
+  localhostProfile:
+
+# DR-D1123-128 - ADP services shall define Seccomp profile
+seccompProfile:
+  type: RuntimeDefault
+  localhostProfile:

@@ -1,0 +1,16 @@
+{
+  "name": "demo-abtest",
+  "type": "static",
+  "replicas": 2,
+  "models": [
+    {
+      "id": "img.inception3.seal",
+      "version": "1.0.11",
+      "weight": "0.4"
+    },
+    {
+      "id": "img.inception3.seal",
+      "version": "1.0.15"
+    }
+  ]
+}

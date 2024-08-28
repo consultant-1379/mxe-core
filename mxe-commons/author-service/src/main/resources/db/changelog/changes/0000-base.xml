@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:appdba="http://www.datical.net/xml/ns/appdba" xmlns:datical="http://www.datical.net/xml/ns/datical" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet author="ruszki " id="20200224-15486">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="authors" />
+            </not>
+        </preConditions>
+        <createTable tableName="authors">
+            <column name="name" type="VARCHAR(255)">
+                <constraints primaryKey="true" primaryKeyName="authors_pkey"/>
+            </column>
+            <column name="public_key" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="ruszki " id="20200224-15487">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="authors_public_key_index" />
+            </not>
+        </preConditions>
+        <createIndex tableName="authors" indexName="authors_public_key_index">
+            <column name="public_key" />
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

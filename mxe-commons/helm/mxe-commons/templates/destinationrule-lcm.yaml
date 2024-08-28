@@ -1,0 +1,30 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: {{ include "mxe-commons.egress-lcm-service-name" . }}-dr
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "lcm-container-registry"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-commons.egress-lcm-service-name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+spec:
+  host: {{ include "mxe-commons.egress-lcm-service-name" . }}
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+    portLevelSettings:
+    - port:
+        number: 5000
+      tls:
+        mode: {{ include "mxe-commons.egress-lcm-tls-mode" . }}
+        clientCertificate: {{ include "mxe-commons.egress-lcm-client-cert" . }}
+        privateKey: {{ include "mxe-commons.egress-lcm-private-key" . }}
+        caCertificates: {{ include "mxe-commons.egress-ca-cert" . }}
+{{- end -}}

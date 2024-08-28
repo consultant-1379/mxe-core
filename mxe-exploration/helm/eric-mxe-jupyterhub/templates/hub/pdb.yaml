@@ -1,0 +1,27 @@
+{{- if .Values.hub.pdb.enabled -}}
+{{- if .Capabilities.APIVersions.Has "policy/v1" }}
+apiVersion: policy/v1
+{{- else }}
+apiVersion: policy/v1beta1
+{{- end }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "eric-mxe-jupyterhub.hub-pod-distribution-budget-name" . | quote }}
+  labels:
+    app.kubernetes.io/component: "jupyterhub-hub-pod-distribution-budget"
+    app.kubernetes.io/name: {{ include "eric-mxe-jupyterhub.hub-pod-distribution-budget-name" . | quote }}
+    {{- include "jupyterhub.labels" . | nindent 4 }}
+spec:
+  {{- if not (typeIs "<nil>" .Values.hub.pdb.maxUnavailable) }}
+  maxUnavailable: {{ .Values.hub.pdb.maxUnavailable }}
+  {{- end }}
+  {{- if not (typeIs "<nil>" .Values.hub.pdb.minAvailable) }}
+  minAvailable: {{ .Values.hub.pdb.minAvailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: "mxe"
+      app.kubernetes.io/component: "jupyterhub-hub"
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+      {{- include "jupyterhub.matchLabels" . | nindent 6 }}
+{{- end }}

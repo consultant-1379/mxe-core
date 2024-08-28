@@ -1,0 +1,53 @@
+
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "-"
+
+nameOverride: null
+
+imageCredentials:
+  registry: {
+    #url: "armdocker.rnd.ericsson.se"
+    #pullSecret: ""
+  }
+  repoPath: "REPO_PATH"
+
+# DR-D1121-011 - Present in Top Level Helm Chart Values.yaml
+#global:
+#  registry:
+#    url: "armdocker.rnd.ericsson.se"
+#    pullSecret:
+#  labels: {}
+#  annotations: {}
+
+images:
+  preUpgradeJob:
+    name: "mxe/eric-mxe-pre-upgrade-job"
+    tag: "VERSION"
+    pullPolicy: IfNotPresent
+
+
+jobSelector: "app.kubernetes.io/part-of=mxe,app.kubernetes.io/component=packager"
+includeReleaseNameSelector: false
+statusCheckInterval: 60
+
+terminationGracePeriodSeconds: 30
+
+resources:
+  preUpgradeJob:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+
+tolerations: []
+
+labels: {}
+annotations: {}

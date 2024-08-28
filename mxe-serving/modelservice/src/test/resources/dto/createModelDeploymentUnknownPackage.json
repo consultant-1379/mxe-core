@@ -1,0 +1,9 @@
+{
+  "name" : "testmodel1",
+  "type" : "model",
+  "replicas" : 1,
+  "models" : [ {
+    "id" : "Non-Existing Package",
+    "version" : "0.0.1"
+  } ]
+}

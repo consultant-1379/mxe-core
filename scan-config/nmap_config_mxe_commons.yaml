@@ -1,0 +1,58 @@
+nmapConfig:
+  services:
+## MXE Commons
+    - name: "eric-mxe-gatekeeper"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "eric-mxe-pypiserver"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "eric-mxe-author-service"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "eric-mxe-gui"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "eric-mxe-ingress-controller"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+        - "--top-ports 3328"
+    - name: "eric-mxe-default-backend"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+  enableUnicornscan:
+    additionalParams:
+      - "-r300"
+      - "-v"
+  reportDir : ".bob/va-reports/nmap/"
+  enableServiceVersionDetection: true

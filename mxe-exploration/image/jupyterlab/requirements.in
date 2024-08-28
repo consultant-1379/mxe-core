@@ -1,0 +1,9 @@
+jupyterhub==4.0.1
+jupyterlab==3.6.5
+
+# plugins
+nbgitpuller
+jupyterlab-git
+
+#libraries
+pyspark

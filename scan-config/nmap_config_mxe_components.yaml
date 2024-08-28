@@ -1,0 +1,84 @@
+nmapConfig:
+  services:
+## mxe-exploration
+    - name: "eric-mxe-jupyterhub-hub"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "eric-mxe-jupyterhub-proxy"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+## mxe-serving
+    - name: "eric-mxe-model-catalogue-service"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "eric-mxe-model-service"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "seldon-controller-manager"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+## mxe-training
+    - name: "eric-mxe-model-training-service"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+## mxe-workflow
+    - name: "mxe-workflow-argo-workflows-argo-server"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "mxe-workflow-argo-workflows-workflow-controller"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "mxe-workflow-spark-operator"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+  enableUnicornscan:
+    additionalParams:
+      - "-r300"
+      - "-v"
+  reportDir : ".bob/va-reports/nmap/"
+  enableServiceVersionDetection: true

@@ -1,0 +1,19 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: {{ include "eric-mxe-model-training-service.name" . }}-dr
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: model-training-service"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-model-training-service.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-model-training-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-model-training-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-model-training-service.annotations" . | nindent 4 }}
+spec:
+  host: {{ include "eric-mxe-model-training-service.name" . }}
+  trafficPolicy:
+    tls:
+      mode: {{ .Values.serviceMesh.tlsMode }}
+{{ end }}

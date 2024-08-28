@@ -1,0 +1,197 @@
++ set -e
+++ pwd
++ CWD=/home/emataru/2.5/mxe-core
++ case "$(uname -s)" in
+++ uname -s
+++ readlink -f /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/configurable-http-proxy/build_image.sh
++ SCRIPT=/mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/configurable-http-proxy/build_image.sh
+++ dirname /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/configurable-http-proxy/build_image.sh
++ BASEDIR=/mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/configurable-http-proxy
+++ dirname /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/configurable-http-proxy
++ MODULEROOT=/mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images
++ source /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/base_image.sh
+++ export LATEST_DATE_TAG=20230412
+++ LATEST_DATE_TAG=20230412
+++ export BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:focal-20230412
+++ BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:focal-20230412
+++ export MINICONDA_VERSION=4.7.12
+++ MINICONDA_VERSION=4.7.12
+++ export S2I_MINICONDA_DOWNLOAD_VERSION=4.10.3
+++ S2I_MINICONDA_DOWNLOAD_VERSION=4.10.3
+++ export MINICONDA_UBUNTU_IMAGE=armdocker.rnd.ericsson.se/proj-mxe/continuumio/miniconda3:4.7.12-ubuntu-20230412
+++ MINICONDA_UBUNTU_IMAGE=armdocker.rnd.ericsson.se/proj-mxe/continuumio/miniconda3:4.7.12-ubuntu-20230412
+++ export SELDON_JAVA_RUNTIME_IMAGE_SOURCE=openjdk
+++ SELDON_JAVA_RUNTIME_IMAGE_SOURCE=openjdk
+++ export SELDON_JAVA_RUNTIME_IMAGE_VERSION=8u141-jdk
+++ SELDON_JAVA_RUNTIME_IMAGE_VERSION=8u141-jdk
+++ export SELDON_JAVA_BUILD_IMAGE_SOURCE=seldonio/core-builder
+++ SELDON_JAVA_BUILD_IMAGE_SOURCE=seldonio/core-builder
+++ export SELDON_JAVA_BUILD_IMAGE_VERSION=0.4
+++ SELDON_JAVA_BUILD_IMAGE_VERSION=0.4
+++ export LATEST_ALPINE_TAG=3.17.3
+++ LATEST_ALPINE_TAG=3.17.3
+++ export PYTHON_ALPINE_TAG=3.9.16-alpine3.17
+++ PYTHON_ALPINE_TAG=3.9.16-alpine3.17
+++ export ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
+++ ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
++ ALPINE_OS_VERSION=3.17
++ ALPINE_BASE_IMAGE=node:lts-alpine3.17
++ REPO_URL=https://github.com/jupyterhub/configurable-http-proxy.git
++ UPSTREAM_VERSION=4.5.1
++ IMAGE=armdocker.rnd.ericsson.se/proj-mxe/jupyterhub/configurable-http-proxy:4.5.1-alpine3.17
++ ALPINE_VERSION_IN_SRC=3.15
++ SRC_ALPINE_BASE_IMAGE=node:lts-alpine3.15
++ cleanup
++ [[ -d /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/configurable-http-proxy/configurable-http-proxy ]]
++ git clone -b 4.5.1 https://github.com/jupyterhub/configurable-http-proxy.git /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/configurable-http-proxy/configurable-http-proxy
+Cloning into '/mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/configurable-http-proxy/configurable-http-proxy'...
+Note: switching to 'd3e1ed34aa806683e7c24b5ce3c31abc1eb1d506'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
++ sed -i s#node:lts-alpine3.15#node:lts-alpine3.17#g /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/configurable-http-proxy/configurable-http-proxy/Dockerfile
++ DOCKER_BUILDKIT=1
++ docker build -t armdocker.rnd.ericsson.se/proj-mxe/jupyterhub/configurable-http-proxy:4.5.1-alpine3.17 /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/configurable-http-proxy/configurable-http-proxy
+#1 [internal] load .dockerignore
+#1 transferring context:
+#1 transferring context: 92B done
+#1 DONE 0.4s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 975B done
+#2 DONE 0.4s
+
+#3 [internal] load metadata for docker.io/library/node:lts-alpine3.17
+#3 DONE 1.4s
+
+#4 [internal] load build context
+#4 DONE 0.0s
+
+#5 [1/6] FROM docker.io/library/node:lts-alpine3.17@sha256:ca5d399560a9d239cbfa28eec00417f1505e5e108f3ec6938d230767eaa81f61
+#5 resolve docker.io/library/node:lts-alpine3.17@sha256:ca5d399560a9d239cbfa28eec00417f1505e5e108f3ec6938d230767eaa81f61 0.1s done
+#5 sha256:44aaf1ccc80eaed6572a0f2ef7d6b5a2982d54481e4255480041ac92221e2f11 1.16kB / 1.16kB done
+#5 sha256:6f44d13dd2586511d630d7708da1eaac09c05693d9e3e06f3f72206927d3201d 6.49kB / 6.49kB done
+#5 sha256:931b0e865bc24d4d3f7032c4a9b98b4790ee7bb8dcd0d2fd02e15e163d806034 0B / 47.48MB 0.1s
+#5 sha256:062e26bc2446cf92691255ec92cacfd68fdb24004e2b9343f416105b2f7d4966 0B / 450B 0.1s
+#5 sha256:ca5d399560a9d239cbfa28eec00417f1505e5e108f3ec6938d230767eaa81f61 1.43kB / 1.43kB done
+#5 ...
+
+#4 [internal] load build context
+#4 transferring context: 1.60MB 0.0s done
+#4 DONE 0.1s
+
+#5 [1/6] FROM docker.io/library/node:lts-alpine3.17@sha256:ca5d399560a9d239cbfa28eec00417f1505e5e108f3ec6938d230767eaa81f61
+#5 sha256:60542df8b663b3c876b9fd0ad8459ac628a50bd8684149e54c3dff2e44397f03 0B / 2.35MB 0.2s
+#5 sha256:931b0e865bc24d4d3f7032c4a9b98b4790ee7bb8dcd0d2fd02e15e163d806034 18.87MB / 47.48MB 0.4s
+#5 sha256:062e26bc2446cf92691255ec92cacfd68fdb24004e2b9343f416105b2f7d4966 450B / 450B 0.3s done
+#5 sha256:931b0e865bc24d4d3f7032c4a9b98b4790ee7bb8dcd0d2fd02e15e163d806034 31.46MB / 47.48MB 0.5s
+#5 sha256:60542df8b663b3c876b9fd0ad8459ac628a50bd8684149e54c3dff2e44397f03 2.35MB / 2.35MB 0.5s
+#5 sha256:931b0e865bc24d4d3f7032c4a9b98b4790ee7bb8dcd0d2fd02e15e163d806034 42.99MB / 47.48MB 0.6s
+#5 sha256:60542df8b663b3c876b9fd0ad8459ac628a50bd8684149e54c3dff2e44397f03 2.35MB / 2.35MB 0.5s done
+#5 sha256:931b0e865bc24d4d3f7032c4a9b98b4790ee7bb8dcd0d2fd02e15e163d806034 47.48MB / 47.48MB 0.7s
+#5 sha256:931b0e865bc24d4d3f7032c4a9b98b4790ee7bb8dcd0d2fd02e15e163d806034 47.48MB / 47.48MB 0.8s done
+#5 extracting sha256:931b0e865bc24d4d3f7032c4a9b98b4790ee7bb8dcd0d2fd02e15e163d806034
+#5 extracting sha256:931b0e865bc24d4d3f7032c4a9b98b4790ee7bb8dcd0d2fd02e15e163d806034 1.2s done
+#5 extracting sha256:60542df8b663b3c876b9fd0ad8459ac628a50bd8684149e54c3dff2e44397f03
+#5 extracting sha256:60542df8b663b3c876b9fd0ad8459ac628a50bd8684149e54c3dff2e44397f03 0.1s done
+#5 extracting sha256:062e26bc2446cf92691255ec92cacfd68fdb24004e2b9343f416105b2f7d4966 done
+#5 DONE 3.0s
+
+#6 [2/6] RUN apk add --no-cache jq curl
+#6 0.399 fetch https://dl-cdn.alpinelinux.org/alpine/v3.17/main/x86_64/APKINDEX.tar.gz
+#6 0.579 fetch https://dl-cdn.alpinelinux.org/alpine/v3.17/community/x86_64/APKINDEX.tar.gz
+#6 0.866 (1/7) Installing ca-certificates (20220614-r4)
+#6 0.891 (2/7) Installing brotli-libs (1.0.9-r9)
+#6 0.913 (3/7) Installing nghttp2-libs (1.51.0-r0)
+#6 0.924 (4/7) Installing libcurl (8.0.1-r0)
+#6 0.940 (5/7) Installing curl (8.0.1-r0)
+#6 0.953 (6/7) Installing oniguruma (6.9.8-r0)
+#6 0.968 (7/7) Installing jq (1.6-r2)
+#6 0.985 Executing busybox-1.35.0-r29.trigger
+#6 0.991 Executing ca-certificates-20220614-r4.trigger
+#6 1.054 OK: 13 MiB in 24 packages
+#6 DONE 1.9s
+
+#7 [3/6] RUN mkdir -p /srv/configurable-http-proxy
+#7 DONE 0.6s
+
+#8 [4/6] COPY . /srv/configurable-http-proxy/
+#8 DONE 0.2s
+
+#9 [5/6] WORKDIR /srv/configurable-http-proxy
+#9 DONE 0.2s
+
+#10 [6/6] RUN npm ci --production  && npm uninstall -g npm
+#10 0.884 npm WARN config production Use `--omit=dev` instead.
+#10 1.863 
+#10 1.863 added 39 packages, and audited 40 packages in 1s
+#10 1.863 
+#10 1.863 2 packages are looking for funding
+#10 1.863   run `npm fund` for details
+#10 1.865 
+#10 1.865 1 moderate severity vulnerability
+#10 1.865 
+#10 1.865 To address all issues, run:
+#10 1.865   npm audit fix
+#10 1.865 
+#10 1.865 Run `npm audit` for details.
+#10 1.866 npm notice 
+#10 1.866 npm notice New minor version of npm available! 9.5.1 -> 9.6.5
+#10 1.866 npm notice Changelog: <https://github.com/npm/cli/releases/tag/v9.6.5>
+#10 1.866 npm notice Run `npm install -g npm@9.6.5` to update!
+#10 1.866 npm notice 
+#10 31.14 
+#10 31.14 removed 235 packages in 29s
+#10 DONE 31.4s
+
+#11 exporting to image
+#11 exporting layers
+#11 exporting layers 0.6s done
+#11 writing image sha256:7ed0e601e1a75784b4eee01e1fc434a99850cf73c7b25808769f49c16cd79f25 done
+#11 naming to armdocker.rnd.ericsson.se/proj-mxe/jupyterhub/configurable-http-proxy:4.5.1-alpine3.17 0.0s done
+#11 DONE 0.6s
++ buildStatus=0
++ [[ 0 == 0 ]]
++ docker push armdocker.rnd.ericsson.se/proj-mxe/jupyterhub/configurable-http-proxy:4.5.1-alpine3.17
+The push refers to repository [armdocker.rnd.ericsson.se/proj-mxe/jupyterhub/configurable-http-proxy]
+f0bda4f97dbf: Preparing
+5f70bf18a086: Preparing
+53215659bf5a: Preparing
+f30b454801f6: Preparing
+27afe8b2c3fd: Preparing
+885a5d40fc11: Preparing
+1b6c3782871e: Preparing
+b0e46d71a47b: Preparing
+f1417ff83b31: Preparing
+885a5d40fc11: Waiting
+b0e46d71a47b: Waiting
+f1417ff83b31: Waiting
+1b6c3782871e: Waiting
+5f70bf18a086: Layer already exists
+885a5d40fc11: Layer already exists
+1b6c3782871e: Layer already exists
+b0e46d71a47b: Layer already exists
+f1417ff83b31: Layer already exists
+27afe8b2c3fd: Pushed
+f30b454801f6: Pushed
+53215659bf5a: Pushed
+f0bda4f97dbf: Pushed
+4.5.1-alpine3.17: digest: sha256:efd4c13d6a257ef739478b8ba0762937fa2870c7c6dc0a9a90cf15cb3480b1cf size: 2204
++ pushed=0
++ [[ 0 == 0 ]]
++ cleanup
++ [[ -d /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/configurable-http-proxy/configurable-http-proxy ]]
++ rm -rf /mnt/disk0/emataru/home/emataru/2.5/mxe-core/3pp-images/configurable-http-proxy/configurable-http-proxy

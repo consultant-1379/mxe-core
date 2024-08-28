@@ -1,0 +1,25 @@
+productName: "MXE"
+productNumber: "CXD 101 0220"
+
+images:
+  authorService:
+    productName: "MXE"
+    productNumber: "CXU 101 0058"
+    registry:  "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-author-service"
+    tag: "VERSION"
+  dbInit:
+    productName: "MXE"
+    productNumber: "CXU 101 0056"
+    registry:  "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-db-init"
+    tag: "VERSION"
+  kubernetes-modifier:
+    productName: "MXE"
+    productNumber: "CXU 101 0060"
+    registry:  "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-kubernetes-modifier"
+    tag: "VERSION"

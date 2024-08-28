@@ -1,0 +1,24 @@
+{{- if  (or .Values.config.argocd.ui.ingress.enabled .Values.ingress.enabled)  -}}
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+    name: {{ include "eric-mxe-deployer-service.pre-install-hook-authz-name" . | quote }}
+    namespace: {{ .Release.Namespace | quote }}
+    labels:
+        {{- $component := printf "%s" "app.kubernetes.io/component: pre-install-hook-authz-allow-deployer"  | fromYaml -}}
+        {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-deployer-service.pre-install-hook-authz-name" .)  | fromYaml -}}
+        {{- $labels := include "eric-mxe-deployer-service.labels" . | fromYaml -}}
+        {{- include "eric-mxe-deployer-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 8 }}
+    annotations:
+        {{- $hook := printf "%s" "helm.sh/hook: post-install,pre-upgrade"  | fromYaml -}}
+        {{- $hookDeletePolicy := printf "%s" "helm.sh/hook-delete-policy: before-hook-creation"  | fromYaml -}}
+        {{- $hookWeight := include "eric-mxe-deployer-service.hook-weight" 3 | fromYaml -}}
+        {{- $annotations := include "eric-mxe-deployer-service.annotations" . | fromYaml -}}
+        {{- include "eric-mxe-deployer-service.mergeAnnotations" (dict "location" .Template.Name "sources" (list $hook $hookDeletePolicy $hookWeight $annotations)) | trim | nindent 8 }}
+spec:
+    selector:
+        matchLabels:
+            app.kubernetes.io/component: ingress-controller
+            app.kubernetes.io/name: eric-mxe-ingress-controller
+    {{- include "eric-mxe-deployer-service.istio-authz-policy-rules-allow-deployer" . | nindent 4 }}
+{{- end }}

@@ -1,0 +1,353 @@
+/* Jenkins file for VA Dev Pipeline */
+def onlyDocModified = true
+def onlyGuiModified = true
+def rebuildIAM = false
+def SLAVE_NODE = null
+
+node(label: 'docker-weekly') {
+    stage('Nominating build node') {
+        SLAVE_NODE = "${NODE_NAME}"
+        echo "Executing build on ${SLAVE_NODE}"
+    }
+}
+pipeline {
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '200'))
+        copyArtifactPermission("mxe-core-va-dev-pipeline")
+    }
+
+    agent {
+        node {
+            label "${SLAVE_NODE}"
+        }
+    }
+
+    parameters {
+            
+        choice(
+          choices: ['Yes', 'No'],
+          description: 'Select Yes to include NMAP Scan in the VA pipeline',
+          name: 'Include_NMAP_Scan'
+        )
+        
+        choice(
+          choices: ['develop', 'master'],
+          description: 'Select branch to run VA pipeline',
+          name: 'BRANCH'
+        )
+        booleanParam(name: 'CLEANUP_SLAVE', defaultValue: true, description: 'Cleanup the slave after test')
+    }
+
+    environment {
+        GIT_AUTHOR_NAME = "mxecifunc"
+        GIT_AUTHOR_EMAIL = "PDLMMECIMM@pdl.internal.ericsson.com"
+        GIT_COMMITTER_NAME = "${USER}"
+        GIT_COMMITTER_EMAIL = "${GIT_AUTHOR_EMAIL}"
+        GERRIT_BRANCH = "${GIT_BRANCH}"
+        RELEASE = 'false'
+        GERRIT_CREDENTIALS_ID = 'gerrit-http-password-mxecifunc'
+        SKIP_COMPARISON_REPORT='false'
+        SCAN_REPORT_FOLDER=".bob/va-reports"
+        RULE_SET="ruleset2.0-va.yaml"
+        // TRIVY_IMAGE_TAG="latest"
+        // GRYPE_IMAGE_TAG="latest"
+        // GRYPE_DB_VERSION="${params.GRYPE_DB_VERSION}"
+        GOPATH = "${WORKSPACE}/.bob/gopath"
+        VERSION_PREFIX_FILE="VERSION_PREFIX_WEEKLY"
+        SCAN_REPORTS_DIR=".bob/scan-reports"
+        TLS_ENABLED="false"
+        ZAP_ENABLED = "true"
+        CREDENTIALS_XRAY_SELI_ARTIFACTORY = credentials('XRAY_SELI_ARTIFACTORY')
+        XRAY_USER = "${env.CREDENTIALS_XRAY_SELI_ARTIFACTORY_USR}"
+        XRAY_APIKEY = "${env.CREDENTIALS_XRAY_SELI_ARTIFACTORY_PSW}"
+        CREDENTIALS_SERO_ARTIFACTORY = credentials('mxecifunc-passwd')
+        SERO_ARTIFACTORY_REPO_USER = "${env.CREDENTIALS_SERO_ARTIFACTORY_USR}"
+        SERO_ARTIFACTORY_REPO_PASS = "${env.CREDENTIALS_SERO_ARTIFACTORY_PSW}"
+        SKIP_VALIDATE="false"
+    }
+
+    stages {
+        stage('Environment info') {
+            steps {
+                script{
+                    
+                    env.STABLE_MXE_VERSION = getLastSuccessfulMXEBuild()
+                }
+                echo "Params: "
+                echo "MXE_VERSION_TO_SCAN: ${env.STABLE_MXE_VERSION}"
+                sh 'printenv | sort'
+            }
+        }
+
+        stage('Prepare') {
+            steps {
+                sshagent(credentials: ['ssh-key-mxecifunc']) {
+                    sh 'git clean -xdff'
+                    sh 'git submodule sync'
+                    sh 'git submodule update --init --recursive'
+                }
+            }
+        }
+
+        stage('Init') {
+            steps {
+                
+                
+
+                withCredentials([
+                    string(credentialsId: 'arm-api-token-mxecifunc', variable: 'API_TOKEN'),
+                ]){
+                    
+                    sh "pipeline-scripts/run_rule.sh clean"
+                    sh './bob/bob init'
+                    sh "pipeline-scripts/run_rule.sh get-mxe-images ruleset2.0.yaml"
+                    sh 'pipeline-scripts/run_rule.sh init'
+                    sh "echo ${env.STABLE_MXE_VERSION} > .bob/var.version"
+                    sh './bob/bob init-dev:docker-helm-generic-settings-internal'
+                }
+
+             }
+        }
+        stage('Generate Image List'){
+            steps { 
+                sh 'pipeline-scripts/run_rule.sh  image-list'
+            }
+        }
+
+        stage('Scan Images') {
+            environment{
+                GITHUB_TOKEN=credentials("GITHUB_TOKEN")
+            }
+            stages {
+                stage("Trivy Scan"){
+                    steps {
+                        parallel(                          
+                            'Internal Images' : {
+                                sh 'pipeline-scripts/run_rule.sh trivy:scan-internal-images'
+                            },
+                            // '2pp Images' : {
+                            //     sh 'pipeline-scripts/run_rule.sh trivy:scan-2pp-images'
+                            // },
+                            '3pp Images' : {
+                                sh 'pipeline-scripts/run_rule.sh trivy:scan-3pp-images'
+                            }
+                        )
+                    }
+                }
+
+
+                stage("Anchore Inline Scan"){
+                    steps {
+                        parallel(
+                            'Internal Images' : {
+                                sh 'pipeline-scripts/run_rule.sh anchore:scan-internal-images'
+                            },
+                            // '2pp Images' : {
+                            //     sh 'pipeline-scripts/run_rule.sh anchore:scan-2pp-images'
+                            // },
+                            '3pp Images' : {
+                                sh 'pipeline-scripts/run_rule.sh anchore:scan-3pp-images'
+                            }
+                        )
+                    }
+                }
+
+                stage('Xray'){
+                    steps{
+                        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                            script {
+                                    sh 'pipeline-scripts/run_rule.sh fetch-xray-report:prepare-config'
+                                    sh 'pipeline-scripts/run_rule.sh fetch-xray-report:fetch-xray-report'
+                                    
+                            }
+                        }
+                    }
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts allowEmptyArchive: true, artifacts: '.bob/va-reports/trivy/*'
+                    archiveArtifacts allowEmptyArchive: true, artifacts: '.bob/va-reports/anchore/*'
+                    archiveArtifacts '.bob/va-reports/xray-reports/**/*'
+                }
+            } 
+        }
+
+
+        stage("Prepare essentials & cli"){
+            environment{
+                API_TOKEN=credentials("arm-api-token-mxecifunc")
+            }
+            steps {
+                script{
+                    sh './bob/bob offline-install-prep:get-essentials'
+                    sh './bob/bob offline-install-prep:get-cli'
+                }
+            }
+        }
+
+        stage('Kube Audit Scan') {
+            steps {
+                script{
+                    withEnv(['SKIP_VALIDATE=true','AUDIT_SCAN=true']){
+                        sh './bob/bob   generate-values-using-mxe-generate-linux:generate-values-files-for-ci'
+                    }  
+                }
+                sh 'pipeline-scripts/run_rule.sh kube-audit:prepare-kube-audit'
+                sh 'pipeline-scripts/run_rule.sh kube-audit:kube-audit'
+                archiveArtifacts allowEmptyArchive: true, artifacts: '.bob/va-reports/kube-audit-report/**/*'
+            }
+        }
+        stage('Lock k8s cluster') {
+            when {
+                expression { params.Include_NMAP_Scan == 'Yes' }
+            }
+            options {
+                // lock(resource: null, label: 'bob-ci-weekly', quantity: 1, variable: 'SYSTEM')
+
+                lock( 
+                    variable:'SYSTEM',
+                    resource:null,
+                    extra :(params.Include_NMAP_Scan == 'Yes'?[[label:'bob-ci-weekly',quantity:1]]:[])
+                )
+            }
+            environment {
+                KUBECONFIG = credentials("kubeconfig-${env.SYSTEM}")
+                TESTMXEENDPOINT = credentials("secure-mxeendpoint-${env.SYSTEM}")
+                TESTDEPLOYERENDPOINT = credentials("secure-deployerendpoint-${env.SYSTEM}")
+                TESTDEPLOYERAUTHENDPOINT = credentials("secure-oauthendpoint-${env.SYSTEM}")
+                GITOPS_REPO = credentials("secure-gitopsrepoendpoint-${env.SYSTEM}")
+                MXESECRETS = credentials("mxek8ssecrets-${env.SYSTEM}")
+                HELM_TOKEN=credentials("SERO_ARM_TOKEN")
+            }
+            stages {
+                stage('Print Cluster Info') {
+                    steps {
+                        echo "Target kubernetes system: ${env.SYSTEM}"
+                        sh './bob/bob test-cluster:print-info'
+                    }
+                }
+
+                stage('Helm Install') {
+                    
+                    steps {
+                        sh './bob/bob install-prequisite-helm-packages:pre-req'
+
+                        script {                           
+                                sh './bob/bob init-dev:docker-helm-generic-settings-internal'
+                                sh './bob/bob install-helm-charts'
+                                sh './bob/bob install-mxe-serving-package'
+                                sh './bob/bob install-optional-packages'
+                            }
+                    }
+                    post {
+                        unsuccessful {
+                            sh "./bob/bob collect-k8s-logs || true"
+                            archiveArtifacts allowEmptyArchive: true, artifacts: "k8s-logs/*"
+                            sh './bob/bob mxe-cleanup'
+                        }
+                    }
+                }
+
+                stage('Network Scans'){
+                    stages{
+                        stage('NMAP Scan'){
+                            when {
+                                expression { params.Include_NMAP_Scan == 'Yes' }
+                            }
+                            steps{
+                                sh 'pipeline-scripts/run_rule.sh nmap_scan:nmap-port-scan-for-mxe-deployer'
+                                sh 'pipeline-scripts/run_rule.sh nmap_scan:nmap-port-scan-for-mxe-components'
+                                sh 'pipeline-scripts/run_rule.sh nmap_scan:nmap-port-scan-for-mxe-commons'
+                                archiveArtifacts allowEmptyArchive: true, artifacts: '.bob/va-reports/nmap/**/*'
+                            }
+                        }
+                        
+                    }
+                    post {
+                        unsuccessful {
+                            // sh './bob/bob fetch-logs'
+                            // archiveArtifacts artifacts: 'logs/**', allowEmptyArchive: true
+                            sh './bob/bob mxe-cleanup'
+                        }
+                    }
+                }
+
+                stage('Cleanup'){
+                    steps{
+                        sh './bob/bob mxe-cleanup'
+                    }
+                }
+            }
+        }
+        stage('Generate Vulnerability report V2.0'){
+            steps {
+                catchError(buildResult: "SUCCESS",stageResult:"UNSTABLE" ){
+                    sh 'pipeline-scripts/run_rule.sh generate-va-report'
+                    sh 'cp html_report/html-va-report/*.html .bob/va-reports/'
+                }
+                catchError(buildResult: "SUCCESS",stageResult:"UNSTABLE" ){
+                    sh 'pipeline-scripts/run_rule.sh analyze:os-report'
+                }
+                
+                archiveArtifacts allowEmptyArchive: true, artifacts: '.bob/va-reports/*.md'
+                archiveArtifacts allowEmptyArchive: true, artifacts: '.bob/va-reports/*.xlsx'
+                archiveArtifacts allowEmptyArchive: true, artifacts: '.bob/va-reports/*.html'
+            }
+        }
+    }
+
+    post {
+        always {
+            timeout(time: 1, unit: 'HOURS') {
+                script {
+                    if ("${params.CLEANUP_SLAVE}".toString() == 'true') {
+                        parallel getCleanupJob(env.NODE_NAME)
+                    }
+                }
+            }
+        }
+        success {
+            emailext attachmentsPattern: "${env.SCAN_REPORT_FOLDER}/*.md",
+                body: "MXE VA Scan Build  ${currentBuild.fullDisplayName} is successful for MXE Version ${env.STABLE_MXE_VERSION} \n More info at: ${env.BUILD_URL}",
+                to: 'PDLMMECIMM@pdl.internal.ericsson.com',
+                subject: "MXE VA Scan Build is successful"
+        }
+        failure {     
+            mail to: 'PDLMMECIMM@pdl.internal.ericsson.com',
+                subject: "MXE VA Scan Failed",
+                body: "MXE VA Scan failed for ${currentBuild.fullDisplayName}, build URL: ${env.BUILD_URL}"
+        }
+    }
+}
+
+
+def getCleanupJob(slaveNodeName) {
+    def jobs = [:]
+    def slave = slaveNodeName
+    jobs[slave] = {
+        node(slave) {
+            stage(slave) {
+                lock(resource: slave) {
+                    sh '''docker rmi --force $(docker image ls | grep 'armdocker.rnd.ericsson.se/proj-' | awk '{print $3}')||true'''
+                    sh '''docker rmi --force $(docker images --quiet --filter dangling=true)||true'''
+                    sh '''docker system prune --force || true'''
+                }
+            }
+        }
+    }
+    jobs
+}
+def getLastSuccessfulMXEBuild() {
+    println("GERRIT_BRANCH env:" + env.GERRIT_BRANCH)
+    def pipelineName
+    if (params.BRANCH == 'develop') {
+        pipelineName = "mxe-core-dev-pipeline"
+    } else if (params.BRANCH == 'master') {
+        pipelineName = "mxe-core-master-pipeline"
+    }
+    def displayName = Jenkins.instance.getItem(pipelineName).lastSuccessfulBuild.displayName
+    println("Selected pipeline:" + pipeline )
+    println("Last Build:" + displayName )
+    return displayName.replaceAll("\\s", "")
+}

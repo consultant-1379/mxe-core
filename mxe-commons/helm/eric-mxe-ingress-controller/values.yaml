@@ -1,0 +1,113 @@
+# Default values for eric-mxe-ingress-controller.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+namespaceOverride: null
+serviceAccountNameOverride: null
+nameOverride: null
+electionIdOverride: null
+
+replicaCount: 2
+
+enabled: true
+
+labels: {}
+annotations: {}
+tolerations: []
+
+imageCredentials:
+  registry:
+    url:
+    pullSecret:
+  repoPath:
+  nginxIngressController:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "-"
+
+images:
+  nginxIngressController:
+    name: "controller"
+    tag: "v1.8.1-3.19.1"
+
+updateStrategy:
+  type: "RollingUpdate"
+  rollingUpdate:
+    maxUnavailable: 25%
+    maxSurge: 25%
+
+affinity:
+  podAntiAffinity: "soft"
+  topologyKey: "kubernetes.io/hostname"
+
+# DR-D1121-011 - Present in Top Level Helm Chart Values.yaml
+# global:
+#   registry:
+#     url: "armdocker.rnd.ericsson.se"
+#     pullSecret:
+#   mxeApiTlsSecretName:
+#   mxeApiHostname:
+#   mxeDisableDefaultIngressControllerUse: false
+#   labels: {}
+#   annotations: {}
+
+
+probes:
+  livenessProbe:
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      failureThreshold: 3
+      timeoutSeconds: 10
+      successThreshold: 1
+  readinessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      failureThreshold: 3
+      timeoutSeconds: 10
+      successThreshold: 1
+
+podPriority:
+  mxeIngressController:
+    priorityClassName:
+
+terminationGracePeriodSeconds: 30
+
+podDisruptionBudget:
+  minAvailable: 2
+
+resources:
+  ingressController:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+      ephemeral-storage: 25Mi
+    limits:
+      cpu: 3000m
+      memory: 6Gi
+      ephemeral-storage: 500Mi
+
+topologySpreadConstraints: [ ]
+
+serviceMesh:
+  enabled: true
+  tlsMode: ISTIO_MUTUAL
+
+# DR-D1123-127 -  ADP services shall define AppArmor profile
+appArmorProfile:
+  type:
+  localhostProfile:
+
+# ADP services shall define Seccomp profile
+seccompProfile:
+  type: RuntimeDefault
+  localhostProfile:
+
+nodeSelector: {}

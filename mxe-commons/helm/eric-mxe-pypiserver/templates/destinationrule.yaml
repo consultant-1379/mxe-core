@@ -1,0 +1,17 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ include "eric-mxe-pypiserver.fullname" . }}-dr
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: pypiserver"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-pypiserver.labels" . | fromYaml -}}
+    {{- include "eric-mxe-pypiserver.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-pypiserver.annotations" . | nindent 4 }}
+spec:
+  host: {{ include "eric-mxe-pypiserver.name" . }}
+  trafficPolicy:
+    tls:
+      mode: {{ include "eric-mxe-pypiserver.tlsMode" . }}
+{{- end }}

@@ -1,0 +1,227 @@
+{{- $global := fromJson (include "eric-mxe-gatekeeper.global" .) -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "eric-mxe-gatekeeper.name" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: gatekeeper"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-gatekeeper.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-gatekeeper.labels" . | fromYaml -}}
+    {{- include "eric-mxe-gatekeeper.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations: {{ include "eric-mxe-gatekeeper.annotations" . | nindent 4 }}
+spec:
+  replicas: {{ include "eric-mxe-gatekeeper.replicaCount" . }}
+  serviceName: {{ include "eric-mxe-gatekeeper.name" . | quote }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: "mxe"
+      app.kubernetes.io/component: "gatekeeper"
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+  template:
+    metadata:
+      labels:
+        {{- $component := printf "%s" "app.kubernetes.io/component: gatekeeper"  | fromYaml -}}
+        {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-gatekeeper.name" .)  | fromYaml -}}
+        {{- $labels := include "eric-mxe-gatekeeper.labels" . | fromYaml -}}
+        {{- $istioSidecarLabels := include "eric-mxe-gatekeeper.istio-sidecar-labels" . | fromYaml -}}
+        {{- include "eric-mxe-gatekeeper.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $istioSidecarLabels $labels )) | trim | nindent 8 }}
+      annotations:
+        {{- $istioSidecar := include "eric-mxe-gatekeeper.istio-sidecar-annotations" . | fromYaml -}}
+        {{- $proInfo := include "eric-mxe-gatekeeper.product-info" . | fromYaml -}}
+        {{- $securityAnn := include "eric-mxe-gatekeeper.security-annotations" . | fromYaml -}}
+        {{- $annotations := include "eric-mxe-gatekeeper.annotations" . | fromYaml -}}
+        {{- $prometheusAnn := include "eric-mxe-gatekeeper.prometheus-annotations" . | fromYaml -}}
+        {{- include "eric-mxe-gatekeeper.mergeAnnotations" (dict "location" .Template.Name "sources" (list $securityAnn $proInfo $istioSidecar $annotations $prometheusAnn)) | trim | nindent 8 }}
+    spec:
+      {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "eric-mxe-gatekeeper.topologySpreadConstraints" . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "eric-mxe-gatekeeper.serviceaccount" . | quote }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- if include "eric-mxe-gatekeeper.podPriority" . }}
+      priorityClassName: {{- include "eric-mxe-gatekeeper.podPriority" . | indent 2 }}
+      {{- end }}
+      initContainers:
+      {{- if .Values.isExtCA }}
+        - name: {{ printf "%s-%s" .Chart.Name "add-externalca" | trunc 63 | trimSuffix "-" }}
+          {{- with .Values.imageCredentials.gatekeeper }}
+          image: "{{ include "eric-mxe-gatekeeper.setImageRepo" (list $ .registry.url .repoPath "gatekeeper") }}{{ $.Values.images.gatekeeper.name }}:{{ $.Values.images.gatekeeper.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-gatekeeper.registryImagePullPolicy" (list . .Values.imageCredentials.gatekeeper.registry.imagePullPolicy) }}
+          {{- include "eric-mxe-gatekeeper.initcontainer-security-context" . | nindent 10 }}
+          command:
+          - sh
+          - -c
+          - |
+          {{- include "eric-mxe-gatekeeper.add-externalca-command" . | nindent 12 }}
+          {{- include "eric-mxe-gatekeeper.add-externalca-volume-mounts" . | nindent 10 }}
+          resources:
+            {{- toYaml .Values.resources.addExternalCa | trim | nindent 12 }}
+      {{- end }}
+      {{- if not .Values.global.serviceMesh.enabled }}
+        - name: {{ printf "%s-%s" .Chart.Name "init-db" | trunc 63 | trimSuffix "-" }}
+          {{- with .Values.imageCredentials.dbInit }}
+          image: "{{ include "eric-mxe-gatekeeper.setImageRepo" (list $ .registry.url .repoPath "dbInit") }}{{ $.Values.images.dbInit.name }}:{{ $.Values.images.dbInit.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-gatekeeper.registryImagePullPolicy" (list . .Values.imageCredentials.dbInit.registry.imagePullPolicy) }}
+          {{- include "eric-mxe-gatekeeper.init-db-security-context" . | nindent 10 }}
+          env:
+            - name: POSTGRESQL_SERVICE
+              value: {{ .Values.database.serviceName | trunc 63 | trimSuffix "-" }}
+            - name: POSTGRESQL_PORT_NAME
+              value: {{ .Values.database.portName }}
+            - name: POSTGRESQL_SUPERUSER_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.superUserSecretName }}
+                  key: {{ .Values.database.superUserIdKey }}
+            - name: POSTGRESQL_SUPERUSER_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.superUserSecretName }}
+                  key: {{ .Values.database.superUserPwdKey }}
+            - name: POSTGRESQL_CREATEDUSER_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-gatekeeper.secret-eric-sec-access-mgmt-creds" . | quote }}
+                  key: "pguserid"
+            - name: POSTGRESQL_CREATEDUSER_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-gatekeeper.secret-eric-sec-access-mgmt-creds" . | quote }}
+                  key: "pgpasswd"
+            - name: POSTGRESQL_DB
+              value: {{ include "eric-mxe-gatekeeper.db-name" . }}
+            {{- if .Values.database.connectionDb }}
+            - name: POSTGRESL_CONNECTION_DB
+              value: {{ .Values.database.connectionDb | quote }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources.dbInit | trim | nindent 12 }}
+          volumeMounts:
+            - mountPath: /home/dbinit/.postgresql
+              name: dbinit-postgres-sql-home
+      {{- end }}
+        - name: {{ printf "%s-%s" .Chart.Name "kubectl" | trunc 63 | trimSuffix "-" }}
+          {{- with (index .Values "imageCredentials" "kubernetes-modifier") }}
+          image: "{{ include "eric-mxe-gatekeeper.setImageRepo" (list $ .registry.url .repoPath "kubernetes-modifier") }}{{ index $.Values "images" "kubernetes-modifier" "name" }}:{{ index $.Values "images" "kubernetes-modifier" "tag" }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-gatekeeper.registryImagePullPolicy" (list . (index .Values "imageCredentials" "kubernetes-modifier" "registry" "imagePullPolicy")) }}
+          {{- include "eric-mxe-gatekeeper.initcontainer-security-context" . | nindent 10 }}
+          env:
+            - name: KEYCLOAK_STATEFULSET_NAME
+              value: {{ .Values.keycloak.statefulset.name | quote }}
+            - name: KEYCLOAK_STATEFULSET_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: KEYCLOAK_STATEFULSET_CONTAINER_NAME
+              value: {{ .Values.keycloak.statefulset.containerName | quote }}
+            - name: KEYCLOAK_SERVICE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-gatekeeper.secret-realm-master" . | quote }}
+                  key: "kcadminid"
+            - name: KEYCLOAK_SERVICE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-gatekeeper.secret-realm-master" . | quote }}
+                  key: "kcpasswd"
+            - name: SERVICE_MESH_MTLS_ENABLED
+              value: {{ .Values.global.serviceMesh.enabled | quote }}
+          resources:
+            {{- toYaml .Values.resources.kubernetesModifier | trim | nindent 12 }}
+          volumeMounts:
+            - mountPath: "/etc/kubernetes-run-script/"
+              name: keycloak-updater-script
+        - name: {{ printf "%s-%s" .Chart.Name "keycloak-init" | trunc 63 | trimSuffix "-" }}
+          {{- with .Values.imageCredentials.keycloakinit }}
+          image: "{{ include "eric-mxe-gatekeeper.setImageRepo" (list $ .registry.url .repoPath "keycloakinit") }}{{ $.Values.images.keycloakinit.name }}:{{ $.Values.images.keycloakinit.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-gatekeeper.registryImagePullPolicy" (list . .Values.imageCredentials.keycloakinit.registry.imagePullPolicy) }}
+          {{- include "eric-mxe-gatekeeper.initcontainer-security-context" . | nindent 10 }}
+          {{- include "eric-mxe-gatekeeper.keycloak-init-args-command" . | nindent 10 }}
+          env:
+            - name: GATEKEEPER_CONFIG_SERVICE_CONFIG_SECRET_NAME
+              value: {{ include "eric-mxe-gatekeeper.secret-config" . | quote }}
+            - name: KEYCLOAK_INIT_SERVICE_SERVER_URL
+              value: {{ include "eric-mxe-gatekeeper.keycloak-path" . | quote }}
+            - name: KEYCLOAK_INIT_SERVICE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-gatekeeper.secret-realm-master" . | quote }}
+                  key: "kcadminid"
+            - name: KEYCLOAK_INIT_SERVICE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-gatekeeper.secret-realm-master" . | quote }}
+                  key: "kcpasswd"
+            - name: REALM_NAME
+              value: "{{ .Values.keycloak.realm.mxe.realmName }}"
+            - name: REALM_REDIRECT_URL
+              value: "https://{{ .Values.global.mxeApiHostname }}*"
+            - name: REALM_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-gatekeeper.secret-realm-mxe" . | quote }}
+                  key: "username"
+            - name: REALM_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-gatekeeper.secret-realm-mxe" . | quote }}
+                  key: "password"
+            - name: REALM_TEMPORAL_USER
+              value: {{ include "eric-mxe-gatekeeper.realm-mxe-temporal-user" . | quote }}
+            - name: SERVICE_MESH_MTLS_ENABLED
+              value: {{ .Values.global.serviceMesh.enabled | quote }}
+            - name: KEYSTORE_FILE_PATH
+              value: "/tmp/server.keystore"
+            - name: TRUSTCA_FILE_PATH
+              value: "/tmp/castore"
+          {{- include "eric-mxe-gatekeeper.keycloak-init-volume-mounts" . | nindent 10 }}
+          resources:
+            {{- toYaml .Values.resources.keycloakInit | trim | nindent 12 }}
+      containers:
+      - name:  {{ include "eric-mxe-gatekeeper.name" . | quote }}
+        {{- with .Values.imageCredentials.gatekeeper }}
+        image: "{{ include "eric-mxe-gatekeeper.setImageRepo" (list $ .registry.url .repoPath "gatekeeper") }}{{ $.Values.images.gatekeeper.name }}:{{ $.Values.images.gatekeeper.tag }}"
+        {{- end }}
+        imagePullPolicy: {{ include "eric-mxe-gatekeeper.registryImagePullPolicy" (list . .Values.imageCredentials.gatekeeper.registry.imagePullPolicy) }}
+        {{- include "eric-mxe-gatekeeper.container-security-context" . | nindent 8 }}
+        ports:
+          - name: http
+            containerPort: 3000
+            protocol: TCP
+        args:
+        - --config=/run/secrets/conf/gatekeeper.yaml
+        {{- include "eric-mxe-gatekeeper.volume-mounts" . | nindent 8 }}
+        livenessProbe:
+          httpGet:
+            path: /oauth/health
+            port: http
+            scheme: HTTPS
+          initialDelaySeconds: {{ .Values.probes.gatekeeper.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.gatekeeper.livenessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.probes.gatekeeper.livenessProbe.failureThreshold }}
+          timeoutSeconds: {{ .Values.probes.gatekeeper.livenessProbe.timeoutSeconds }}
+        readinessProbe:
+          httpGet:
+            path: /oauth/health
+            port: http
+            scheme: HTTPS
+          initialDelaySeconds: {{ .Values.probes.gatekeeper.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.probes.gatekeeper.readinessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.probes.gatekeeper.readinessProbe.failureThreshold }}
+          timeoutSeconds: {{ .Values.probes.gatekeeper.readinessProbe.timeoutSeconds }}
+        resources:
+          {{- toYaml .Values.resources.gatekeeper | trim | nindent 12 }}
+      {{- include "eric-mxe-gatekeeper.tolerations" . | nindent 6 }}
+      tolerations: {{ include "eric-mxe-gatekeeper.merge-tolerations" (dict "root" . "podbasename" "eric-mxe-gatekeeper") | nindent 6}}       
+      {{- include "eric-mxe-gatekeeper.volumes" . | nindent 6 }}
+      {{- include "eric-mxe-gatekeeper.image-pull-secrets" . | nindent 6 }}
+      {{- if (or .Values.nodeSelector $global.nodeSelector) }}
+      nodeSelector: {{- include "eric-mxe-gatekeeper.nodeSelector" . | nindent 8 }}
+      {{- end }}
+      affinity:
+        podAntiAffinity:
+          {{- include "eric-mxe-gatekeeper.podAntiAffinityType" . | indent 8}}

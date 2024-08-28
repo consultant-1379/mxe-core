@@ -1,0 +1,721 @@
+@font-face {
+	font-family: "Ericsson Hilda";
+	src: url("font/EricssonHilda-Medium.eot");
+	src: url("font/EricssonHilda-Medium.woff") format("woff"),
+		url("font/EricssonHilda-Medium.otf") format("opentype");
+}
+
+
+
+.login-pf body {
+	background-color: #242424;
+	color: #f2f2f2;
+	font-family: "Ericsson Hilda", Helvetica, Arial, sans-serif;
+}
+
+.alert-error {
+	background-color: #242424;
+	color: #f2f2f2;
+        font-family: "Ericsson Hilda", Helvetica, Arial, sans-serif;
+        padding-bottom: 10px;
+        position: relative;
+        top: -20px;
+}
+
+#kc-locale ul {
+	display: none;
+	position: absolute;
+	background-color: #fff;
+	list-style: none;
+	right: 0;
+	top: 20px;
+	min-width: 100px;
+	padding: 2px 0;
+	border: solid 1px #bbb;
+}
+
+#kc-locale:hover ul {
+	display: block;
+	margin: 0;
+}
+
+#kc-locale ul li a {
+	display: block;
+	padding: 5px 14px;
+	color: #000 !important;
+	text-decoration: none;
+	line-height: 20px;
+}
+
+#kc-locale ul li a:hover {
+	color: #4d5258;
+	background-color: #d4edfa;
+}
+
+#kc-locale-dropdown a {
+	color: #4d5258;
+	background: 0 0;
+	padding: 0 15px 0 0;
+	font-weight: 300;
+}
+
+#kc-locale-dropdown a:hover {
+	text-decoration: none;
+}
+
+a#kc-current-locale-link {
+	display: block;
+	padding: 0 5px;
+}
+
+/* a#kc-current-locale-link:hover {
+    background-color: rgba(0,0,0,0.2);
+} */
+a#kc-current-locale-link::after {
+	content: "\2c5";
+	margin-left: 4px;
+}
+
+.login-pf .container {
+	padding-top: 40px;
+}
+
+.login-pf a:hover {
+	color: #0099d3;
+}
+
+#kc-logo {
+	width: 100%;
+}
+
+div.kc-logo-text span {
+	display: none;
+}
+
+#kc-content {
+	width: 100%;
+        max-height: 600px;
+}
+
+/* #kc-content-wrapper {
+    overflow-y: hidden;
+} */
+#kc-info {
+     top: -25px;
+     position: relative;
+     color: #f2f2f2;
+     font-family: "Ericsson Hilda", Helvetica, Arial, sans-serif;
+}
+
+#kc-info-wrapper {
+	font-size: 13px;
+        width: 50%;
+        text-align: justify;
+        padding-left: 5px;
+}
+
+#kc-form-options span {
+	display: block;
+}
+
+#kc-form-options .checkbox {
+	margin-top: 0;
+	color: #72767b;
+}
+
+#kc-terms-text {
+	margin-bottom: 20px;
+}
+
+#kc-registration {
+	margin-bottom: 15px;
+}
+
+/* TOTP */
+ol#kc-totp-settings {
+	position: relative;
+	left: -50%;
+	top: 80px;
+}
+
+ul#kc-totp-supported-apps {
+	margin-bottom: 10px;
+}
+
+#kc-totp-secret-qr-code {
+	max-width: 150px;
+	max-height: 150px;
+}
+
+#kc-totp-secret-key {
+	background-color: #242424;
+	color: #f2f2f2;
+	font-size: 16px;
+	padding: 10px 0;
+}
+
+/* OAuth */
+#kc-oauth h3 {
+	margin-top: 0;
+}
+
+#kc-oauth ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+#kc-oauth ul li {
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	font-size: 12px;
+	padding: 10px 0;
+}
+
+#kc-oauth ul li:first-of-type {
+	border-top: 0;
+}
+
+#kc-oauth .kc-role {
+	display: inline-block;
+	width: 50%;
+}
+
+/* Code */
+#kc-code textarea {
+	width: 100%;
+	height: 8em;
+}
+
+/* Social */
+#kc-social-providers ul {
+	padding: 0;
+}
+
+#kc-social-providers li {
+	display: block;
+}
+
+#kc-social-providers li:first-of-type {
+	margin-top: 0;
+}
+
+.zocial, a.zocial {
+	width: 100%;
+	font-weight: normal;
+	font-size: 14px;
+	text-shadow: none;
+	border: 0;
+	background: #f5f5f5;
+	color: #72767b;
+	border-radius: 0;
+	white-space: normal;
+}
+
+.zocial:before {
+	border-right: 0;
+	margin-right: 0;
+}
+
+.zocial span:before {
+	padding: 7px 10px;
+	font-size: 14px;
+}
+
+.zocial:hover {
+	background: #ededed !important;
+}
+
+.zocial.facebook, .zocial.github, .zocial.google, .zocial.microsoft,
+	.zocial.stackoverflow, .zocial.linkedin, .zocial.twitter {
+	background-image: none;
+	border: 0;
+	box-shadow: none;
+	text-shadow: none;
+}
+
+.login-pf-social-section hr {
+    width: 50%;
+    margin: 0px;
+    border: 1px solid gray;
+}
+
+/* Copy of zocial windows classes to be used for microsoft's social provider button */
+.zocial.microsoft:before {
+	content: "\f15d";
+}
+
+.zocial.stackoverflow:before {
+	color: inherit;
+}
+
+.card-pf form.form-actions .btn {
+	float: right;
+	margin-left: 10px;
+}
+
+#kc-form-buttons {
+	margin-top: 40px;
+}
+
+.login-pf-page .login-pf-brand {
+	margin-top: 20px;
+	max-width: 360px;
+	width: 40%;
+}
+
+.card-pf {
+	background: #242424;
+	max-width: 500px;
+	left: 50%;
+	position: relative;
+	margin-left: -130px;
+}
+
+
+.login-pf-page .login-pf-signup {
+	font-size: 15px;
+	color: #72767b;
+}
+
+#kc-content-wrapper .row {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+
+.login-pf-page .login-pf-social-link {
+	margin-bottom: 25px;
+}
+
+.login-pf-page .login-pf-social-link a {
+	padding: 2px 0;
+}
+
+.login-pf-page.login-pf-page-accounts {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.login-pf-page .btn-primary {
+	margin-top: 0;
+}
+
+/********* CUSTOMIZE BASE LOGIN FORM STYLES ***************/
+
+/* label change Username, Password text*/
+div#kc-form label {
+	display: block;
+	font-size: 15px;
+	position: relative;
+	top: 70px;
+        font-family: "Ericsson Hilda", Helvetica, sans-serif;
+        color:#fefefe;
+}
+
+/* PASSWORD LABEL MODIFICATION */
+div#kc-form label.eric-pwd-custom-label-class {
+	display: block;
+	font-size: 15px;
+	width: 100%;
+	margin: 0 auto;
+	position: relative;
+	top: 30px;
+}
+
+/* custom title settings*/
+h1#kc-page-title {
+	Font-size: 25px;
+}
+
+input#username.form-control {
+	border: 1px solid gray;
+	width: 50%;
+	top: 40px;
+	position: relative;
+	background: #242424;
+	height: 40px;
+	color: #f2f2f2;
+	padding-left: 10px;
+	font-family: "Ericsson Hilda", Helvetica, sans-serif;
+	transition: 0.3s;
+}
+
+/* Fix for first-login-form username overlap */
+#kc-update-profile-form input#username.form-control {
+    top: unset;
+}
+
+input#password.form-control {
+	border: 1px solid gray;
+	width: 50%;
+	top: 50px;
+	position: relative;
+	background-color: #242424;
+	height: 40px;
+	color: #f2f2f2;
+	padding-left: 10px;
+	letter-spacing: 1px;
+	font-family: "Ericsson Hilda", Helvetica, Arial, sans-serif;
+	transition: 0.3s;
+}
+
+input#password.form-control-active {
+	border: 1px solid #A56EBE;
+	width: 50%;
+	top: 50px;
+	position: relative;
+	background-color: #242424;
+	height: 40px;
+	color: #f2f2f2;
+	padding-left: 10px;
+	letter-spacing: 1px;
+	font-family: "Ericsson Hilda", Helvetica, Arial, sans-serif;
+	border-radius: 3px;
+	transition: 0.3s;
+	border-left: 3px solid #dc2d37 !important;
+}
+
+input#username.form-control-active {
+	border: 1px solid #A56EBE;
+	width: 50%;
+	top: 40px;
+	position: relative;
+	background-color: #242424;
+	height: 40px;
+	color: #f2f2f2;
+	padding-left: 10px;
+	font-family: "Ericsson Hilda", Helvetica, sans-serif;
+	transition: 0.3s;
+	border-left: 3px solid #dc2d37 !important;
+}
+
+
+/* Footer Info Message */
+div#kc-ericsson-warn-msg {
+font-size: 15px;
+color: #f2f2f2;
+font-family: "Ericsson Hilda", Helvetica, Arial, sans-serif;
+width: 400px;
+margin-left: -180px;
+position: relative;
+left: 50%;
+margin-top: -20px;
+}
+
+div#kc-ericsson-copyright-msg {
+	font-size: 16px;
+        position: absolute;
+        color: #f2f2f2;
+        left: 50%;
+        font-family: "Ericsson Hilda", Helvetica, Arial, sans-serif;
+        width: 300px;
+       text-align: center;
+       margin-left: -150px;
+       opacity: 0.4;
+       bottom: 80px;
+}
+
+div#kc-ericsson-copyright-perm {
+	font-size: 16px;
+	position: absolute;
+	color: #f2f2f2;
+	left: 50%;
+	font-family: "Ericsson Hilda", Helvetica, Arial, sans-serif;
+	word-wrap: break-word;
+	width: 400px;
+	text-align: center;
+	opacity: .4;
+	margin-left: -200px;
+	bottom: 40px;
+}
+
+div#kc-ericsson-warn-legal-notice {
+	font-size: 15px;
+	top: 4px;
+	color: #f2f2f2;
+	font-family: "Ericsson Hilda", Helvetica, Arial, sans-serif;
+	position: relative;
+        width: 500px;
+        left: 50%;
+        margin-left: -220px;
+}
+
+div#eric-product-name {
+	white-space: pre-wrap;
+	white-space: -moz-pre-wrap;
+	white-space: -pre-wrap;
+	white-space: -o-pre-wrap;
+	word-wrap: break-word;
+	width: 100px;
+	margin-left: 110px;
+	font-size: 16px;
+	display: block;
+	color: #f2f2f2;
+	font-family: "Ericsson Hilda", Helvetica, Arial, sans-serif;
+	margin-top: -35px;
+}
+
+a {
+	color: #f2f2f2;
+	text-decoration-line: underline;
+	text-decoration-style: dashed;
+	padding-bottom: 1px;
+}
+
+/************************************/
+/************************************/
+/* CUSTOM MESSAGE STYLES*/
+div#pre.eric-pre-message-style {
+	width: 98vw;
+	height: 98vh;
+	position: absolute;
+	background: white;
+	overflow: scroll;
+	z-index: 999;
+}
+
+div.eric-message-container {
+	overflow: auto;
+	width: 500px;
+	height: 400px;
+	position: absolute;
+	background: #4E4E4E;
+	z-index: 99999;
+	margin-left: -250px;
+	margin-top: -200px;
+	padding: 1em;
+	color: #ffffff;
+	font-family: "Ericsson Hilda", Helvetica, Arial, sans-serif;
+	font-size: 16px;
+	top: 50%;
+	left: 50%;
+}
+
+span.eric-confirm-button {
+	position: absolute;
+	border-radius: 3px;
+	color: white;
+	font-size: 15px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	text-align: center;
+	font-family: "Ericsson Hilda", Helvetica, sans-serif;
+	background-color: #1174e6;
+	border: 1px solid #1174e6;
+	width: 100px;
+	display: block;
+	cursor: pointer;
+        right: 1em;
+        bottom: 1em;
+}
+
+div#legal_notice.eric-legal-notice {
+     width: 500px;
+     height: 400px;
+     position: absolute;
+     background-color: #4E4E4E;;
+     z-index: 99999;
+     margin-left: -250px;
+     margin-top: -200px;
+     padding: 1em;
+     color: #ffffff;
+     font-family: "Ericsson Hilda", Helvetica, Arial, sans-serif;
+     font-size: 16px;
+     top: 50%;
+     left: 50%;
+}
+
+div#kc-header-wrapper {
+	background-image: url(../img/ericsson-logo-transp_v6.png);
+	background-repeat: no-repeat;
+	height: 110px;
+	margin-left: 110px;
+	margin-top: 110px;
+	background-position: -50px -20px;
+}
+
+p.instruction {
+	font-family: "Ericsson Hilda", Helvetica, sans-serif;
+	margin-bottom: 40px;
+	color: #f2f2f2;
+}
+
+input.form-control {
+	border: 1px solid gray;
+	width: 50%;
+	position: relative;
+	background-color: #242424;
+	height: 40px;
+	color: #f2f2f2;
+	padding-left: 10px;
+	letter-spacing: 1px;
+	font-family: "Ericsson Hilda", Helvetica, Arial, sans-serif;
+}
+
+div.btn.btn-primary.btn-block.btn-lg {
+	border-radius: 3px;
+	box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
+	color: white;
+	font-size: 15px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	margin-top: 3em;
+	width: 53%;
+	text-align: center;
+	font-family: "Ericsson Hilda", Helvetica, sans-serif;
+	background-color: #1174e6;
+	border: 1px solid #1174e6;
+	margin-bottom: 38px;
+	cursor: pointer;
+}
+
+a#forgot-password-link {
+        top: 70px;
+        position: relative;
+        left: 5px;
+        font-family: "Ericsson Hilda", Helvetica, sans-serif;
+}
+
+input.btn.btn-primary.btn-block.btn-lg {
+	border-radius: 3px;
+	box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
+	color: white;
+	font-size: 15px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	margin-top: 5em;
+	width: 53%;
+	text-align: center;
+	font-family: "Ericsson Hilda", Helvetica, sans-serif;
+	background-color: #1174e6;
+	border: 1px solid #1174e6;
+	margin-bottom: 38px;
+	cursor: pointer;
+}
+
+input#register_button.btn.btn-primary.btn-block.btn-lg {
+	border-radius: 3px;
+	box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
+	color: white;
+	font-size: 15px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	margin-top: 0.1em;
+	width: 53%;
+	text-align: center;
+	font-family: "Ericsson Hilda", Helvetica, sans-serif;
+	background-color: #1174e6;
+	border: 1px solid #1174e6;
+	margin-bottom: 38px;
+	cursor: pointer;
+}
+
+form#kc-register-form.form-horizontal {
+	color: white;
+	font-family: "Ericsson Hilda", Helvetica, sans-serif;
+	font-size: 16px;
+}
+
+label#form_login_username_label {
+	left: 10px;
+    	color: #f2f2f2;
+    	font-size: 16px;
+    	background-color: #242424;
+    	width: 100px;
+	z-index:9999;
+	font-family: "Ericsson Hilda", Helvetica, sans-serif;
+	transition: 0.2s;
+}
+
+label#form_login_password_label.normal_q {
+   z-index: 999;
+   top: 80px;
+   padding-left: 10px;
+   width: 100px;
+   font-family: "Ericsson Hilda", Helvetica, sans-serif;
+   font-size: 15px;
+   transition: 0.2s;
+}
+
+label#form_login_password_label.active {
+   z-index: 999;
+   top: 65px;
+   padding-left: 10px;
+   width: 100px; 
+   font-family: "Ericsson Hilda", Helvetica, sans-serif;
+   font-size: 10px;
+}
+
+label#form_login_username_label.active{
+	top: 55px;
+	font-size: 10px;
+	font-family: "Ericsson Hilda", Helvetica, sans-serif;
+}
+
+/** PASSWORD RESET**/
+label.control-label {
+	color: white;
+	top: 30px;
+        font-family: "Ericsson Hilda", Helvetica, sans-serif;
+}
+
+label#reset-password-label.control-label {
+	position: relative;
+}
+
+span.kc-feedback-text {
+	color: #f2f2f2;
+	position: relative;
+	top: 30px;
+	max-width: 500px;
+	display: inline-block;
+	font-family: "Ericsson Hilda", Helvetica, sans-serif;
+	font-size: 16px;
+	left: -100px;
+}
+
+a#reset-pwd-link-return {
+	top: 60px;
+	position: relative;
+}
+
+html.login-pf body div.login-pf-page div.card-pf div#kc-content div#kc-content-wrapper form#kc-totp-settings-form.form-horizontal {
+	position: relative;
+	left: 300px;
+	top: -250px;
+}
+
+html.login-pf body div.login-pf-page div.card-pf div#kc-content div#kc-content-wrapper form#kc-totp-settings-form.form-horizontal input#saveTOTPBtn.btn.btn-primary.btn-block.btn-lg {
+	border-radius: 3px;
+	box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.5);
+	color: white;
+	font-size: 15px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	margin-top: 5em;
+	width: 53%;
+	text-align: center;
+	font-family: "Ericsson Hilda", Helvetica, sans-serif;
+	background-color: #1174e6;
+	border: 1px solid #1174e6;
+	margin-bottom: 38px;
+	cursor: pointer;
+	top: -50px;
+	position: relative;
+}
+
+html.login-pf body div.login-pf-page div.card-pf div#kc-content div#kc-content-wrapper form#kc-otp-login-form.form-horizontal div#eric-totp-insert-pass-one-time-group.form-group {
+	position: relative;
+	top: 100px;
+}
+
+/** MXE Styles update **/
+.mxe-update-pwd-form {
+	margin-top: 5em;
+}
+
+/** MXE Styles update **/
+.mxe-update-pwd-button {
+	margin-top: -24px !important;
+}
+

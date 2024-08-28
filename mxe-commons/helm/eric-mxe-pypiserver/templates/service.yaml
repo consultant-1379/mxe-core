@@ -1,0 +1,25 @@
+{{- if .Values.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "eric-mxe-pypiserver.name" . }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: pypiserver"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-pypiserver.labels" . | fromYaml -}}
+    {{- include "eric-mxe-pypiserver.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-pypiserver.annotations" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  {{- include "eric-mxe-pypiserver.ipFamilies" . | nindent 2 }}
+  clusterIP: None
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "pypiserver"
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+{{- end }}

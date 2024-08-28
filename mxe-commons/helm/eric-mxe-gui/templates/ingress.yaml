@@ -1,0 +1,35 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "eric-mxe-gui.fullname" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: eric-mxe-gui-ingress"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-gui.labels" . | fromYaml -}}
+    {{- include "eric-mxe-gui.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $annotations := include "eric-mxe-gui.annotations" . | fromYaml -}}
+    {{- $ingressAnn := include "eric-mxe-gui.ingress-annotations" . | fromYaml -}}
+    {{- include "eric-mxe-gui.mergeAnnotations" (dict "location" .Template.Name "sources" (list $ingressAnn $annotations)) | trim | nindent 4 }}
+spec:
+  ingressClassName: {{ include "eric-mxe-gui.ingress-class" . | quote }}
+  defaultBackend:
+    service:
+      name: {{ include "eric-mxe-gui.defaultbackend" . | quote }}
+      port:
+        name: "http"
+  {{- include "eric-mxe-gui.ingress-tls" . | nindent 2 -}}
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ include "eric-mxe-gui.fullname" . | quote }}
+                port:
+                  name: "http"
+      {{- if or .Values.global.mxeApiHostname .Values.ingress.hostname }}
+      host: {{ default .Values.global.mxeApiHostname .Values.ingress.hostname | quote }}
+      {{- end }}
+{{ end }}

@@ -1,0 +1,82 @@
+/* style goes here */
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
+.content .section {
+  background: var(--card-color-background, var(--card-color-background, #fafafa));
+  padding: var(--space-xl);
+  margin-bottom: var(--space-base);
+}
+
+.content .section .title {
+  font-size: 16px;
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  color: var(--text);
+}
+
+.content .section {
+  margin-bottom: 28px;
+}
+
+.title {
+  margin-bottom: 16px;
+}
+
+.content .section .subtitle {
+  opacity: 0.6;
+  font-size: 12px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  color: var(--text);
+}
+
+.content .package-info .container {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: 300px repeat(2, 1fr);
+  grid-template-areas: 'image info-table info-table' 'image description description';
+}
+
+.content .package-info .container img {
+  grid-area: image;
+}
+
+.content .package-info .container .info-table {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-area: info-table;
+  grid-row-gap: 24px;
+}
+
+.content .package-info .container .description {
+  grid-area: description;
+}
+
+.info-table .cell-title {
+  opacity: 0.6;
+  font-size: 14px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.info-table {
+  margin-bottom: 16px;
+}

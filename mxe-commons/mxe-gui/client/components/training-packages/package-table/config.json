@@ -1,0 +1,7 @@
+{
+  "script": "package-table/PackageTable",
+  "id": "PackageTable",
+  "dependencies": {
+    "@eui/lit-component": "0.8.2"
+  }
+}

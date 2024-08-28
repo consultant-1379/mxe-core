@@ -1,0 +1,410 @@
+{{- $global := fromJson (include "eric-mxe-model-catalogue-service.global" .) -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "eric-mxe-model-catalogue-service.name" . }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: model-catalogue-service"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-model-catalogue-service.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-model-catalogue-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-model-catalogue-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-model-catalogue-service.annotations" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: "mxe"
+      app.kubernetes.io/component: "model-catalogue-service"
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+  {{- include "eric-mxe-model-catalogue-service.update-strategy" . | nindent 2 }}
+  template:
+    metadata:
+      labels:
+        {{- $component := printf "%s" "app.kubernetes.io/component: model-catalogue-service"  | fromYaml -}}
+        {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-model-catalogue-service.name" .)  | fromYaml -}}
+        {{- $istioLabels := include "eric-mxe-model-catalogue-service.istio-sidecar-labels" . | fromYaml -}}
+        {{- $labels := include "eric-mxe-model-catalogue-service.labels" . | fromYaml -}}
+        {{- include "eric-mxe-model-catalogue-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $istioLabels $labels )) | trim | nindent 8 }}
+      annotations:
+        {{- $annotations := include "eric-mxe-model-catalogue-service.annotations" . | fromYaml -}}
+        {{- $istioAnn := include "eric-mxe-model-catalogue-service.istio-sidecar-annotations" . | fromYaml -}}
+        {{- $productInfoAnn := include "eric-mxe-model-catalogue-service.product-info" . | fromYaml -}}
+        {{- $prometheusAnn := include "eric-mxe-model-catalogue-service.prometheus-annotations" . | fromYaml -}}
+        {{- $securityAnn := include "eric-mxe-model-catalogue-service.security-annotations" . | fromYaml -}}
+        {{- include "eric-mxe-model-catalogue-service.mergeAnnotations" (dict "location" .Template.Name "sources" (list $annotations $istioAnn $productInfoAnn $prometheusAnn $securityAnn)) | trim | nindent 8 }}
+    spec:
+      {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "eric-mxe-model-catalogue-service.topologySpreadConstraints" . | trim | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "eric-mxe-model-catalogue-service.serviceaccount" . | quote }}
+      {{- if include "eric-mxe-model-catalogue-service.podPriority" . }}
+      priorityClassName: {{- include "eric-mxe-model-catalogue-service.podPriority" . | indent 2 }}
+      {{- end }}
+      initContainers:
+        - name: init-cacerts
+          # Since CBO image does not include java-certs or jdk, author-service image is being pulled in for a copy of system wide java-certs.
+          {{- with .Values.imageCredentials.modelService }}
+          image: "{{ include "eric-mxe-model-catalogue-service.setImageRepo" (list $ .registry.url .repoPath "modelService") }}{{ $.Values.images.modelService.name }}:{{ $.Values.images.modelService.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-model-catalogue-service.registryImagePullPolicy" (list . (index .Values "imageCredentials" "modelService" "registry" "imagePullPolicy")) }}
+          command:
+            - bash
+            - -c
+            - |
+              cp /var/lib/ca-certificates/java-cacerts /cacerts/
+              chmod u+w /cacerts/java-cacerts
+              keytool -noprompt -importcert -alias startssl -keystore /cacerts/java-cacerts -storepass changeit -file /run/secrets/iam-ca-cert/ca.crt
+          {{- include "eric-mxe-model-catalogue-service.init-certs-mtls" . | nindent 14 }}
+          {{- include "eric-mxe-model-catalogue-service.add-externalca-command" . | nindent 14 }}
+          volumeMounts:
+            - name: cacerts
+              mountPath: /cacerts
+            - name: iam-ca-cert
+              mountPath: /run/secrets/iam-ca-cert
+            - name: tmp
+              mountPath: /tmp
+          {{- include "eric-mxe-model-catalogue-service.init-certs-mtls-volume-mounts" . | nindent 12 }}
+          {{- include "eric-mxe-model-catalogue-service.add-externalca-volume-mounts" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources.initCacerts | trim | nindent 12 }}
+          {{- include "eric-mxe-model-catalogue-service.init-security-context" . | nindent 10 }}
+            runAsUser: 1111
+        - name: {{ printf "%s-%s" .Chart.Name "kubectl" | trunc 63 | trimSuffix "-" }}
+          {{- with (index .Values "imageCredentials" "kubernetes-modifier") }}
+          image: "{{ include "eric-mxe-model-catalogue-service.setImageRepo" (list $ .registry.url .repoPath "kubernetes-modifier") }}{{ index $.Values "images" "kubernetes-modifier" "name" }}:{{ index $.Values "images" "kubernetes-modifier" "tag" }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-model-catalogue-service.registryImagePullPolicy" (list . (index .Values "imageCredentials" "modelService" "registry" "imagePullPolicy")) }}
+          env:
+            - name: KEYCLOAK_STATEFULSET_NAME
+              value: {{ .Values.keycloak.statefulset.name | quote }}
+            - name: KEYCLOAK_STATEFULSET_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            {{- toYaml .Values.resources.kubernetesModifier | trim | nindent 12 }}
+          {{- include "eric-mxe-model-catalogue-service.kubectl-security-context" . | nindent 10 }}
+          volumeMounts:
+            - mountPath: "/etc/kubernetes-run-script/"
+              name: wait-for-keycloak-script
+        {{ if .Values.database.create -}}
+        - name: {{ printf "%s-%s" .Chart.Name "init-db" | trunc 63 | trimSuffix "-" }}
+          {{- with .Values.imageCredentials.dbInit }}
+          image: "{{ include "eric-mxe-model-catalogue-service.setImageRepo" (list $ .registry.url .repoPath "dbInit") }}{{ $.Values.images.dbInit.name }}:{{ $.Values.images.dbInit.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-model-catalogue-service.registryImagePullPolicy" (list . .Values.imageCredentials.dbInit.registry.imagePullPolicy) }}
+          {{ include "eric-mxe-model-catalogue-service.db-init-args-command" . | nindent 10 }}
+          env:
+            - name: POSTGRESQL_SERVICE
+              value: {{ .Values.database.serviceName | trunc 63 | trimSuffix "-" }}
+            - name: POSTGRESQL_PORT_NAME
+              value: {{ .Values.database.portName }}
+            - name: POSTGRESQL_SUPERUSER_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.superUserSecretName }}
+                  key: {{ .Values.database.superUserIdKey }}
+            - name: POSTGRESQL_SUPERUSER_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.superUserSecretName }}
+                  key: {{ .Values.database.superUserPwdKey }}
+            - name: POSTGRESQL_CREATEDUSER_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.db-custom-user-secret-name" . }}
+                  key: {{ .Values.database.customUserIdKey }}
+            - name: POSTGRESQL_CREATEDUSER_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.db-custom-user-secret-name" . }}
+                  key: {{ .Values.database.customUserPwdKey }}
+            - name: POSTGRESQL_DB
+              value: {{ include "eric-mxe-model-catalogue-service.db-name" . }}
+            {{- if .Values.database.connectionDb }}
+            - name: POSTGRESL_CONNECTION_DB
+              value: {{ .Values.database.connectionDb | quote }}
+            {{- end }}
+            {{- include "eric-mxe-model-catalogue-service.db-init-env" . | nindent 12 -}}
+          {{- include "eric-mxe-model-catalogue-service.db-init-volume-mounts" . | nindent 10 }}
+          resources:
+            {{- toYaml .Values.resources.dbInit | trim | nindent 12 }}
+          {{- include "eric-mxe-model-catalogue-service.dbinit-security-context" . | nindent 10 }}
+        {{ end }}
+        - name: minio-model-source-service-config
+          {{- with (index .Values "imageCredentials" "minio-cli") }}
+          image: "{{ include "eric-mxe-model-catalogue-service.setImageRepo" (list $ .registry.url .repoPath "minio-cli") }}{{ index $.Values "images" "minio-cli" "name" }}:{{ index $.Values "images" "minio-cli" "tag" }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-model-catalogue-service.registryImagePullPolicy" (list . (index .Values "images" "minio-cli" "pullPolicy")) }}
+          command: ["/bin/sh", "/etc/init-script/init.sh"]
+          volumeMounts:
+          - mountPath: "/etc/init-script/"
+            name: minio-init-script
+          - mountPath: /run/secrets/config
+            name: minio-configuration
+          {{ include "eric-mxe-model-catalogue-service.minio-init-volume-mounts" . | nindent 10 }}
+          env:
+            - name: MINIO_URL
+              value: {{ include "eric-mxe-model-catalogue-service.minio-url" . | quote }}
+            - name: MINIO_CREATE
+              {{- if .Values.minio.userModelSourceServiceSecretName }}
+              value: "false"
+              {{- else }}
+              value: "true"
+            {{- end }}
+            - name: MINIO_USER_ACTIONS
+              value: "[\"s3:PutObject\",\"s3:GetBucketLocation\",\"s3:ListBucket\",\"s3:DeleteObject\"]"
+            - name: MINIO_USER_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.model-source-service-minio-user-secret-name" . | quote }}
+                  key: accesskey
+            - name: MINIO_USER_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.model-source-service-minio-user-secret-name" . | quote }}
+                  key: secretkey
+            - name: MINIO_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.model-source-service-minio-user-secret-name" . | quote }}
+                  key: bucket
+            - name: SERVICE_MESH_MTLS_ENABLED
+              value: {{ .Values.global.serviceMesh.enabled | quote }}
+          resources:
+            {{- toYaml .Values.resources.minioCli | trim | nindent 12 }}
+          {{- include "eric-mxe-model-catalogue-service.minio-security-context" . | nindent 10 }}
+        - name: minio-model-source-instance-config
+          {{- with (index .Values "imageCredentials" "minio-cli") }}
+          image: "{{ include "eric-mxe-model-catalogue-service.setImageRepo" (list $ .registry.url .repoPath "minio-cli") }}{{ index $.Values "images" "minio-cli" "name" }}:{{ index $.Values "images" "minio-cli" "tag" }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-model-catalogue-service.registryImagePullPolicy" (list . (index .Values "imageCredentials" "minio-cli" "registry" "imagePullPolicy")) }}
+          command: ["/bin/sh", "/etc/init-script/init.sh"]
+          volumeMounts:
+          - mountPath: "/etc/init-script/"
+            name: minio-init-script
+          - mountPath: /run/secrets/config
+            name: minio-configuration
+          {{ include "eric-mxe-model-catalogue-service.minio-init-volume-mounts" . | nindent 10 }}
+          env:
+            - name: MINIO_URL
+              value: {{ include "eric-mxe-model-catalogue-service.minio-url" . | quote }}
+            - name: MINIO_CREATE
+              {{- if .Values.minio.userModelSourceInstanceSecretName }}
+              value: "false"
+              {{- else }}
+              value: "true"
+            {{- end }}
+            - name: MINIO_USER_ACTIONS
+              value: "[\"s3:GetObject\",\"s3:ListBucket\"]"
+            - name: MINIO_USER_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.model-source-instance-minio-user-secret-name" . | quote }}
+                  key: accesskey
+            - name: MINIO_USER_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.model-source-instance-minio-user-secret-name" . | quote }}
+                  key: secretkey
+            - name: MINIO_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.model-source-service-minio-user-secret-name" . | quote }}
+                  key: bucket
+            - name: SERVICE_MESH_MTLS_ENABLED
+              value: {{ .Values.global.serviceMesh.enabled | quote }}
+          resources:
+            {{- toYaml .Values.resources.minioCli | trim | nindent 12 }}
+          {{- include "eric-mxe-model-catalogue-service.minio-security-context" . | nindent 10 }}
+      containers:
+        {{ if .Values.global.serviceMesh.enabled -}}
+        - name: {{ printf "%s-%s" .Chart.Name "certificate-sidecar" | trunc 63 | trimSuffix "-" }}
+          {{- with (index .Values "imageCredentials" "kubernetes-modifier") }}
+          image: "{{ include "eric-mxe-model-catalogue-service.setImageRepo" (list $ .registry.url .repoPath "kubernetes-modifier") }}{{ index $.Values "images" "kubernetes-modifier" "name" }}:{{ index $.Values "images" "kubernetes-modifier" "tag" }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-model-catalogue-service.registryImagePullPolicy" (list . (index .Values "imageCredentials" "kubernetes-modifier" "registry" "imagePullPolicy")) }}
+          env:
+            - name: SOURCE
+              value: {{ include "eric-mxe-model-catalogue-service.certificate-sidecar-source" . }}
+            - name: DESTINATION
+              value: {{ include "eric-mxe-model-catalogue-service.certificate-sidecar-destination" . }}
+            - name: RUN_COMMAND
+              value: {{ include "eric-mxe-model-catalogue-service.certificate-sidecar-run-command" . }}
+          resources:
+            {{- toYaml .Values.resources.certificateSidecarService | trim | nindent 12 }}
+          {{- include "eric-mxe-model-catalogue-service.usercontainer-security-context" . | nindent 10 }}
+          volumeMounts:
+            - name: kubernetes-run-script
+              mountPath: /etc/kubernetes-run-script
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+            {{- include "eric-mxe-model-catalogue-service.service-mesh-volume-mounts" . | nindent 12 }}
+        {{ end }}
+        - name: {{ .Chart.Name | quote }}
+          {{- with .Values.imageCredentials.modelService }}
+          image: "{{ include "eric-mxe-model-catalogue-service.setImageRepo" (list $ .registry.url .repoPath "modelService") }}{{ $.Values.images.modelService.name }}:{{ $.Values.images.modelService.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-model-catalogue-service.registryImagePullPolicy" (list . .Values.imageCredentials.modelService.registry.imagePullPolicy) }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: mgmt
+              containerPort: 8081
+              protocol: TCP
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POSTGRESQL_SERVICE
+              value: {{ .Values.database.serviceName | trunc 63 | trimSuffix "-" }}
+            - name: POSTGRESQL_PORT
+              value: {{ .Values.database.portName }}
+            - name: POSTGRESQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.db-custom-user-secret-name" . }}
+                  key: {{ .Values.database.customUserIdKey }}
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.db-custom-user-secret-name" . }}
+                  key: {{ .Values.database.customUserPwdKey }}
+            - name: POSTGRESQL_DB
+              value: {{ include "eric-mxe-model-catalogue-service.db-name" . }}
+            - name: MODEL_DEPLOYMENT_SERVICE_HOST_NAME
+              value: {{ include "eric-mxe-model-catalogue-service.model-service-host" . | quote }}
+            - name: MODEL_DEPLOYMENT_SERVICE_PORT_NAME
+              value: {{ .Values.modelService.port }}
+            - name: AUTHOR_SERVICE_HOST_NAME
+              value: {{ include "eric-mxe-model-catalogue-service.author-service-host" . | quote }}
+            - name: AUTHOR_SERVICE_PORT_NAME
+              value: {{ .Values.authorService.port }}
+            - name: MODEL_CATALOGUE_SERVICE_NAME
+              value: {{ include "eric-mxe-model-catalogue-service.name" . | quote }}
+            - name: MODEL_CATALOGUE_SERVICE_INSTANCE_NAME
+              value: {{ .Release.Name | quote }}
+            - name: MODEL_CATALOGUE_SERVICE_VERSION
+              value: {{ .Chart.AppVersion | quote }}
+            - name: SERVICE_MESH_MTLS_ENABLED
+              value: {{ .Values.global.serviceMesh.enabled | quote }}
+            - name: SERVICE_MESH_USER_VOLUME
+              value: {{ include "eric-mxe-model-catalogue-service.istio-sidecar-annotations-user-volume" . | squote }}
+            - name: SERVICE_MESH_USER_VOLUME_MOUNTS
+              value: {{ include "eric-mxe-model-catalogue-service.istio-sidecar-annotations-volume-mounts" . | squote }}
+            - name: JDBC_PARAMS
+              value: {{ include "eric-mxe-model-catalogue-service.jdbc-params" . | quote }}
+            - name: MODEL_PACKAGER_IMAGE
+              value: "{{ include "eric-mxe-model-catalogue-service.setImageRepo" (list . .Values.imageCredentials.packager.registry.url .Values.imageCredentials.packager.repoPath "packager") }}{{ .Values.images.packager.name }}:{{ .Values.images.packager.tag }}"
+            - name: MODEL_PACKAGER_PULL_POLICY
+              value: {{ include "eric-mxe-model-catalogue-service.registryImagePullPolicy" (list . (index .Values "imageCredentials" "packager" "imagePullPolicy")) | quote }}
+            - name: MODEL_PACKAGER_PULL_SECRET
+              value: {{ include "eric-mxe-model-catalogue-service.image-pull-secret-name" . | quote }}
+            - name: DOCKER_REGISTRY_HOSTNAME
+              value: {{ include "eric-mxe-model-catalogue-service.docker-registry-hostname" . | quote }}
+            {{- include "eric-mxe-model-catalogue-service.installer-docker-registry-casecretname-env" . | nindent 12 }}
+            - name: DOCKER_REGISTRY_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.internal-container-registry-secret-name" . | quote }}
+                  key: username
+            - name: DOCKER_REGISTRY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.internal-container-registry-secret-name" . | quote }}
+                  key: password
+            - name: MINIO_URL
+              value: {{ .Values.minio.http.url | quote }}
+            - name: MINIO_MODEL_SOURCE_SERVICE_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.model-source-service-minio-user-secret-name" . | quote }}
+                  key: accesskey
+            - name: MINIO_MODEL_SOURCE_SERVICE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.model-source-service-minio-user-secret-name" . | quote }}
+                  key: secretkey
+            - name: MINIO_MODEL_SOURCE_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-catalogue-service.model-source-service-minio-user-secret-name" . | quote }}
+                  key: bucket
+            - name: MINIO_MODEL_SOURCE_INSTANCE_SECRET_NAME
+              value: {{ include "eric-mxe-model-catalogue-service.model-source-instance-minio-user-secret-name" . | quote }}
+            - name: PYPISERVICE_INTERNAL_SERVER
+              value: {{ include "eric-mxe-model-catalogue-service.pypi-internal-server" . | quote }}
+            - name: PYPISERVICE_EXTERNAL_SERVER
+              value: {{ include "eric-mxe-model-catalogue-service.pypi-external-server" . | quote }}
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI
+              value: "{{ include "eric-mxe-model-catalogue-service.oauth-api-host-path-url" . }}/auth/realms/mxe/protocol/openid-connect/certs"
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              value: "{{ include "eric-mxe-model-catalogue-service.oauth-api-host-path-url" . }}/auth/realms/mxe"
+            - name: DOCKER_REGISTRY_SECRET_NAME
+              value: {{ include "eric-mxe-model-catalogue-service.docker-registry-secret-name" . | quote }}
+            - name: MODEL_CATALOGUE_SERVICE_DOCKERFILE
+              value: {{ include "eric-mxe-model-catalogue-service.model-source-docker-37-configmap" .}}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: mgmt
+            initialDelaySeconds: {{ .Values.probes.modelCatalogueService.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.modelCatalogueService.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.probes.modelCatalogueService.livenessProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.probes.modelCatalogueService.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: mgmt
+            initialDelaySeconds: {{ .Values.probes.modelCatalogueService.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.modelCatalogueService.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.probes.modelCatalogueService.readinessProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.probes.modelCatalogueService.readinessProbe.timeoutSeconds }}
+          resources:
+            {{- toYaml .Values.resources.modelService | trim | nindent 12 }}
+          {{- include "eric-mxe-model-catalogue-service.init-security-context" . | nindent 10 }}
+            runAsUser: 1111
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: cacerts
+              mountPath: /var/lib/ca-certificates
+            - name: iam-ca-cert
+              mountPath: /run/secrets/iam-ca-cert
+            - name: log-control
+              mountPath: /app/config/logcontrol
+            {{- include "eric-mxe-model-catalogue-service.service-mesh-volume-mounts" . | nindent 12 }}
+      volumes:
+        - name: log-control
+          configMap:
+            name: {{ include "eric-mxe-model-catalogue-service.log-control-configmap" . | quote }}
+        - name: tmp
+          emptyDir: {}
+        - name: cacerts
+          emptyDir: {}
+        - name: wait-for-keycloak-script
+          configMap:
+             name: {{ include "eric-mxe-model-catalogue-service.wait-for-keycloak-configmap" . | quote }}
+        - name: minio-init-script
+          configMap:
+            name: {{ include "eric-mxe-model-catalogue-service.minio-configmap" . | quote }}
+        - name: minio-configuration
+          secret:
+            secretName: {{ .Values.minio.adminSecretName | quote }}
+        - name: iam-ca-cert
+          secret:
+            secretName: {{ include "eric-mxe-model-catalogue-service.iam-ca-cert-name" . | quote }}
+        {{- include "eric-mxe-model-catalogue-service.service-mesh-volumes" . | nindent 8 }}
+      securityContext:
+        fsGroup: {{ include "eric-mxe-model-catalogue-service.fsGroup.coordinated" . }}
+      {{- include "eric-mxe-model-catalogue-service.image-pull-secrets" . | nindent 6 }}
+      {{- if (or .Values.nodeSelector $global.nodeSelector) }}
+      nodeSelector: {{- include "eric-mxe-model-catalogue-service.nodeSelector" . | nindent 8 }}
+      {{- end }}
+      affinity:
+        {{- tpl (toYaml .Values.affinity) . | nindent 8 }}
+      tolerations: {{ include "eric-mxe-model-catalogue-service.merge-tolerations" (dict "root" . "podbasename" "eric-mxe-model-catalogue-service") | nindent 8}}

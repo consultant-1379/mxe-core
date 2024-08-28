@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling>=1.18.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mxeauth"
+version = "2.6"
+authors = [
+    {name = "MXE", email = "PDLMXEGAIA@pdl.internal.ericsson.com"},
+]
+description = "Authenticator for mxe user to jupyterhub"
+keywords = ["mxeauth"]
+requires-python = ">=3.8"
+dependencies = [
+    "tornado==6.3.2",
+    "jupyterhub==4.0.1",
+    "python-jose==3.3.0",
+    "requests==2.31.0"
+]
+
+[tool.hatch.build.targets.sdist]
+exclude = [ "build/"]

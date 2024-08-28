@@ -1,0 +1,11 @@
+productName: "MXE"
+productNumber: "CXD 101 0844"
+
+images:
+  kubernetes-modifier:
+    productName: "MXE"
+    productNumber: "CXU 101 0060"
+    registry:  "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-kubernetes-modifier"
+    tag: "VERSION"

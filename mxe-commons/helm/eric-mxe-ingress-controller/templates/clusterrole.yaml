@@ -1,0 +1,28 @@
+{{- if .Values.enabled -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "eric-mxe-ingress-controller.role" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: ingress-role"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-ingress-controller.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-ingress-controller.labels" . | fromYaml -}}
+    {{- include "eric-mxe-ingress-controller.mergeLabels" (dict "location" .Template.Name "sources" (list $component $name $labels )) | trim | nindent 4 }}
+  annotations: {{ include "eric-mxe-ingress-controller.annotations" . | nindent 4 }}
+rules:
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingressclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - list
+  - watch
+{{ end }}

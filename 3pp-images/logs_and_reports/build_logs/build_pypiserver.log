@@ -1,0 +1,188 @@
++ set -e
+++ pwd
++ CWD=/home/evatsiv/gitViews/mxe-core/3pp-images
++ case "$(uname -s)" in
+++ uname -s
+++ readlink -f /home/evatsiv/gitViews/mxe-core/3pp-images/pypiserver/build_image.sh
++ SCRIPT=/home/evatsiv/gitViews/mxe-core/3pp-images/pypiserver/build_image.sh
+++ dirname /home/evatsiv/gitViews/mxe-core/3pp-images/pypiserver/build_image.sh
++ BASEDIR=/home/evatsiv/gitViews/mxe-core/3pp-images/pypiserver
+++ dirname /home/evatsiv/gitViews/mxe-core/3pp-images/pypiserver
++ MODULEROOT=/home/evatsiv/gitViews/mxe-core/3pp-images
++ source /home/evatsiv/gitViews/mxe-core/3pp-images/base_image.sh
+++ export LATEST_DATE_TAG=20240405
+++ LATEST_DATE_TAG=20240405
+++ export BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
+++ BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
+++ export LATEST_ALPINE_TAG=3.19.1
+++ LATEST_ALPINE_TAG=3.19.1
+++ export PYTHON_ALPINE_TAG=3.12.3-alpine3.19
+++ PYTHON_ALPINE_TAG=3.12.3-alpine3.19
+++ export ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
+++ ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
++ ALPINE_BASE_IMAGE=python:3.12.3-alpine3.19
++ ALPINE_BASE_IMAGE_ARMPROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/python:3.12.3-alpine3.19
++ ALPINE_OS_PATCH_VERSION=3.19.1
++ REPO_URL=https://github.com/pypiserver/pypiserver.git
++ VERSION=2.0.1
++ BUILD_NO=
++ IMAGE=armdocker.rnd.ericsson.se/proj-mxe/pypiserver/pypiserver:2.0.1-alpine3.19.1
++ [[ -n '' ]]
++ SRC_ALPINE_BASE_IMAGE=python:3.8-alpine3.12
++ cleanup
++ [[ -d /home/evatsiv/gitViews/mxe-core/3pp-images/pypiserver/pypiserver ]]
++ git clone -b v2.0.1 https://github.com/pypiserver/pypiserver.git /home/evatsiv/gitViews/mxe-core/3pp-images/pypiserver/pypiserver
+Cloning into '/home/evatsiv/gitViews/mxe-core/3pp-images/pypiserver/pypiserver'...
+Note: switching to '2ab30ea2ec7ee52009b1e6daa16e7c5fad3c8722'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
++ sed -i s#python:3.8-alpine3.12#armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/python:3.12.3-alpine3.19#g /home/evatsiv/gitViews/mxe-core/3pp-images/pypiserver/pypiserver/Dockerfile
++ sed -i '$a\USER 9898' /home/evatsiv/gitViews/mxe-core/3pp-images/pypiserver/pypiserver/Dockerfile
++ sed -i s#21.12.0#23.9.0#g /home/evatsiv/gitViews/mxe-core/3pp-images/pypiserver/pypiserver/docker/docker-requirements.txt
++ DOCKER_BUILDKIT=1
++ docker build -t armdocker.rnd.ericsson.se/proj-mxe/pypiserver/pypiserver:2.0.1-alpine3.19.1 /home/evatsiv/gitViews/mxe-core/3pp-images/pypiserver/pypiserver
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.88kB done
+#1 DONE 0.0s
+
+#2 [auth] dockerhub-ericsson-remote/python:pull python:pull token for armdocker.rnd.ericsson.se
+#2 DONE 0.0s
+
+#3 [internal] load metadata for armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/python:3.12.3-alpine3.19
+#3 DONE 18.4s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 181B done
+#4 DONE 0.0s
+
+#5 [base 1/1] FROM armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/python:3.12.3-alpine3.19@sha256:ef097620baf1272e38264207003b0982285da3236a20ed829bf6bbf1e85fe3cb
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 297.71kB done
+#6 DONE 0.0s
+
+#7 [builder_dependencies 1/8] WORKDIR /code
+#7 CACHED
+
+#8 [builder_dependencies 2/8] COPY docker/docker-requirements.txt .
+#8 CACHED
+
+#9 [builder_dependencies 3/8] RUN apk add --no-cache --virtual .build-deps         build-base         libffi-dev     && mkdir /install     && python -m pip install         --no-warn-script-location         --prefix=/install         --requirement docker-requirements.txt
+#9 CACHED
+
+#10 [builder_dependencies 4/8] COPY pypiserver pypiserver
+#10 DONE 0.1s
+
+#11 [builder_dependencies 5/8] COPY setup.cfg .
+#11 DONE 0.1s
+
+#12 [builder_dependencies 6/8] COPY setup.py .
+#12 DONE 0.1s
+
+#13 [builder_dependencies 7/8] COPY README.md .
+#13 DONE 0.1s
+
+#14 [builder_dependencies 8/8] RUN python -m pip install --no-warn-script-location --prefix=/install .
+#14 0.630 Processing /code
+#14 0.631   Preparing metadata (setup.py): started
+#14 1.837   Preparing metadata (setup.py): finished with status 'done'
+#14 1.844 Requirement already satisfied: pip>=7 in /usr/local/lib/python3.12/site-packages (from pypiserver==2.0.1) (24.0)
+#14 1.846 Building wheels for collected packages: pypiserver
+#14 1.846   Building wheel for pypiserver (setup.py): started
+#14 2.085   Building wheel for pypiserver (setup.py): finished with status 'done'
+#14 2.085   Created wheel for pypiserver: filename=pypiserver-2.0.1-py2.py3-none-any.whl size=90641 sha256=cc4272089768422e886d0b13ff6323ac0ee6de6ca30f370a91d0a1c5ec37d2bf
+#14 2.085   Stored in directory: /tmp/pip-ephem-wheel-cache-011lwk4q/wheels/f1/48/1b/a62d5561052e80c3dcfa2c21d0074268a0e9cbbe483c0d680a
+#14 2.091 Successfully built pypiserver
+#14 2.143 Installing collected packages: pypiserver
+#14 2.221 Successfully installed pypiserver-2.0.1
+#14 2.221 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+#14 DONE 2.3s
+
+#15 [stage-3 1/6] WORKDIR /data
+#15 CACHED
+
+#16 [builder_gosu 1/1] RUN apk add --no-cache --virtual .build-deps         ca-certificates         dpkg         gnupg     && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"     && wget -O /usr/local/bin/gosu https://github.com/tianon/gosu/releases/download/1.12/gosu-${dpkgArch}     && wget -O /usr/local/bin/gosu.asc https://github.com/tianon/gosu/releases/download/1.12/gosu-${dpkgArch}.asc     && export GNUPGHOME="$(mktemp -d)"     && gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4     && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu     && command -v gpgconf && gpgconf --kill all || true     && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc     && chmod +x /usr/local/bin/gosu     && gosu --version     && gosu nobody true     && apk del --no-cache         .build-deps     && rm -rf /var/cache/apk/*     && rm -rf /tmp/*
+#16 CACHED
+
+#17 [stage-3 2/6] COPY --from=builder_dependencies /install /usr/local
+#17 DONE 0.3s
+
+#18 [stage-3 3/6] COPY --from=builder_gosu /usr/local/bin/gosu /usr/local/bin/gosu
+#18 DONE 0.1s
+
+#19 [stage-3 4/6] COPY docker/entrypoint.sh /entrypoint.sh
+#19 DONE 0.2s
+
+#20 [stage-3 5/6] COPY docker/gunicorn.conf.py /data
+#20 DONE 0.1s
+
+#21 [stage-3 6/6] RUN apk add bash     && rm -rf /var/cache/apk/*     && rm -rf /tmp/*     && addgroup -S -g 9898 pypiserver     && adduser -S -u 9898 -G pypiserver pypiserver --home /data    && mkdir -p /data/packages     && chmod +x /entrypoint.sh
+#21 0.337 fetch https://dl-cdn.alpinelinux.org/alpine/v3.19/main/x86_64/APKINDEX.tar.gz
+#21 1.248 fetch https://dl-cdn.alpinelinux.org/alpine/v3.19/community/x86_64/APKINDEX.tar.gz
+#21 1.728 (1/1) Installing bash (5.2.21-r0)
+#21 1.760 Executing bash-5.2.21-r0.post-install
+#21 1.762 Executing busybox-1.36.1-r15.trigger
+#21 1.766 OK: 17 MiB in 39 packages
+#21 DONE 1.9s
+
+#22 exporting to image
+#22 exporting layers
+#22 exporting layers 0.4s done
+#22 writing image sha256:11e49b02b830d386a6c94ec552e40e8b97ff1f4564e70d6226dec7e7b64c23dc done
+#22 naming to armdocker.rnd.ericsson.se/proj-mxe/pypiserver/pypiserver:2.0.1-alpine3.19.1 0.0s done
+#22 DONE 0.5s
++ buildStatus=0
++ [[ 0 == 0 ]]
++ docker push armdocker.rnd.ericsson.se/proj-mxe/pypiserver/pypiserver:2.0.1-alpine3.19.1
+The push refers to repository [armdocker.rnd.ericsson.se/proj-mxe/pypiserver/pypiserver]
+6be466c2aea2: Preparing
+c162cadc1a7d: Preparing
+c32aa8aabc76: Preparing
+05756a6f843a: Preparing
+94a5d98bf768: Preparing
+8c8ad1c00cb1: Preparing
+d46b5001af7f: Preparing
+6c673d8c5e6c: Preparing
+80fef791f8cf: Preparing
+4c9c2b9681ab: Preparing
+d4fc045c9e3a: Preparing
+4c9c2b9681ab: Waiting
+d4fc045c9e3a: Waiting
+80fef791f8cf: Waiting
+d46b5001af7f: Waiting
+6c673d8c5e6c: Waiting
+8c8ad1c00cb1: Waiting
+05756a6f843a: Pushed
+c32aa8aabc76: Pushed
+c162cadc1a7d: Pushed
+6be466c2aea2: Pushed
+94a5d98bf768: Pushed
+80fef791f8cf: Layer already exists
+6c673d8c5e6c: Layer already exists
+d46b5001af7f: Layer already exists
+d4fc045c9e3a: Layer already exists
+4c9c2b9681ab: Layer already exists
+8c8ad1c00cb1: Pushed
+2.0.1-alpine3.19.1: digest: sha256:cb7fa5a140a4a1363bac5d636d0e69668f74524962e9ac032d809ac7199c411e size: 2622
++ pushed=0
++ [[ 0 == 0 ]]
++ cleanup
++ [[ -d /home/evatsiv/gitViews/mxe-core/3pp-images/pypiserver/pypiserver ]]
++ rm -rf /home/evatsiv/gitViews/mxe-core/3pp-images/pypiserver/pypiserver

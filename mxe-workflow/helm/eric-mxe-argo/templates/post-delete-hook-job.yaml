@@ -1,0 +1,91 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "eric-mxe-argo.name" . }}-post-delete-hook
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: eric-mxe-argo-post-delete-hook"  | fromYaml -}}
+    {{- $name := printf "%s: %s-%s" "app.kubernetes.io/name" (include "eric-mxe-argo.name" .) "post-delete-hook" | fromYaml -}}
+    {{- $labels := include "eric-mxe-argo.labels" . | fromYaml -}}
+    {{- include "eric-mxe-argo.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $hook := printf "%s" "helm.sh/hook: post-delete"  | fromYaml -}}
+    {{- $hookDeletePolicy := printf "%s" "helm.sh/hook-delete-policy: before-hook-creation"  | fromYaml -}}
+    {{- $hookWeight := include "eric-mxe-argo.hook-weight" 2 | fromYaml -}}
+    {{- $annotations := include "eric-mxe-argo.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-argo.mergeAnnotations" (dict "location" .Template.Name "sources" (list $hook $hookDeletePolicy $hookWeight $annotations)) | trim | nindent 4 }}
+spec:
+  completions: 1
+  parallelism: 1
+  backoffLimit: 3
+  template:
+    metadata:
+      annotations:
+        {{- $istioAnn := include "eric-mxe-argo.istio-annotations" . | fromYaml -}}
+        {{- $annotations := include "eric-mxe-argo.annotations" . | fromYaml -}}
+        {{- $appArmor := include "eric-mxe-argo.security-annotations-delete" . | fromYaml -}}
+        {{- include "eric-mxe-argo.mergeAnnotations" (dict "location" .Template.Name "sources" (list $istioAnn $appArmor $annotations)) | trim | nindent 8 }}
+      labels:
+        {{- $labels := include "eric-mxe-argo.labels" . | fromYaml -}}
+        {{- $istioLab := include "eric-mxe-argo.istio-labels" . | fromYaml -}}
+        {{- include "eric-mxe-argo.mergeLabels" (dict "location" .Template.Name "sources" (list $labels $istioLab )) | trim | nindent 8 }}
+    spec:
+      automountServiceAccountToken: false
+      {{- include "eric-mxe-argo.tolerations" . | nindent 6 }}
+      tolerations: {{ include "eric-mxe-argo.merge-tolerations" (dict "root" . "podbasename" "eric-mxe-argo") | nindent 8}}
+      containers:
+        - name: minio-post-delete-hook
+          {{- with (index .Values "imageCredentials" "minio-cli") }}
+          image: "{{ include "eric-mxe-argo.setImageRepo" (list $ .registry.url .repoPath "minio-cli") }}{{ index $.Values "images" "minio-cli" "name" }}:{{ index $.Values "images" "minio-cli" "tag" }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-argo.registryImagePullPolicy" (list . (index .Values "imageCredentials" "minio-cli" "registry" "imagePullPolicy")) }}
+          command: ["/bin/bash", "/etc/cleanup/minio-cleanup.sh"]
+          volumeMounts:
+            - mountPath: "/etc/cleanup/"
+              name: cleanup-scripts
+            - mountPath: /config
+              name: minio-configuration
+            - mountPath: /home/mxe/.mc/
+              name: mxe-mc-home
+            {{- if .Values.global.security.tls.enabled }}
+            - name: trusted-ca
+              mountPath: /tmp/certificates/trusted
+              readOnly: true
+            {{- end }}
+          env:
+            - name: MINIO_URL
+            {{- if .Values.global.security.tls.enabled }}
+              value: {{ .Values.minio.httpsurl | quote }}
+            {{- else }}
+              value: {{ .Values.minio.url | quote }}
+            {{- end }}
+            - name: MINIO_ARGO_WF_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-argo.minio-user-secret-name" . | quote }}
+                  key: accesskey
+            - name: USERS_TO_DELETE
+              value: "$(MINIO_ARGO_WF_ACCESS_KEY)"
+            - name: BUCKETS_TO_DELETE
+              value: "{{ .Values.minio.bucket}}"
+            - name: SERVICE_MESH_MTLS_ENABLED
+              value: {{ .Values.global.security.tls.enabled | quote }}
+          resources:
+            {{- toYaml .Values.resources.minioCli | trim | nindent 12 }}
+          securityContext:
+            {{- include "eric-mxe-argo.post-delete-hook-security-context" . | nindent 12 }}
+      restartPolicy: OnFailure
+      volumes:
+      - configMap:
+          name: {{ include "eric-mxe-argo.name" . }}-post-delete-hook-config
+        name: cleanup-scripts
+      - name: minio-configuration
+        secret:
+          secretName: {{ .Values.minio.adminSecretName | quote }}
+      - name: mxe-mc-home
+        emptyDir: {}
+      {{- if .Values.global.security.tls.enabled }}
+      - name: trusted-ca
+        secret:
+          secretName: eric-sec-sip-tls-trusted-root-cert
+      {{- end }}
+      {{- include "eric-mxe-argo.image-pull-secrets" . | nindent 6 }}

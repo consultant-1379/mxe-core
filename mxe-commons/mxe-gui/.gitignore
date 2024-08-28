@@ -1,0 +1,7 @@
+/node_modules/
+/target/
+/deploy/
+/test/coverage/
+/test/junit/
+/.idea/
+/docs

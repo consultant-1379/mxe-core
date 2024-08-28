@@ -1,0 +1,631 @@
+= Troubleshooting Guide
+:author: Kristóf Nékám
+:signature: EKRINKM
+:department: BDGSJBAK
+:doc-name: TROUBLESHOOTING
+:doc-no: 1/15451-CAV 101 061/1
+:revnumber: PK2
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+//Template updated 2018-08-21 (keep to track template history)
+
+[[Introduction]]
+== Introduction
+
+This guide is designed to help engineers troubleshoot MXE Service and write Trouble Reports (TRs).
+
+.The guide provides the following information:
+* Simple verification and possible recovery.
+* The required information when writing a TR or a support case, including all files and system logs that are needed.
+* How to retrieve the above information from the system.
+
+[[Prerequisites]]
+=== Prerequisites
+
+* `kubectl` CLI tool properly configured
+
+[[Troubleshooting]]
+== Troubleshooting
+
+This section describes the troubleshooting functions and procedures for MXE.
+
+If this step does not work correctly, restart the pod.
+
+[[EnableDebugLogging]]
+=== Enable Debug Logging
+
+Only enable debug logging to troubleshoot a problem that can be reproduced. Debug logging may impact performance.
+
+[[DataCollection]]
+=== Data Collection
+
+* The logs are collected from each pod as follows:
++
+....
+kubectl logs <pod name> --namespace=<pod's namespace> > <log file name>.txt
+....
++
+* The detailed information about the pod are collected as follows:
++
+....
+kubectl describe pod <pod name> --namespace=<pod's namespace>
+kubectl exec <pod-name> --namespace=<pod's namespace> env
+....
+
+[[TroubleReportsandAdditionalSupport]]
+== Trouble Reports and Additional Support
+
+.Issues can be handled in different ways, as listed below:
+* For questions, support or hot requesting, contact the support team.
+* For reporting of faults, see <<TroubleReports,Trouble Reports>>.
+
+[[TroubleReports]]
+== Trouble Reports
+
+If there is a suspected fault, raise a trouble report (TR). The TR must contain specific MXE information and all applicable troubleshooting information highlighted in <<Troubleshooting,Troubleshooting>> and <<DataCollection,Data Collection>>.
+
+Note if the suspected fault can be resolved by restarting the pod.
+
+When issuing a TR for MXE, use the Catfacts Text Analyzer Service CXC product number as input for Faulty Product section. The CXC number to use is shown as part of the container information that was collected in section <<DataCollection,Data Collection>>, grep for PRODUCT_NUMBER. The product number information can also be found in the Catfacts Text Analyzer Service release documentation.
+
+[[CommandstoCollectAllLogs]]
+== Commands to Collect All Logs
+
+[[LogginginKubernetes]]
+=== Logging in Kubernetes
+
+Print the logs for a container in a pod or specified resource using the `kubectl logs` command. If the pod has only one container, the container name is optional.
+
+.Aliases used are as follows:
+* log
+* logs
+
+See the command options available in the following table:
+
+.MXE Command Options
+[options="header",cols=",,"]
+|===
+|Command Option |Description |Default Value
+|--all-containers=false |Gets all container logs in the pod. |-
+|-c, --container='' |Prints the logs of this container. |-
+|-f, --follow=false |Specifies if the logs should be streamed. |-
+|--limit-bytes=0 |Maximum bytes of logs to return. |no limit
+|--max-log-requests=5 |Specify maximum number of concurrent logs to
+follow when using by a selector. |5
+|--pod-running-timeout=20s |The length of time (for example: 5 s, 2 min,
+or 3 h, higher than zero) to wait until at least one pod is running. |-
+|-p, --previous=false |If true, prints the logs for the previous
+instance of the container in a pod if it exists. |-
+|-l, --selector='' |Selector (label query) to filter on. |-
+|--since=0s |Only returns logs newer than a relative duration like 5 s,
+2 min, or 3 h. Only one of since-time / since can be used. |all logs
+|--since-time='' |Only return logs after a specific date (RFC3339). Only
+one of since-time / since can be used. |all logs
+|--tail=-1 |Lines of recent log file to display. Defaults to -1 with no
+selector, showing all log lines otherwise 10, if a selector is provided.
+|-1
+|--timestamps=false |Include timestamps on each line in the log output.
+|-
+|===
+
+NOTE: To get a list of global command-line options, use `kubectl options` (applies to all commands).
+
+To get the built-in log Help, use `kubectl logs --help` (applies to all commands).
+
+Use command options as shown here:
+
+....
+$ kubectl logs [-f] [-p] (POD | TYPE/NAME) [-c CONTAINER] [options]
+....
+
+.MXE Command Option Examples
+[options="header",cols=","]
+|===
+|Command Option |Description
+|`kubectl logs nginx` |Return snapshot logs from pod nginx with only one container.
+|`kubectl logs nginx --all-containers=true` |Return snapshot logs from pod nginx with multi containers.
+|`kubectl logs -lapp=nginx --all-containers=true` |Return snapshot logs from all containers in pods defined by label app=nginx.
+|`kubectl logs -p -c ruby web-1` |Return snapshot of previous terminated ruby container logs from pod web-1.
+|`kubectl logs -f -c ruby web-1` |Begin streaming the logs of the ruby container in pod web-1.
+|`kubectl logs -f -lapp=nginx --all-containers=true` |Begin streaming the logs from all containers in pods defined by label app=nginx.
+|`kubectl logs --tail=20 nginx` |Display only the most recent 20 lines of output in pod nginx.
+|`kubectl logs --since=1h nginx` |Show all logs from pod nginx written in the last hour.
+|`kubectl logs job/hello` |Return snapshot logs from first container of a job named hello.
+|`kubectl logs deployment/nginx -c nginx-1` |Return snapshot logs from container nginx-1 of a deployment named nginx.
+|===
+
+[[FetchingtheReleaseVersionofMXE]]
+== Fetching the Release Version of MXE
+
+[[ModelVersion]]
+=== Model Version
+
+To fetch the MXE model version, issue the following command:
+
+....
+$ mxe-model version
+
+mxe-model version: 1.0.0-21
+....
+
+[[FlowVersion]]
+=== Flow Version
+
+To fetch the MXE flow version, issue the following command:
+
+....
+$ mxe-flow version
+
+mxe-flow version: 1.0.0-21
+....
+
+[[CheckPodsandNamespaces]]
+== Check Pods and Namespaces
+
+[[CheckPodStatus]]
+=== Check Pod Status
+
+To check the status of a pod, issue the following command:
+
+....
+$ kubectl get pods <pod name> --namespace=<namespace>
+....
+
+Result Example:
+
+....
+kubectl get pods jazzed-bunny-nfs-server-provisioner-0
+
+NAME                                    READY   STATUS    RESTARTS   AGE
+jazzed-bunny-nfs-server-provisioner-0   1/1     Running   2          12d
+....
+
+[[DetailedInformationonPods]]
+== Detailed Information on Pods
+
+To get detailed information on a pod, issue the following command:
+
+....
+$ kubectl describe pods <pod name> --namespace=<namespace>
+....
+
+Result Example:
+
+....
+kubectl describe pods jazzed-bunny-nfs-server-provisioner-0
+
+Name:               jazzed-bunny-nfs-server-provisioner-0
+Namespace:          default
+Priority:           0
+PriorityClassName:  <none>
+Node:               node3/10.61.172.67
+Start Time:         Fri, 14 Jun 2019 09:44:04 +0200
+Labels:             app=nfs-server-provisioner
+                    chart=nfs-server-provisioner-0.3.0
+                    controller-revision-hash=jazzed-bunny-nfs-server-provisioner-86656dd46c
+                    heritage=Tiller
+                    release=jazzed-bunny
+                    statefulset.kubernetes.io/pod-name=jazzed-bunny-nfs-server-provisioner-0
+Annotations:        <none>
+Status:             Running
+IP:                 10.233.92.246
+Controlled By:      StatefulSet/jazzed-bunny-nfs-server-provisioner
+Containers:
+  nfs-server-provisioner:
+    Container ID:  docker://ce0ba255865bb823becea15f9c8fb9c725d5f484e9b1e82395a2a1965c40959f
+    Image:         quay.io/kubernetes_incubator/nfs-provisioner:v2.2.1-k8s1.12
+    Image ID:      docker-pullable://quay.io/kubernetes_incubator/nfs-provisioner@sha256:f0f0d9d39f8aac4a2f39a1b0b602baa993bca0f22c982f208ca9d7a0d2b2399f
+    Ports:         2049/TCP, 20048/TCP, 111/TCP, 111/UDP
+    Host Ports:    0/TCP, 0/TCP, 0/TCP, 0/UDP
+    Args:
+      -provisioner=cluster.local/jazzed-bunny-nfs-server-provisioner
+    State:          Running
+      Started:      Fri, 14 Jun 2019 10:37:56 +0200
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    255
+      Started:      Fri, 14 Jun 2019 10:34:41 +0200
+      Finished:     Fri, 14 Jun 2019 10:37:43 +0200
+    Ready:          True
+    Restart Count:  2
+    Environment:
+      POD_IP:          (v1:status.podIP)
+      SERVICE_NAME:   jazzed-bunny-nfs-server-provisioner
+      POD_NAMESPACE:  default (v1:metadata.namespace)
+    Mounts:
+      /export from data (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from jazzed-bunny-nfs-server-provisioner-token-82vrr (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             True
+  ContainersReady   True
+  PodScheduled      True
+Volumes:
+  data:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:
+    SizeLimit:  <unset>
+  jazzed-bunny-nfs-server-provisioner-token-82vrr:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  jazzed-bunny-nfs-server-provisioner-token-82vrr
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:          <none>
+....
+
+[[CheckNamespaceoftheIngressControllers]]
+== Check Namespace of the Ingress Controllers
+
+To list the namespaces of the ingress controllers, issue the following command:
+
+....
+kubectl get ingress --all-namespaces
+....
+
+Result Example:
+
+....
+kubectl get ingress --all-namespaces
+
+NAMESPACE       NAME                                        HOSTS   ADDRESS   PORTS   AGE
+mxe             eric-mxe-nifi-service                       *                 80      2m31s
+mxe             eric-mxe-prometheus-ingress                 *                 80      2m31s
+mxe             mxe-mxe-gui                                 *                 80      2m31s
+mxe             mxe-mxe-model-catalogue-service             *                 80      2m31s
+mxe             mxe-mxe-model-service                       *                 80      2m31s
+....
+
+[[CLIRelatedTroubleshooting]]
+== CLI Related Troubleshooting
+
+[[mxe-modelCommandTroubleshooting]]
+=== mxe-model Command Troubleshooting
+
+If the provided logs are not informative enough, enable verbose mode using the `verbose` flag. Verbose mode prints logs for the underlying processes started during the install or uninstall as well.
+
+....
+mxe-model package --source=C:\models\knn --verbose
+....
+
+.mxe-model Command Troubleshooting
+[options="header",cols=",,"]
+|===
+|Error Type |System Message / Symptom |Cause
+|*Common* |`Cluster does not exist: <cluster>` |The provided cluster name does not match any of the environments in the MXE configuration file.
+| |`No connection to MXE cluster.` |Cluster is not available or your MXE configuration file contains faulty cluster addresses.
+|*Onboard* |`required flag(s) "docker", "id", "title", "version" not set` |Use docker or source onboarding.
+| |`At least one of the the following flags should be set: source, docker` |Use docker or source onboarding.
+| |`model Id is missing from \<model source>/MXE-META-INF/INFO` |There is no Id attribute in model source INFO file, or the file does not exist.
+| |`model Version is missing from \<model source>/MXE-META-INF/INFO` |There is no Version attribute in model source INFO file, or the file does not exist.
+| |`Failed to create zip archive from \<model source>` |Failed to create zip archive from model source, check directory permissions.
+| |`required flag(s) "id", "title", "version" not set` |Mandatory command parameters of docker onboarding are missing.
+| |`Error: flag needs an argument --id, --docker, --title, --version` |Mandatory command parameters of docker onboarding are missing.
+| |`Model ID must be at most 32 characters length.` |Check the model id length in the command parameters.
+| |`Description must be at most 120 characters length.` |Check the model description length in the command parameters.
+| |`Incorrect version format. Valid format: a.b.c where a, b and c are non-negative numbers. For example: 0.1.4` |Use correct version format in parameters
+| |`The id <id> shall only contain lower case alphanumeric characters, and dots (.).` |Check the model id in the command parameters.
+| |`Error during the onboard request!` |Could not get a response from the MXE server, check if it is down or not.
+| |`MXE resource conflict` |The model to be onboarded was already present on the cluster. Currently you should delete and onboard it again if you would like to replace it.
+| |`Server responded with error status code: <status code>` |The server responded with an unhandled status code, maybe it's not available or an older version?
+| |`There is no permission to onboard model \<model_id>` |The user has no permission to onboard model in the specified domain. Check if the domain prefix in the model id is correct. For checking and modifying access rights see the *Access Control Administration* section of the doc-ref:[GUI Guide].
+|*List* |`Failed to parse creation date received from the server!` |The server sent a date format that did not meet the client side expectation. Make sure it is not running an older version of the MXE server.
+| |`Request failed` |The server sent a malformed response. Make sure that the MXE server is not running an older version.
+| |`Failed to decode response from server!` |Erroneous response received from the server. Make sure that the MXE server is not running an older version.
+| |`Expected model is not visible in the list.` |The user has no permission to get/list models in the specified domain. For checking and modifying access rights see the *Access Control Administration* section of the doc-ref:[GUI Guide].
+|*Package* |`Source code is not recognizable.` |The model source code did not meet all the requirements detailed in the documentation.
+| |`required flag(s) "source" not set / flag needs an argument: --source` |The source parameter must be provided to run this command.
+| |`open .<source code directory>/MXE-META-INF/INFO: no such file or directory` |No MXE-META-INF/INFO in the model source directory. Create it with the following mandatory attributes: Id, Version
+| |`model Id is missing from <source code directory>/MXE-META-INF/INFO` |Add Id attribute to MXE-META-INF/INFO file
+| |`model Id can only contain lower case alphanumeric characters and dots (.)` |Use a valid model id in MXE-META-INF/INFO.
+| |`model Version is missing from <source code directory>/MXE-META-INF/INFO` |Add Version attribute to MXE-META-INF/INFO file
+| |`invalid model Version format. Valid format: a.b.c where a, b and c are non-negative numbers. For example: 0.1.4` |Use correct version format in MXE-META-INF/INFO file
+| |`open <source code directory>/.s2i/environment: no such file or directory` |s2i configuration seems to be missing, please check your model source.
+| |`MODEL_NAME is missing from <source code directory>/.s2i/environment` |The entrypoint of your model should be filled in correctly.
+| |`no supported source file with name <model name> can be found in <source code directory>` |Source code directory does not contain supported source file. The entrypoint of your model should be filled in correctly. There should be supported source code file in Your source code directory.
+| |`Model deployment of a newly packaged python model fails with python exceptions` |Check python version (version 3 required) an python dependencies in Your environment
+|*Delete* |`Error: required flag(s) "id", "version" not set` |The id and version argument of the delete command is mandatory.
+| |`Error: flag needs an argument --id, --version` |The id and version argument of the delete command is mandatory.
+| |`Failed to create a new HTTP request` |Erroneous response received from the server. Are you sure that the MXE server is not an older version?
+| |`Model <id> version <version> not found!` |The model you wanted to delete can not be found in the cluster
+| |`There is no permission to delete model \<model_id>` |The user has no permission to delete model in the specified domain. For checking and modifying access rights see the *Access Control Administration* section of the doc-ref:[GUI Guide].
+|*Version* |`Version is empty` |Make sure that You use an official release of cli. Always make sure that You use the same version as the MXE version.
+|===
+
+[[mxe-flowCommandTroubleshooting]]
+== mxe-flow Command Troubleshooting
+
+If the provided logs are not informative enough, enable verbose mode using the `verbose` flag. Verbose mode prints logs for the underlying processes started during the install or uninstall as well.
+
+.mxe-flow Command Troubleshooting
+[options="header",cols=",,"]
+|===
+|Error Type |System Message / Symptom |Cause
+|*Common* |`Cluster does not exist: <cluster>` |The provided cluster name doesn't match any of your environment in the MXE configuration file.
+| |`No connection to MXE cluster.` |Cluster is not available or your MXE configuration file contains faulty cluster addresses.
+|*Onboard* |`Failed to open the provided file: <filename>` |Are you sure that the provided location is correct?
+| |`Reading file failed: <error message>` |Are you sure that the provided location is correct? Are you sure that you have the proper permission the open given file?
+| |`Creating new form-data header for the file failed.` |Are you sure that you have the proper permission to write the given file?
+| |`Failed to created JSON for name parameter.` |The provided name parameter probably contained special characters.
+| |`Server error while trying to create new flow.` |Could not get a response from the MXE server, are you sure it’s running?
+| |`Onboarding request failed with status code <status_code>` |The server responded with an unhandled status code, maybe it's not available or an older version?
+|*Deploy* |`required flag(s) "name" not set / flag needs an argument: --name` |The name parameter must be provided.
+| |`Please provide either the "file" or the "flow-name" parameter!` |Either the file or the flow-name parameter must be provided along with the name!
+| |`Failed to created JSON object for HTTP request.` |The provided deploymentName or flowName parameters probably contained special characters.
+| |`Error occurred during the deployment request!` |Could not get a response from the MXE server, are you sure it’s running?
+| |`Deployment request failed with status code <status_code>` |The server responded with an unhandled status code, maybe it's not available or an older version?
+|*List flows* |`Request failed!` |Failed to get a response from the server. Are you sure it's running?
+| |`Failed to decode response from server!` |Erroneous response received from the server. Are you sure that the MXE server is not an older version?
+|*List deployments* |`Request failed!` |Failed to get a response from the server. Are you sure it's running?
+| |`Failed to decode response from the server!` |Erroneous response received from the server. Are you sure that the MXE server is not an older version?
+| |`Service Error: 500 Internal Server Error` |One, or more Nifi deployments cannot be reached properly by MXE's Nifi service. The problematic Nifi deployments' names can be found out by checking the log of the Nifi service, then the logs of the Nifi deployments can help to understand what are the problems with the given deployments.
+|*Delete flow* |`required flag(s) "name" not set / flag needs an argument: --name` |One argument (the flow name) must be provided for this command.
+| |`<status_code> status code.` |The server responded with an unhandled status code, maybe it's not available or an older version?
+|*Delete deployment* |`required flag(s) "name" not set / flag needs an argument: --name` |One argument (the deployment name) must be provided for this command.
+| |`<status_code> status code.` |The server responded with an unhandled status code, maybe it's not available or an older version?
+|*Version* |`Version is empty` |Make sure that You use an official release of cli. Always make sure that You use the same version as the MXE version.
+|===
+
+[[mxe-serviceCommandTroubleshooting]]
+=== mxe-service Command Troubleshooting
+
+If the provided logs are not informative enough, enable verbose mode using the `verbose` flag. Verbose mode prints logs for the underlying processes started during the install or uninstall as well.
+
+....
+mxe-service create --name testservice --models testmodel:0.0.1 --verbose
+....
+
+.mxe-service Command Troubleshooting
+[options="header",cols=",,"]
+|===
+|Error Type |System Message / Symptom |Cause
+|*Common* |`Cluster does not exist: <cluster>` |The provided cluster name does not match any of the environments in the MXE configuration file.
+| |`No connection to MXE cluster.` |Cluster is not available or your MXE configuration file contains faulty cluster addresses.
+|*Create* |`required flag(s) "models", "name" not set` |Mandatory parameters are not set.
+| |`Model service name can only contain lower case alphanumeric characters and dash (-)` |Wrong model service name format used in parameter.
+| |`Model must contain the id and version, separated by a colon: <id>:<version>` |Models parameter should contain image in correct format
+| |`Model Id can only contain lower case alphanumeric characters and dots (.)` |Wrong model name format used in parameter.
+| |`Incorrect version format. Valid format: a.b.c where a, b, and c are non-negative numbers. For example: 0.1.4` |Use correct version format in parameters.
+| |`Invalid number of instances. It should be a positive number.` |If you provide the instance parameter you should make sure that it's a positive, round number.
+| |`Auto scaling parameters 'minReplicas', 'maxReplicas' and 'targetAverageValue' must be integers, 'metric' must be either 'cpu' or 'memory'. All four of these parameters must be provided in case of auto scaling!` |If you provide `auto` as instance parameter, you must provide all four of the mentioned parameters, using the given types/values.
+| |`It is not allowed to set auto scaling parameters 'minReplicas', 'maxReplicas', 'targetAverageValue' and 'metric', if the 'instances' parameter is not 'auto'` |If you provide an integer value as instance parameter, you can not set the mentioned parameters, which are used for auto scaling.
+| |`Model service <model service name> is already running on cluster.` |There is an already running model service with the given name. Please check running model services and try to delete it, or try to create model service with different name.
+| |`There is no permission to create model service \<service_name>` |The user has no permission to create service without domain. For checking and modifying access rights see the *Access Control Administration* section of the doc-ref:[GUI Guide].
+| |`There is no permission to create model service \<service_name> in domain \<domain_name>` |The user has no permission to create service in the specified domain. Check if the domain of the service is correct. For checking and modifying access rights see the *Access Control Administration* section of the doc-ref:[GUI Guide].
+| |`Model with ID "\<model_id>" and version "<model_version>" does not exist, or there is no permission to use it` |The model does not exist, or the user has no permission to create service with the given model. Check if the domain prefix of the model id is correct. For checking and modifying access rights see the *Access Control Administration* section of the doc-ref:[GUI Guide].
+|*List* |`Failed to parse creation date received from the server!` |The server sent a date format that did not meet the client side expectation. Make sure it is not running an older version of the MXE server.
+| |`Request failed` |The server sent a malformed response. Make sure that the MXE server is not running an older version.
+| |`Failed to decode response from server!` |Erroneous response received from the server. Make sure that the MXE server is not running an older version.
+| |`Expected model service is not visible in the list.` |The user has no permission to get/list model services in the specified domain. For checking and modifying access rights see the *Access Control Administration* section of the doc-ref:[GUI Guide].
+|*Modify* |`Both models and instances could not be empty` |At least one of the models or instances parameter should be given.
+| |`Model service name can only contain lower case alphanumeric characters and dash (-)` |Wrong model service name format used in parameter.
+| |`Model must contain the id and version, separated by a colon: <id>:<version>` |Models parameter should contain image in correct format
+| |`Model Id can only contain lower case alphanumeric characters and dots (.)` |Wrong model name format used in parameter.
+| |`Incorrect version format. Valid format: a.b.c where a, b, and c are non-negative numbers. For example: 0.1.4` |Use correct version format in parameters.
+| |`Invalid number of instances. It should be a positive number.` |If you provide the instance parameter you should make sure that it's a positive, round number.
+| |`Auto scaling parameters 'minReplicas', 'maxReplicas' and 'targetAverageValue' must be integers, 'metric' must be either 'cpu' or 'memory'. All four of these parameters must be provided in case of auto scaling!` |If you provide `auto` as instance parameter, you must provide all four of the mentioned parameters, using the given types/values.
+| |`It is not allowed to set auto scaling parameters 'minReplicas', 'maxReplicas', 'targetAverageValue' and 'metric', if the 'instances' parameter is not 'auto'` |If you provide an integer value as instance parameter, you can not set the mentioned parameters, which are used for auto scaling.
+| |`Model-service <model service name> does not exist` |There is no model service running with the given name. Check running model services.
+| |`Model <id> does not have version <version>` |Service model could not be changed No model found with given id and version. Check onboarded models.
+| |`Model identified by <id> in model-service <model service name> is already on version <version>` |The service is already running with the given model version. No change in the service.
+| |`Nothing to do, model service <model service name> already contains model "<id>:<version>", and has <instances> instances.` |The service is already running with the given model version and given instances. No change in the service.
+| |`There is no permission to modify model service \<service_name> in domain \<domain_name>` |The user has no permission to modify service in the domain of the given model service. For checking and modifying access rights see the *Access Control Administration* section of the doc-ref:[GUI Guide].
+| |`Model with ID "\<model_id>" and version "<model_version>" does not exist, or there is no permission to use it` |The model does not exist, or the user has no permission to modify service with the given model. Check if the domain prefix of the model id is correct. For checking and modifying access rights see the *Access Control Administration* section of the doc-ref:[GUI Guide].
+|*Delete* |`required flag(s) “name” not set / flag needs an argument: --name` |The name flag of the delete command (the name of the model service to be deleted) is mandatory.
+| |`Model service <model service name> is not running on cluster.` |The model service you wanted to stop has not been started.
+| |`There is no permission to delete model service \<service_name> in domain \<domain_name>` |The user has no permission to delete service in the domain of the given model service. For checking and modifying access rights see the *Access Control Administration* section of the doc-ref:[GUI Guide].
+|*Version* |`Version is empty` |Make sure that You use an official release of cli. Always make sure that You use the same version as the MXE version.
+|===
+
+[[mxe-trainingCommandTroubleshooting]]
+=== mxe-training Command Troubleshooting
+
+If the provided logs are not informative enough, enable verbose mode using the `verbose` flag. Verbose mode prints logs for the underlying processes started during the install or uninstall as well.
+
+....
+mxe-training start --packageId=knn.model.test --packageVersion=1.0.0 --verbose
+....
+
+.mxe-training Command Troubleshooting
+[options="header",cols=",,"]
+|===
+|Error Type |System Message / Symptom |Cause
+|*Common* |`Cluster does not exist: <cluster>` |The provided cluster name does not match any of the environments in the MXE configuration file.
+| |`No connection to MXE cluster.` |Cluster is not available or your MXE configuration file contains faulty cluster addresses.
+|*Onboard* |`required flag(s) "package" not set` |Set package path.
+| |`training package Id can only contain lower case alphanumeric characters and dots` |Incorrect training package id format.
+| |`training package Id/Version/Type/Title/Author/Description is missing from /MXE-META-INF/INFO` |Mandatory attribute is missing from training source INFO file, or the file does not exist.
+| |`invalid training package Version format. Valid format: a.b.c where a, b, and c are non-negative numbers. For example: 0.1.4` |Incorrect training package version format.
+| |`invalid training package type. Valid type: Training` |Type should be Training in MXE-META-INF/INFO file.
+| |`Failed to create zip archive from <training source>` |Failed to create zip archive from model source, check directory permissions.
+| |`Failed to read file` |Source archive reading failed. Please check the permissions.
+| |`Error during the onboard request!` |Couldn't get a response from the MXE server, are you sure it's running?
+| |`MXE resource conflict` |The training to be installed was already present on the cluster. Delete and onboard it again to replace it.
+| |`Server responded with error status code: <status code>` |The server responded with an unhandled status code, maybe it's not available or an older version?
+| |`Pip install related error messages during packaging` |Please check requirements.txt in Your training source code directory.
+| |`Could not open requirements file` |Please check requirements.txt in Your training source code directory.
+|*Start* |`required flag(s) "packageId", "packageVersion" not set` |Package id and version should be set.
+| |`training package Id can only contain lower case alphanumeric characters and dots` |Incorrect training package id format
+| |`invalid training package Version format. Valid format: a.b.c where a, b, and c are non-negative numbers. For example: 0.1.4` |Incorrect training package version format.
+| |`Training is already running with packageId <packageId> packageVersion <packageVersion>` |There is an already running training job from the given package. Wait until the previous job finishes.
+| |`Training package with packageId <packageId> packageVersion <packageVersion> not found!` |There is no onboarded training package with the given id and version. Please onboard it first.
+| |`Python related error messages during starting` |Check Your training python code for errors.
+|*List* |`Failed to parse creation date received from the server!` |The server sent a date format that did not meet the client side expectation. Make sure it is not running an older version of the MXE server.
+| |`Request failed` |The server sent a malformed response. Make sure that the MXE server is not running an older version.
+| |`Failed to decode response from server!` |Erroneous response received from the server. Make sure that the MXE server is not running an older version.
+|*Delete package* |`Error: required flag(s) "id", "version" not set` |The id and version argument of the delete command is mandatory.
+| |`Incorrect version format. Valid format: a.b.c where a, b, and c are non-negative numbers. For example: 0.1.4` |Incorrect training package version format.
+| |`Failed to create a new HTTP request` |Erroneous response received from the server. Are you sure that the MXE server is not an older version?
+| |`Training package <id> version <version> not found!` |The training package you wanted to delete can not be found in the cluster
+|*Delete job* |`Incorrect command usage.` +
+`Valid usage: mxe-training delete job --packageId com.ericsson.bdgs.oss.oss.eea.aio --packageVersion 0.0.1` +
+`mxe-training delete job --id 31415926"` |There are two ways to delete jobs, please check command help for more information. +
+Deleting job with packageId and packageVersion will delete all of the jobs pods and stored files, if the job was started from the given id and version. +
+Deleting job with id will delete the job pod and stored files of the given training job.
+| |`Incorrect version format. Valid format: a.b.c where a, b, and c are non-negative numbers. For example: 0.1.4` |Incorrect training package version format.
+| |`No training job found with packageId <packageId> and packageVersion <packageVersion>` |There is no job started from the given packageId and packageVersion, or it is already deleted.
+| |`training job with id <id> not found` |There is no job with the given id, or it is already deleted.
+| |`Failed to delete stored training results of job <id>.` +
+`Failed to delete training pod <pod_name>.` +
+`Failed to delete training job <job_name>.` |There was MXE cluster level fault when deleting files, kubernetes pods, kubernetes jobs. +
+Please collect logs and contact the support.
+| |`Failed to create a new HTTP request` |Erroneous response received from the server. Are you sure that the MXE server is not an older version?
+|*Version* |`Version is empty` |Make sure that You use an official release of cli. Always make sure that You use the same version as the MXE version.
+|===
+
+[[InstallationRelatedTroubleshooting]]
+== Installation Related Troubleshooting
+
+[[NoDefaultstorageclassSet]]
+=== No Default storageclass Set
+
+A pod is in *Pending* state when no storageclass can be found for the bound `PersistentVolumeClaims`.
+
+*Cause*: No default storageclass is set in the system.
+
+*Solution*:
+
+. List the storageclasses by issuing the following command:
++
+....
+kubectl get storageclasses
+
+NAME            PROVISIONER                                         AGE
+nfs (default)   cluster.local/jazzed-bunny-nfs-server-provisioner   13d
+....
++
+. Use one of the names to every `values.yaml` file where `storageClassName` can be found.
+. Set the other fields which were already changed (for example, `secretName` for container registry).
+
+[[MetricsApiserviceErrors]]
+=== Metrics Apiservice Errors
+
+The following error appears:
+
+`Error: release <some-name> failed: apiservices.apiregistration.k8s.io "v1beta1.metrics.k8s.io" already exists`
+
+*Cause*: The `values.yaml` file does not fit your installation target Kubernetes cluster regarding the metrics server configuration.
+
+*Solution*: Update the `values.yaml` file to not install the metrics server.
+
+[[NotEnoughvCPUs]]
+=== Not Enough vCPUs
+
+Depending on the HW configuration and how many vCPUs are in use the resource pool can prove to be insufficient during installation. The typical symptom of it is when the following response is received:
+
+....
+$ helm install mxe/mxe --version 1.0.0-21 -f values.yaml --wait --namespace mxe --name mxe
+
+Error: release mxe failed: timed out waiting for the condition
+....
+
+Issue the following command to check whether every pod is up, and running:
+
+....
+$ kubectl get pod -n mxe
+....
+
+Check if the resulting output contains any pods for which the `READY` column contains two numbers that differ from each other, for example `0/1` in the example:
+
+....
+$ kubectl get pods -n mxe
+
+NAMESPACE       NAME                                                   READY    STATUS          RESTARTS    AGE
+mxe             alertmanager-deployment-6df999b6d7-qx6c4               1/1      Running         0           5m
+mxe             eric-data-document-database-pg-0                       2/2      Running         0           5m
+mxe             eric-data-document-database-pg-1                       2/2      Running         0           4m
+mxe             eric-data-search-engine-client-856c55b8f-24wcr         0/1      Pending         0           5m
+....
+
+Issue the following command to check the events for any resource-related issues.
+....
+# kubectl describe pod <pod_name that is is pending state>
+....
+
+Issue the following command to check for current resource utilization, if `metrics-server` was installed. 
+....
+# kubectl top nodes 
+....
+
+[[PodStuckinContainerCreatingPhase]]
+=== Pod Stuck in ContainerCreating Phase
+
+A pod remains in `ContainerCreating` status even after a half an hour, as seen if you check the list of pods in the namespace which is used to install MXE:
+
+....
+$ kubectl get pods
+ 
+NAME                                                   READY    STATUS             RESTARTS    AGE
+eric-data-document-database-pg-0                       0/2      ContainerCreating  0           8h
+....
+
+Check the pod's detailed information, and find the `Events` section at the end for information:
+
+....
+$ kubectl describe pod eric-data-document-database-pg-0
+
+[...]
+
+Events:
+  Type     Reason                  Age                   From            Message
+  ----     ------                  ----                  ----            -------
+  Warning  FailedCreatePodSandBox  3m31s (x132 over 8h)  kubelet, node2  Failed create pod sandbox: rpc error: code = DeadlineExceeded desc = context deadline exceeded
+....
+
+The exact troubleshooting steps to take depend on what is listed in the `Events` section.
+
+In this case `FailedCreatePodSandBox` means the underlying Docker cannot create a pod.
+
+. Delete the pod manually by issuing:
++
+....
+$ kubectl delete pod eric-data-document-database-pg-0
+  
+pod "eric-data-document-database-pg-0" deleted
+....
++
+. Wait until the pod is in ready state.
+
+If this does not solve the issue, contact MXE support.
+
+[[Modelrelatedtroubleshooting]]
+== Model related troubleshooting
+
+[[Predictionerror]]
+=== Prediction error
+
+A model is returning `upstream request timeout` message with `504` status code when the prediction endpoint is invoked.
+
+*Cause:* The model is unable to return results in 3 seconds. This can be due to high load, or, depending on complexity, the model itself cannot genrate a prediction in 3 seconds.
+
+*Solution:* If the error is related to high load, increase the model instance number with the `mxe-service modify` command. If the model itself is unable to generate a prediction in 3 seconds try a less complex model or increase your hardware resources.
+
+[[ModelPackagingRelatedTroubleshooting]]
+== Model Packaging Related Troubleshooting
+
+[[PackagingError]]
+=== Packaging Error
+
+Model packaging can fail for numerous reasons. Most of the time there is a memory pressure problem in the running environment. In this, and in similar cases the packaging restarts automatically. After packaging fails for the first time, its status can be failed, even if it retries later. This means that packagings' status can change from failure to completed without prior warning.
+
+*Cause:* This can have several causes. Most of the time, there is memory problem, or the model's code contains some errors.
+
+*Solution:* If the error persists for a long time, then the cause can be checked with its log. If the problem is insufficient memory, and the packaging stays in failed state for more than several tens of minutes, then a cluster upgrade may be needed.
+
+[[FlowDeploymentRelatedTroubleshooting]]
+== Flow Deployment Related Troubleshooting
+
+[[DeploymentError]]
+=== Deployment Error
+
+When deploying a new flow deployment using an existing onboarded `flow.xml.gz` from the CLI, the deployment can be stuck in *Creating* state.
+
+*Cause:* The `flow.xml.gz` might be corrupted and that causes the deployment to be stuck in the *Creating* state.
+
+*Solution:* Delete the deployment and the onboarded flow as well to avoid confusion. Check the onboarded `flow.xml.gz` that it is not corrupted, and it contains a valid `flow.xml` file. Try to onboard the new `flow.xml.gz` and deploy a flow from that.

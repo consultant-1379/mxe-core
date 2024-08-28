@@ -1,0 +1,25 @@
+{
+  "name": "demo-abtest",
+  "type": "static",
+  "created": "2020-01-22T18:13:36Z",
+  "status": "running",
+  "message": null,
+  "replicas": 2,
+  "autoScaling": null,
+  "models": [
+    {
+      "id": "img.inception3.seal",
+      "version": "1.0.11",
+      "endpointType": "REST",
+      "weight": 0.8
+    },
+    {
+      "id": "img.inception3.seal",
+      "version": "1.0.15",
+      "endpointType": "REST",
+      "weight": 0.2
+    }
+  ],
+  "createdByUserId": "65f235b4-f0d8-4aa4-a9cd-6733626ba31c",
+  "createdByUserName": "mxe-user"
+}

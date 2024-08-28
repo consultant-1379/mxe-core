@@ -1,0 +1,27 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="MxeSuite">
+
+    <listeners>
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGTestListener" />
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGSuiteListener" />
+    </listeners>
+
+    <parameter name="cluster" value="cluster3" />
+    
+    <test name="Model Baseline Performance Test for Empty model">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeBaselinePerformanceTest">
+                <parameter name="modelBaseDir" value="mxe-jcat/src/main/resources/testmodels/seldon-test-python" />
+                <parameter name="testScriptName" value="predict_empty_for_baseline.py" />
+                <parameter name="count" value="1000" />
+                <parameter name="workdir" value="/tmp/testmxebaseline/" />
+                <parameter name="pip" value="pip3" />
+                <parameter name="python" value="python3" />
+                <methods>
+                    <include name="performBaselineEmptyTest" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>

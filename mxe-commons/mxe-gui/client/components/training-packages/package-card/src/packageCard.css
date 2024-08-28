@@ -1,0 +1,235 @@
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+:host {
+  width: 100%;
+  position: relative;
+  display: flex;
+  transition: all 300ms ease-in-out;
+}
+
+.package-card {
+  user-select: none;
+  position: relative;
+  width: 100%;
+  min-height: 154px;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xl);
+  border: solid 1px var(--layer1);
+  background-color: var(--card-color-background, var(--card-color-background, #fafafa));
+  cursor: pointer;
+  transition: all 300ms ease-in-out;
+  will-change: auto;
+}
+
+.package-card:hover,
+.package-card.selected {
+  background-color: var(--card-color-background-hover);
+}
+
+.package-card.selected {
+  border: 1px solid var(--blue);
+}
+
+.package-card .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  word-break: break-word;
+}
+
+.package-card .header .left {
+  opacity: 0.8;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--text);
+  padding-right: var(--space-base);
+  word-break: break-word;
+  white-space: pre-line;
+}
+
+.package-card .subtitle {
+  font-size: 12px;
+  margin-top: 4px;
+  opacity: 0.8;
+  font-weight: bold;
+}
+
+.package-card .id {
+  font-size: 10px;
+  margin-top: 0;
+  opacity: 0.6;
+  font-weight: bold;
+}
+
+.package-card .footer {
+  display: none;
+}
+
+.package-card .text {
+  margin-top: var(--space-base);
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.package-card .content {
+  text-align: center;
+  /*height: 84px;*/
+  flex: 1;
+  margin-top: var(--space-base);
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: flex-start;
+  align-content: center;
+}
+
+.package-icon {
+  max-width: 100%;
+  max-height: 80px;
+}
+
+.package-card .action {
+  transition: all 300ms ease-in-out;
+}
+.package-card .action:hover {
+  transform: scale(1.2);
+  transform-origin: center;
+}
+
+/**
+ * Stacked
+ * source: https://css-tricks.com/snippets/css/stack-of-paper/
+ */
+.package-card.stacked {
+  /* stylelint-disable */
+  box-shadow: 0 0 0 transparent, 4px 4px 0 -1px var(--card-color-background),
+    4px 4px 0 0 var(--layer1), 8px 8px 0 -1px var(--card-color-background),
+    8px 8px 0 0 var(--layer1) !important;
+  /* stylelint-enable */
+}
+.package-card.stacked:hover {
+  /* stylelint-disable */
+  box-shadow: 0 0 0 transparent, 5px 5px 0 -1px var(--card-color-background),
+    5px 5px 0 0 var(--layer1), 10px 10px 0 -1px var(--card-color-background),
+    10px 10px 0 0 var(--layer1) !important;
+  /* stylelint-enable */
+}
+
+/**
+ Available
+ */
+.package-card.available .subtitle {
+  color: var(--blue);
+}
+.package-card.available .right {
+  border-color: var(--blue);
+  display: block;
+}
+/**
+ Creating
+ */
+.package-card.available-creating .subtitle {
+  color: var(--orange);
+}
+
+.package-card.available-creating .right {
+  display: block;
+  border-color: transparent;
+  text-align: right;
+  min-width: 45px;
+}
+.package-card.available-creating .action .creating {
+  animation: rotating 10s linear infinite;
+}
+
+/**
+ Running
+ */
+.package-card.available-running {
+  box-shadow: inset 2px 0 0 0 var(--green);
+  border-left: 0;
+}
+
+.package-card.available-running .right {
+  border-color: var(--green);
+  display: block;
+}
+
+.package-card.available-running .subtitle {
+  color: var(--green);
+}
+
+/**
+ Packaging
+ */
+.package-card.packaging {
+  background: rgba(0, 130, 240, 0.6);
+}
+
+.package-card.packaging .content {
+  color: var(--text);
+  align-items: center;
+  justify-content: center;
+}
+
+.package-card.packaging .id,
+.package-card.packaging .title {
+  opacity: 0.4;
+}
+
+.package-card.packaging .text,
+.package-card.packaging .package-icon {
+  color: var(--white);
+  --icon-color: var(--white);
+}
+
+.package-card.packaging .action {
+  display: none;
+}
+
+.package-card eui-v0-icon[name='dial'] {
+  animation: rotating 10s linear infinite;
+}
+
+/**
+ Packaging Error
+ */
+.package-card.error {
+  box-shadow: inset 2px 0 0 0 var(--red);
+}
+
+.package-card.error .package-icon,
+.package-card.error .action {
+  --icon-color: var(--red);
+}
+
+.package-card.error .content {
+  align-items: center;
+  justify-content: center;
+}
+
+/**
+ Deployment Error
+ */
+.package-card.available-error {
+  box-shadow: inset 2px 0 0 0 var(--red);
+}
+
+.package-card.available-error .package-icon {
+  --icon-color: var(--red);
+}
+.package-card.available-error .action {
+  --icon-color: var(--blue);
+}
+.package-card.available-error .content {
+  align-items: center;
+  justify-content: center;
+}

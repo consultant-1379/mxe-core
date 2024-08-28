@@ -1,0 +1,378 @@
+{
+	"apiVersion": "machinelearning.seldon.io/v1",
+	"kind": "SeldonDeployment",
+	"metadata": {
+		"name": "test-ab-model",
+		"namespace": "testnamespace",
+		"labels": {
+			"mxe/createdbyuserid": "1234-5678-9012",
+			"mxe/createdbyusername": "mxe-user",
+			"app": "seldon",
+			"mxe/component": "mxe-modeldeployment",
+			"mxe/deploymenttype": "static",
+			"mxe/templateversion": "2.0"
+		},
+		"resourceVersion": "123456"
+	},
+	"spec": {
+		"predictors": [{
+			"name": "main",
+			"annotations": {
+				"predictor_version": "v1"
+			},
+			"replicas": 1,
+			"graph": {
+				"name": "ab-test",
+				"endpoint": {},
+				"implementation": "RANDOM_ABTEST",
+				"parameters": [{
+					"name": "ratioA",
+					"value": "0.5",
+					"type": "FLOAT"
+				}],
+				"children": [{
+					"name": "model-1",
+					"endpoint": {
+						"type": "REST"
+					},
+					"type": "MODEL",
+					"children": []
+				}, {
+					"name": "model-2",
+					"endpoint": {
+						"type": "REST"
+					},
+					"type": "MODEL",
+					"children": []
+				}]
+			},
+			"componentSpecs": [{
+				"spec": {
+					"containers": [{
+						"image": "vmx-eea166.ete.ka.sw.ericsson.se:32222/mxe.manifest.stateless:2.0.1",
+						"name": "model-2",
+						"livenessProbe": {
+							"failureThreshold": 6,
+							"initialDelaySeconds": 10,
+							"periodSeconds": 10,
+							"successThreshold": 1,
+							"timeoutSeconds": 1,
+							"tcpSocket": {
+								"port": "http"
+							}
+						},
+						"readinessProbe": {
+							"failureThreshold": 6,
+							"initialDelaySeconds": 10,
+							"periodSeconds": 10,
+							"successThreshold": 1,
+							"timeoutSeconds": 1,
+							"tcpSocket": {
+								"port": "http"
+							}
+						}
+					}],
+					"terminationGracePeriodSeconds": 1,
+					"imagePullSecrets": [{
+						"name": null
+					}],
+					"affinity": {
+						"podAntiAffinity": {
+							"preferredDuringSchedulingIgnoredDuringExecution": [{
+								"weight": 75,
+								"podAffinityTerm": {
+									"topologyKey": "kubernetes.io/hostname",
+									"labelSelector": {
+										"matchExpressions": [{
+											"key": "app.kubernetes.io/part-of",
+											"operator": "In",
+											"values": ["mxe"]
+										}, {
+											"key": "app.kubernetes.io/component",
+											"operator": "In",
+											"values": ["model-service-instance"]
+										}, {
+											"key": "app.kubernetes.io/instance",
+											"operator": "In",
+											"values": ["test-ab-model"]
+										}]
+									}
+								}
+							}, {
+								"weight": 25,
+								"podAffinityTerm": {
+									"topologyKey": "kubernetes.io/hostname",
+									"labelSelector": {
+										"matchExpressions": [{
+											"key": "app.kubernetes.io/part-of",
+											"operator": "In",
+											"values": ["mxe"]
+										}, {
+											"key": "app.kubernetes.io/component",
+											"operator": "In",
+											"values": ["model-service-instance"]
+										}, {
+											"key": "app.kubernetes.io/instance",
+											"operator": "NotIn",
+											"values": ["test-ab-model"]
+										}]
+									}
+								}
+							}, {
+								"weight": 50,
+								"podAffinityTerm": {
+									"topologyKey": "kubernetes.io/hostname",
+									"labelSelector": {
+										"matchExpressions": [{
+											"key": "app.kubernetes.io/part-of",
+											"operator": "In",
+											"values": ["mxe"]
+										}, {
+											"key": "app.kubernetes.io/component",
+											"operator": "In",
+											"values": ["trainer"]
+										}]
+									}
+								}
+							}, {
+								"weight": 50,
+								"podAffinityTerm": {
+									"topologyKey": "kubernetes.io/hostname",
+									"labelSelector": {
+										"matchExpressions": [{
+											"key": "app.kubernetes.io/part-of",
+											"operator": "In",
+											"values": ["mxe"]
+										}, {
+											"key": "app.kubernetes.io/component",
+											"operator": "In",
+											"values": ["packager"]
+										}]
+									}
+								}
+							}, {
+								"weight": 10,
+								"podAffinityTerm": {
+									"topologyKey": "kubernetes.io/hostname",
+									"labelSelector": {
+										"matchExpressions": [{
+											"key": "app.kubernetes.io/part-of",
+											"operator": "In",
+											"values": ["mxe"]
+										}, {
+											"key": "app.kubernetes.io/component",
+											"operator": "In",
+											"values": ["gatekeeper"]
+										}]
+									}
+								}
+							}, {
+								"weight": 10,
+								"podAffinityTerm": {
+									"topologyKey": "kubernetes.io/hostname",
+									"labelSelector": {
+										"matchExpressions": [{
+											"key": "app.kubernetes.io/part-of",
+											"operator": "In",
+											"values": ["mxe"]
+										}, {
+											"key": "app.kubernetes.io/component",
+											"operator": "In",
+											"values": ["ingress-controller"]
+										}]
+									}
+								}
+							}, {
+								"weight": 5,
+								"podAffinityTerm": {
+									"topologyKey": "kubernetes.io/hostname",
+									"labelSelector": {
+										"matchExpressions": [{
+											"key": "app",
+											"operator": "In",
+											"values": ["nginx-ingress"]
+										}]
+									}
+								}
+							}]
+						}
+					}
+				},
+				"metadata": {
+					"labels": {
+						"app.kubernetes.io/part-of": "mxe",
+						"mxe.ericsson.com/model-service-component": "model",
+						"app.kubernetes.io/instance": "test-ab-model",
+						"app.kubernetes.io/component": "model-service-instance"
+					}
+				}
+			}, {
+				"spec": {
+					"containers": [{
+						"image": "vmx-eea166.ete.ka.sw.ericsson.se:32222/mxe.manifest.stateless:2.0.1",
+						"name": "model-2",
+						"livenessProbe": {
+							"failureThreshold": 6,
+							"initialDelaySeconds": 10,
+							"periodSeconds": 10,
+							"successThreshold": 1,
+							"timeoutSeconds": 1,
+							"tcpSocket": {
+								"port": "http"
+							}
+						},
+						"readinessProbe": {
+							"failureThreshold": 6,
+							"initialDelaySeconds": 10,
+							"periodSeconds": 10,
+							"successThreshold": 1,
+							"timeoutSeconds": 1,
+							"tcpSocket": {
+								"port": "http"
+							}
+						}
+					}],
+					"terminationGracePeriodSeconds": 1,
+					"imagePullSecrets": [{
+						"name": null
+					}],
+					"affinity": {
+						"podAntiAffinity": {
+							"preferredDuringSchedulingIgnoredDuringExecution": [{
+								"weight": 75,
+								"podAffinityTerm": {
+									"topologyKey": "kubernetes.io/hostname",
+									"labelSelector": {
+										"matchExpressions": [{
+											"key": "app.kubernetes.io/part-of",
+											"operator": "In",
+											"values": ["mxe"]
+										}, {
+											"key": "app.kubernetes.io/component",
+											"operator": "In",
+											"values": ["model-service-instance"]
+										}, {
+											"key": "app.kubernetes.io/instance",
+											"operator": "In",
+											"values": ["test-ab-model"]
+										}]
+									}
+								}
+							}, {
+								"weight": 25,
+								"podAffinityTerm": {
+									"topologyKey": "kubernetes.io/hostname",
+									"labelSelector": {
+										"matchExpressions": [{
+											"key": "app.kubernetes.io/part-of",
+											"operator": "In",
+											"values": ["mxe"]
+										}, {
+											"key": "app.kubernetes.io/component",
+											"operator": "In",
+											"values": ["model-service-instance"]
+										}, {
+											"key": "app.kubernetes.io/instance",
+											"operator": "NotIn",
+											"values": ["test-ab-model"]
+										}]
+									}
+								}
+							}, {
+								"weight": 50,
+								"podAffinityTerm": {
+									"topologyKey": "kubernetes.io/hostname",
+									"labelSelector": {
+										"matchExpressions": [{
+											"key": "app.kubernetes.io/part-of",
+											"operator": "In",
+											"values": ["mxe"]
+										}, {
+											"key": "app.kubernetes.io/component",
+											"operator": "In",
+											"values": ["trainer"]
+										}]
+									}
+								}
+							}, {
+								"weight": 50,
+								"podAffinityTerm": {
+									"topologyKey": "kubernetes.io/hostname",
+									"labelSelector": {
+										"matchExpressions": [{
+											"key": "app.kubernetes.io/part-of",
+											"operator": "In",
+											"values": ["mxe"]
+										}, {
+											"key": "app.kubernetes.io/component",
+											"operator": "In",
+											"values": ["packager"]
+										}]
+									}
+								}
+							}, {
+								"weight": 10,
+								"podAffinityTerm": {
+									"topologyKey": "kubernetes.io/hostname",
+									"labelSelector": {
+										"matchExpressions": [{
+											"key": "app.kubernetes.io/part-of",
+											"operator": "In",
+											"values": ["mxe"]
+										}, {
+											"key": "app.kubernetes.io/component",
+											"operator": "In",
+											"values": ["gatekeeper"]
+										}]
+									}
+								}
+							}, {
+								"weight": 10,
+								"podAffinityTerm": {
+									"topologyKey": "kubernetes.io/hostname",
+									"labelSelector": {
+										"matchExpressions": [{
+											"key": "app.kubernetes.io/part-of",
+											"operator": "In",
+											"values": ["mxe"]
+										}, {
+											"key": "app.kubernetes.io/component",
+											"operator": "In",
+											"values": ["ingress-controller"]
+										}]
+									}
+								}
+							}, {
+								"weight": 5,
+								"podAffinityTerm": {
+									"topologyKey": "kubernetes.io/hostname",
+									"labelSelector": {
+										"matchExpressions": [{
+											"key": "app",
+											"operator": "In",
+											"values": ["nginx-ingress"]
+										}]
+									}
+								}
+							}]
+						}
+					}
+				},
+				"metadata": {
+					"labels": {
+						"app.kubernetes.io/part-of": "mxe",
+						"mxe.ericsson.com/model-service-component": "model",
+						"app.kubernetes.io/instance": "test-ab-model",
+						"app.kubernetes.io/component": "model-service-instance"
+					}
+				}
+			}]
+		}],
+		"name": "test-ab-model",
+		"annotations": {
+			"deployment_version": "v1",
+			"seldon.io/rest-read-timeout": "0",
+			"project_name": "test-ab-model"
+		}
+	}
+}

@@ -1,0 +1,16 @@
+apiVersion: v2
+appVersion: 1.0.0
+description: A Helm chart for MXE Serving
+name: mxe-serving
+version: 1.0.0-0
+dependencies:
+  - name: eric-mxe-serving-pre-upgrade-job
+    version: MXE_VERSION
+  - name: eric-mxe-seldon-service-account
+    version: MXE_VERSION
+  - name: eric-mxe-serving-upgrade-jobs
+    version: MXE_VERSION
+  - name: eric-mxe-model-catalogue-service
+    version: MXE_VERSION
+  - name: eric-mxe-model-service
+    version: MXE_VERSION

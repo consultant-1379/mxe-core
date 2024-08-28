@@ -1,0 +1,8 @@
+{
+  "script": "package-versions/PackageVersions",
+  "id": "PackageVersions",
+  "data": {},
+  "dependencies": {
+    "@eui/lit-component": "^0.9.0"
+  }
+}

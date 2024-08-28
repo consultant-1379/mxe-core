@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "eric-mxe-serving-pre-upgrade-job.role" . | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+   {{- $component := printf "%s" "app.kubernetes.io/component: pre-upgrade-job-role"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-serving-pre-upgrade-job.labels" . | fromYaml -}}
+    {{- include "eric-mxe-serving-pre-upgrade-job.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $hook := printf "%s" "helm.sh/hook: pre-upgrade"  | fromYaml -}}
+    {{- $hookDeletePolicy := printf "%s" "helm.sh/hook-delete-policy: before-hook-creation"  | fromYaml -}}
+    {{- $hookWeight := include "eric-mxe-serving-pre-upgrade-job.hook-weight" -5 | fromYaml -}}
+    {{- $annotations := include "eric-mxe-serving-pre-upgrade-job.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-serving-pre-upgrade-job.mergeAnnotations" (dict "location" .Template.Name "sources" (list $hook $hookDeletePolicy $hookWeight $annotations)) | trim | nindent 4 }}
+rules:
+  - apiGroups:
+      - "batch"
+    resources:
+      - jobs
+    verbs:
+      - get
+      - list
+      - watch

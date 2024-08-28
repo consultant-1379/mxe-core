@@ -1,0 +1,32 @@
+# Default values for eric-mxe-seldon-service-account
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+operatorNameOverride: null
+engineNameOverride: null
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "-"
+
+imageCredentials:
+  registry:
+   pullSecret:
+   repoPath:
+
+# DR-D1121-011 - Present in Top Level Helm Chart Values.yaml
+#global:
+#  registry:
+#    pullSecret:
+#  labels: {}
+#  annotations: {}
+
+
+# Added to handle DR-D1121-068
+labels: {}
+annotations: {}
+tolerations: []
+
+terminationGracePeriodSeconds: 30

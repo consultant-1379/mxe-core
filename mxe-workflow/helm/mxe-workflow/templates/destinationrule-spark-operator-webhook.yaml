@@ -1,0 +1,22 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: mxe-workflow-spark-operator-webhook-dr
+  labels:
+    app.kubernetes.io/part-of: "mxe-workflow"
+    app.kubernetes.io/component: "mxe-workflow"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name:  mxe-workflow-spark-operator-webhook-dr
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- include "mxe.product-info" . | nindent 4 }}
+spec:
+  host: "mxe-workflow-spark-operator-webhook"
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+{{- end -}}

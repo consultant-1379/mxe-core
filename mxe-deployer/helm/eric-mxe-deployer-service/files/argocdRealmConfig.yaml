@@ -1,0 +1,123 @@
+{{- $argocdRealmName := (index .Values "config" "sso" "argocdRealmName") -}}
+{{- $clientID := (index .Values "config" "sso" "clientID") -}}
+{{- $restClientID := print $clientID "-rest-client" -}}
+{{- $argocdUIURL := (include "eric-mxe-deployer-service.argocdui-url" . ) -}}
+{{- $argocdCallbackURL := print $argocdUIURL "/auth/callback" -}}
+{{- $adminGroupName := (index .Values "config" "sso" "groups" "adminGroupName") -}}
+{{- $readOnlyGroupName := (index .Values "config" "sso" "groups" "readOnlyGroupName") -}}
+{{- $readOnlyUserName := (index .Values "config" "sso" "users" "readOnlyUserName") -}}
+{{- $readOnlyUserPassword := (index .Values "config" "sso" "users" "readOnlyUserPassword") -}}
+{{- $adminUserSecret := (index .Values "config" "sso" "users" "adminUserSecret") -}}
+realm:
+  realm: {{ $argocdRealmName }}
+  accountTheme: ericsson-base-modified-theme
+  loginTheme: ericsson-base-modified-theme
+  enabled: true
+  passwordPolicy: "length(8) and maxLength(64) and forceExpiredPasswordChange(90)"
+  bruteForceProtected: true 
+  permanentLockout: false 
+  failureFactor: 5 
+  waitIncrementSeconds: 60
+  quickLoginCheckMilliSeconds: 1000 
+  minimumQuickLoginWaitSeconds: 60
+  maxFailureWaitSeconds: 900
+  maxDeltaTimeSeconds: 43200
+clientScope:
+  name: groups
+  protocol: openid-connect
+  attributes:
+    include.in.token.scope: true
+    display.on.consent.screen: true
+  protocolMappers:
+    - name: groups
+      protocol: openid-connect
+      protocolMapper: oidc-group-membership-mapper
+      config:
+        id.token.claim: true
+        access.token.claim: true
+        userinfo.token.claim: true
+        claim.name: groups
+client:
+  clientId: {{ $clientID }}
+  name: {{ $clientID }}
+  protocol: openid-connect
+  rootUrl: {{ $argocdUIURL }}
+  redirectUris:
+    - {{ $argocdCallbackURL }}
+  adminUrl: {{ $argocdUIURL }}
+  webOrigins:
+    - {{ $argocdUIURL }}
+  baseUrl: /applications
+  bearerOnly: false
+  publicClient: false
+  standardFlowEnabled: true
+  implicitFlowEnabled: false
+  directAccessGrantsEnabled: true
+  consentRequired: false
+  defaultClientScopes:
+    - email
+    - groups 
+    - profile
+    - roles 
+    - web-origins 
+  optionalClientScopes:
+    - address 
+    - microprofile-jwt
+    - offline_access 
+    - phone
+restClient:
+  clientId: {{ $restClientID }}
+  name: {{ $restClientID }}
+  protocol: openid-connect
+  rootUrl: {{ $argocdUIURL }}
+  redirectUris:
+    - {{ $argocdCallbackURL }}
+  adminUrl: {{ $argocdUIURL }}
+  webOrigins:
+    - {{ $argocdUIURL }}
+  baseUrl: /applications
+  bearerOnly: false
+  publicClient: true
+  standardFlowEnabled: true
+  implicitFlowEnabled: false
+  directAccessGrantsEnabled: true
+  consentRequired: false
+  defaultClientScopes:
+    - email
+    - groups 
+    - profile
+    - roles 
+    - web-origins 
+  optionalClientScopes:
+    - address 
+    - microprofile-jwt
+    - offline_access 
+    - phone
+groups:
+  - name: {{ $adminGroupName }}
+  - name: {{ $readOnlyGroupName }}
+users:
+ - keycloakUser:
+    username:
+    enabled: true
+    groups:
+      - {{ $adminGroupName }}
+    credentials:
+      - type: password
+        value:
+   secrets:
+    userNameSecret: 
+        name: {{ $adminUserSecret }}
+        key:  username
+    passwordSecret: 
+      name: {{ $adminUserSecret }}
+      key:  password 
+ - keycloakUser:
+    username: {{ $readOnlyUserName }}
+    enabled: true
+    groups:
+    - {{ $readOnlyGroupName }}
+    credentials:
+      - temporary: true
+        type: password
+        value: {{ $readOnlyUserPassword }}

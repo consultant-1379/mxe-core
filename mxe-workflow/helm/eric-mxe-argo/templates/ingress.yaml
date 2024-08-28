@@ -1,0 +1,36 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "eric-mxe-argo.ingress-name" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: argo-ingress"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-argo.ingress-name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-argo.labels" . | fromYaml -}}
+    {{- include "eric-mxe-argo.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $ingressAnn := include "eric-mxe-argo.ingress-annotations" . | fromYaml -}}
+    {{- $annotations := include "eric-mxe-argo.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-argo.mergeAnnotations" (dict "location" .Template.Name "sources" (list $ingressAnn $annotations)) | trim | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClass | quote }}
+  defaultBackend:
+    service:
+      name: {{ include "eric-mxe-argo.defaultbackend" . | quote }}
+      port:
+        name: "http"
+  {{- include "eric-mxe-argo.ingress-tls" . | nindent 2 -}}
+  rules:
+    - http:
+        paths:
+        - path: /argo(/|$)(.*)
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: {{ include "eric-mxe-argo.service-name" . | quote }}
+              port:
+                name: "http"
+      {{- if or .Values.global.mxeApiHostname .Values.ingress.hostname }}
+      host: {{ default .Values.global.mxeApiHostname .Values.ingress.hostname | quote }}
+      {{- end }}
+{{- end }}

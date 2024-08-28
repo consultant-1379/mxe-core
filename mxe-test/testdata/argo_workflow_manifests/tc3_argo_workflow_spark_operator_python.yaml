@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: spark-argo-python-                            # Name of Argo Workflow
+  namespace: mxe-ci
+spec:
+  serviceAccountName: eric-mxe-argo-workflow-service-account  # Service account of Argo Workflow
+  entrypoint: spark-job
+  imagePullSecrets:
+  - name: mxe-pull-secret    
+  templates:
+  - name: spark-job
+    # MXE runs Argo workflow with a restricted Security Context where readOnlyRootFilesystem is set to true
+    # The below resource definition is mounted at /tmp in the init container corresponding to the Workflow pod
+    # Mount fails due to readOnlyRootFilesystem being set to true
+    # As a workaround an emptyDir volume is added to the podSpec at /tmp using podSpecPatch
+    podSpecPatch: '{"initContainers":[{"name":"init","volumeMounts":[{"name":"init-temp-dir","mountPath":"/tmp"}]}],"volumes":[{"name":"init-temp-dir","emptyDir":{"sizeLimit":"50Mi"}}]}'
+    resource:
+      action: create
+      successCondition: status.applicationState.state==COMPLETED
+      failureCondition: status.applicationState.state==FAILED
+      manifest: |
+        apiVersion: "sparkoperator.k8s.io/v1beta2"
+        kind: SparkApplication
+        metadata:
+          generateName: spark-python-3-4-0-
+        spec:
+          type: Python
+          pythonVersion: "3"
+          mode: cluster
+          image: "apache/spark:3.4.0-python3"
+          imagePullPolicy: Always
+          mainClass: org.apache.spark.examples.SparkPi
+          mainApplicationFile: "local:///opt/spark/examples/src/main/python/pi.py"
+          sparkVersion: "3.4.0"
+          restartPolicy:
+            type: Never
+          driver:
+            cores: 1
+            memory: "512m"
+            labels:
+              version: 3.4.0
+            serviceAccount: eric-mxe-spark-jobs-service-account
+          executor:
+            cores: 1
+            instances: 1
+            memory: "512m"
+            deleteOnTermination: false
+            labels:
+              version: 3.4.0

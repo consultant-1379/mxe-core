@@ -1,0 +1,455 @@
+= Security User Guide
+:author: Kristóf Nékám
+:signature: EKRINKM
+:department: BDGSJBAK
+:doc-name: USER GUIDE
+:doc-no: 2/1553-AVA 901 53
+:revnumber: PK5
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+//Template updated 2018-08-21 (keep to track template history)
+
+[[Introduction]]
+== Introduction
+
+This guide describes the security functions implemented by Machine Learning Model Execution Environment (MXE). It also describes the security-related procedures that can be performed by the system administrators.
+
+[[Prerequisites]]
+== Prerequisites
+
+The prerequisites for security management on MXE are the same as for performing other management activities (such as installation and upgrade) and administrative operations in Kubernetes.
+
+Security management requires basic knowledge of Kubernetes management concepts.
+
+[[SecurityOperationsonRunningClusters]]
+=== Security Operations on Running Clusters
+
+Kubernetes security operations are performed using the Kubernetes API (for example the management of role-based authorization or network policy). The API can be accessed from the Command-line Interface (CLI) using the `kubectl` command, or graphically from the Kubernetes dashboard. In both cases, appropriate Kubernetes credentials with sufficient privileges are required.
+
+[[Conditions]]
+=== Conditions
+
+.Ensure that the following conditions are met before performing Kubernetes operations:
+* Appropriate Kubernetes credentials.
+* A copy of the `kubectl` command for your local system, or network access to the Kubernetes dashboard from the browser.
+* Network access to the Kubernetes API for `kubectl`.
+
+[[DockerContainerPrivileges]]
+== Docker Container Privileges
+
+Kubernetes runs a privileged Docker container with root access, as this is required to build new Docker images within Kubernetes. Any further containers are not executed in privileged security context.
+
+NOTE: A container with root access can be used to reach the surrounding Kubernetes environment with privileged access.
+
+[[NetworkSecurity]]
+== Network Security
+
+MXE must be deployed into a trusted network to ensure secure networking. It must not be deployed into a globally accessible network.
+
+[[TransportLayerSecurity]]
+== Transport Layer Security
+
+A Transport Layer Security (TLS) certificate protects the API server entry point.
+
+[[SecuringCommunicationBetweenServicesintheMXECluster]]
+== Securing Communication Between Services in the MXE Cluster
+
+By default services within the MXE cluster do not implement encrypted communication nor do they authenticate the identity of communicating parties. Communication to and from MXE through its API is protected with TLS. As an experimental feature MXE is now being prepared to be installed on a Kubernetes cluster that runs an https://istio.io/[Istio] service mesh. Istio configures workload sidecars to use https://istio.io/docs/tasks/security/authentication/authn-policy/#auto-mutual-tls[mutual TLS] (mTLS) when calling other services within the mesh by default.
+
+[[Prerequisites.1]]
+=== Prerequisites
+
+The Kubernetes cluster needs to have Istio installed and configured properly before installing MXE. On installing Istio please refer to its https://istio.io/latest/docs/setup/install/istioctl/[official documentation]. Currently MXE installation only supports an Istio mesh that has the `istio-sidecar-injector` policy set to `disabled`. This can be done by editing the `istio-sidecar-injector ConfigMap` and setting the `policy` value to `disabled`. This results in that only those pods get the Istio sidecar injected at creation time that have the `sidecar.istio.io/inject` annotation with value `true`. Since this is a global Istio service mesh level setting it applies to every application in the mesh not just to MXE. This is a limitation that needs to be taken into consideration when using this feature.
+
+[[IstioConfigurationtoEnablemTLSBetweenServices]]
+=== Istio Configuration to Enable mTLS Between Services
+
+The following steps assume Istio is already installed in the namespace `istio-system`, and MXE is already installed in the namespace `mxe`. Executing these steps before installing MXE will enable mTLS.
+
+[[ProxySidecarInjection]]
+==== Proxy Sidecar Injection
+
+In order to add a MXE service to the Istio Service Mesh, the Kubernetes Pod of the Service need to be injected with Istio's proxy side car. Annotate the namespace hosting the MXE services with the label `istio-injection=enabled`. Use the following command:
+
+....
+kubectl label namespace mxe istio-injection=enabled
+....
+Before installing MXE, the `values.yaml` file used for installation should be updated as follows:
+....
+
+# Whether to enable mTLS between MXE services using Istio service mesh
+
+enableIstioMtls: &enableIstioMtls true
+....
+Install MXE into the cluster. The helm charts of MXE services have special annotations within the Pod configuration to selectively enable/disable proxy sidecar injection.
+
+[[SetTLSEnforcementPolicytoPERMISSIVE]]
+==== Set TLS Enforcement Policy to PERMISSIVE
+
+Add a `PeerAuthentication` resource to set the tls enforcement policy to `PERMISSIVE`:
+
+....
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: tls-policy-permissive
+  namespace: mxe
+spec:
+  mtls:
+    mode: PERMISSIVE
+....
+
+[[SetTLSModetoISTIOMUTUAL]]
+==== Set TLS Mode to ISTIO_MUTUAL
+
+Add a `DestinationRule` to set the default tls mode to `ISTIO_MUTUAL` for all MXE services:
+
+....
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: tls-mode-istio-mutual
+  namespace: mxe
+spec:
+  host: "*"
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+....
+
+[[DisablemTLStoKubernetesAPIServer]]
+==== Disable mTLS to Kubernetes API Server
+
+By default, traffic to and from Kubernetes API Server to other MXE services are already encrypted using TLS. The certificate of the Kubernetes API Server is verified by the MXE services. Since this traffic is already encrypted, all outbound traffic from MXE services towards the API Server should not be subjected to mTLS. Apply the following `DestinationRule`:
+
+....
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: disable-mtls-to-k8s
+  namespace: mxe
+spec:
+  host: "kubernetes.default.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+....
+
+[[DisablemTLStoPrometheusServer]]
+==== Disable mTLS to Prometheus Server
+
+Disable mTLS to and from Prometheus Server. Apply the following `DestinationRule`:
+
+....
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: disable-mtls-to-prometheus
+  namespace: mxe
+spec:
+  host: "eric-pm-server"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+....
+
+[[DisablemTLStoJupyterhubProxyService]]
+==== Disable mTLS to Jupyterhub Proxy Service
+
+Disable mTLS to and from Jupyterhub Proxy Service. Apply the following `DestinationRule`:
+
+....
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: disable-mtls-to-jupyterhub-proxy-public
+  namespace: mxe
+spec:
+  host: "eric-mxe-jupyterhub-proxy-public"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+....
+
+[[DisablemTLStoInternalDockerRegistry]]
+==== Disable mTLS to Internal Docker Registry
+
+Disable mTLS to and from Internal Docker Registry. Apply the following `DestinationRule`:
+
+....
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: disable-mtls-to-docker-registry
+  namespace: mxe
+spec:
+  host: "eric-lcm-container-registry-registry"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+....
+
+[[AddIstioServiceEntryforMXEDomainName]]
+==== Add Istio ServiceEntry for MXE Domain Name
+
+Add a `ServiceEntry` matching MXE's Domain name. Apply the following configuration:
+
+....
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: service-entry-mxe-domain
+  namespace: mxe
+spec:
+  hosts:
+    # Should match the value of field "apiHostname" in values.yaml used for MXE installation
+    - <mxe_domain_name>
+  location: MESH_INTERNAL
+  ports:
+    - number: 80
+      name: http
+      protocol: HTTP
+  resolution: DNS
+  endpoints:
+    - address: mxe-mxe-ingress-controller
+      ports:
+        http: 80
+....
+
+[[DisablemTLSforthecompleteMXEinstance]]
+=== Disable mTLS for the complete MXE instance
+
+.After installing the MXE instance with `Istio mTLS` enabled, if you prefer to disable mTLS for the complete MXE instance, perform the following steps:
+. Delete the PeerAuthentication resource created during enabling `Istio mTLS` by using the following command:
++
+....
+kubectl delete peerauthentication tls-policy-permissive --namespace mxe
+....
++
+. Create a `PeerAuthentication` resource with the following configuration.
++
+....
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: tls-policy-disable
+  namespace: mxe
+spec:
+  mtls:
+    mode: DISABLE
+....
++
+. Delete the `DestinationRule` resource created for setting the TLS mode to `ISTIO_MUTUAL` by using the following command
++
+....
+kubectl delete destinationrule tls-mode-istio-mutual --namespace mxe
+....
++
+. Create a `DestinationRule` resource with the following configuration.
++
+....
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: tls-mode-disable
+  namespace: mxe
+spec:
+  host: "*"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+....
+
+These changes configures `Istio` to `disable mTLS` and fallback to plain text `http` communication between MXE services.
+
+[[MonitoringandLogging]]
+== Monitoring and Logging
+
+Kubernetes provides an API endpoint for gathering metrics from pods. For MXE basic information about pods, for example whether they are up, can be checked. For more information, see the https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/#the-metrics-api[Kubernetes Metrics API].
+
+MXE writes events with at least INFO level into the container logs which can then be accessed with Kubernetes. Furthermore, Kubernetes provides container logs to the end user through
+the `kubectl logs` command.
+
+[[VulnerabilityManagement]]
+== Vulnerability Management
+
+During MXE GUI package building, `npm` (Node Package Manager) checks if the `npm` dependencies have known vulnerabilities.
+
+[[InstallationSecurity]]
+== Installation Security
+
+The doc-ref:[Installation Guide] contains steps that enhance security, for example using a certificate acquired from Ericsson Certificate Services, and storing that certificate in a Kubernetes Secret.
+
+[[ServicesPortsandProtocols]]
+== Services, Ports, and Protocols
+
+MXE uses random plain HTTP ports allocated from the range of 30000 to 32767. It is possible to configure the exact ports to use by following the steps described in the *Post Installation Activities* section of the doc-ref:[Installation Guide].
+
+[[KubernetesSecretEncryption]]
+== Kubernetes Secret Encryption
+
+Kubernetes secrets are encrypted while stored in the Kubernetes `etcd` database. This encryption is performed automatically by the Kubernetes API server when the relevant configuration argument is provided. This back-end encryption does not change access to secrets by API clients since the API server decrypts the values before it returns them. For
+more information, see https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/[Encrypting Secret Data at Rest].
+
+[[HardeningGuidelines]]
+== Hardening Guidelines
+
+These sections describe the hardening procedures of MXE. As a prerequisite, users need familiarity with Kubernetes, and Kubernetes security features. For more information, see https://kubernetes.io/docs/home/[].
+
+[[ApplicationSoftwareInstallation]]
+=== Application Software Installation
+
+.Install applications by using Helm charts, with the following security practices in mind:
+* Use version and source control for Helm charts to track changes and identify what is being used for any given installation. Consider using Helm provenance and integrity, see https://github.com/helm/helm/blob/master/docs/provenance.md[].
+* Select variable names carefully and with meaning. Do not reuse or redefine standard names already defined by Helm.
+* Use explicit image versions rather than latest. Change the image version if it is needed.
+* Avoid defining namespace objects inside Helm charts, as `delete --purge` deletes the namespace and possibly affects running jobs.
+* Use `PullSecret` to identify a Kubernetes secret, for example if needed for registry authorization. Do not include registry secrets or tokens in the chart itself.
+
+[[HardeningDuringMXEDevelopment]]
+=== Hardening During MXE Development
+
+.Various activities take place during MXE development to harden and secure the system:
+* Components are built from source, rather than depending on binaries retrieved from internet sites.
+* Open-source components are carefully vetted, are widely used in the industry, and come from large communities with many contributors.
+* Configuration parameters are selected with appropriate defaults, taking security into consideration.
+* Keys, for example for securing control plane Transport Layer Security (TLS) connections, are generated dynamically, with appropriate key sizes.
+* MXE has undergone formal risk assessment and vulnerability analysis.
+
+[[SystemAccessControlAuthenticationandAuthorization]]
+=== System Access Control, Authentication, and Authorization
+
+.Security practices to keep in mind with regard to access are as follows:
+* Use specific accounts for each user, rather than shared accounts.
+* Use strong authentication mechanisms.
+* Control user privileges using Kubernetes Role-Based Access Control (RBAC). Only give users the minimal privilege required.
+* Use Kubernetes network security features such as ingress control and network policy. These ensure that applications can only access allowed network endpoints, and can only be accessed by proper incoming paths.
+
+[[PKIandTrustRelationshipConfiguration]]
+=== PKI and Trust Relationship Configuration
+
+The `/etc/kubernetes/pki/ca.crt` file serves as the root certificate for trust in the cluster. User accounts authenticating to the Kubernetes API have to use certificates issued against this root.
+
+[[NetworkConfigurationandSecurity]]
+=== Network Configuration and Security
+
+Firewall rules are advised to be used as to only permit access as needed. For example, external users accessing services generally only have direct access to load balancers, firewalls or ingress controllers that are the front ends for those services, and not directly to nodes.
+
+Kubernetes network security features, such as ingress control and network policy are advised to be used to secure application networking.
+
+Ingress control is an important Kubernetes mechanism that manages external access to cluster services. For more information, see https://kubernetes.io/docs/concepts/services-networking/ingress/[Ingress].
+
+Kubernetes network policy is a mechanism for controlling communication between groups of pods and network endpoints. Use it to set appropriate controls on the applications. For more information on how to configure and use network policy, see https://kubernetes.io/docs/concepts/services-networking/networkpolicies/[Network Policies].
+
+[[LoggingandAuditing]]
+=== Logging and Auditing
+
+MXE does a complete logging of system events. Furthermore, Kubernetes provides container logs to the end user through the `kubectl logs` command.
+
+For more information on Kubernetes auditing, see https://kubernetes.io/docs/tasks/debug-application-cluster/audit/[Auditing].
+
+[[IntrusionPreventionSystem]]
+=== Intrusion Prevention System
+
+When Intrusion Prevention System (IPS) is used, install and configure it according to its instructions prior to the deployment of MXE. The IPS must not interfere with the required communications of the Kubernetes network functions. It is recommended to use an IPS that has specific instructions for use with Kubernetes.
+
+[[EnforcingStrongUserPasswords]]
+=== Enforcing Strong User Passwords
+
+Keycloak can be configured to enforce password policies. For a detailed description and possibilities, see https://www.keycloak.org/docs/6.0/server_admin/index.html#_password-policies[]. For information on how to access the Keycloak admin page, please see the *User Administration* section of the doc-ref:[GUI Guide].
+
+[[PasswordCrackingProtectionBruteForce]]
+=== Password Cracking Protection (Brute Force)
+
+A brute force attack happens when an attacker is trying to guess a user’s password. Keycloak has some limited brute force detection capabilities. If turned on, a user account will be temporarily disabled if a threshold of login failures is reached. To enable this feature navigate to `/auth/admin/master/console/#/realms/mxe/defense/brute-force` under your MXE installation.
+
+Details on this feature and its settings can be found on https://github.com/keycloak/keycloak-documentation/blob/master/server_admin/topics/threat/brute-force.adoc[].
+
+NOTE: Brute Force Detection is disabled by default. Enabling this feature is highly recommended to protect against this type of attack.
+
+[[Privacy]]
+== Privacy
+
+These sections describe privacy related information for MXE.
+
+NOTE: Although MXE does not handle subscriber privacy data on its own, the models used in MXE may do.
+
+[[SubscriberNoticeandConsent]]
+=== Subscriber Notice and Consent
+
+Notice and consent needed to handling the data used by the model should be handled externally or on the application layer, since MXE is not aware of data processed by data-flows and models running in MXE.
+
+[[HandlingMXEModelAdminUserPrivacyData]]
+=== Handling MXE Model Admin User Privacy Data
+
+To manage models in MXE, a model admin account must be created. The following privacy data is requested: username, password. Optionally, the user can set his or her first name and last name. This data is used exclusively to authenticate the MXE model manager user, and it is not shared outside of MXE.
+
+Users can change their password, as well as delete their user accounts.
+
+[[PrivacyDataRetention]]
+=== Privacy Data Retention
+
+Log management is provided by the environment (Docker), therefore MXE expects the environment to provide proper privacy data retention in the logs (personal data: system users and administrator data).
+
+MXE model admin data is deleted from Keycloak when the user is deleted, however, it is preserved if the user onboarded or started the model.
+
+[[PrivacyDataIdentification]]
+=== Privacy Data Identification
+
+Privacy data in the logs is identified by `username = <username>`.
+
+[[SubscriberDatainMXE]]
+=== Subscriber Data in MXE
+
+MXE does not handle subscriber privacy data on its own, the models used in MXE may do, and therefore subscriber privacy data might be transferred in MXE, and such data might be temporarily, while it is being transferred, persisted in MXE. Therefore, the administrator of the environment (OS, Kubernetes) can copy such persisted data.
+
+Consequently, administrative access to the MXE environment shall be limited: the number of people who have administrative access to the environment (OS, Kubernetes cluster) shall be minimized to ideally one or two people.
+
+[[AccessingLogs]]
+=== Accessing Logs
+
+Logs can be accessed by the Kubernetes cluster administrators only.
+
+[[RestrictionofDataProcessing]]
+=== Restriction of Data Processing
+
+Models and data flows can be stopped if needed. For details please refer to the doc-ref:[Tutorial] and Interface documentation in the CPI, such as doc-ref:[REST API] or doc-ref:[CLI Guide].
+
+[[MXEAccessControlAuthenticationandAuthorization]]
+=== MXE Access Control, Authentication, and Authorization
+
+MXE uses OpenID Connect authentication framework which is built on top of OAuth 2.0. It is implemented by the usage of the Keycloak identity provider service.
+
+MXE GUI, API endpoints, and model services are only accessible after authentication.
+
+For more information about authentication, see doc-ref:[GUI Guide], doc-ref:[CLI Guide], and doc-ref:[REST API].
+
+MXE has target based access control. Targets are defined as resources available in MXE: models, model services, flow deployments, training packages, training jobs, and notebooks.
+
+Access control currently is only available for models and model services, all other targets are accessible by all users with the highest level of privilege.
+
+.Available access privilege:
+* *READ*: target is visible for the user and can query all available details of such target
+* *ALL*: target can be read, created, modified, deleted by the user
+
+Access privileges are not directly tied to targets. Instead all targets are grouped by domain names and privilege levels are tied to these domains.
+
+Privileges defined for a domain are applied for all of its subdomains (for example read access rights for domain `com.ericsson` is also valid for `com.ericsson.internal`).
+
+Privileges defined for a subdomain cannot restrict the privilege inherited from its parent (for example if all access rights are defined for domain `com.ericsson` then it is not valid to set read for `com.ericsson.internal`).
+
+For models the domain information is encoded in the `id` field. Model services have a separate field for the domain.
+
+Defining a domain for either models or model services is optional, in which case they are only accessible with the special wildcard `*` domain.
+
+Do not use a dot character in the id to have models without domains (for example `mymodel`).
+
+For Access Control administration, see the doc-ref:[GUI Guide].
+
+[[IngressControllerLogContent]]
+=== Ingress Controller Log Content
+
+Ingress controller logs contain the target IP address, but not the source IP address.

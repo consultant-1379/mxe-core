@@ -1,0 +1,1035 @@
+= Installation Guide
+:author: Kristóf Nékám
+:signature: EKRINKM
+:department: BDGSJBAK
+:doc-name: INSTALLATION INSTR.
+:doc-no: 1/1531-CAV 101 061/1
+:revnumber: PU6
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+//Template updated 2018-08-21 (keep to track template history)
+
+[[Introduction]]
+== Introduction
+
+The following sections describe the complete procedure for installing Machine Learning Model Execution Environment (MXE) to a cluster.
+
+.The following systems are involved in the installation:
+* The system, on which the installer is run. It can be one of the following:
+** A node of the cluster, on which Kubernetes is installed.
+** A separate terminal through which the user has access to the target Kubernetes. For example, it can be a Windows laptop.
++
+NOTE: Proper kube configuration is required in both cases.
++
+* Target Kubernetes system, where it is not necessary that the user has access to the underlying system.
+
+The installation and initial configuration takes around 30 minutes, of which the MXE installation part is around 10 minutes.
+
+NOTE: Installation time is hardware-dependent.
+
+[[Prerequisites]]
+== Prerequisites
+
+.The systems needed for the installation process are the following:
+* The target Kubernetes system where MXE is deployed. It is recommended to use Ericsson’s Kubernetes as a Service (KaaS). Optionally, Kubernetes installed on a set of VMs can also be used.
+* Terminal is where the installation commands are issued. This can be a laptop or one of the nodes of the cluster mentioned above.
+
+NOTE: It is outside of the scope of MXE CPI to provide details on the installation and setup of the environment MXE runs in. This includes HW, OS, VM, Kubernetes, and so on.
+
+[[HardwarePrerequisites]]
+=== Hardware Prerequisites
+
+* Target Kubernetes
+** Access to the Ericsson Corporate Network (ECN)
+** At least 6 GB of RAM and 4 CPU cores per host machine
+** At least 18 GB of RAM and 25 CPU cores for the whole cluster
+* Terminal
+** Network access to the Target Kubernetes system
+
+[[SoftwarePrerequisites]]
+=== Software Prerequisites
+
+* Target Kubernetes
+** Kubernetes version 14 or later
+** Reference Kubernetes cluster. MXE is Kubernetes cluster agnostic, but it is recommended to use KaaS with the rose option: https://confluence.lmera.ericsson.se/display/AD/KaaS[].
+** A storage class configured for MXE as described in <<SetUpaStorageClass,Set Up a Storage Class>>.
+* Terminal
+** A Unix shell terminal, where the installation commands are executed
+** Kubeconfig file configured as described in <<ConfigureAccesstotheKubernetesCluster,Configure Access to the Kubernetes Cluster>>.
+** The required command line utilities `kubectl` and `helm` are downloaded and available in the `PATH` before installing MXE.
+** For Helm, the required version is 3.2.x.
+
+NOTE: For a Windows environment, installing https://github.com/git-for-windows/git/releases/latest is recommended.
+
+[[Preparations]]
+== Preparations
+
+[[PreparethevaluesyamlInstallationConfigurationFile]]
+=== Prepare the values.yaml Installation Configuration File
+
+Helm uses a configuration file called `values.yaml` to change the settings of MXE during installation. The default configuration is part of the MXE release.
+
+Please click here to download an embedded archive containing this file.
+
+Customize the installation by changing the values in the file. The following sections describe the configurable parameters.
+
+[[ConfigureAccesstotheKubernetesCluster]]
+=== Configure Access to the Kubernetes Cluster
+
+The kubeconfig needs to be set for the `kubectl` and `helm` utilities to access the Kubernetes cluster by using a kubeconfig file.
+
+.For KaaS, a proper kubeconfig file can be downloaded from Rancher. To access Rancher:
+. Go to ~https://access-<cluster-name>.rnd.gic.ericsson.se/~, where `<cluster-name>` is the given name of a KaaS cluster.
+. Log on with your signum, and select a cluster on which MXE is to be installed.
++
+There is usually only one cluster listed with the same name as `<cluster-name>`.
++
+. Download the kubeconfig file with the *Kubeconfig File* button in the upper right corner. Save the content to `~/.kube/config`.
++
+For alternative solutions to KaaS the kubeconfig file can be retrieved from the Kubernetes cluster as it is created automatically when a cluster is created. By default it is located in `~/.kube/config`.
++
+. Optionally, validate the proper configuration of `kubectl` by issuing the following command:
++
+....
+$ kubectl cluster-info
+....
+
+[[InstallkubectlandhelmClients]]
+==== Install kubectl and helm 3 Clients
+
+.Install the clients on your terminal using the following official guides:
+* https://kubernetes.io/docs/tasks/tools/install-kubectl/[Install and Set Up kubectl]
+* https://helm.sh/docs/intro/install/[Installing Helm]
+
+[[SecureAPIEndpoint]]
+=== Secure API Endpoint
+
+The Application Programming Interface (API) endpoint, through which MXE can be reached, is secured. A certificate is required to be used to access it through HTTPS.
+
+.To set up a secure API endpoint:
+. Configure the domain name for the API endpoint, see <<ConfiguretheDomainNamefortheAPIEndpoint,Configure the Domain Name for the API Endpoint>>.
+. Acquire a certificate from Ericsson Certificate Services, see <<AcquireaCertificatefromEricssonCertificateServices,Acquire a Certificate from Ericsson Certificate Services>>.
+. Store the private key and the certificate in a Kubernetes secret, see <<StorethePrivateKeyandtheCertificateinaKubernetesSecret,Store the Private Key and the Certificate in a Kubernetes Secret>>.
+. Set the secret in the `values.yaml` file, see <<SettheSecretinthevaluesyamlFile,Set the Secret in the values.yaml File>>.
+
+[[ConfiguretheDomainNamefortheAPIEndpoint]]
+==== Configure the Domain Name for the API Endpoint
+
+By default, the API endpoint is exposed through a default ingress controller already present on the cluster.
+
+This behavior can be changed, and an internal Ingress controller can be used. This controller can be reached through a `NodePort` after installation. For more information, see <<UsinganInternalIngressController,Using an Internal Ingress Controller>>.
+
+The domain name for KaaS clusters are `<cluster-name>.rnd.gic.ericsson.se`, where `<cluster-name>` is the given name of a KaaS cluster. The domain name through which the API endpoint can be reached depends on the operator of the cluster. Contact the provider of the cluster for more information.
+
+[[AcquireaCertificatefromEricssonCertificateServices]]
+==== Acquire a Certificate from Ericsson Certificate Services
+
+. Create a configuration file called `mxe-api.conf` for openssl certificate:
++
+....
+[ req ] 
+default_bits = 2048
+distinguished_name = dn
+prompt = no
+req_extensions = req_ext
+
+[ dn ]
+CN = <domain-address>
+O = Ericsson
+OU = IT Services
+L = Stockholm
+ST = Stockholm
+C = SE
+emailAddress = <ericsson-email-address>
+
+[ req_ext ]
+subjectAltName = DNS: <domain-address>
+....
++
+Where `<domain-address>` is the domain name defined earlier, and `<ericsson-email-address>` is your Ericsson email address.
+. Generate a private key and a certificate signing request to obtain a secure certificate by issuing the following command:
++
+....
+$ openssl req -new -nodes -keyout mxe-api.key -out mxe-api.csr -config mxe-api.conf
+....
++
+. Navigate to the certificate request form at https://ecs.internal.ericsson.com/CertificateServices/Index[].
+. Configure the parameters:
+.. Set the *Alternative Contact E-mail* to a group email list.
+.. Set the *Validity* as needed. The certificate must be replaced before the expiry of the validity period, otherwise, key functionalities of MXE stop working after the certificate expired.
+.. Set the *Server type* to *Apache.*
+.. Select the *Trust*. It is recommended to use *Internal Trust*. Use *External Trust* for internet facing solutions only.
+... For *Internal Trust* set the *Signing Algorithm* to *sha256 With RSAEncryption SHA256 Root*.
+... For *External Trust* set the *Signing Algorithm* to *sha256 With RSAEncryption SHA1 Root*.
+.. Fill the *Common Name* field with the FQDN of the server.
+.. Fill the *CSR* field with the contents of the `.csr` file generated earlier.
+. Click *Validate Request* to submit the form, then click *Submit Request*.
+. Save the certificate, and rename it as *mxe-api.cer*.
+. Copy the certificate in X.509 format and save it as `mxe-api.cer`.
+. Remove UTF-8 BOM from the certificate by issuing the the following command:
++
+....
+sed -i '1s/^\xEF\xBB\xBF//' mxe-api.cer
+....
++
+Follow the steps in <<AdditionalStepsforInternalTrustCertificates,Additional Steps for Internal Trust Certificates>> or <<AdditionalStepsforExternalTrustCertificates,Additional Steps for External Trust Certificates>> to conclude the procedure.
+
+[[AdditionalStepsforInternalTrustCertificates]]
+===== Additional Steps for Internal Trust Certificates
+
+. Download and merge the necessary intermediate certificate. The intermediate certificate can be found at http://pki.ericsson.se/CertData/EGADIssuingCA3.crt[]. Download this certificate by issuing the following command:
++
+....
+$ curl -L http://pki.ericsson.se/CertData/EGADIssuingCA3.crt >> mxe-api.cer
+....
++
+. Download and install the necessary root certificate. The root certificate can be found at http://pki.ericsson.se/CertData/EGADRootCA.crt[]. This certificate must be installed on all of the nodes on the cluster for Docker, and on any machine where mxe CLI will be used. On Ericsson maintained workstations, this is usually already installed. Usually, only the cluster lacks this certificate. This certificate must be copied, by default, into `/etc/docker/certs.d/<apiHostname>/EGADRootCA.crt` and `/etc/docker/certs.d/<apiHostname>:<apiPort>/EGADRootCA.crt` on all nodes in the cluster. Where `<apiHostname>`, and `<apiPort>` are values which are used in the `values.yaml` file.
+.. For KaaS, root access is needed on all of the worker nodes to achieve this. https://ews.rnd.gic.ericsson.se/p.php[This site] can be used as a guide. Only the cluster's owner and anybody whom the owner gave permissions have access to the worker nodes. The list of worker nodes can be found on https://ews.rnd.gic.ericsson.se/cluster.php?service=ks[this site]. These steps must be made for all of the worker nodes separately. Master nodes don't need the root certificate, and they are not accessible via SSH.
+
+[[AdditionalStepsforExternalTrustCertificates]]
+===== Additional Steps for External Trust Certificates
+
+. Download, and merge the necessary intermediate certificate. The intermediate certificate can be found at [https://www.websecurity.symantec.com/content/dam/websitesecurity/support/digicert/symantec/ica/DigiCertSHA2SecureServerCA.pem]. Download this certificate by issuing the following command:
++
+....
+$ curl -L https://www.websecurity.symantec.com/content/dam/websitesecurity/support/digicert/symantec/ica/DigiCertSHA2SecureServerCA.pem >> mxe-api.cer
+....
++
+. Download, and merge the necessary root certificate. The root certificate can be found at https://www.websecurity.symantec.com/content/dam/websitesecurity/support/digicert/symantec/root/DigiCert_Global_Root_CA.pem[]. Download this certificate by issuing the following command:
++
+....
+$ curl -L https://www.websecurity.symantec.com/content/dam/websitesecurity/support/digicert/symantec/root/DigiCert_Global_Root_CA.pem >> mxe-api.cer
+....
+
+[[CreatethemxeNamespace]]
+==== Create the mxe Namespace
+
+Create the `mxe` namespace by issuing the following command:
+
+....
+kubectl create namespace mxe
+....
+
+[[StorethePrivateKeyandtheCertificateinaKubernetesSecret]]
+==== Store the Private Key and the Certificate in a Kubernetes Secret
+
+Store the private key and the certificate in a Kubernetes secret in the `mxe` namespace by issuing the following command:
+
+....
+$ kubectl create secret tls api-tls --key mxe-api.key --cert mxe-api.cer --namespace mxe
+....
+
+.Result:
+The certificate is now stored in a Kubernetes secret called `api-tls`.
+
+[[SettheSecretinthevaluesyamlFile]]
+==== Set the Secret in the values.yaml File
+
+. Set the `apiSecretName` parameter in the `values.yaml` file to the name of the Kubernetes secret, `api-tls`:
++
+....
+apiSecretName: &apiSecretName api-tls
+....
++
+. Set the `apiHostname` parameter to the hostname of the cluster, for example:
++
+....
+apiHostname: &apiHostname <cluster-name>.rnd.gic.ericsson.se
+....
++
+. Set the `apiPort` parameter to a port through which the default ingress controller can be accessed (if there is a default ingress controller, or a load balancer in the target Kubernetes).
++
+Alternativaly, set the `apiPort` parameter to a port which is used to access MXE (if a default ingress controller, or load balancer is not provided).
++
+....
+apiPort: &apiPort 443
+....
++
+NOTE: Port 443 is the default HTTPS port, so in that case it does not need to be specified in the URL to access MXE.
+
+.Result:
+The API is now accessible securely through HTTPS.
+
+[[SetUpaStorageClass]]
+=== Set Up a Storage Class
+
+A storage class must be configured because MXE only supports dynamic volume provisioning.
+
+NOTE: Default storage classes are not used, therefore the storage class name must be set during installation.
+
+.To set up a storage class for MXE:
+. Check available storage classes, see <<CheckAvailableStorageClasses,Check Available Storage Classes>>.
+. Install a storage class, if needed, see <<InstallingaStorageClass,Installing a Storage Class>> in the <<Appendix,Appendix>>.
+. Set the storage class for MXE, see <<SettheStorageClassforMXE,Set the Storage Class for MXE>>.
+
+[[CheckAvailableStorageClasses]]
+==== Check Available Storage Classes
+
+. Check available storage classes by issuing the following command:
++
+....
+$ kubectl get storageclasses
+....
++
+For KaaS, there should be at least two: `nfs` and `erikube-rbd`.
++
+. If there are none listed, install a storage class by following <<InstallingaStorageClass,Installing a Storage Class>>. If at least one storage class has already been installed, continue with <<SettheStorageClassforMXE,Set the Storage Class for MXE>>.
+
+[[SettheStorageClassforMXE]]
+==== Set the Storage Class for MXE
+
+Specify the name of the chosen storage class in the `values.yaml` file for the `storageClass` parameter.
+
+.Result:
+Storage handling of MXE is now configured.
+
+[[SetUpDiskSpaceMonitoring]]
+==== Set Up Disk Space Monitoring
+
+For the operation of MXE it is essential that there is always sufficient free disk space on the volumes used by the MXE services. To ensure high availability it is recommended to set up disk space monitoring and warning policies on the Kubernetes cluster level.
+
+[[ConfigureContainerRegistryVolumeSizeOptional]]
+=== Configure Container Registry Volume Size (Optional)
+
+You can change the size of the Docker container registry volume which is used to store onboarded model and training package images. To modify the size of the volume, change the `containerRegistryVolumeSize` key in the `values.yaml` file.
+
+WARNING: If this volume runs out of disk space, it will not be possible to onboard further model or training packages until the size of the volume is increased by the Kubernetes cluster administrator. Expansion of the volume size may or may not be possible, depending on the storage class configured for MXE.
+
+[[SetUpArmdockerCredentialsOptional]]
+=== Set Up Armdocker Credentials (Optional)
+
+This step is optional for offline installations and is mandatory otherwise.
+
+Proper credentials are required to access Docker images from Armdocker. Any user who has access to Armdocker also has access to all required images.
+
+[[GetAccesstoArmdocker]]
+==== Get Access to Armdocker
+
+The following users can have the necessary permissions:
+
+* Ericsson users with signum IDs
+* Global functional IDs
+
+For a small cluster used for testing or by one user only a signum ID is sufficient. For more advanced scenarios, a functional ID is recommended. The latter can be ordered by following https://wcdma-confluence.rnd.ki.sw.ericsson.se/pages/viewpage.action?pageId=229935792[] or https://wiki.lmera.ericsson.se/wiki/ARM/KB/How_To_Request_A_Global_Functional_ID[].
+
+Both with signum IDs, or functional IDs, it is recommended to use API keys, instead of passwords. To generate an API key, see https://wiki.lmera.ericsson.se/wiki/ARM/Usage/Authenticate_with_API_Keys[Armdocker's related documentation].
+
+[[CreateSecretfortheSelectedCredentials]]
+==== Create Secret for the Selected Credentials
+
+A Kubernetes secret must be made to store the necessary credentials for Docker to load images from Armdocker. Issue the following command to create a secret called `armdocker-creds` in the `mxe` namespace:
+
+....
+kubectl create secret docker-registry armdocker-creds --docker-server armdocker.rnd.ericsson.se --docker-username "<username>" -n mxe --docker-password "<password>"
+....
+
+Where `<username>` is the username for the selected signum ID or functional ID, and `<password>` is the corresponding password or API key.
+
+WARNING: This command is stored in history as issued, unless it starts with a whitespace. That is, the username and password is stored in plain text format on the terminal used. It is strongly recommended to either not letting the command saved in the shell history by starting it with a whitespace or use environmental variables or other solutions to avoid this security issue.
+
+[[ModifyvaluesyamlwiththeSecret]]
+==== Modify values.yaml with the Secret
+
+Set `installerDockerRegistrySecret` key in `values.yaml` to the newly created secret. With the command above, the value must be `armdocker-creds`.
+
+[[ChangeUserCredentialsOptional]]
+=== Change User Credentials (Optional)
+
+The install flow initializes the Keycloak administrator and the very first user of the MXE cluster. The defaults are the following:
+
+.User Defaults
+[options="header",cols=",,,,"]
+|===
+|Role|Username|Password|Temporary|Description
+|Keycloak admin user|admin|My-super-secret-pw123|no|This is the realm administrator user. This user can create users and edit access controls.
+|MXE cluster user|mxe-user|password|yes|This is the initial user for the MXE cluster. Since this is a temporary user, the password must be changed at the very first login attempt. This user will be added to the default access control group which gives full access to MXE. It can be changed after installation, see the *Access Control Administration* section of the doc-ref:[GUI Guide].
+|===
+
+NOTE: The password for temporary users cannot be changed through the Command Line Interface (CLI).
+
+Credentials can be changed during the installation procedure. For more details, see <<SettingUpUserCredentials,Setting Up User Credentials>>.
+
+[[SetLegalWarningMessageOptional]]
+=== Set Legal Warning Message (Optional)
+
+You can set a legal warning message to be displayed for the user on the GUI login page and on the CLI after login.
+
+To do this set the `legalWarningMessage` key in the `values.yaml` file.
+
+*Default Message*:
+
+....
+*Log-on is only allowed for authorized users. If you are not an authorized user, please exit.
+In accordance with requirements of data protection laws, we hereby inform you that personally
+identifiable information will be handled in log files for legal, security and costs reasons.
+
+This system processes sensitive personal data. The misuse of such data may generate considerable harm to the data subjects. Be reminded of the confidentiality obligations you have when accessing this kind of data and the disciplinary consequences of improper handling.
+....
+
+[[ChangePersistenceforPrometheusOptional]]
+=== Change Persistence for Prometheus (Optional)
+
+Persistence for Prometheus is enabled by default, and it works out of the box. See section <<SettingUpPersistenceforPrometheus,Setting Up Persistence for Prometheus>> on how to configure it.
+
+[[EnableOWASPOptional]]
+=== Enable OWASP for Model Services (Optional)
+
+Ambassador security can be hardened by turning on OWASP for model services.
+
+WARNING: Turning this feature on has a significant impact on performance (model response time).
+
+OWASP is disabled by default for model services in Ambassador. It can be turned on by setting the `modelServiceOwasp` key to `true` in the `values.yaml` file.
+
+[[CheckMetricsServerAvailability]]
+=== Check Metrics Server Availability
+
+To make the https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/[Horizontal Pod Autoscaler] (HPA) work - which is used by the model service autoscale functionality - the MXE installation target cluster must have the corresponding metrics apiservice and metrics server installation.
+
+....
+$ kubectl get apiservices
+
+...
+v1beta1.metrics.k8s.io                 metrics-server   True        18h
+...
+....
+
+The `values.yaml` file has to be changed according to the result of the above check, if no such entry then `metricsServer: &metricsServer true`, otherwise `metricsServer: &metricsServer false`.
+
+By default the metrics-server is not installed.
+
+[[CreateGeodeKVDBCustomResource]]
+=== Create Geode KVDB Custom Resource
+
+Geode KVDB instance, where the model state is persisted, is defined by a GeodeCluster CustomResource (CR), and its CustomResourceDefinition (CRD) must be installed before the chart containing the CR is deployed as part of MXE installation.
+
+[[InstallGeodeClusterCRDUsingtheReleaseHelmRepository]]
+==== Install GeodeCluster CRD Using the Release Helm Repository
+
+. Add ADP KVDB release repository to Helm:
++
+....
+$ helm repo add adp-gs-all https://arm.sero.gic.ericsson.se/artifactory/proj-adp-gs-all-helm/ && helm repo update
+....
++
+. Start the installation with the following Helm command:
++
+....
+$ helm upgrade --install -n mxe mxe-kvdb-crd adp-gs-all/eric-data-kvdb-ag-crd  --version 1.4.0+4
+....
+
+[[InstallGeodeClusterCRDUsingHelmChartDownloadedfromGASK]]
+==== Install GeodeCluster CRD Using Helm Chart Downloaded from GASK
+
+. Download the Helm CRD chart: `19010-CXC1742982_1_X_A_TAR_GZIPV1.tar.gz` from Software Gateway.
+. Rename CRD helm chart `19010-CXC1742982_1_X_A_TAR_GZIPV1.tar.gz` to `eric-data-kvdb-ag-crd-<version>.tgz`.
++
+....
+$ helm upgrade --install -n mxe mxe-kvdb-crd eric-data-kvdb-ag-crd-<version>.tgz
+....
+
+Make sure to always use the latest available CRD chart version when upgrading to newer KVDB releases.
+
+Installation can be verified with below command:
++
+....
+$ kubectl get crd | grep geodeclusters.kvdbag.data.ericsson.com
+....
+
+[[InstallationFlow]]
+== Installation Flow
+
+MXE is installed using Helm. The Helm chart used for the installation is available in the MXE release Helm repository and in GASK.
+
+[[InstallMXEUsingtheReleaseHelmRepository]]
+=== Install MXE Using the Release Helm Repository
+
+NOTE: <<SetUpArmdockerCredentialsOptional,Set Up Armdocker Credentials (Optional)>> is a prerequisite to this kind of installation.
+
+To install MXE using the Release Helm Repository:
+
+. Add MXE's release repository to Helm:
++
+....
+$ helm repo add mxe https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-release-helm && helm repo update
+....
++
+. Start the installation with the following Helm command:
+.. Using Helm 2.x:
++
+....
+$ helm install --name mxe mxe/mxe --version <version> -f values.yaml --wait --namespace mxe --timeout 1200
+....
+.. Using Helm 3.x:
++
+....
+$ helm install mxe mxe/mxe --version <version> -f values.yaml --wait --namespace mxe --timeout 20m
+....
++
+This command waits until all pods are ready in the cluster.
++
+For the current release, `<version>` is *1.7.1+4*. For information on fetching the `<version>` of MXE, see the *Fetching the Release Version of MXE* section in the doc-ref:[Troubleshooting Guide].
++
+NOTE: The following warning can be ignored:
++
+....
+Warning: Merging destination map for chart 'eric-sec-access-mgmt'. Cannot overwrite table item 'additionalEnv', with non table value: map[]
+....
++
+. Wait for the authentication service to be up:
++
+....
+$ kubectl rollout status deployment/eric-mxe-gatekeeper --watch --namespace mxe
+....
+
+[[InstallingMXEUsingtheHelmChartDownloadedfromGASK]]
+=== Installing MXE Using the Helm Chart Downloaded from GASK
+
+NOTE: <<SetUpArmdockerCredentialsOptional,Set Up Armdocker Credentials (Optional)>> is a prerequisite to this kind of installation.
+
+To install MXE using the Helm Chart Downloaded from GASK:
+
+. Download the Helm chart archive and save it on the terminal used for the installation along with the `values.yaml` configuration file.
+. Start the installation with the following Helm command:
+.. Using Helm 2.x:
++
+....
+$ helm install --name mxe mxe-<version>.tgz -f values.yaml --wait --namespace mxe --timeout 1200
+....
+.. Using Helm 3.x:
++
+....
+$ helm install mxe mxe-<version>.tgz -f values.yaml --wait --namespace mxe --timeout 20m
+....
++
+This command waits until all pods are ready in the cluster.
++
+For the current release, `<version>` is *1.7.1+4*. For information on fetching the `<version>` of MXE, see the *Fetching the Release Version of MXE* section in the doc-ref:[Troubleshooting Guide].
++
+NOTE: The following warning can be ignored:
++
+....
+Warning: Merging destination map for chart 'eric-sec-access-mgmt'. Cannot overwrite table item 'additionalEnv', with non table value: map[]
+....
++
+. Wait for the authentication service to be up:
++
+....
+$ kubectl rollout status deployment/eric-mxe-gatekeeper --watch --namespace mxe
+....
+
+[[InstallMXEUsingDownloadedOfflineImagesArchive]]
+=== Install MXE Using Downloaded Offline Images Archive
+
+To install MXE in an offline environment use the Helm chart archive and the offline images archive.
+
+There should be a Docker registry available from the cluster nodes.
+
+. Save the Helm chart archive on the terminal used for installation along with the `values.yaml` configuration file and the `offline_installer_images.tar.gz` archive.
++
+. Load all the images contained in the archive into Docker in one step:
++
+....
+$ docker load -i offline_installer_images.tar.gz
+....
++
+NOTE: This process takes time, possibly without indicating progress, depending on the environment used for installation.
++
+. The images in the offline archive need to be retagged and pushed to the available Docker registry. Set this local Docker registry url and port into an environment variable, which will be used in the commands later:
++
+....
+$ REGISTRY=<registry_url:port>
+....
++
+NOTE: Do not indicate the protocol itself (http, https) in the registry URL.
++
+. Tag the loaded images with the local Docker registry:
++
+....
+$ for image in $(docker image ls --format '{{print .Repository ":" .Tag}}' --filter 'reference=armdocker.rnd.ericsson.se/*/*' --filter 'reference=armdocker.rnd.ericsson.se/*/*/*' --filter 'reference=armdocker.rnd.ericsson.se/*/*/*/*'); do \
+  echo "Tagging image ${image}"; \
+  docker tag "${image}" "$(sed -e "s@armdocker.rnd.ericsson.se@${REGISTRY}@" <<< "${image}")"; \
+  docker tag "${image}" "$(sed -e "s@armdocker.rnd.ericsson.se/proj-mxe/@${REGISTRY}/proj-mxe-release/@" <<< "${image}")"; \
+done
+....
++
+. Push the tagged images into the local Docker registry:
++
+....
+$ for image in $(docker image ls --format '{{print .Repository ":" .Tag}}' | grep "${REGISTRY}"); do \
+  docker push "${image}"; \
+done
+....
++
+. Optionally, untag the originally loaded `armdocker.rnd.ericsson.se` images:
++
+....
+$ docker image rm $(docker image ls --format '{{print .Repository ":" .Tag}}' | grep 'armdocker.rnd.ericsson.se') --force
+....
++
+. Change the registry URLs in the previously filled `values.yaml` to the local registry URL and port:
++
+....
+$ sed -e "s/armdocker.rnd.ericsson.se/${REGISTRY}/g" values.yaml > offline_values.yaml
+....
++
+. Install works as in the previous section:
+.. Using Helm 2.x:
++
+....
+$ helm install --name mxe mxe-<version>.tgz -f offline_values.yaml --namespace mxe --timeout 1200
+....
+.. Using Helm 3.x:
++
+....
+$ helm install mxe mxe-<version>.tgz -f offline_values.yaml --namespace mxe --timeout 20m
+....
++
+For the current release, `<version>` is *1.7.1+4*. For information on fetching the `<version>` of MXE, see the *Fetching the Release Version of MXE* section in the doc-ref:[Troubleshooting Guide].
++
+NOTE: The following warning can be ignored:
++
+....
+Warning: Merging destination map for chart 'eric-sec-access-mgmt'. Cannot overwrite table item 'additionalEnv', with non table value: map[]
+....
++
+. Wait for the authentication service to be up:
++
+....
+$ kubectl rollout status deployment/eric-mxe-gatekeeper --watch --namespace mxe
+....
+
+[[PostInstallationCheck]]
+=== Post Installation Check
+
+The following elements are deployed in the Kubernetes cluster:
+
+* A new namespace: `mxe`
++
+....
+$ kubectl get ns
+
+NAME          STATUS    AGE
+default       Active    271d
+kube-public   Active    271d
+kube-system   Active    271d
+mxe           Active    3m
+....
++
+* The following pods:
++
+....
+$ kubectl get pods -n mxe
+
+NAME                                                      READY   STATUS      RESTARTS   AGE
+eric-data-coordinator-zk-0                                1/1     Running     0          47m
+eric-data-coordinator-zk-1                                1/1     Running     0          47m
+eric-data-coordinator-zk-2                                1/1     Running     0          47m
+eric-data-document-database-pg-0                          2/2     Running     0          47m
+eric-data-document-database-pg-1                          2/2     Running     0          47m
+eric-data-object-storage-mn-0                             1/1     Running     0          47m
+eric-data-object-storage-mn-1                             1/1     Running     0          47m
+eric-data-object-storage-mn-2                             1/1     Running     0          47m
+eric-data-object-storage-mn-3                             1/1     Running     0          47m
+eric-data-object-storage-mn-mgt-58f47d57db-tsmjp          1/1     Running     0          47m
+eric-lcm-container-registry-registry-0                    1/1     Running     0          47m
+eric-mxe-dind-78764c6f94-fds5x                            1/1     Running     0          47m
+eric-mxe-gatekeeper-58bd566dc7-cncds                      1/1     Running     0          47m
+eric-mxe-jupyterhub-hub-bdb9b5cc8-8wmnl                   1/1     Running     0          47m
+eric-mxe-jupyterhub-proxy-bf6c86f5c-jxxd5                 1/1     Running     0          47m
+eric-mxe-kvdb-ag-admin-mgr-0                              1/1     Running     0          47m
+eric-mxe-kvdb-ag-locator-0                                3/3     Running     0          47m
+eric-mxe-kvdb-ag-locator-1                                3/3     Running     0          46m
+eric-mxe-kvdb-ag-operator-7f6fdc455f-mkktm                1/1     Running     0          47m
+eric-mxe-kvdb-ag-server-0                                 2/2     Running     0          45m
+eric-mxe-kvdb-ag-server-1                                 2/2     Running     0          45m
+eric-mxe-nifi-service-56ffbf8b54-nvgmv                    1/1     Running     0          47m
+eric-mxe-prometheus-kube-state-metrics-6f997fc888-qpnjt   1/1     Running     0          47m
+eric-mxe-pypiserver-0                                     1/1     Running     0          47m
+eric-pm-server-0                                          2/2     Running     0          47m
+eric-sec-access-mgmt-0                                    1/1     Running     0          47m
+mxe-ambassador-6d6449594b-6kk2w                           1/1     Running     0          47m
+mxe-ambassador-6d6449594b-78kwm                           1/1     Running     0          47m
+mxe-ambassador-6d6449594b-rkkk7                           1/1     Running     0          47m
+mxe-argo-server-78bf697cc7-9f255                          1/1     Running     0          47m
+mxe-argo-workflow-controller-669449567b-qhthh             1/1     Running     0          47m
+mxe-mxe-author-service-6f997c756c-4w7c2                   1/1     Running     0          47m
+mxe-mxe-default-backend-5b7cc7bcb-ddsx9                   1/1     Running     0          47m
+mxe-mxe-gui-6564697f6f-98lnm                              1/1     Running     0          47m
+mxe-mxe-ingress-controller-578f464776-qjxwg               1/1     Running     0          47m
+mxe-mxe-ingress-controller-578f464776-qmrzr               1/1     Running     0          47m
+mxe-mxe-model-catalogue-service-5cfc65f586-fp7dk          1/1     Running     0          47m
+mxe-mxe-model-service-674b8f9644-fjxzq                    1/1     Running     0          47m
+seldon-controller-manager-85c59d894-4xrhr                 1/1     Running     0          47m
+....
+
+[[InstalltheCLI]]
+=== Install the CLI
+
+[[Prerequisites.1]]
+==== Prerequisites
+
+* An installed MXE cluster.
+* Linux or Windows operating system.
+* Docker engine is installed, as described in the https://docs.docker.com/install/[official guide].
+* `s2i` is installed, as described in https://github.com/openshift/source-to-image#installation[its documentation].
+* Optional: `kubectl` is installed. Only required if the internal ingress controller is used, and its ports are not known, see the https://kubernetes.io/docs/tasks/tools/install-kubectl/[installation instructions].
+
+[[GettheCLI]]
+==== Get the CLI
+
+The CLI component of MXE is included in the release package and contains two executables and a data folder with a configuration file.
+
+To install the CLI:
+
+. Extract the CLI component to a freely chosen folder.
+. Optionally, add this directory to the `PATH` (on Linux), or `Path` (on Windows) environmental variables to access MXE commands from anywhere in the file system tree.
+
+[[ConfigureAccesstotheMXECluster]]
+==== Configure Access to the MXE Cluster
+
+CLI commands are configured by the `clusters.json` file, which must be placed either under the `data` folder located relative to the MXE CLI executables or into the `.mxe` folder in the user `HOME` directory.
+
+This configuration file specifies the address where the MXE cluster can be accessed.
+
+To configure access to the MXE cluster:
+
+. Add a new cluster to the `clusters` key:
++
+....
+{
+    "name": "main",
+    "mxeEndpoint": <mxe-endpoint>
+}
+....
++
+. Set the default key to `main`. The `<mxe-endpoint>` is different according the following scenarios:
++
+* Using the default ingress controller:
++
+~https://<api-hostname>:<api-port>~, where <api-hostname> is the value of `apiHostname` taken from the `values.yaml` file of the installation, and `<api-port>` is the https port of the default ingress controller, which is defined by the `apiPort` parameter in `values.yaml`. The latter is usually 443, which can be omitted including the colon before it. In Kaas, the port is 443, and `<api-hostname>` is in the format of `<cluster-name>.rnd.gic.ericsson.se`.
++
+* Using the internal ingress controller:
++
+~https://<api-hostname>:<internal-ingress-controller-https-port>~, where `<api-hostname>` is the value of `apiHostname` taken from the `values.yaml` file of the installation, and `<api-port>` is the https port of the internal ingress controller, which is defined by the `apiPort` parameter in `values.yaml`. To check the `apiPort` parameter, issue the following command:
++
+....
+$ kubectl get svc --all-namespaces -l app.kubernetes.io/instance=mxe,app.kubernetes.io/component=ingress-service -o jsonpath --template '{.items[0].spec.ports[?(@.name=="https")].nodePort}'
+....
+
+Result: After the above changes, the configuration should look similar to the following example:
+
+*data/clusters.json example:*
+
+....
+{
+        "default": "main",
+        "clusters": [{
+                "name": "main",
+                "mxeEndpoint": "https://target.mxe.ericsson.com"
+        }, {
+                "name": "portforwarded",
+                "mxeEndpoint": "http://localhost:32111"
+        }]
+}
+....
+
+[[TesttheConnection]]
+==== Test the Connection
+
+. Issue the following command to test the connection towards the MXE cluster:
++
+....
+$ mxe-model list onboarded
+....
+
+Result: If an empty list is returned, the connection is up.
+
+[[Uninstallation]]
+== Uninstallation
+
+This section describes the uninstallation process of MXE.
+
+WARNING: During the uninstallation process, all data, flow deployments, flows, model deployments, and models are lost.
+
+NOTE: Ensure that all models and flows are present outside of the MXE cluster for later use.
+
+[[UninstallMXEUsingHelm]]
+=== Uninstall MXE Using Helm
+
+To uninstall MXE using Helm:
+
+. Start the uninstallation process with the following Helm command:
++
+....
+$ helm delete --purge mxe
+....
++
+NOTE: For Helm 3.x, the command is `$ helm delete mxe`.
+
+Result: The MXE installation is removed.
+
+[[PostUninstallationSteps]]
+=== Post Uninstallation Steps
+
+Running Nifi instances are not deleted by default. To remove running NiFi instances, issue the following commands:
+
+....
+$ kubectl delete deployment -n mxe -l app.kubernetes.io/part-of=mxe
+$ kubectl delete service -n mxe -l app.kubernetes.io/part-of=mxe
+$ kubectl delete ingress -n mxe -l app.kubernetes.io/part-of=mxe
+....
+
+Model packager jobs are not deleted immediately. To remove model packager jobs, issue the following command:
+
+....
+$ kubectl delete jobs -n mxe -l app.kubernetes.io/part-of=mxe
+....
+
+Persistent Volume Claims (PVCs) are not deleted due to their persistent nature. To remove all PVCs from the `mxe` namespace, issue the following command:
+
+....
+$ kubectl delete pvc -n mxe --all
+....
+
+Some secrets remain in the namespace, including those that are created before installation. To remove all secrets from the `mxe` namespace, issue the following command:
+
+....
+$ kubectl delete secrets -n mxe --all
+....
+
+NOTE: It is recommended to delete secrets one-by-one to prevent data loss.
+
+A few dinamically created configmaps remains in the `mxe` namespace. To remove all configmaps from the `mxe` namespace, issue the following command:
+
+....
+$ kubectl delete configmaps -n mxe --all
+....
+
+Delete seldon `validatingwebhookconfigurations` and `mutatingwebhookconfigurations`:
+
+....
+$ kubectl delete validatingwebhookconfigurations.admissionregistration.k8s.io seldon-validating-webhook-configuration-mxe
+$ kubectl delete mutatingwebhookconfigurations.admissionregistration.k8s.io seldon-mutating-webhook-configuration-mx
+....
+
+Delete ADP Geode KVDB CRD Release:
+
+....
+$ helm uninstall -n mxe mxe-kvdb-crd
+....
+
+Delete ADP Geode KVDB CRD:
+
+....
+$ kubectl delete CustomResourceDefinition geodeclusters.kvdbag.data.ericsson.com
+....
+
+To fully delete the `mxe` namespace, issue the following command:
+
+....
+$ kubectl delete namespace mxe
+....
+
+NOTE: Issue this command only if it is absolutely sure that nothing is needed from the `mxe` namespace.
+
+To remove MXE release repository from Helm, issue the following command:
+
+....
+$ helm repo remove mxe
+....
+
+[[PostUninstallationChecks]]
+=== Post Uninstallation Checks
+
+To check that MXE is completely removed and that there is no `mxe` namespace, issue the following commands:
+
+....
+$ kubectl get ns
+
+NAME          STATUS    AGE
+default       Active    271d
+kube-public   Active    271d
+kube-system   Active    271d
+....
+
+....
+$ kubectl get pods -n mxe
+
+No resources found
+....
+
+[[Appendix]]
+== Appendix
+
+[[SettingUpUserCredentials]]
+=== Setting Up User Credentials
+
+To change the default user credentials for Keycloak administration and for the MXE cluster user:
+
+. Create custom Keycloak admin credentials by using the following script with custom values for `kcadminid` and `kcpasswd`:
++
+....
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: custom-keycloak-admin-secret
+  namespace: mxe
+type: Opaque
+stringData:
+  kcadminid: custom-keycloak-admin
+  kcpasswd: custom-keycloak-admin-password
+EOF
+....
++
+. Create custom MXE cluster user credentials by using the following script with custom values for `username` and `password`:
++
+....
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: custom-mxe-user-secret
+  namespace: mxe
+type: Opaque
+stringData:
+  username: custom-mxe-user
+  password: custom-mxe-user-password
+EOF
+....
++
+. Update the corresponding section in the `values.yaml` file:
++
+....
+# User provided credentials in a form of a secret and given by its name for administering the realms in Keycloak. If not CHANGED, then the defaults are going to be used, see the Installation Guide for details.
+# If this value is changed, then the corresponding secret needs to be created beforehand.
+# Mandatory fields in the user provided secret:
+# - kcadminid (for the admin username)
+# - kcpasswd (for the admin user password)
+mxeAdminSecret: &mxeAdminSecret custom-keycloak-admin-secret
+ 
+# User provided credentials in a form of a secret and given by its name for the initial MXE user If not PROVIDED, then the defaults are going to be used, see the Installation Guide for details.
+# Mandatory fields in the user provided secret:
+# - username (for the initial MXE username)
+# - password (for the initial MXE user password)
+mxeUserSecret: &mxeUserSecret custom-mxe-user-secret
+....
+
+[[SettingUpPersistenceforPrometheus]]
+=== Setting Up Persistence for Prometheus
+
+By default the persistence of data that is collected by Prometheus from Kubernetes nodes and pods is enabled. All data is persistent, even if its pod is evicted. You can turn this off by setting `seldon-core-analytics.persistence.enabled` to `false`. If persistence is disabled, all data collected and stored locally on the container volumes is lost in case of intended or unintended restart. To provide complete control, persistence of Prometheus data is fully configurable for MXE.
+
+.Persistence Related Properties
+[options="header",cols=",,"]
+|===
+|Property|Default Value|Description
+|`seldon-core-analytics.persistence.enabled`|true|Enable or disable persistence of Prometheus data.
+|`seldon-core-analytics.persistence.claim.create`|true|Create PVC or reuse an existing one during install.
+|`seldon-core-analytics.persistence.claim.name`|mxe-metrics-claim|The PVC name to create or if the `create` property is set to false then the existing PVC name to use.
+|`seldon-core-analytics.persistence.claim.storageClassName`| |Only taken into account if the `create` (and `persistence.enabled`) property is set to `true`, controls the used storage class https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1[]
+|`seldon-core-analytics.persistence.claim.capacity`|8Gi|Only taken into account if the `create` property is set to `true`, controls the size of the storage
+|`seldon-core-analytics.persistence.walCompression`|false|Enables compression of the Write-ahead Log (WAL). Depending on the data the WAL size can decrease to as much as half, with limited extra CPU load.
+|`seldon-core-analytics.persistence.retention.size`|4096MB|Determines the maximum number of bytes that storage blocks can use (not including the WAL size, which can be substantial).
+|`seldon-core-analytics.persistence.retention.time`|7d|Determines when to remove old data.
+|===
+
+Example configuration:
+
+....
+seldon-core-analytics:
+  enabled: true
+  persistence:
+    enabled: true
+    claim:
+      create: true
+      name: "mxe-metrics-claim"
+      storageClassName: "nfs"
+      capacity: 4Gi
+    walCompression: false
+    retention:
+      time: 1d
+      size: 64MB
+....
+
+[[PrometheusMetrics]]
+==== Prometheus Metrics
+
+The scrape configuration of Prometheus is limited to gathering metrics that are vital to MXE system operation to save space for stored data. These metrics are the following:
+
+* system performance related:
+** `container_cpu_usage_seconds_total`
+** `container_fs_limit_bytes`
+** `container_fs_usage_bytes`
+** `container_memory_working_set_bytes`
+** `machine_cpu_cores`
+** `machine_memory_bytes`
+* model performance related:
+** `seldon_api_engine_client_requests_seconds`
+** `seldon_api_engine_client_requests_seconds_bucket`
+** `seldon_api_engine_client_requests_seconds_count`
+** `seldon_api_engine_client_requests_seconds_max`
+** `seldon_api_engine_client_requests_seconds_sum`
+** `seldon_api_engine_server_requests_seconds`
+** `seldon_api_engine_server_requests_seconds_bucket`
+** `seldon_api_engine_server_requests_seconds_count`
+** `seldon_api_engine_server_requests_seconds_maxseldon_api_engine_server_requests_seconds_sum`
+
+[[StorageRequirements]]
+=== Storage Requirements
+
+If metrics persistence is enabled, a persistent volume claim definition must already exist or must be created during install. During the install procedure, Helm creates this using either default values or user-defined ones. Regarding the `storageClassName` property, the following needs to be considered: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1[].
+
+The capacity of the user-defined persistent volume claim is determined based on the retention settings or the retention size and time settings have to be adjusted according to the capacity (in case of a lack of storage space for example).
+
+During the required space calculation the following needs to be considered: https://prometheus.io/docs/prometheus/latest/storage/#operational-aspects[].
+
+NOTE: The size of the WAL log is substantial and the retention policies have no effect on it, except for the `walCompression` parameter.
+
+The MXE system produces an estimated 500 MB data in Prometheus per day. This amount is affected by the following:
+
+* cluster size (nodes)
+* cluster utilization
+* amount of models
+* model utilization
+* retention and compression settings
+
+[[InstallingaStorageClass]]
+=== Installing a Storage Class
+
+NFS software needs to be installed on the underlying operating system. Make sure that the necessary software packages are installed *on all nodes*.
+
+For example, for Ubuntu, Debian:
+
+....
+$ apt install nfs-common
+....
+
+For example, for Red Hat, CentOS:
+
+....
+$ yum -y install nfs-utils
+....
+
+To install an NFS-based storage class, issue the following command:
+
+....
+$ helm install stable/nfs-server-provisioner --name nfs
+....
+
+Result: A storage class with the name of `nfs` is set up.
+
+NOTE: If the provisioner pod is replaced, all stored data is lost. To make the solution stateful, check the chart https://github.com/helm/charts/tree/master/stable/nfs-server-provisioner#persistence[documentation] and the Kubernetes https://kubernetes.io/docs/concepts/storage/persistent-volumes/[documentation about persistent volumes].
+
+[[UsinganInternalIngressController]]
+=== Using an Internal Ingress Controller
+
+By default, MXE REST API is exposed through the default ingress controller found on the cluster. This behavior can be changed to use an internal ingress controller. However, this has some caveat in many cases. The internal ingress controller is exposed through a `NodePort` service. This can have some limitations depending on the cluster type. For example, on Kaas, there is no associated domain name to it, and it cannot be accessed from outside by default.
+
+To use an internal ingress controller:
+
+. Change the `disableDefaultIngressControllerUse` setting to `true` in `values.yaml`.
+. Set the `apiPort` key to the port to be used as exposed port for MXE.

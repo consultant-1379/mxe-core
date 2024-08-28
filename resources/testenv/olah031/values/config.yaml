@@ -1,0 +1,205 @@
+# The storage class which will be used by MXE to create persistent volumes
+storage_class: rbd
+
+# In case cluster has SEP installed, and an encrypted storage class is available; users can prefer to use that for encrypting  
+# Document Database PG and LCM Container Registry data at rest
+# In case cluster does not have SEP, user can leave this entry as-is
+encrypted_storage_class: ""
+
+# IngressClass Name of Cluster-Wide Ingress Controller
+cluster_wide_ingress_class_name: nginx
+isExtCA: false
+# The name of a secret which contains the ca-certs that has been used to secure the given iam hostname
+# The below secret need to be manually created.
+# Internal Root CA:
+#   1. curl http://pki.ericsson.se/CertData/EGADRootCA.crt  > EGADRootCA.crt
+#   2. curl http://pki.ericsson.se/CertData/EGADIssuingCA3.crt >> EGADRootCA.crt
+#   3. kubectl create secret generic iam-ca-cert --from-file=ca.crt=./EGADRootCA.crt --namespace mxe
+# External Root CA:
+#   1. curl <URL>/ExtCA.crt  > ExtCA.crt
+#   2. kubectl create secret generic iam-ca-cert --from-file=ca.crt=./ExtCA.crt --namespace mxe
+iam_ca_secret_name: iam-ca-cert
+
+# In scenarios like EKS with non-standard CNI plugin like calico, the control plane cannot reach the webhook
+# hence it is needed to set hostNetwork: true
+# Setting this property to true enables hostNetwork and hostPort in seldon-core-operator
+# enabling Pods in EKS to reach Webhooks which are part of the control plane
+hostNetwork: false 
+
+# API Endpoints used in MxE and the TLS secrets used to secure them
+# TLS secrets have to be created beforehand using steps described in the Installation guide
+api:
+    mxe:  
+        host: mxe.olah031.rnd.gic.ericsson.se
+        tlsSecretName: api-tls
+    deployer: 
+        host: mxe-deployer.olah031.rnd.gic.ericsson.se
+        tlsSecretName: deployer-tls
+    oauth:
+        host: oauth.mxe.olah031.rnd.gic.ericsson.se
+        tlsSecretName: oauth-api-tls
+    argocd: 
+        host: argocd.olah031.rnd.gic.ericsson.se
+        tlsSecretName: argocd-tls
+    gitea:
+        host: gitea.mxe.olah031.rnd.gic.ericsson.se
+        tlsSecretName: gitea-api-tls
+
+# The docker registry which is used by MXE's components
+docker_registry:
+    host: armdocker.rnd.ericsson.se
+    # Pull secret used to access images from the registry
+    secret:
+
+# Backup & Recovery Operator Configuration
+# BRO service is used in MXE for backup and restore operations. 
+# It should be installed in same namespace where MXE is going to be installed
+# Currently it is supported only for following the ADP services:
+# eric-data-document-database-pg, eric-data-object-storage-mn, eric-lcm-container-registry
+bro:
+    # BRO Service Name should be eric-ctrl-bro
+    service_name: eric-ctrl-bro
+    # Port where BRO Service is exposed, by default service_port will be 3000
+    service_port: 3000
+    # Set the label_key parameter to the same value as defined for the brLabelKey parameter configured while installing the BRO Service
+    label_key: adpbrlabelkey
+
+# Define the apparmor profile type supported by the environment
+# Possible values are "runtime/default" or "unconfined" or "localhost/<profile_name>"
+# Select "unconfined" only for environment with no apparmor support
+appArmorProfile_type: runtime/default
+
+# Define the seccomp profile type supported by the environment
+# Possible values are "RuntimeDefault" or "unconfined" or "localhost/<profile_name>"
+# Select "unconfined" only for environment with no seccomp support
+seccompProfile_type: RuntimeDefault
+
+# Define the default PYPI server that is to be used to fetch python dependencies/requirements.
+# Default value is https://pypi.org/simple
+external_pypi_server: https://pypi.org/simple
+
+# MXE COMMONS configuration
+mxe_commons:
+    # User provided credentials in a form of a secret and given by its name for administering the realms in Keycloak. If not CHANGED, then the defaults are going to be used, see the Installation Guide for details.
+    # If this value is changed, then the corresponding secret needs to be created beforehand.
+    # Mandatory fields in the user provided secret:
+    # - kcadminid (for the admin username)
+    # - kcpasswd (for the admin user password)
+    mxe_admin_secret: eric-mxe-gatekeeper-keycloak-access-creds-hooked
+    # User provided credentials in a form of a secret and given by its name for the initial MXE user If not PROVIDED, then the defaults are going to be used, see the Installation Guide for details.
+    # Mandatory fields in the user provided secret:
+    # - username (for the initial MXE username)
+    # - password (for the initial MXE user password)
+    mxe_user_secret:
+    # Size of the container registry volume which is used to store onboarded model and training package images.
+    container_registry_volume_size: 20Gi
+    # Whether to install gatekeeper with High Availability
+    # true (default) - 3 instances of gatekeeper is deployed. Requires 3 nodes
+    # false  - 1 instance of gatekeeper is deployed.
+    enable_gatekeeper_ha: false
+    # Choose whether RateLimit needs to be applied for the Model Service 
+    rate_limit_enabled: false
+    encryption:
+        # Whether service mesh with mtls is enabled or not
+        enable_in_transit: true
+    # MXE internal service mesh configuration
+    service_mesh:
+        # Version of service mesh
+        version: SERVICE_MESH_VERSION
+        # Namespace where Mesh controller is installed
+        namespace: mxe-ci
+    # whether to set mxe-user as a temporal user in keycloak
+    # temporal users have to reset password on first time login
+    mxe_gatekeeper:
+        keycloak:
+            temporal_user: "false"
+    # Legal Warning message to be displayed on the login page of the GUI and after login on the CLI
+    legal_warning_message: |-
+        *Log-on is only allowed for authorized users. If you are not an authorized user, please exit.
+        In accordance with requirements of data protection laws, we hereby inform you that personally identifiable information will be handled in log files for legal, security and costs reasons.
+        This system processes sensitive personal data. The misuse of such data may generate considerable harm to the data subjects. Be reminded of the confidentiality obligations you have when accessing this kind of data and the disciplinary consequences of improper handling.
+
+# MXE Deployer configuration
+mxe_deployer:
+    # Internal gitops configuration
+    internal_gitops:
+        # Whether to install Internal Git (Gitea) or not
+        enabled: true
+    # External gitops configuration, set these values only if internal_gitops.enabled is false
+    external_gitops: 
+        # https repo url to be used for gitops
+        url:
+        # domain of your gitserver if you are using an external git provider like gerrit or gitlab 
+        # For example: gerrit.ericsson.se or gitlab.internal.ericsson.com
+        domain:
+    # Secret containing the https/ssh credentials to connect to gitOpsRepo 
+    # If internal gitrepo is requested, access is only possible via http
+    # For internal gitrepo, the user is created in Gitea with the http credentials specified in gitops-repo-creds
+    gitops_repo_creds: gitops-repo-creds
+    ## Commit Author information
+    ## Used to sign commits made by mxe deployer into the gitops repo
+    ## For internal gitrepo:
+    ##  the user is created in gitea with the email given in the commitAuthor.email 
+    commit_author:
+        name: "MXE CI User"
+        email: "mxecifunc@ericsson.com"
+    # Set the secret containing Argocd Admin user credentials
+    # Create the secret with fields username and password
+    # Deployer init will create admin user in keycloak
+    argocd_admin_creds: argocdadmincreds
+    # Whether argocd should be deployed with redis ha cluster or not
+    # true: redis ha cluster will be used
+    # false: redis standalone will be used
+    argocd_redis_ha: true    
+    # CI specific requests/limits
+    argocd:
+        imagePullPolicy: Always
+        controller:
+            requests:
+                cpu: 400m
+                memory: 512Mi
+            limits:
+                cpu: 2000m
+                memory: 2048Mi
+        repoServer:
+            requests:
+                cpu: 400m
+                memory: 512Mi
+            limits:
+                cpu: 2000m
+                memory: 1Gi
+
+# MXE Serving configuration
+mxe_serving:
+    # Whether OWASP should be enabled for model-endpoints. This degrades performance noticeably when it's enabled! Takes effect only if owasp is set to true
+    model_service_owasp: false
+    seldon_webhook_port: 4443 # If 'hostNetwork: true' change this port if it is already used by some other pod running on the node
+    seldon_metrics_port: 8080 # these are the metrics exposed by the controller pod, If 'hostNetwork: true' change this port if it is already used by the node
+
+
+
+# MXE Exploration Configuration
+mxe_exploration:
+    # The profile list for mxe-exploration for a single user
+    singleUserProfileList: |
+        - display_name: "Minimal Profile"
+          description: "Jupyterlab instance with a minimum of 1 CPU/2GB RAM"
+          kubespawner_override:
+            mem_guarantee: 2G
+            mem_limit: 2G
+            cpu_guarantee: 1
+            cpu_limit: 1
+        - display_name: "Medium Profile"
+          description: "Jupyterlab instance with a minimum of 2 CPU/4GB RAM"
+          kubespawner_override:
+            mem_guarantee: 4G
+            mem_limit: 4G
+            cpu_guarantee: 2
+            cpu_limit: 2
+        - display_name: "Large Profile"
+          description: "Jupyterlab instance with a minimum of 4 CPU/8GB RAM"
+          kubespawner_override:
+            mem_guarantee: 8G
+            mem_limit: 8G
+            cpu_guarantee: 4
+            cpu_limit: 4

@@ -1,0 +1,19 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mxe-deployer.post-install-hook-certificate-sidecar-script-name" . | quote }}
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "post-install-hook-certificate-sidecar-configmap"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-deployer.post-install-hook-certificate-sidecar-name" . | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-deployer.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- include "mxe-deployer.product-info" . | nindent 4 }}
+data:
+  run.sh: |
+    {{- (.Files.Get "files/post-install-hook-certificate-sidecar/certificate-sidecar.sh") | nindent 4 }}
+{{- end -}}

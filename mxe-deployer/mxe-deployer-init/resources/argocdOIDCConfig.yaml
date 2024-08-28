@@ -1,0 +1,5 @@
+name: Keycloak
+issuer: https://mxe.olah015.rnd.gic.ericsson.se/auth/realms/argocd
+clientID: argocd
+clientSecret: $oidc.keycloak.clientSecret
+requestedScopes: ["openid", "profile", "email", "groups"]

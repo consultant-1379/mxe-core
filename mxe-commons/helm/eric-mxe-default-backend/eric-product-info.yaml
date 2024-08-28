@@ -1,0 +1,11 @@
+productName: "MXE"
+productNumber: "CXD 101 0217"
+
+images:
+  defaultBackend:
+    productName: "MXE"
+    productNumber: "CXD 101 0053"
+    registry:  "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-default-backend"
+    tag: "VERSION"

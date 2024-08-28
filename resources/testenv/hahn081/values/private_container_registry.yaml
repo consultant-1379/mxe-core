@@ -1,0 +1,21 @@
+global:
+  security:
+    tls:
+      enabled: false
+registry:
+  users:
+    secret: private-container-registry
+ingress:
+  enabled: true
+  hostname: registry.hahn081.rnd.gic.ericsson.se
+  tls:
+    enabled: true
+    secretName: registry-api-tls
+  ingressClass: nginx
+  useHttpProxy: false
+persistence:
+  persistentVolumeClaim:
+    storageClassName: network-block
+    size: 20Gi
+imageCredentials:
+  pullSecret: armdocker-creds

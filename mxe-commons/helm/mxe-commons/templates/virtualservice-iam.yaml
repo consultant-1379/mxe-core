@@ -1,0 +1,34 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: {{ include "mxe-commons.egress-iam-service-name" . }}-vs
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "eric-sec-access-mgmt"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-commons.egress-iam-service-name" . }}-vs
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+spec:
+  hosts:
+  - {{ .Values.global.mxeOauthApiHostname }}
+  gateways:
+  - {{ include "mxe-commons.mesh-ingress-gw-name" . }}
+  http:
+  - headers:
+      request:
+        set:
+          X-Forwarded-Proto: https
+    name: "iam"
+    match:
+    - uri:
+        prefix: "/"
+    route:
+    - destination:
+        host: {{ include "mxe-commons.egress-iam-service-name" . }}
+        port:
+          number: {{ include "mxe-commons.egress-iam-service-port" . }}

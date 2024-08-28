@@ -1,0 +1,7 @@
+{
+  "script": "create-model-service/CreateModelService",
+  "id": "CreateModelService",
+  "dependencies": {
+    "@eui/lit-component": "0.8.2"
+  }
+}

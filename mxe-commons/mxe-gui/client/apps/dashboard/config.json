@@ -1,0 +1,17 @@
+{
+  "script": "dashboard/Dashboard",
+  "title": "DASHBOARD_TITLE",
+  "route": "dashboard",
+  "dependencies": {
+    "@eui/component": "^0.9.0",
+    "@eui/lit-component": "^0.9.0",
+    "@eui/app": "^0.9.1"
+  },
+  "menu": {
+    "id": "DASHBOARD",
+    "label": "DASHBOARD",
+    "data": {
+      "path": "dashboard"
+    }
+  }
+}

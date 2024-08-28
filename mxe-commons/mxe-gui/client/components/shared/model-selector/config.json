@@ -1,0 +1,8 @@
+{
+  "script": "model-selector/ModelSelector",
+  "id": "ModelSelector",
+  "data": {},
+  "dependencies": {
+    "@eui/lit-component": "^0.9.0"
+  }
+}

@@ -1,0 +1,132 @@
+# Default values for mxe training.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+productInfo:
+# R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+# To automate it when packaging the helm chart rstate can be generated
+# and below value replaced with correct R-State
+  rstate: 
+
+# Dependent 3pps must be configured below 
+eric-mxe-jupyterhub:
+  proxy:
+    secretToken: "fdabbe6e405c3db6f770eaa0a6ea08cf6281d9ae82480bf76744bef1a5790d92"
+  hub:
+    extraConfig:
+      mxeConfig: |
+        from mxeauth.mxeauth import JSONWebTokenAuthenticator
+        c.JupyterHub.admin_access = True
+        c.Authenticator.admin_users = {'admin'}
+        c.Authenticator.auto_login = True
+        c.Spawner.default_url = '/lab'
+        c.Spawner.cmd = ['jupyterhub-singleuser']
+        c.Spawner.env_keep = ['PIP_USER']
+        c.JupyterHub.authenticator_class = JSONWebTokenAuthenticator
+        c.JSONWebTokenAuthenticator.signing_certificate_url = 'http://eric-sec-access-mgmt-http:8080/auth/realms/mxe/protocol/openid-connect/certs'
+        c.JSONWebTokenAuthenticator.username_claim_field = 'preferred_username'
+        c.JSONWebTokenAuthenticator.expected_audience = 'mxe-client'
+        c.JSONWebTokenAuthenticator.external_logout_url = '/oauth/logout?redirect=/'
+    baseUrl: /jupyter
+
+  resources:
+    hub:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 200m
+        memory: 512Mi
+    proxy:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 200m
+        memory: 512Mi
+  appArmorProfile:
+    type:
+
+# DR-D1121-011 - Includes global vales of sub-charts
+global:
+  safeToShowValues: false
+  pullSecret:
+  registry:
+    url: "armdocker.rnd.ericsson.se"
+    pullSecret:
+    imagePullPolicy: IfNotPresent
+    repoPath:
+  nodeSelector: {}
+  labels: {}
+  annotations: {}
+  mxeApiTlsSecretName:
+  mxeApiHostname:
+  mxeDisableDefaultIngressControllerUse: false
+  security:
+    tls:
+      enabled: false
+  fsGroup:
+    manual: 10000
+    namespace: false
+  internalIPFamily:
+  serviceMesh:
+    enabled: true
+    annotations:
+      serviceMesh:
+    egress:
+      ca:
+        secretName: egress-ca-secret
+        caCertsPath: /etc/istio/egress-ca-certs/
+        caCertificates: ca.crt
+        genSecretName: eric-sec-sip-tls-trusted-root-cert
+        readonly: true
+      lcmRegistry:
+        enabled: true
+        serviceName: eric-lcm-container-registry-registry
+        secretName: egress-lcm-secret
+        certsPath: /etc/istio/lcm/egress-certs/
+        genSecretName: eric-lcm-container-registry-client-cert
+        clientCertificate: clicert.pem
+        privateKey: cliprivkey.pem
+        optional: true
+        readonly: true
+        tlsMode: MUTUAL
+      iam:
+        enabled: true
+        serviceName: eric-sec-access-mgmt-http
+        secretName: egress-secret
+        certsPath: /etc/istio/egress-certs/
+        genSecretName: eric-sec-access-mgmt-iam-int-client-cert
+        clientCertificate: clicert.pem
+        privateKey: cliprivkey.pem
+        optional: true
+        readonly: true
+        tlsMode: MUTUAL
+        certificateCN: adp-iam-aa-client
+        caIssuer: eric-sec-access-mgmt-iam-client-ca
+      pmServer:
+        enabled: true
+        serviceName: eric-pm-server
+        caIssuer: eric-pm-server-query-ca
+        secretName: egress-pm-secret
+        certsPath: /etc/istio/pm/egress-certs/
+        genSecretName: eric-pm-server-query-cert
+        clientCertificate: clicert.pem
+        privateKey: cliprivkey.pem
+        optional: true
+        readonly: true
+      postgres:
+        serviceName: eric-data-document-database-pg
+        caIssuer: eric-data-document-database-pg-client-ca
+        clientCertificate: clicert.pem
+        privateKey: cliprivkey.pem
+  mxePrometheusPath: /actuator/prometheus
+  mxePrometheusPort: '8081'
+  mxePrometheusScrape: 'true'
+  mxePrometheusScrapeRole: pod 
+  mxePrometheusScrapeInterval: 15s
+
+# DR-D1123-128 - ADP services shall define Seccomp profile
+seccompProfile:
+  type: RuntimeDefault
+  localhostProfile:

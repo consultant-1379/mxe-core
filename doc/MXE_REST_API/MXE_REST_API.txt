@@ -1,0 +1,1547 @@
+= REST API
+:author: Kristóf Nékám
+:signature: EKRINKM
+:department: BDGSJBAK
+:doc-name: INTERFACE DESCRIPT
+:doc-no: 1/155 19-AVA 901 53
+:revnumber: PM2
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+//Template updated 2018-08-21 (keep to track template history)
+
+[[NamingConventions]]
+== Naming Conventions
+
+The `name` field must be unique within the MXE cluster, and is used to derive the corresponding resource names in Kubernetes. Thus, the Kubernetes naming conventions apply for MXE as well, and only lower case alphanumeric characters and `-` (dash) are allowed.
+
+NOTE: The first and last character of the name must not be `-` (dash).
+
+[[AuthenticationandAuthorization]]
+== Authentication and Authorization
+
+MXE uses OpenID Connect authentication framework which is built on top of OAuth 2.0.
+
+OAuth 2.0 uses a token based authentication. It issues two kinds of tokens upon authentication, an access token that is used in subsequent requests and a refresh token that can be used to request a new access token when one expires.
+
+OAuth 2.0 offers multiple flows for authentication. For clients using the REST API directly, the authentication is done through the so called *Resource Owner Password Credentials Grant* flow. This flow requires the username/password for authentication, see <<GetAccessToken,Get Access Token>>.
+
+Access tokens expire in five minutes by default regardless of their use. When it expires, a new one has to be acquired, which can be done through the aforementioned *Resource Owner Password Credentials Grant* flow. An alternative option is the use of refresh tokens, see <<RefreshAccessToken,Refresh Access Token>>. Note that when you refresh the access token, you receive a new refresh token as well. The advantage of using refresh tokens is that clients (apps that users use to access services, like the MXE GUI or CLI) do not have to prompt the user for credentials to reauthenticate after the access token expires. This is also an advantage in case of having your own implementation (for example a bash script using curl) for calling the REST API as you do not have to store the username/password.
+
+A valid access token is required to call any REST request. An access token can be obtained from Keycloack with `<MXE endpoint>/auth/realms/mxe/protocol/openid-connect/token`. See <<GetAccessToken,Get Access Token>>.
+
+TIP: All MXE REST operations must contain the access token in their header in the following format: `key="Authorization", value="Bearer <access token>"`.
+
+The access token expires after a fixed amount of time regardless of its use. When expiration happens it must be refreshed. See <<RefreshAccessToken,Refresh Access Token>>.
+
+NOTE: The response code is 307 for requests without an Authorization header or with an invalid token in the Authorization header.
+
+For more information about user credentials setup during the installation procedure, please see *Changing User Credentials (Optional)* in the doc-ref:[Installation Guide].
+
+For more information on creating a new user, please see *Creating a New User* in the doc-ref:[GUI Guide].
+
+[[APIResources]]
+== API Resources
+
+[[authrealmsmxeprotocolopenid-connecttoken]]
+=== /auth/realms/mxe/protocol/openid-connect/token
+
+Get tokens from Keycloak.
+
+[[GetAccessToken]]
+==== Get Access Token
+
+[[POSTauthrealmsmxeprotocolopenid-connecttoken]]
+===== POST /auth/realms/mxe/protocol/openid-connect/token
+
+POST is sent as a form-urlencoded request.
+
+Curl example for getting access token:
+
+....
+curl --request POST --url https://<mxe-endpoint>/auth/realms/mxe/protocol/openid-connect/token --header 'Content-Type: application/x-www-form-urlencoded' --data 'username=mxe-user&password=password&grant_type=password&client_id=mxe-rest-client&scope=offline_access'
+....
+
+*Response Example:*
+
+....
+{
+ "access_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPbmxuZzNrb2dhNUhILUhJeGlGZzJLWDNSMEo2aXlpdDU0bkpsejJMRkRRIn0.eyJqdGkiOiI3MThhMzdmOS1jYTg1LTRmMjUtYjFmYy03YjA5NDIwYzcwOTciLCJleHAiOjE1NzY1MDk4OTcsIm5iZiI6MCwiaWF0IjoxNTc2NTA5NTk3LCJpc3MiOiJodHRwOi8vZXJpYy1zZWMtYWNjZXNzLW1nbXQtaHR0cDo4MDgwL2F1dGgvcmVhbG1zL214ZSIsImF1ZCI6WyJteGUtY2xpZW50IiwiYWNjb3VudCJdLCJzdWIiOiI2YWU1ZjE4ZC0zNDIzLTQzNDUtYTFlZC1lMThiOTQxYTgwZWEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJteGUtcmVzdC1jbGllbnQiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiI3MTVhNmU4NS1lMjFlLTQ1NWItYTFkNy0yM2EyYTRhZWM0ZjYiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIG14ZS1zY29wZSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicHJlZmVycmVkX3VzZXJuYW1lIjoibXhlLXVzZXIiLCJnaXZlbl9uYW1lIjoiIiwiZmFtaWx5X25hbWUiOiIiLCJwcmV2X2F1dGhfdGltZSI6MTU3NjUwOTU2NTc5Nn0.JLUlUSg2hiqOUzzoi7IxDNFEqda7F9aax0iIGiHqwOoqEgA2wbf43rF5dVKdRLuM1J-t1wUKRzOGEJvkw2dcjCFibRG5z4EtIHaX80mOQ4pIaMCRrIDXBhzEENjtDB9oqog98euew29GHs-2tNYIItjhBjUzle77dP4GLQO_Gh6pkqEbNGhJAf8o03Lb2g768WYYz5nS2_zPDVdxwm7g-4jfTWUnshSIxFM_ERlGE5KIx1fx2MEw3819cWeob3zYtFQOjcWrgOADTbDiid7tTD118TineFUA82sVrr3RwV3AMgLjalRVEpMiE5YKhmWeq1ytswRwieryJQfVN3HCVg",
+ "token_type":"bearer",
+ "expires_in":300,
+ "refresh_expires_in":1800,
+ "refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1NWQ5YzRhMC02MjAwLTQ3Y2UtOWZlZi00NDU0NDM4YTk2ZWEifQ.eyJqdGkiOiIxOWYyOTU2Yy0yNGJkLTQ3MTUtOTE0Ni1kYzAwMWMxZTY1OWIiLCJleHAiOjE1NzY1MTEzOTcsIm5iZiI6MCwiaWF0IjoxNTc2NTA5NTk3LCJpc3MiOiJodHRwOi8vZXJpYy1zZWMtYWNjZXNzLW1nbXQtaHR0cDo4MDgwL2F1dGgvcmVhbG1zL214ZSIsImF1ZCI6Imh0dHA6Ly9lcmljLXNlYy1hY2Nlc3MtbWdtdC1odHRwOjgwODAvYXV0aC9yZWFsbXMvbXhlIiwic3ViIjoiNmFlNWYxOGQtMzQyMy00MzQ1LWExZWQtZTE4Yjk0MWE4MGVhIiwidHlwIjoiUmVmcmVzaCIsImF6cCI6Im14ZS1yZXN0LWNsaWVudCIsImF1dGhfdGltZSI6MCwic2Vzc2lvbl9zdGF0ZSI6IjcxNWE2ZTg1LWUyMWUtNDU1Yi1hMWQ3LTIzYTJhNGFlYzRmNiIsInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSBteGUtc2NvcGUifQ.JeDtYBk_xADcNpKqKHtoOsecbSK-7bMwMC67p17GOX0",
+ "not-before-policy":0,
+ "session_state":"715a6e85-e21e-455b-a1d7-23a2a4aec4f6",
+ "scope":"openid email profile mxe-scope"
+}
+....
+
+[[RefreshAccessToken]]
+==== Refresh Access Token
+
+[[POSTauthrealmsmxeprotocolopenid-connecttoken.1]]
+===== POST /auth/realms/mxe/protocol/openid-connect/token
+
+POST is sent as a form-urlencoded request.
+
+Curl example for refreshing access token:
+
+....
+curl --request POST --url https://<mxe-endpoint>/auth/realms/mxe/protocol/openid-connect/token --header 'Content-Type: application/x-www-form-urlencoded' --data 'grant_type=refresh_token&client_id=mxe-rest-client&scope=offline_access&refresh_token=<refresh_token>'
+....
+
+Response is the same as the one received for getting an access token.
+
+[[authrealmsmxeprotocolopenidconnectuserinfo]]
+=== /auth/realms/mxe/protocol/openid-connect/userinfo
+
+To get the user information use the `/auth/realms/mxe/protocol/openid-connect/userinfo` request. This request gives back a json response, which contains the last login infromation in the `prev_auth_time` field.
+
+[[GetUserInfo]]
+==== Get User Info
+
+[[GETauthrealmsmxeprotocolopenidconnectuserinfo]]
+===== GET /auth/realms/mxe/protocol/openid-connect/userinfo
+
+Curl example for refreshing access token:
+
+....
+curl --request GET --url https://<mxe-endpoint>/auth/realms/mxe/protocol/openid-connect/userinfo --header "Authorization: Bearer <access_token>"
+....
+
+*Response Example:*
+
+....
+{
+    "sub": "6ae5f18d-3423-4345-a1ed-e18b941a80ea",
+    "email_verified": false,
+    "preferred_username": "mxe-user",
+    "given_name": "",
+    "family_name": "",
+    "prev_auth_time": 1576509565796
+}
+....
+
+[[v1models]]
+=== /v1/models
+
+Onboard, list, delete models.
+
+[[OnboardModelfromExternalDockerRegistry]]
+==== Onboard model from External Docker Registry
+
+[[POSTv1models]]
+===== POST /v1/models
+
+`POST` is sent as a multipart request with the part name `modeldata`. The part content is the model metadata in JSON format:
+
+JSON payload of the "modeldata" part:
+
+....
+{
+    "id": "com.ericsson.imagerecognition.inception3",
+    "author": "Kovacs Istvan",
+    "title": "Inception 3 model",
+    "description": "This is the Inception3 model detailed description",
+    "version": "0.0.1",
+    "image": "vmx-eea171:5000/img_inception3:v0.0.1",
+    "icon": "base64 encoded image"
+}
+....
+
+Curl example for onboarding a model from external docker registry:
+
+....
+curl --request POST --url https://<mxe-endpoint>/v1/models
+--header "Authorization: Bearer <access_token>"
+--form 'modeldata={
+    "id": "com.ericsson.imagerecognition.inception3",
+    "author": "Kovacs Istvan",
+    "title": "Inception 3 model",
+    "description": "This is the Inception3 model detailed description",
+    "version": "0.0.1",
+    "image": "vmx-eea171:5000/img_inception3:v0.0.1",
+    "icon": "base64 encoded image"
+};type=application/json'
+....
+
+[[OnboardModelfromSourceFiles]]
+==== Onboard model from Source Files
+
+[[POSTv1models.1]]
+===== POST /v1/models
+
+`POST` is sent as a multipart request with the part name `sourcefile`. The part content is the .zip file containing the model sources.
+
+Curl example for onboarding a model from a `.zip` file:
+
+....
+curl --request POST --url https://<mxe-endpoint>/v1/models --form 'sourcefile=@model.zip' --header "Authorization: Bearer <access_token>"
+....
+
+[[OnboardModelfromDockerImageArchive]]
+==== Onboard Model from Docker Image Archive
+
+[[POSTv1models.2]]
+===== POST /v1/models
+
+`POST` is sent as a multipart request with the part name `archivefile`. The part content is the .tar or .tar.gz file containing the docker image of the model.
+
+Curl example for onboarding a model from image archive file:
+
+....
+curl --request POST --url https://<mxe-endpoint>/v1/models -F 'archivefile=@image.tar.gz'
+....
+
+[[ListOnboardedModels]]
+==== List Onboarded Models
+
+[[GETv1models]]
+===== GET /v1/models
+
+Returns a list of available models in the model repository.
+
+.*Status values:*
+* *available*: the model is ready to be used
+* *packaging*: the model is being packaged
+* *error*: there is an error with the model (see the `message` and `errorLog` fields for details)
+
+*Response Example:*
+
+....
+[
+  {
+    "id": "com.ericsson.imagerecognition.inception3",
+    "version": "0.0.1",
+    "title": "Inception 3 model",
+    "author": "Kovacs Istvan",
+    "description": "This is the Inception3 model detailed description",
+    "image": "vmx-eea171:5000/img_inception3:v0.0.1",
+    "created": "2019-07-05T12:32:35.478Z",
+    "icon": "base64 encoded image",
+    "status": "available",
+    "message": null,
+    "createdByUserId": "32b3b238-c54e-468a-9bfa-95c2f87ae689",
+    "createdByUserName": "mxe-user"
+ }
+]
+....
+
+*Curl Example:*
+
+....
+curl --request GET --url https://<mxe-endpoint>/v1/models --header "Authorization: Bearer <access_token>"
+....
+
+....
+curl --request GET --url https://<mxe-endpoint>/v1/models?id=com.ericsson.imagerecognition.inception3 --header "Authorization: Bearer <access_token>"
+....
+
+[[DeleteModel]]
+==== Delete Model
+
+[[DELETEv1modelsidversion]]
+===== DELETE /v1/models/<id>/<version>
+
+Deletes the given `version` of the model with the given `id`.
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 403 (Forbidden) In case of insufficient access rights
+* HTTP 404 (Not Found)
+
+[[v1training-packages]]
+=== /v1/training-packages
+
+Onboard, list, delete training packages.
+
+[[OnboardTrainingPackagefromSourceFiles]]
+==== Onboard Training Package from Source Files
+
+[[POSTv1training-packages]]
+===== POST /v1/training-packages
+
+POST is sent as a multipart request with the part name `trainingpackage`. The part content is the .zip file containing the training sources.
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 400 (Bad request)
+* HTTP 409 (Conflict)
+* HTTP 500 (Internal error)
+
+*Curl example for onboarding a training package from .zip file:*
+
+....
+curl --request POST --url https://<mxe-endpoint>/v1/training-packages --form 'trainingpackage=@training_package.zip' --header "Authorization: Bearer <access_token>"
+....
+
+[[ListOnboardedTrainingPackages]]
+==== List Onboarded Training Packages
+
+[[GETv1training-packages]]
+===== GET /v1/training-packages
+
+Returns a list of available training packages in the training package repository.
+
+Status values:
+
+* *available*: the training package is ready to be used
+* *packaging*: the training package is being packaged
+* *error*: there is an error with the  training package (see the `message` field for details)
+
+*Response Example:*
+
+....
+[
+  {
+    "id": "com.ericsson.imagerecognition.inception3.trainer",
+    "version": "0.0.1",
+    "title": "Inception 3 model",
+    "author": "Kovacs Istvan",
+    "description": "This is the Inception3 model trainer detailed description",
+    "image": "vmx-eea171:5000/img_inception3_trainer:v0.0.1",
+    "created": "2019-07-05T12:32:35.478Z",
+    "icon": "base64 encoded image",
+    "status": "available",
+    "message": null,
+    "createdByUserId": "32b3b238-c54e-468a-9bfa-95c2f87ae689",
+    "createdByUserName": "mxe-user"
+ }
+]
+....
+
+*Curl example for listing training packages*:
+
+....
+curl --request GET --url https://<mxe-endpoint>/v1/training-packages --header "Authorization: Bearer <access_token>"
+....
+
+[[GETv1training-packagesidversion]]
+===== GET /v1/training-packages/<id>/<version>
+
+Returns an exact training package.
+
+Status values:
+
+* *completed*: training job completed
+* *running*: the training job is running
+* *failed*: training job failed
+
+*Response Example:*
+
+....
+{
+    "id": "com.ericsson.imagerecognition.inception3.trainer",
+    "version": "0.0.1",
+    "title": "Inception 3 model",
+    "author": "Kovacs Istvan",
+    "description": "This is the Inception3 model trainer detailed description",
+    "image": "vmx-eea171:5000/img_inception3_trainer:v0.0.1",
+    "created": "2019-07-05T12:32:35.478Z",
+    "icon": "base64 encoded image",
+    "status": "available",
+    "message": null
+}
+....
+
+*Curl example for listing training jobs*:
+
+....
+curl --request GET --url https://<mxe-endpoint>/v1/training-packages/com.ericsson.imagerecognition.inception3.trainer/0.0.1 --header "Authorization: Bearer <access_token>"
+....
+
+[[DeleteTrainingPackage]]
+==== Delete Training Package
+
+[[DELETEv1training-packagesidversion]]
+===== DELETE /v1/training-packages/<id>/<version> 
+
+Deletes the given `version` of the training package with the given `id`. The training jobs started from the given package are deleted too.
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 404 (Not Found)
+
+[[v1training-jobs]]
+=== /v1/training-jobs
+
+Start, list, delete training jobs.
+
+[[StartingTrainingJobfromanOnboardedTrainingPackage]]
+==== Starting Training Job from an Onboarded Training Package
+
+[[POSTv1training-jobs]]
+===== POST /v1/training-jobs
+
+_Content-Type: application/json_
+
+*POST /v1/training-jobs*
+
+....
+{
+  "packageId" : "com.ericsson.imagerecognition.inception3.trainer",
+  "packageVersion": "0.0.1"
+}
+....
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 404 (Not found) There is no training package with the given id and version
+* HTTP 409 (Conflict) There is an already running training job from the given package
+* HTTP 500 (Internal error) Failed to start training job
+
+
+*Curl example for starting a training job from an onboarded training package:*
+
+....
+curl --request POST --url https://<mxe-endpoint>/v1/training-jobs --header "Content-Type: application/json" --data "{\"packageId\":\"com.ericsson.imagerecognition.inception3.trainer\",\"packageVersion\":\"0.0.1\"};type=application/json" --header "Authorization: Bearer <access_token>"
+....
+
+[[ListTrainingJobs]]
+==== List Training Jobs
+
+[[GETv1training-jobs]]
+===== GET /v1/training-jobs
+
+Returns a list of training jobs.
+
+Status values:
+
+* *completed*: training job completed
+* *running*: the training job is running
+* *failed*: training job failed
+
+*Response Example:*
+
+....
+[
+  {
+    "id": "aaa-bbb-ccc"
+    "packageId": "com.ericsson.imagerecognition.inception3.trainer",
+    "packageVersion": "0.0.1",
+    "created": "2019-07-05T12:32:35.478Z",
+    "completed": "2019-07-05T12:32:35.478Z",
+    "status": "completed",
+    "errorLog": null,
+    "message": null
+  }
+]
+....
+
+*Curl example for listing training jobs*:
+
+....
+curl --request GET --url https://<mxe-endpoint>/v1/training-jobs --header "Authorization: Bearer <access_token>"
+....
+
+[[GETv1training-jobsid]]
+===== GET /v1/training-jobs/<id>
+
+Returns an exact training job.
+
+Status values:
+
+* *completed*: training job completed
+* *running*: the training job is running
+* *failed*: training job failed
+
+*Response Example:*
+
+....
+{
+    "id": "aaa-bbb-ccc"
+    "packageId": "com.ericsson.image.training1",
+    "packageVersion": "0.0.1",
+    "created": "2019-07-05T12:32:35.478Z",
+    "completed": "2019-07-05T12:32:35.478Z",
+    "status": "completed",
+    "errorLog": null,
+    "message": null
+}
+....
+
+*Curl example for listing training jobs*:
+
+....
+curl --request GET --url https://<mxe-endpoint>/v1/training-jobs/aaa-bbb-ccc --header "Authorization: Bearer <access_token>"
+....
+
+[[GETtraining-jobspackageIdpackageId]]
+===== GET /v1/training-jobs?packageId=<packageId>
+
+Returns a list of training jobs that have been started from the same training package (but not same version).
+
+Status values:
+
+* *completed*: training job completed
+* *running*: the training job is running
+* *failed*: training job failed
+
+*Response Example:*
+
+....
+[
+  {
+    "id": "aaa-bbb-ccc"
+    "packageId": "com.ericsson.image.training1",
+    "packageVersion": "0.0.1",
+    "created": "2019-07-05T12:32:35.478Z",
+    "completed": "2019-07-05T12:32:35.478Z",
+    "status": "completed",
+    "errorLog": null,
+    "message": null
+  }
+]
+....
+
+*Curl example for listing training jobs*:
+
+....
+curl --request GET --url https://<mxe-endpoint>/v1/training-jobs?packageId=com.ericsson.image.training1 --header "Authorization: Bearer <access_token>"
+....
+
+[[GETtraining-jobspackageIdpackageIdpackageVersionpackageVersion]]
+===== GET /v1/training-jobs?packageId=<packageId>&packageVersion=<packageVersion>
+
+Returns a list of training jobs that have been started from an exact training package.
+
+Status values:
+
+* *completed*: training job completed
+* *running*: the training job is running
+* *failed*: training job failed
+
+*Response Example:*
+
+....
+[
+  {
+    "id": "aaa-bbb-ccc"
+    "packageId": "com.ericsson.image.training1",
+    "packageVersion": "0.0.1",
+    "created": "2019-07-05T12:32:35.478Z",
+    "completed": "2019-07-05T12:32:35.478Z",
+    "status": "completed",
+    "errorLog": null,
+    "message": null
+  }
+]
+....
+
+*Curl example for listing training jobs*:
+
+....
+curl --request GET --url https://<mxe-endpoint>/v1/training-jobs?packageId=com.ericsson.image.training1&packageVersion=0.0.1 --header "Authorization: Bearer <access_token>"
+....
+
+[[DownloadTrainingJobResult]]
+==== Download Training Job Result
+
+[[GETv1training-jobsidresult]]
+===== GET /v1/training-jobs/<id>/result
+
+Retrieves the result of a completed training job.
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 404 (Not Found) Training job with a given id does not exist or the job has not yet completed.
+* HTTP 500 (Internal error)
+
+*Curl example to download a training job result*:
+
+....
+curl --request GET --url https://<mxe-endpoint>/v1/training-jobs/<id-of-training-job>/result --header "Authorization: Bearer <access_token>"
+....
+
+[[DeleteTrainingJob]]
+==== Delete Training Job
+
+[[DELETEv1training-jobsid]]
+===== DELETE /v1/training-jobs/<id>
+
+Deletes the given training job or all of the jobs with given `packageId` and `packageVersion`.
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 404 (Not Found)
+* HTTP 500 (Internal error) Failed to delete jobs or pods
+
+*Curl example for deleting training jobs*:
+
+....
+curl --request DELETE --url https://<mxe-endpoint>/v1/training-jobs/<id-of-training-job> --header "Authorization: Bearer <access_token>"
+....
+
+[[DELETEv1training-jobspackageIdpackageIdpackageVersionpackageVersion]]
+===== DELETE /v1/training-jobs?packageId=<packageId>&packageVersion=<packageVersion>
+
+Deletes the given training job or all of the jobs with given `packageId` and `packageVersion`.
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 404 (Not Found)
+* HTTP 500 (Internal error) Failed to delete jobs or pods
+
+*Curl example for deleting training jobs*:
+
+....
+curl --request DELETE --url https://<mxe-endpoint>/v1/training-jobs?packageId=com.ericsson.image.training1&packageVersion=1.0.1 --header "Authorization: Bearer <access_token>"
+....
+
+[[v1model-services]]
+=== /v1/model-services
+
+Create, modify, delete, list model services.
+
+[[StartaModelService]]
+==== Create a Model Service
+
+[[POSTv1model-services]]
+===== POST /v1/model-services
+
+Create a model service.
+
+* `type` is the type of the model service. It has to be `model` in case of a model service with one model, and `static` in case of a model service with two models.
+* `name` is the model service name. The provided name must be unique within the MXE cluster.
+* `replicas` is the number of service instances to start. Optional, default value is 1.
+* `models` is the list of models.
+** `id` is the model identifier.
+** `version` is the model version.
+** `weight` contains the weights of models in a static deployment. Optional, default value is 0.5,0.5. If values for both models are given, the sum of weights must be 1.0. If value for only one model is given, the other will be calculated.
+* `autoScaling` is Auto scaling data.
+** `metrics` is a list of metrics.
+*** `name`, with the following metric names supported: `memoryMegaBytes`, `cpuMilliCores`.
+*** `targetAverageValue` specifies how much of a total value of metric each replica can handle.
+** `minReplicas` is the minimum allowed number of replicas.
+** `maxReplicas` is the maximum allowed number of replicas.
+
+*Request example - create model service with single model setting replicas:*
+
+_Content-Type: application/json_
+
+Single model service example
+
+....
+{
+  "name" : "anomaly-detection1"
+  "type" : "model",
+  "replicas" : 3,
+  "models" : [ {
+    "id" : "com.ericsson.imagerecognition.inception3",
+    "version" : "0.0.1"
+  } ]
+}
+....
+
+*Request example - create model service with single model setting auto scale:*
+
+_Content-Type: application/json_
+
+Single model service example
+
+....
+{
+  "name" : "anomaly-detection1"
+  "type" : "model",
+  "autoScaling": {
+    "minReplicas" : 2,
+    "maxReplicas" : 4,
+    "metrics": [{
+      "name": "memoryMegaBytes",
+      "targetAverageValue" : 10
+    }]
+  },
+  "models" : [ {
+    "id" : "com.ericsson.imagerecognition.inception3",
+    "version" : "0.0.1"
+  } ]
+}
+....
+
+*Request example - create model service with two models:*
+
+_Content-Type: application/json_
+
+Static model service example (A/B testing)
+
+....
+{
+  "name" : "anomaly-detection1"
+  "type" : "static",
+  "replicas" : 3,
+  "models" : [ {
+    "id" : "com.ericsson.imagerecognition.inception3",
+    "version" : "0.0.1",
+    "weight" : 0.2
+ },{
+    "id" : "com.ericsson.imagerecognition.inception3",
+    "version" : "0.0.2",
+    "weight" : 0.8
+ } ]
+}
+....
+
+*Response Example:*
+
+* HTTP 201 (Created)
+* HTTP 403 (Forbidden) In case of insufficient access rights
+* HTTP 409 (Conflict) when resource with the specified name already exists
+
+*Request Example (in case of HTTP 201)*
+
+_Content-Type: application/json_
+
+Response contains the name of the model service
+
+....
+{
+  "name" : "mymodel1"
+}
+....
+
+[[ChangeaRunningModelService]]
+==== Change a Running Model Service
+
+[[PATCHv1model-servicesname]]
+===== PATCH /v1/model-services/<name>
+
+Modify a model service: change model(s), scale manually or automatically, or change weights in a static model service.
+
+*Request Example - scale:*
+
+_Content-Type: application/json_
+
+PATCH /v1/model-services/mymodel1
+
+....
+{
+  "replicas" : 3
+}
+....
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 403 (Forbidden) In case of insufficient access rights
+* HTTP 404 (Not Found) - Model service does not exist
+
+*Request example - autoscale:*
+
+_Content-Type: application/json_
+
+PATCH /v1/model-services/mymodel1
+
+....
+{
+  "autoScaling": {
+    "minReplicas" : 2,
+    "maxReplicas" : 4,
+    "metrics": [{
+      "name": "memoryMegaBytes",
+      "targetAverageValue" : 10
+    }]
+  }
+}
+....
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 403 (Forbidden) In case of insufficient access rights
+* HTTP 404 (Not Found) Model service does not exist
+
+*Request example - change models:*
+
+Single model serving example
+
+....
+{
+  "models" : [ {
+    "id" : "com.ericsson.imagerecognition.vgg16",
+    "version" : "0.0.6"
+  } ]
+}
+....
+
+*Request example - change weight:*
+
+Single model serving example
+
+....
+{
+  "models" : [ {
+    "weight" : 0.2
+  },{
+    "weight" : 0.8
+  } ]
+}
+....
+
+*Request example - change several parameters:*
+
+Single model serving example
+
+....
+{
+  "replicas" : 5,
+  "models" : [ {
+    "id" : "com.ericsson.imagerecognition.inception3",
+    "version" : "0.0.2",
+    "weight" : 0.2
+ },{
+    "id" : "com.ericsson.imagerecognition.vgg16",
+    "version" : "0.0.6",
+    "weight" : 0.8
+  } ]
+}
+....
+
+*Response Example:*
+
+* HTTP 200 (OK) Model service has been changed, or all values are the same, so no need to change
+* HTTP 403 (Forbidden) In case of insufficient access rights
+* HTTP 404 (Not Found) Model service does not exist
+* HTTP 422 (Unprocessable Entity) Model package not found in model catalog
+
+[[ListRunningModelServices]]
+==== List Running Model Services
+
+[[GETv1model-services]]
+===== GET /v1/model-services
+
+Get all model services.
+
+.Status values:
+* running
+* creating
+* error
+
+*Response Example:*
+
+_Content-Type: application/json_
+
+GET /v1/model-services
+
+....
+[
+  {
+    "name": "com-ericsson-imagerecognition-inception3",
+    "type": "model",
+    "created": "2019-07-05T12:58:19Z",
+    "status": "creating",
+    "message": null,
+    "replicas": 1,
+    "models": [
+      {
+        "id": "com.ericsson.imagerecognition.inception3",
+        "version": "0.0.1",
+        "endpointType": "REST"
+      }
+    ],
+    "createdByUserId": "2499600f-bf68-4c4d-b86f-270409d66e8f",
+    "createdByUserName": "mxe-user"
+ },{
+    "name": "com-ericsson-imagerecognition-inception3-2",
+    "type": "static",
+    "created": "2019-07-05T14:37:13Z",
+    "status": "running",
+    "message": null,
+    "replicas": 1,
+    "models": [
+      {
+        "id": "com.ericsson.imagerecognition.inception3",
+        "version": "0.0.1",
+        "weight": 0.2,
+        "endpointType": "REST"
+      },{
+        "id": "com.ericsson.imagerecognition.inception3",
+        "version": "0.0.2",
+        "weight": 0.8,
+        "endpointType": "REST"
+      }
+    ],
+    "createdByUserId": "2499600f-bf68-4c4d-b86f-270409d66e8f",
+    "createdByUserName": "mxe-user"
+ }
+]
+....
+
+*Response Example:*
+
+* HTTP 200 (OK)
+
+*Response Example with auto scaling:*
+
+_Content-Type: application/json_
+
+GET /v1/model-services
+
+....
+[
+  {
+    "name": "com-ericsson-imagerecognition-inception3",
+    "type": "model",
+    "created": "2019-07-05T12:58:19Z",
+    "status": "creating",
+    "message": null,
+    "replicas": 1,
+    "autoScaling": {
+      "minReplicas" : 1,
+      "maxReplicas" : 1,
+        "metrics": [{
+          "name": "memoryMegaBytes",
+          "targetAverageValue" : 10
+        }]
+    },
+    "models": [
+      {
+        "id": "com.ericsson.imagerecognition.inception3",
+        "version": "0.0.1",
+        "endpointType": "REST"
+      }
+    ],
+    "createdByUserId": "2499600f-bf68-4c4d-b86f-270409d66e8f",
+    "createdByUserName": "mxe-user"
+ },{
+    "name": "com-ericsson-imagerecognition-inception3-2",
+    "type": "static",
+    "created": "2019-07-05T14:37:13Z",
+    "status": "running",
+    "message": null,
+    "replicas": 1,
+    "autoScaling": {
+      "minReplicas" : 1,
+      "maxReplicas" : 1,
+        "metrics": [{
+          "name": "memoryMegaBytes",
+          "targetAverageValue" : 10
+        }]
+    },
+    "models": [
+      {
+        "id": "com.ericsson.imagerecognition.inception3",
+        "version": "0.0.1",
+        "weight": 0.2,
+        "endpointType": "REST"
+      },{
+        "id": "com.ericsson.imagerecognition.inception3",
+        "version": "0.0.2",
+        "weight": 0.8,
+        "endpointType": "REST"
+      }
+    ],
+    "createdByUserId": "2499600f-bf68-4c4d-b86f-270409d66e8f",
+    "createdByUserName": "mxe-user"
+ }
+]
+....
+
+*Response Example:*
+
+* HTTP 200 (OK)
+
+*GET /v1/model-services/<name>*
+
+Get data for one single model service. A single element is returned instead of the list.
+
+*Request Example:*
+
+_Content-Type: application/json_
+
+GET /v1/model-services/com-ericsson-imagerecognition-inception3
+
+....
+  {
+    "name": "com-ericsson-imagerecognition-inception3",
+    "type": "model",
+    "created": "2019-07-05T12:58:19Z",
+    "status": "creating",
+    "message": null,
+    "replicas": 1,
+    "models": [
+      {
+        "id": "com.ericsson.imagerecognition.inception3",
+        "version": "0.0.1",
+        "endpointType": "REST"
+      }
+    ]
+  }
+....
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 403 (Forbidden) In case of insufficient access rights
+* HTTP 404 (Not Found)
+
+*Request Example with auto scaling:*
+
+_Content-Type: application/json_
+
+GET /v1/model-services/com-ericsson-imagerecognition-inception3
+
+....
+{
+  "name": "com-ericsson-imagerecognition-inception3",
+  "type": "model",
+  "created": "2019-07-05T12:58:19Z",
+  "status": "creating",
+  "message": null,
+  "replicas": 1,
+  "autoScaling": {
+    "minReplicas" : 1,
+    "maxReplicas" : 1,
+      "metrics": [{
+        "name": "memoryMegaBytes",
+        "targetAverageValue" : 10
+      }]
+  },
+  "models": [
+    {
+      "id": "com.ericsson.imagerecognition.inception3",
+      "version": "0.0.1",
+      "endpointType": "REST"
+    }
+  ]
+}
+....
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 403 (Forbidden) In case of insufficient access rights
+* HTTP 404 (Not Found)
+
+[[GetModelServiceLogs]]
+==== Get Model Service Logs
+
+[[GETv1modelservicesnamelogs]]
+===== GET /v1/model-services/<name>/logs
+
+Gets the recent logs for a model service.
+
+*Query string parameters:*
+
+* limit=x : limit each returned log size to x bytes (default value: 50000)
+* lines=x : return last x lines of the logs (default value: 100)
+* seconds=x : return the logs for the last x seconds
+
+*Examples:*
+
+* GET /v1/model-services/myservice1/logs?lines=10 (get the logs for the last 10 lines)
+* GET /v1/model-services/myservice1/logs?seconds=60  (get the logs starting from the last 60 seconds)
+* GET /v1/model-services/myservice1/logs?seconds=60&limit=1000   (get the logs starting from the last 60 seconds and limit each log to 1000 bytes)
+* GET /v1/model-services/myservice1/logs   (defaults to lines=100 & limit = 50000)
+
+*Response:*
+
+The logs for all containers of all instances of the model service will be returned as Strings in a Map. The keys of the map are derived from `<pod name>/<container name>`.
+
+*Response Example:*
+
+*GET /v1/model-services/com-ericsson-imagerecognition-inception3/logs?lines=1*
+
+....
+{
+  "iot-test1-main-e278548-54f57b47df-lkgh6/seldon-container-engine": "2020-01-03 14:46:29.572  INFO 7 --- [           main] io.seldon.engine.App                     : Started App in 9.446 seconds (JVM running for 10.691)\n",
+  "iot-test1-main-e278548-54f57b47df-p24sq/seldon-container-engine": "2020-01-03 14:46:46.813  INFO 8 --- [           main] io.seldon.engine.App                     : Started App in 6.329 seconds (JVM running for 7.068)\n",
+  "iot-test1-main-e278548-54f57b47df-lkgh6/model": "14:46:25.182531 139899188122624 _internal.py:122]  * Running on http://0.0.0.0:9000/ (Press CTRL+C to quit)\n",
+  "iot-test1-main-e278548-54f57b47df-p24sq/model": "14:46:43.885142 140183029613568 _internal.py:122]  * Running on http://0.0.0.0:9000/ (Press CTRL+C to quit)\n",
+}
+....
+
+*Response Codes:*
+
+* HTTP 200 (OK)
+* HTTP 403 (Forbidden) In case of insufficient access rights
+* HTTP 404 (Not Found)
+
+[[DeleteModelService]]
+==== Delete Model Service
+
+[[DELETEv1model-servicesname]]
+===== DELETE /v1/model-services/<name>
+
+Deletes the model service with the given name.
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 403 (Forbidden) In case of insufficient access rights
+* HTTP 404 (Not Found)
+
+[[v1flows]]
+=== /v1/flows
+
+Onboard, list, delete NiFi flow files.
+
+[[OnboardFlows]]
+==== Onboard Flows
+
+[[POSTv1flows]]
+===== POST /v1/flows
+
+Onboard a NiFi flow file under the given name. The file is stored in the flow-repository. The file must be sent together with the JSON payload.
+
+*Request Example:*
+
+POST /v1/flows
+
+....
+{
+ "name": "flow1"
+}
+....
+
+_Content-Type: multipart/form-data_
+
+_File key: "file"_
+
+_JSON data key: "data"_
+
+*Response Example:*
+
+* HTTP 201 (Created): Successful onboarding.
+* HTTP 409 (Conflict): If a flow under the name already exists.
+
+*Curl Example:*
+
+....
+curl --request POST --url https://<mxe-endpoint>/v1/flows --header "Content-Type: multipart/form-data" --form "file=@flow.xml.gz" --form "data={\"name\":\"flow1\"};type=application/json" --header "Authorization: Bearer <access_token>"
+....
+
+[[ListFlows]]
+==== List Flows
+
+[[GETv1flows]]
+===== GET /v1/flows
+
+Returns list of onboarded NiFi flows.
+
+*Response Example:*
+
+GET /v1/flows
+
+....
+["flow1", "flow2", "flow3"]
+....
+
+*Curl Example:*
+
+....
+curl --request GET --url https://<mxe-endpoint>/v1/flows --header "Authorization: Bearer <access_token>"
+....
+
+[[DeleteFlows]]
+==== Delete Flows
+
+[[DELETEv1flowsname]]
+===== DELETE /v1/flows/<name>
+
+Deletes the NiFi flow with the given name.
+
+*Response Example:*
+
+* HTTP 200 (OK): NiFi flow deleted.
+* HTTP 404 (Not found): NiFi flow under this name does not exist.
+
+*Curl Example:*
+
+....
+curl --request DELETE --url https://<mxe-endpoint>/v1/flows/flow1 --header "Authorization: Bearer <access_token>"
+....
+
+[[v1flow-deployments]]
+=== /v1/flow-deployments
+
+Deploy, list, delete NiFi flow deployments.
+
+[[DeployFlowDeployments]]
+==== Deploy Flow Deployments
+
+[[POSTv1flow-deployments]]
+===== POST /v1/flow-deployments
+
+New NiFi flow deployments can be created with POST. The payload has one mandatory field: the name of the new deployment. The following example payload creates a new empty NiFi deployment:
+
+POST /v1/flow-deployments with empty flow
+
+....
+{
+  "name": "flow1"
+}
+....
+
+By providing the name of an already onboarded flow (flowName) the new deployment will be created out of that:
+
+POST /v1/flow-deployments
+
+....
+{
+  "name": "flow1",
+  "flowName": "flow1"
+}
+....
+
+*Curl Example:*
+
+....
+curl --request POST --url https://<mxe-endpoint>/v1/flow-deployments --header "Content-Type: application/json" --data "{\"name\":\"flow1\",\"flowName\":\"flow1\"};type=application/json" --header "Authorization: Bearer <access_token>"
+....
+
+It is also possible to specify the base image of NiFi using the `image` field:
+
+POST /v1/flow-deployments with custom nifi image
+
+....
+{
+  "name": "flow1",
+  "flowName": "flow1",
+  "image": "armdocker.rnd.ericsson.se/proj-mxe/mxe/nifi-base:0.0.1"
+ }
+....
+
+*Curl Example:*
+
+....
+curl --request POST --url https://<mxe-endpoint>/v1/flow-deployments --header "Content-Type: application/json" --data "{\"name\":\"flow1\",\"flowName\":\flow1\", \"image\":\"armdocker.rnd.ericsson.se/proj-mxe/mxe/nifi-base:0.0.1\"};type=application/json" --header "Authorization: Bearer <access_token>"
+....
+
+The payload can also contain 3 optional fields to specify the JVM minHeap and maxHeap arguments for NiFi, and a replica number for how many pods the NiFi cluster should run in.
+
+POST /v1/flow-deployments with minHeap and maxHeap settings
+
+....
+{
+  "name": "flow1",
+  "minHeap": "2g",
+  "maxHeap": "3g"
+  "replicas": "1"
+ }
+....
+
+*Curl Example:*
+
+....
+curl --request POST --url https://<mxe-endpoint>/v1/flow-deployments --header "Content-Type: application/json" --data "{\"name\":\"flow1\",\"minHeap\":\"2\",\"maxHeap\":\"3g\",\"replicas\":\"1\"};type=application/json" --header "Authorization: Bearer <access_token>"
+....
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 409 (Conflict): If a flow deployment under the name already exists
+
+[[ListFlowDeployments]]
+==== List Flow Deployments
+
+[[GETv1flow-deployments]]
+===== GET /v1/flow-deployments
+
+Returns a list of deployed NiFi instances.
+
+.Status values:
+* *running*: deployment is running and all processors are running
+* *stopped*: deployment is running and at least 1 processor is stopped
+* *empty*: deployment is running and there are no processors in the flow
+* *error*: deployment is running and at least 1 processor has error
+* *creating*: deployment is being created
+* *failed*: deployment has failed (failed creating or went to failure state for some reason)
+* *deleting*: deployment is being deleted
+
+*Response Example:*
+
+....
+[
+  {
+    "name": "flow1",
+    "flowName": "flow1",
+    "creationTime": "2019-07-24T06:32:53Z",
+    "status": "running",
+    "replicas": "1"
+ },
+  {
+    "name": "flow2",
+    "flowName": "flow2",
+    "creationTime": "2019-07-24T06:32:53Z",
+    "status": "error",
+    "replicas": "2"
+ }
+]
+....
+
+*Curl Example:*
+
+....
+curl --request GET --url https://<mxe-endpoint>/v1/flow-deployments --header "Authorization: Bearer <access_token>"
+....
+
+[[PATCHv1flow-deploymentsname]]
+===== PATCH /v1/flow-deployments/<name>
+
+Using PATCH it is possible to set the replica number of a NiFi deployment, that is to scale it on or out
+
+*Request Payload Example:*
+
+....
+{
+  "replicas": "2"
+}
+....
+
+*Curl Example:*
+
+....
+curl --request PATCH --url https://<mxe-endpoint>/v1/flow-deployments/<name> --header "Content-Type: application/json" --data "{\"replicas\":\"2\"};type=application/json" --header "Authorization: Bearer <access_token>"
+....
+
+[[DeleteFlowDeployments]]
+==== Delete Flow Deployments
+
+[[DELETEv1flow-deploymentsname]]
+===== DELETE /v1/flow-deployments/<name>
+
+Deletes the NiFi instance with the given name.
+
+*Response Example:*
+
+* HTTP 200 (OK): NiFi instance deleted.
+* HTTP 404 (Not found): NiFi deployment under this name does not exist.
+
+*Curl Example:*
+
+....
+curl --request DELETE --url https://<mxe-endpoint>/v1/flow-deployments/flow1 --header "Authorization: Bearer <access_token>"
+....
+
+[[v1authors]]
+=== /v1/authors
+
+Manage the package signers and public keys.
+
+NOTE: From MXE 1.7 onwards, only signed model images can be imported from an external archive, by using the `mxe-model onboard --archive` command. The public key of the signer of the archive has to registered via the `/v1/authors` endpoint before onboarding.
+
+NOTE: This endpoint is only accessible for users who have the `mxe_administrator_role` assigned either directly, or by a group membership.
+
+[[POSTv1authors]]
+==== POST /v1/authors
+
+Add a package author and its public key.
+
+*Request Payload Example:*
+
+POST /v1/authors
+
+....
+{
+    "name": "Model author 1",
+    "publicKey": "-----BEGIN PUBLIC KEY----- ... -----END PUBLIC KEY-----"
+}
+....
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 409 (Conflict): If an author with the same name or public key is already registered.
+
+See other error codes in Prometheus API https://prometheus.io/docs/prometheus/latest/querying/api/[documentation].
+
+*Curl Example:*
+
+....
+curl --request POST --url https://<mxe-endpoint>/v1/authors --header "Content-Type: application/json" --data '{"name":"Model author 1","publicKey":"-----BEGIN PUBLIC KEY----- ... -----END PUBLIC KEY-----"}' --header "Authorization: Bearer <access_token>"
+....
+
+[[GETv1authors]]
+==== GET /v1/authors
+
+List package authors and their public keys.
+
+*Request Payload Example:*
+
+GET /v1/authors
+
+....
+[
+  {
+    "name": "Model author 1",
+    "publicKey": "-----BEGIN PUBLIC KEY----- ... -----END PUBLIC KEY-----"
+  }
+]
+....
+
+*Curl Example:*
+
+....
+curl --request GET --url https://<mxe-endpoint>/v1/authors --header "Authorization: Bearer <access_token>"
+....
+
+*Response Example:*
+
+* HTTP 200 (OK)
+
+[[DELETEv1authorsname]]
+==== DELETE /v1/authors/<name>
+
+Delete author.
+
+*Curl Example:*
+
+....
+curl --request DELETE --url https://<mxe-endpoint>/v1/authors/Model%20author%201 --header "Authorization: Bearer <access_token>"
+....
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 404 (Not Found): If an author with this name does not exist.
+
+[[POSTv1authorsverify]]
+==== POST /v1/authors/verify
+
+Verify that the given public key is registered in the author service, and if yes, return the matching author name.
+
+*Request Payload Example:*
+
+POST /v1/authors/verify
+
+....
+-----BEGIN PUBLIC KEY-----
+...
+-----END PUBLIC KEY-----
+....
+
+*Response Example:*
+
+POST /v1/authors/verify (Public key is registered)
+
+....
+{
+  "result": true,
+  "name": "Model author 1"
+}
+....
+
+POST /v1/authors/verify (Public key is not registered)
+
+....
+{
+  "result": false,
+  "name": null
+}
+....
+
+*Curl Example:*
+
+....
+curl --request POST --url https://<mxe-endpoint>/v1/authors/verify --header "Content-Type: application/json" --data '-----BEGIN PUBLIC KEY----- ... -----END PUBLIC KEY-----' --header "Authorization: Bearer <access_token>"
+....
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 404 (Not Found): If an author with this name does not exist.
+
+[[PrometheusQueries]]
+=== Prometheus Queries
+
+Queries metrics from Prometheus. See API documentation https://prometheus.io/docs/prometheus/latest/querying/api/[here].
+
+[[POSTv1prometheusapiv1query]]
+==== POST /v1/prometheus/api/v1/query
+
+Executes a simple query and returns some metrics as a result. The query must be sent in a form parameter.
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 400 (Bad Request)
+* HTTP 404 (Not found)
+
+See other error codes in Prometheus API https://prometheus.io/docs/prometheus/latest/querying/api/[documentation].
+
+*Curl Example:*
+
+....
+curl --request POST --url https://<mxe-endpoint>/v1/prometheus/api/v1/query --header "Authorization: Bearer <access_token>" --form 'query=sum (machine_memory_bytes)'
+....
+
+*Response Example:*
+
+....
+{
+    "status": "success",
+    "data": {
+        "resultType": "vector",
+        "result": [
+            {
+                "metric": {},
+                "value": [
+                    1582810238.612,
+                    "100707037184"
+                ]
+            }
+        ]
+    }
+}
+....
+
+[[POSTv1prometheusapiv1queryrange]]
+==== POST /v1/prometheus/api/v1/query_range
+
+Executes a query with range and returns some metrics as a result. The query must be sent in a form parameter.
+
+*Response Example:*
+
+* HTTP 200 (OK)
+* HTTP 400 (Bad Request)
+* HTTP 404 (Not found)
+
+See other error codes in Prometheus API https://prometheus.io/docs/prometheus/latest/querying/api/[documentation].
+
+*Curl Example:*
+
+....
+curl --request POST --url https://<mxe-endpoint>/v1/prometheus/api/v1/query_range --header "Authorization: Bearer <access_token>" --form 'query=avg(rate(seldon_api_engine_client_requests_seconds_bucket{deployment_name="aaa"}[20s])) by (deployment_name)' --form 'start=1582804251' --form 'end=1582804551' --form step='5s'
+....
+
+*Response Example:*
+
+....
+{
+    "status": "success",
+    "data": {
+        "resultType": "matrix",
+        "result": [
+            {
+                "metric": {
+                    "deployment_name": "aaa"
+                },
+                "values": [
+                    [
+                        1582804251,
+                        "0"
+                    ],
+                    [
+                        1582804256,
+                        "0"
+                    ],
+                    [
+                        1582804551,
+                        "0"
+                    ]
+                ]
+            }
+        ]
+    }
+}
+....

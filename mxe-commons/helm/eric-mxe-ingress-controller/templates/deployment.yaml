@@ -1,0 +1,123 @@
+{{- if .Values.enabled -}}
+{{- $global := fromJson (include "eric-mxe-ingress-controller.global" .) -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "eric-mxe-ingress-controller.name" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: controller"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-ingress-controller.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-ingress-controller.labels" . | fromYaml -}}
+    {{- include "eric-mxe-ingress-controller.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $hookWeight := include "eric-mxe-ingress-controller.hook-weight" 5 | fromYaml -}}
+    {{- $annotations := include "eric-mxe-ingress-controller.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-ingress-controller.mergeAnnotations" (dict "location" .Template.Name "sources" (list $hookWeight $annotations)) | trim | nindent 4 }}
+spec:
+  replicas: {{ include "eric-mxe-ingress-controller.replicaCount" . }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: "mxe"
+      app.kubernetes.io/component: "ingress-controller"
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+  {{- include "eric-mxe-ingress-controller.update-strategy" . | nindent 2 }}
+  template:
+    metadata:
+      labels:
+        {{- $component := printf "%s" "app.kubernetes.io/component: ingress-controller"  | fromYaml -}}
+        {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-ingress-controller.name" .)  | fromYaml -}}
+        {{- $istioLabels := include "eric-mxe-ingress-controller.istio-sidecar-labels" . | fromYaml -}}
+        {{- $labels := include "eric-mxe-ingress-controller.labels" . | fromYaml -}}
+        {{- include "eric-mxe-ingress-controller.mergeLabels" (dict "location" .Template.Name "sources" (list $name $istioLabels $component $labels )) | trim | nindent 8 }}
+      annotations:
+        {{- $securityAnn := include "eric-mxe-ingress-controller.security-annotations" . | fromYaml -}}
+        {{- $istioAnn := include "eric-mxe-ingress-controller.istio-sidecar-annotations" . | fromYaml -}}
+        {{- $annotations := include "eric-mxe-ingress-controller.annotations" . | fromYaml -}}
+        {{- $prometheusAnn := include "eric-mxe-ingress-controller.prometheus-annotations" . | fromYaml -}}
+        {{- include "eric-mxe-ingress-controller.mergeAnnotations" (dict "location" .Template.Name "sources" (list $istioAnn $securityAnn $annotations $prometheusAnn)) | trim | nindent 8 }}
+    spec:
+      {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "eric-mxe-ingress-controller.topologySpreadConstraints" . | trim | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "eric-mxe-ingress-controller.serviceaccount" . | quote }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- if include "eric-mxe-ingress-controller.podPriority" . }}
+      priorityClassName: {{- include "eric-mxe-ingress-controller.podPriority" . | indent 2 }}
+      {{- end }}
+      containers:
+        - name: {{ include "eric-mxe-ingress-controller.name" . | quote }}
+          {{- with .Values.imageCredentials.nginxIngressController }}
+          image: "{{ include "eric-mxe-ingress-controller.setImageRepo" (list $ .registry.url .repoPath "nginxIngressController") }}{{ $.Values.images.nginxIngressController.name }}:{{ $.Values.images.nginxIngressController.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-ingress-controller.registryImagePullPolicy" (list . .Values.imageCredentials.nginxIngressController.registry.imagePullPolicy) | quote }}
+          args:
+            - /nginx-ingress-controller
+            - --configmap=$(POD_NAMESPACE)/{{ include "eric-mxe-ingress-controller.nginx-configmap" . }}
+            - --tcp-services-configmap=$(POD_NAMESPACE)/{{ include "eric-mxe-ingress-controller.tcp-services-configmap" . }}
+            - --udp-services-configmap=$(POD_NAMESPACE)/{{ include "eric-mxe-ingress-controller.udp-services-configmap" . }}
+            - --publish-service=$(POD_NAMESPACE)/{{ include "eric-mxe-ingress-controller.name" . }}
+            - --annotations-prefix={{ include "eric-mxe-ingress-controller.ingress-annotation-prefix" . }}
+            - --controller-class={{ include "eric-mxe-ingress-controller.controllerclass" . }}
+            - --ingress-class={{ include "eric-mxe-ingress-controller.class" . }}
+            - --election-id={{ include "eric-mxe-ingress-controller.election-id" . }}
+            - --watch-namespace={{ .Release.Namespace }}
+            - --update-status=false
+            - --update-status-on-shutdown=false
+            - --http-port=1180
+            - --https-port=11443
+          {{- include "eric-mxe-ingress-controller.container-security-context" . | nindent 10 }}
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - name: http
+              containerPort: 1180
+            - name: https
+              containerPort: 11443
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            periodSeconds: 10
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            initialDelaySeconds: {{ .Values.probes.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.probes.livenessProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.probes.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            initialDelaySeconds: {{ .Values.probes.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.probes.readinessProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.probes.readinessProbe.timeoutSeconds }}
+          resources:
+            {{- toYaml .Values.resources.ingressController | nindent 12 }}
+          {{- include "eric-mxe-ingress-controller.pg-cert-volume-mounts" . | nindent 10 }}
+      {{- include "eric-mxe-ingress-controller.tolerations" . | nindent 6 }}
+      {{- include "eric-mxe-ingress-controller.image-pull-secrets" . | nindent 6 }}
+      {{- include "eric-mxe-ingress-controller.pg-cert-volumes" . | nindent 6 }}
+      {{- if (or .Values.nodeSelector $global.nodeSelector) }}
+      nodeSelector: {{- include "eric-mxe-ingress-controller.nodeSelector" . | nindent 8 }}
+      {{- end }}
+      affinity:
+        podAntiAffinity:
+          {{- include "eric-mxe-ingress-controller.podAntiAffinityType" . | indent 8}}
+      tolerations: {{ include "eric-mxe-ingress-controller.merge-tolerations" (dict "root" . "podbasename" "eric-mxe-ingress-controller") | nindent 8}}
+{{ end }}

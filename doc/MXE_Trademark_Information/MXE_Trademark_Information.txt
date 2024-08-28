@@ -1,0 +1,25 @@
+Trademark Information
+=====================
+=========================================
+:author:
+:doc-name: LIST
+:doc-no: 1/006 51-CAV 101 061/1
+:revnumber: PA1
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name:
+:approved-by-department:
+
+== Trademarks Used in Library
+
+The trademarks used in this library, and their respective owners, are as follows:
+
+* *Ericsson* is the trademark or registered trademark of Telefonaktiebolaget LM Ericsson.
+
+* *Docker* is the trademark or registered trademark of Docker, Inc.
+
+* *Kubernetes* is the trademark or registered trademark of The Linux Foundation.
+
+* *Red Hat Enterprise Linux Atomic Host* is a registered trademark of Red Hat,
+Inc. in the United States and other countries.
+
+All other trademarks mentioned herein are the property of their respective owners.

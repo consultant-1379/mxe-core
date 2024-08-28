@@ -1,0 +1,82 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "mxe-deployer.post-install-hook-certificate-sidecar-name" . | quote }}
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "post-install-hook-certificate-sidecar-merge-job"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-deployer.post-install-hook-certificate-sidecar-name" . | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-deployer.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": "hook-succeeded,before-hook-creation"
+    {{- include "mxe-deployer.product-info" . | nindent 4 }}
+spec:
+  completions: 1
+  parallelism: 1
+  backoffLimit: 3
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "false"
+        {{- include "mxe-deployer.security-annotations-certificate-sidecar" . | nindent 8 }}
+      labels:
+        sidecar.istio.io/inject: "false"
+    spec:
+      {{- include "mxe-deployer.post-install-hook-certificate-sidecar-merge-pull-secrets" . | nindent 6 }}
+      serviceAccountName: {{ include "mxe-deployer.post-install-hook-certificate-sidecar-name" . | quote }}
+      containers:
+        - name: post-install-hook-certificate-sidecar
+          image: "{{ include "mxe-deployer.post-install-hook-certificate-sidecar.image-repository" . }}{{ index .Values "mxePostInstallCertificateSideCar" "image" "name" }}:{{ index .Values "mxePostInstallCertificateSideCar" "image" "tag" }}"
+          imagePullPolicy: "{{ include "mxe-deployer.post-install-hook.registryImagePullPolicy" (list . (index .Values "mxePostInstallCertificateSideCar" "image" "pullPolicy")) }}"
+          volumeMounts:
+            - mountPath: "/etc/kubernetes-run-script/"
+              name: kubernetes-run-script
+            - mountPath: "/etc/patch-template/"
+              name: patch-template
+            - name: all-pull-secrets
+              mountPath: "/temp/all-pull-secrets/"
+          env:
+            - name: MXE_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: GITEA_SERVICE_NAME
+              value: {{ include "mxe-deployer.gitea-service-name" . | quote }}
+            - name: IMAGE_NAME
+              value: "{{ include "mxe-deployer.post-install-hook-certificate-sidecar.image-registry" .}}/{{ index .Values "mxePostInstallCertificateSideCar" "sideCarImage" "name" }}:{{ index .Values "mxePostInstallCertificateSideCar" "sideCarImage" "tag" }}"
+            - name: CONFIG_MAP_NAME
+              value: {{ include "mxe-deployer.post-install-hook-certificate-sidecar-script-name" . | quote }}
+          securityContext:
+            {{- include "mxe-deployer.post-install-hook-certificate-sidecar-security-context" . | nindent 12 }}
+      restartPolicy: Never
+      volumes:
+      - name: kubernetes-run-script
+        configMap:
+          name: {{ include "mxe-deployer.post-install-hook-certificate-sidecar-name" . | quote }}
+          defaultMode: 0744
+      - name: patch-template
+        configMap:
+          name: {{ include "mxe-deployer.post-install-hook-certificate-sidecar-patch-template-name" . | quote }}
+          defaultMode: 0744
+      - name: all-pull-secrets
+        projected:
+          sources:
+          {{- if (include "mxe-deployer.post-install-hook-certificate-sidecar-merge-pull-secrets-name" . ) }}
+          - secret:
+              name: {{ include "mxe-deployer.post-install-hook-certificate-sidecar-merge-pull-secrets-name" . }}
+              items:
+                - key: .dockerconfigjson 
+                  path: source-registry-docker-config.json
+          {{- end }}
+          - secret: 
+              name: {{ include "mxe-deployer.internal-container-registry-dockerconfig-secret-name" . | quote }}
+              items:
+                - key: .dockerconfigjson 
+                  path: internal-registry-docker-config.json  
+{{- end -}}

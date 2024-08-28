@@ -1,0 +1,50 @@
+/* style goes here */
+:host {
+  display: block;
+}
+
+.invoke-model {
+  background: var(--card-color-background, var(--card-color-background, #fafafa));
+  margin: 0 -24px;
+  padding: 24px 24px 0;
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  width: 100%;
+}
+
+.invoke-model-input {
+  min-height: 100px;
+  flex: 4;
+  margin-bottom: 16px;
+}
+
+.title {
+  opacity: 0.8;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+#invoke {
+  text-align: center;
+  margin: 16px auto 0;
+}
+
+#invoke-model-result {
+  min-height: 100px;
+  width: 100%;
+}
+
+.error {
+  color: var(--red);
+}

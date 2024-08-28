@@ -1,0 +1,28 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "eric-mxe-serving-upgrade-jobs.preupgrade-cleanup-cluster-role" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: preupgrade-cleanup-cluster-role"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-serving-upgrade-jobs.labels" . | fromYaml -}}
+    {{- include "eric-mxe-serving-upgrade-jobs.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $hook := printf "%s" "helm.sh/hook: pre-upgrade"  | fromYaml -}}
+    {{- $hookDeletePolicy := printf "%s" "helm.sh/hook-delete-policy: before-hook-creation"  | fromYaml -}}
+    {{- $hookWeight := include "eric-mxe-serving-upgrade-jobs.hook-weight" 0 | fromYaml -}}
+    {{- $annotations := include "eric-mxe-serving-upgrade-jobs.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-serving-upgrade-jobs.mergeAnnotations" (dict "location" .Template.Name "sources" (list $hook $hookDeletePolicy $hookWeight $annotations)) | trim | nindent 4 }}
+rules:
+  - apiGroups:
+      - rbac.authorization.k8s.io
+    resources:
+      - clusterrolebindings
+    verbs:
+      - "delete"
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - mutatingwebhookconfigurations
+      - validatingwebhookconfigurations
+    verbs:
+      - "delete"

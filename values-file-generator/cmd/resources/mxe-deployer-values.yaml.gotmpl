@@ -1,0 +1,672 @@
+# Set values for mxe-deployer helm chart
+# This is a YAML-formatted file generated using mxe-generate-linux cli tool version {{ .MXE_VERSION }}
+
+### DO NOT CHANGE ANCHORS! ###
+
+# These fields are all mandatory. Please set them/change them according to your desire.
+
+# Set appropriate AppArmor Profile supported by the cluster node.
+appArmorProfile: &appArmorProfile {{ .appArmorProfile_type }}
+
+# Set appropriate Seccomp Profile supported by the cluster node.
+seccompProfile: &seccompProfile {{ .seccompProfile_type }}
+
+# The docker registry which would be used by majority of docker images
+installerDockerRegistry: &installerDockerRegistry {{ .docker_registry.host }}
+
+# The secret which contains the credentials for the used docker registry
+installerDockerRegistrySecret: &installerDockerRegistrySecret {{ .docker_registry.secret | quote }}
+
+# Pull secrets
+# If *installerDockerRegistrySecret is not set then set installerDockerRegistrySecrets to
+# installerDockerRegistrySecrets: &installerDockerRegistrySecrets []
+# If *installerDockerRegistrySecret is set then set installerDockerRegistrySecrets to
+# installerDockerRegistrySecrets: &installerDockerRegistrySecrets
+#     - name: *installerDockerRegistrySecret
+{{- if not .docker_registry.secret  }}
+installerDockerRegistrySecrets: &installerDockerRegistrySecrets []
+{{ else }}
+installerDockerRegistrySecrets: &installerDockerRegistrySecrets
+    - name: {{ .docker_registry.secret }}
+{{- end }}
+
+# The docker registry which is used by ArgoCD images
+installerArgoCDDockerRegistry: &installerArgoCDDockerRegistry {{ .docker_registry.host }}/proj-mxe/argoproj/argocd
+
+# The docker registry which is used by haproxy images
+installerHAProxyDockerRegistry: &installerHAProxyDockerRegistry  {{ .docker_registry.host }}/proj-mxe/haproxy
+
+# The docker registry which is used by redis images
+installerRedisDockerRegistry: &installerRedisDockerRegistry {{ .docker_registry.host }}/proj-mxe/redis
+
+# The storage class which will be used by MXE-deployer to create persistent volumes
+storageClass: &storageClass {{ .storage_class }}
+
+# If the target environment where MXE is going to be installed is going to use External CA, set the below property to true
+# Setting this property to true enables to mount external CA on the pods where CA is required for authentication.
+isExtCA: &isExtCA {{ .isExtCA }}
+
+# User provided credentials in a form of a secret and given by its name for the initial MXE user If not PROVIDED, then the defaults are going to be used, see the Installation Guide for details.
+# Mandatory fields in the user provided secret:
+# - username (for the initial MXE username)
+# - password (for the initial MXE user password)
+mxeUserSecret: &mxeUserSecret {{ .mxe_commons.mxe_user_secret | quote }}
+
+# Settings to enable service mesh mtls
+enableEncryptionInTransit: &enableEncryptionInTransit {{ .mxe_commons.encryption.enable_in_transit }}
+
+# Requires SIP-TLS ADP generic service
+enableSipTls: &enableSipTls {{ .mxe_commons.encryption.enable_in_transit }}
+
+# ServiceMesh version to be added as annotaion 
+serviceMeshVersion: &serviceMeshVersion {{ .mxe_commons.service_mesh.version }}
+
+# Argo CD expects the admin password to be bcrypt hashed. You can create this hash via
+# Command line `htpasswd -nbBC 10 "" $ARGOCD_PWD | tr -d ':\n' | sed 's/$2y/$2a/'`
+# Or via browser  https://www.browserling.com/tools/bcrypt 
+argocdServerAdminPassword: &argocdServerAdminPassword $2a$10$5YbrGwj7jgWU/ZUjSKnFX.A1VJyJpuu3gurOzxg9AnOYSgw0ex1Km
+
+# Argocd Http Ingress Configuration
+# Enable the Argo CD Http ingress
+argocdHttpIngressEnabled : &argocdHttpIngressEnabled true
+# Set the Argo CD http hostname if ingress is enabled
+argocdHttpHostName : &argocdHttpHostName {{ .api.argocd.host }}
+# Set the secret containing the tls for the Argo CD http hostname
+argocdHttpTLSSecret : &argocdHttpTLS  {{ .api.argocd.tlsSecretName }}
+
+# Deployer Ingress Configuration
+# Enable the Deployer Service ingress
+deployerIngressEnabled : &deployerIngressEnabled true
+# Set the deployer service hostname
+deployerServiceHostName: &deployerServiceHostName {{ .api.deployer.host }}
+# Set the secret containing the tls for the Deployer hostname
+deployerServiceTLSSecret : &deployerTLS {{ .api.deployer.tlsSecretName }}
+
+# The docker registry which is used by Gitea image
+installerGiteaDockerRegistry: &installerGiteaDockerRegistry {{ .docker_registry.host }}
+# Gitea Root URL e.g. https://gitea.mxe.cram010.rnd.gic.ericsson.se
+giteaRootUrl: &giteaRootUrl {{if .api.gitea.host}} https://{{.api.gitea.host}} {{else}} {{end}}
+# Enable or disable creation of Gitea Ingress resource
+giteaEnableIngress: &giteaEnableIngress true
+# Gitea Ingress Host e.g. gitea.mxe.cram010.rnd.gic.ericsson.se
+giteaIngressHost: &giteaIngressHost {{ default "" .api.gitea.host }}
+# Kubernetes Secret containing TLS certificate for Gitea Ingress
+giteaApiTls: &giteaApiTls {{ .api.gitea.tlsSecretName }}
+# Gitea OAuth Cofiguration - openid-configuration endpoint of keycloak
+giteaOauthAutoDiscoverUrl: &giteaOauthAutoDiscoverUrl https://{{ .api.oauth.host }}/auth/realms/mxe/.well-known/openid-configuration
+
+# GitOps Repo Details
+# All manifests to be deployed are to be checked in here. Either by the user or by the deployer service
+# Internal Git Configuration
+# If enabled, Deployer init will create a repo at <*giteaRootUrl/*internalGitOrgName/*internalGitRepoName>.git
+internalGitopsRepoEnabled: &internalGitEnabled {{ .mxe_deployer.internal_gitops.enabled }} 
+internalGitOpsRepoOrgname: &internalGitOrgName mxe
+internalGitOpsRepoName: &internalGitRepoName mxe-gitops
+internalGitOpsRepoPath: &internalGitOpsRepoPath /mxe/mxe-gitops
+# External git configuration: set this only if Deployer should configure an external repo in ArgoCD
+# Will be used only if internalGitopsRepoEnabled is false
+# https repo url to be used for cloning and performing git operations
+externalGitOpsRepoURL: &gitOpsRepoURL {{ .mxe_deployer.external_gitops.url | quote }}
+# Secret containing the https/ssh credentials to connect to gitOpsRepo 
+# If internal gitrepo is requested, access is only possible via http
+# For internal gitrepo, the user is created in Gitea with the http credentials specified in gitOpsAccessSecret
+gitOpsAccessSecret : &gitOpsAccessSecret {{ .mxe_deployer.gitops_repo_creds }}
+
+## Commit Author information
+## Used to sign commits made by mxe deployer into the gitops repo
+## For internal gitrepo, the user is created in gitea with the email given in the commitAuthorEmail 
+commitAuthorName: &commitAuthorName   {{ .mxe_deployer.commit_author.name }}
+commitAuthorEmail: &commitAuthorEmail {{ .mxe_deployer.commit_author.email }}
+## Gitserver domain for which the above commit author information is to be used
+## This property is ignored if  Internal git is enabled. Instead the value of *giteaIngressHost is used as the commitDomain
+## Set this to the domain of your gitserver if you are using an external git provider like gerrit or gitlab 
+##  For example: gerrit.ericsson.se or gitlab.internal.ericsson.com
+commitAuthorDomain: &commitAuthorDomain {{ .mxe_deployer.external_gitops.domain | quote}}
+
+# MXE Api Host details
+protocol: &mxeApiProtocol https 
+mxeApiHostname: &mxeApiHost {{ .api.mxe.host }}
+mxeApiPort: &mxeApiPort 443
+
+# MXE OAUTH Api Host details
+mxeOauthApiHostname: &mxeOauthApiHost {{ .api.oauth.host }}
+
+# Set the secret containing Argocd Admin user credentials
+# Create the secret with fields username and password
+# Deployer init will create admin user in keycloak
+# Once keycloak users are created, argocd local admin user login will be disabled
+argocdAdminCreds : &argocdAdminCreds {{ .mxe_deployer.argocd_admin_creds }}
+
+# Redis installation configuration
+# redisHAEnabled: Whether to install redisHA chart along with argocd
+# redisEnabled: Whether to install argocd with single replica redis. Set this to true only if redisHAEnabled is false
+{{- if .mxe_deployer.argocd_redis_ha }}
+redisHAEnabled: &redisHAEnabled true
+redisEnabled: &redisEnabled false
+{{ else }}
+redisHAEnabled: &redisHAEnabled false
+redisEnabled: &redisEnabled true
+{{- end }}
+
+# MXE Keycloak admin credentials secret
+# should match the secret used in mxe-values.yaml for property mxeAdminSecret
+mxeKeycloakAdminSecret: &mxeKeycloakAdminSecret {{ .mxe_commons.mxe_admin_secret }}
+
+# IngressClass Name of Cluster-Wide Ingress Controller
+clusterWideIngressClassName: &clusterWideIngressClassName {{ .cluster_wide_ingress_class_name }}
+
+### DO NOT MODIFY PARAMETERS BELOW THIS LINE! ###
+
+# Whether MXE will be accessible through a default ingress controller already present on the Kubernetes cluster, or a new internal one which will be installed by MXE.
+disableDefaultIngressControllerUse: &disableDefaultIngressControllerUse false
+
+global: &global
+  registry:
+    url: *installerDockerRegistry
+    # The secret which contains the credentials for the used docker registry
+    pullSecret: *installerDockerRegistrySecret
+  imageRegistry: *installerDockerRegistry
+  # By default, MXE uses a default ingress controller.
+  # To use an internal one change the next setting to false. The behaviour of this ingress controller can be modified under eric-mxe-ingress-controller key.
+  mxeDisableDefaultIngressControllerUse: *disableDefaultIngressControllerUse
+  mxeGiteaApiHostname: *giteaIngressHost
+  mxeDeployerApiHostname: *deployerServiceHostName
+  mxeArgoCDApiHostname: *argocdHttpHostName
+  mxeOauthApiHostname: *mxeOauthApiHost
+  security:
+    tls:
+      enabled: *enableSipTls
+  serviceMesh:
+    enabled: *enableEncryptionInTransit
+    annotations:
+      # This is used to annotate pods with sidecars, so they are automatically
+      # restarted and reinjected with the correct proxy version on SM upgrades
+      serviceMesh: *serviceMeshVersion
+      
+appArmorProfile:
+  type: *appArmorProfile
+seccompProfile:
+  type: *seccompProfile
+
+## Argocd HTTP Ingress set hosts & tls if ingress.enabled is true
+argocdIngress:
+  enabled: *argocdHttpIngressEnabled
+  {{- if .mxe_commons.encryption.enable_in_transit }}
+  annotations:
+    mxe.nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    mxe.nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    mxe.nginx.ingress.kubernetes.io/service-upstream: "true"
+    mxe.nginx.ingress.kubernetes.io/upstream-vhost: "argocd-server"
+  {{- end }}
+  ## Hostname must be provided if Ingress is enabled.
+  ## Secrets must be manually created in the namespace
+  hostName: *argocdHttpHostName
+  tls:
+    - secretName: *argocdHttpTLS
+      hosts:
+      - *argocdHttpHostName
+
+argo-cd:
+  global:
+    image:
+      repository: *installerArgoCDDockerRegistry
+      imagePullPolicy: &imagePullPolicy {{ default "IfNotPresent" .mxe_deployer.argocd.imagePullPolicy }}
+    imagePullSecrets: *installerDockerRegistrySecrets 
+    {{- if .mxe_commons.encryption.enable_in_transit }}
+    podAnnotations:
+      sidecar.istio.io/inject: "true"
+      sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      sidecar.istio.io/userVolume: '{"egress-secret":{"secret":{"secretName":"eric-sec-access-mgmt-iam-int-client-cert","optional":true}},"egress-pm-secret":{"secret":{"secretName":"eric-pm-server-query-cert","optional":true}},"egress-lcm-secret":{"secret":{"secretName":"eric-lcm-container-registry-client-cert","optional":true}},"egress-ca-secret":{"secret":{"secretName":"eric-sec-sip-tls-trusted-root-cert"}}}'
+      sidecar.istio.io/userVolumeMount: '{"egress-secret":{"mountPath":"/etc/istio/egress-certs/","readOnly":true},"egress-pm-secret":{"mountPath":"/etc/istio/pm/egress-certs/","readOnly":true},"egress-lcm-secret":{"mountPath":"/etc/istio/lcm/egress-certs/","readOnly":true},"egress-ca-secret":{"mountPath":"/etc/istio/egress-ca-certs/","readOnly":true}}'
+    {{- end }}
+
+  ## Controller
+  controller:
+    extraArgs:
+     - --repo-server-plaintext
+    resources:
+      requests:
+        cpu:  {{ default "400m"  .mxe_deployer.argocd.controller.resources.requests.cpu }} 
+        memory: {{ default "512Mi"  .mxe_deployer.argocd.controller.resources.requests.memory }}  
+      limits:
+        cpu: {{ default "2000m"  .mxe_deployer.argocd.controller.resources.limits.cpu }}
+        memory: {{ default "2048Mi"  .mxe_deployer.argocd.controller.resources.limits.memory }}
+
+  redis:
+    enabled: *redisEnabled
+    image:
+      repository: *installerRedisDockerRegistry
+      imagePullPolicy: *imagePullPolicy
+    {{- if .mxe_commons.encryption.enable_in_transit }}
+    podAnnotations:
+      sidecar.istio.io/inject: "true"
+      sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      sidecar.istio.io/userVolume: '{"egress-secret":{"secret":{"secretName":"eric-sec-access-mgmt-iam-int-client-cert","optional":true}},"egress-pm-secret":{"secret":{"secretName":"eric-pm-server-query-cert","optional":true}},"egress-lcm-secret":{"secret":{"secretName":"eric-lcm-container-registry-client-cert","optional":true}},"egress-ca-secret":{"secret":{"secretName":"eric-sec-sip-tls-trusted-root-cert"}}}'
+      sidecar.istio.io/userVolumeMount: '{"egress-secret":{"mountPath":"/etc/istio/egress-certs/","readOnly":true},"egress-pm-secret":{"mountPath":"/etc/istio/pm/egress-certs/","readOnly":true},"egress-lcm-secret":{"mountPath":"/etc/istio/lcm/egress-certs/","readOnly":true},"egress-ca-secret":{"mountPath":"/etc/istio/egress-ca-certs/","readOnly":true}}'
+    {{- end }}
+    resources:
+      requests:
+        memory: 200Mi
+        cpu: 100m
+      limits:
+        memory: 1Gi
+        cpu: 500m
+
+  # This key configures Redis-HA subchart and when enabled (redis-ha.enabled=true)
+  # the custom redis deployment is omitted
+  redis-ha:
+    enabled: *redisHAEnabled
+    persistentVolume:
+      storageClass: *storageClass
+    image:
+      repository: *installerRedisDockerRegistry
+      pullPolicy: *imagePullPolicy
+    {{- if .mxe_commons.encryption.enable_in_transit }}
+    podAnnotations:
+      sidecar.istio.io/inject: "true"
+      sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      sidecar.istio.io/userVolume: '{"egress-secret":{"secret":{"secretName":"eric-sec-access-mgmt-iam-int-client-cert","optional":true}},"egress-pm-secret":{"secret":{"secretName":"eric-pm-server-query-cert","optional":true}},"egress-lcm-secret":{"secret":{"secretName":"eric-lcm-container-registry-client-cert","optional":true}},"egress-ca-secret":{"secret":{"secretName":"eric-sec-sip-tls-trusted-root-cert"}}}'
+      sidecar.istio.io/userVolumeMount: '{"egress-secret":{"mountPath":"/etc/istio/egress-certs/","readOnly":true},"egress-pm-secret":{"mountPath":"/etc/istio/pm/egress-certs/","readOnly":true},"egress-lcm-secret":{"mountPath":"/etc/istio/lcm/egress-certs/","readOnly":true},"egress-ca-secret":{"mountPath":"/etc/istio/egress-ca-certs/","readOnly":true}}'
+    {{- end }}
+    imagePullSecrets: *installerDockerRegistrySecrets
+    redis:
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 100m
+        limits:
+          memory: 800Mi
+          cpu: 400m
+    serviceAccount:
+      automountToken: true
+    haproxy:
+      image:
+        repository: *installerHAProxyDockerRegistry
+        pullPolicy: *imagePullPolicy
+      {{- if .mxe_commons.encryption.enable_in_transit }}
+      annotations:
+        sidecar.istio.io/inject: "true"
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+        sidecar.istio.io/userVolume: '{"egress-secret":{"secret":{"secretName":"eric-sec-access-mgmt-iam-int-client-cert","optional":true}},"egress-pm-secret":{"secret":{"secretName":"eric-pm-server-query-cert","optional":true}},"egress-lcm-secret":{"secret":{"secretName":"eric-lcm-container-registry-client-cert","optional":true}},"egress-ca-secret":{"secret":{"secretName":"eric-sec-sip-tls-trusted-root-cert"}}}'
+        sidecar.istio.io/userVolumeMount: '{"egress-secret":{"mountPath":"/etc/istio/egress-certs/","readOnly":true},"egress-pm-secret":{"mountPath":"/etc/istio/pm/egress-certs/","readOnly":true},"egress-lcm-secret":{"mountPath":"/etc/istio/lcm/egress-certs/","readOnly":true},"egress-ca-secret":{"mountPath":"/etc/istio/egress-ca-certs/","readOnly":true}}'
+      {{- end }}
+      imagePullSecrets: *installerDockerRegistrySecrets
+      resources:
+        requests:
+          memory: 200Mi
+          cpu: 100m
+        limits:
+          memory: 400Mi
+          cpu: 200m
+    
+  ## Server
+  server:
+    resources:
+      limits:
+        cpu: 200m
+        memory: 1024Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+
+    extraArgs:
+    - --insecure
+    - --repo-server-plaintext
+
+  ## Repo Server
+  repoServer:
+    resources:
+      requests:
+        cpu: {{ default "400m"  .mxe_deployer.argocd.repoServer.resources.requests.cpu }}
+        memory: {{ default "512Mi"  .mxe_deployer.argocd.repoServer.resources.requests.memory }}
+      limits:
+        cpu: {{ default "2000m"  .mxe_deployer.argocd.repoServer.resources.limits.cpu }}
+        memory: {{ default "2048Mi"  .mxe_deployer.argocd.repoServer.resources.limits.memory }}
+
+    extraArgs:
+    - --disable-tls
+
+  ## use bcrypted password see https://argoproj.github.io/argo-cd/faq/#i-forgot-the-admin-password-how-do-i-reset-it
+  configs:
+    secret:
+      argocdServerAdminPassword: *argocdServerAdminPassword
+      argocdServerAdminPasswordMtime: "'$(date -u +%FT%T%Z)'" #"2021-01-01T10:11:12Z"
+
+  applicationSet:
+    {{- if .mxe_commons.encryption.enable_in_transit }}
+    podAnnotations:
+      proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      sidecar.istio.io/inject: "true"
+      sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      sidecar.istio.io/userVolume: '{"egress-secret":{"secret":{"secretName":"eric-sec-access-mgmt-iam-int-client-cert","optional":true}},"egress-pm-secret":{"secret":{"secretName":"eric-pm-server-query-cert","optional":true}},"egress-lcm-secret":{"secret":{"secretName":"eric-lcm-container-registry-client-cert","optional":true}},"egress-ca-secret":{"secret":{"secretName":"eric-sec-sip-tls-trusted-root-cert"}}}'
+      sidecar.istio.io/userVolumeMount: '{"egress-secret":{"mountPath":"/etc/istio/egress-certs/","readOnly":true},"egress-pm-secret":{"mountPath":"/etc/istio/pm/egress-certs/","readOnly":true},"egress-lcm-secret":{"mountPath":"/etc/istio/lcm/egress-certs/","readOnly":true},"egress-ca-secret":{"mountPath":"/etc/istio/egress-ca-certs/","readOnly":true}}'
+    {{- end }}
+    resources:
+      requests:
+        cpu:  {{ default "400m"  .mxe_deployer.argocd.applicationSet.resources.requests.cpu }} 
+        memory: {{ default "512Mi"  .mxe_deployer.argocd.applicationSet.resources.requests.memory }}  
+      limits:
+        cpu: {{ default "2000m"  .mxe_deployer.argocd.applicationSet.resources.limits.cpu }}
+        memory: {{ default "2048Mi"  .mxe_deployer.argocd.applicationSet.resources.limits.memory }}
+
+  notifications:
+    {{- if .mxe_commons.encryption.enable_in_transit }}
+    podAnnotations:
+      proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      sidecar.istio.io/inject: "true"
+      sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      sidecar.istio.io/userVolume: '{"egress-secret":{"secret":{"secretName":"eric-sec-access-mgmt-iam-int-client-cert","optional":true}},"egress-pm-secret":{"secret":{"secretName":"eric-pm-server-query-cert","optional":true}},"egress-lcm-secret":{"secret":{"secretName":"eric-lcm-container-registry-client-cert","optional":true}},"egress-ca-secret":{"secret":{"secretName":"eric-sec-sip-tls-trusted-root-cert"}}}'
+      sidecar.istio.io/userVolumeMount: '{"egress-secret":{"mountPath":"/etc/istio/egress-certs/","readOnly":true},"egress-pm-secret":{"mountPath":"/etc/istio/pm/egress-certs/","readOnly":true},"egress-lcm-secret":{"mountPath":"/etc/istio/lcm/egress-certs/","readOnly":true},"egress-ca-secret":{"mountPath":"/etc/istio/egress-ca-certs/","readOnly":true}}'
+    {{- end }}
+    resources:
+      requests:
+        cpu:  {{ default "400m"  .mxe_deployer.argocd.notifications.resources.requests.cpu }} 
+        memory: {{ default "512Mi"  .mxe_deployer.argocd.notifications.resources.requests.memory }}  
+      limits:
+        cpu: {{ default "1000m"  .mxe_deployer.argocd.notifications.resources.limits.cpu }}
+        memory: {{ default "1024Mi"  .mxe_deployer.argocd.notifications.resources.limits.memory }}
+
+
+eric-mxe-deployer-service:
+  global: *global
+  {{- if .mxe_commons.encryption.enable_in_transit }}
+  podAnnotations:
+    proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+    sidecar.istio.io/rewriteAppHTTPProbers: "true"
+    sidecar.istio.io/userVolume: '{"egress-secret":{"secret":{"secretName":"eric-sec-access-mgmt-iam-int-client-cert","optional":true}},"egress-pm-secret":{"secret":{"secretName":"eric-pm-server-query-cert","optional":true}},"egress-lcm-secret":{"secret":{"secretName":"eric-lcm-container-registry-client-cert","optional":true}},"egress-ca-secret":{"secret":{"secretName":"eric-sec-sip-tls-trusted-root-cert"}}}'
+    sidecar.istio.io/userVolumeMount: '{"egress-secret":{"mountPath":"/etc/istio/egress-certs/","readOnly":true},"egress-pm-secret":{"mountPath":"/etc/istio/pm/egress-certs/","readOnly":true},"egress-lcm-secret":{"mountPath":"/etc/istio/lcm/egress-certs/","readOnly":true},"egress-ca-secret":{"mountPath":"/etc/istio/egress-ca-certs/","readOnly":true}}'
+  {{- end }}
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile
+  ingress:
+    clusterWideIngressClass: *clusterWideIngressClassName
+    enabled: *deployerIngressEnabled
+    hostname: *deployerServiceHostName
+    tlsSecretName: *deployerTLS
+  resources:
+    limits:
+      cpu: 500m
+      memory: 640Mi 
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  isExtCA: *isExtCA
+  config:
+    git:
+      url: *gitOpsRepoURL
+      accessSecret: *gitOpsAccessSecret
+      internal:
+        enabled: *internalGitEnabled
+        rootUrl: *giteaRootUrl
+        org: *internalGitOrgName
+        repo: *internalGitRepoName
+        domain: *giteaIngressHost
+        userEmail: *commitAuthorEmail
+      author:
+        domain: *commitAuthorDomain
+        name: *commitAuthorName
+        email: *commitAuthorEmail
+    argocd:
+      ingress:
+        clusterWideIngressClass: *clusterWideIngressClassName
+      redisHA:
+        enabled: *redisHAEnabled
+      redis:
+        enabled: *redisEnabled
+      ui:
+        ingress:
+          enabled: *argocdHttpIngressEnabled
+          host: *argocdHttpHostName
+          tlsSecretName: *argocdHttpTLS
+    sso:
+      mxe:
+        ingress:
+          protocol: *mxeApiProtocol
+          apiHostName: *mxeApiHost
+          apiPort: *mxeApiPort
+          oauthApiHostName: *mxeOauthApiHost
+        adminSecret: *mxeKeycloakAdminSecret
+      users:
+        adminUserSecret: *argocdAdminCreds
+
+mxeGitea:
+  isExtCA: *isExtCA
+  ingress:
+    clusterWideIngressClass: *clusterWideIngressClassName
+  giteaKeycloakInit:
+    clientRedirectUri: *giteaRootUrl
+    autoDiscoveryUrl: *giteaOauthAutoDiscoverUrl
+    mxeKeycloakAdminSecretName: *mxeKeycloakAdminSecret
+  giteaIngressHost: *giteaIngressHost
+  giteaApiTls: *giteaApiTls
+  giteaRootUrl: *giteaRootUrl
+  mxeUserSecretName: *mxeUserSecret
+  keepAliveRepo:
+    org: *internalGitOrgName
+
+gitea:
+  imagePullSecrets: *installerDockerRegistrySecrets
+  gitea:
+    {{- if .mxe_commons.encryption.enable_in_transit }}
+    podAnnotations:
+      sidecar.istio.io/inject: "true"
+      sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      sidecar.istio.io/userVolume: '{"egress-secret":{"secret":{"secretName":"eric-sec-access-mgmt-iam-int-client-cert","optional":true}},"egress-pm-secret":{"secret":{"secretName":"eric-pm-server-query-cert","optional":true}},"egress-lcm-secret":{"secret":{"secretName":"eric-lcm-container-registry-client-cert","optional":true}},"egress-ca-secret":{"secret":{"secretName":"eric-sec-sip-tls-trusted-root-cert"}}}'
+      sidecar.istio.io/userVolumeMount: '{"egress-secret":{"mountPath":"/etc/istio/egress-certs/","readOnly":true},"egress-pm-secret":{"mountPath":"/etc/istio/pm/egress-certs/","readOnly":true},"egress-lcm-secret":{"mountPath":"/etc/istio/lcm/egress-certs/","readOnly":true},"egress-ca-secret":{"mountPath":"/etc/istio/egress-ca-certs/","readOnly":true}}'
+      proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      traffic.sidecar.istio.io/excludeOutboundPorts: "5432"
+    {{- end }}
+    config:
+      service:
+        ALLOW_ONLY_EXTERNAL_REGISTRATION: true
+      server:
+        PROTOCOL: http
+        ROOT_URL: *giteaRootUrl
+        DISABLE_SSH: true
+      database:
+        DB_TYPE: postgres
+        HOST: eric-data-document-database-pg:5432
+        NAME: gitea
+        USER: gitea
+        PASSWD: Z2l0ZWFfcGFzc3dvcmQ=
+      {{- if .mxe_commons.encryption.enable_in_transit }}
+        SSL_MODE: verify-full
+      {{- end }}
+      session:
+      {{- if .mxe_deployer.argocd_redis_ha }}
+        PROVIDER: redis
+        PROVIDER_CONFIG: redis://:macaron@mxe-deployer-redis-ha-haproxy:6379/0?pool_size=100&idle_timeout=180s
+      {{ else }}
+        PROVIDER: redis
+        PROVIDER_CONFIG: redis://:macaron@argocd-redis:6379/0?pool_size=100&idle_timeout=180s
+      {{- end }}
+      cache:
+        ENABLED: true
+      {{- if .mxe_deployer.argocd_redis_ha }}
+        ADAPTER: redis
+        HOST: redis://:macaron@mxe-deployer-redis-ha-haproxy:6379/0?pool_size=100&idle_timeout=180s
+      {{ else }}
+        ADAPTER: redis
+        HOST: redis://:macaron@argocd-redis:6379/0?pool_size=100&idle_timeout=180s
+      {{- end }}
+      webhook:
+        ALLOWED_HOST_LIST: "*"
+  ingress:
+    enabled: *giteaEnableIngress
+    hosts:
+      - host: *giteaIngressHost
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+    - secretName: *giteaApiTls
+      hosts:
+        - *giteaIngressHost
+    {{- if .mxe_commons.encryption.enable_in_transit }}
+    annotations:
+      ericsson.com/product-name: mxe-deployer
+      mxe.nginx.ingress.kubernetes.io/backend-protocol: HTTP
+      mxe.nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+      mxe.nginx.ingress.kubernetes.io/service-upstream: "true"
+      mxe.nginx.ingress.kubernetes.io/upstream-vhost: "mxe-deployer-gitea-http"
+    {{- end }}
+  persistence:
+    storageClass: *storageClass
+  deployment:
+    env:
+{{- if .mxe_commons.encryption.enable_in_transit }}
+    - name: "PGSSLCERT"
+      value: "/data/git/.postgresql/postgresql.crt"
+    - name:  "PGSSLKEY"
+      value: "/data/git/.postgresql/postgresql.key"
+    - name:  "PGSSLROOTCERT"
+      value: "/data/git/.postgresql/root.crt"
+    - name: "PGSSLMODE"
+      value: "require"
+{{- end }}
+    - name: POSTGRESQL_SERVICE
+      value: eric-data-document-database-pg
+    - name: PORT
+      value: "5432"
+    - name: POSTGRESQL_DB
+      value: gitea
+  extraVolumes:
+{{- if .mxe_commons.encryption.enable_in_transit }}
+  - name: eric-data-document-database-pg-postgres-cert
+    secret:
+      secretName: eric-data-document-database-pg-postgres-cert
+  - name: trusted-ca
+    secret:
+      secretName: eric-sec-sip-tls-trusted-root-cert
+  - name: gitea-pg-certificate
+    secret:
+      secretName: gitea-pg-certificate
+{{- end }}
+  - name: auth-source
+    secret:
+      secretName: gitea-auth-source
+  - name: password
+    secret:
+      secretName: gitea-db-password
+  extraContainerVolumeMounts:
+{{- if .mxe_commons.encryption.enable_in_transit }}  
+  - name: eric-data-document-database-pg-postgres-cert
+    readOnly: true
+    mountPath: "/pg-ssl/postgres"
+  - name: trusted-ca
+    readOnly: true
+    mountPath: "/pg-ssl/root"
+  - name: gitea-pg-certificate
+    readOnly: true
+    mountPath: "/pg-ssl/gitea"
+{{- end }}
+  - mountPath: /etc/db-init/
+    name: password
+    readOnly: true
+  - name: auth-source
+    readOnly: true
+    mountPath: "/etc/auth-source/"
+  extraInitVolumeMounts:
+{{- if .mxe_commons.encryption.enable_in_transit }}
+  - name: eric-data-document-database-pg-postgres-cert
+    readOnly: true
+    mountPath: "/pg-ssl/postgres"
+  - name: trusted-ca
+    readOnly: true
+    mountPath: "/pg-ssl/root"
+  - name: gitea-pg-certificate
+    readOnly: true
+    mountPath: "/pg-ssl/gitea"
+{{- end }}
+  - mountPath: /etc/db-init/
+    name: password
+    readOnly: true
+  - name: auth-source
+    readOnly: true
+    mountPath: "/etc/auth-source/"
+  initPreScript: |
+{{- if .mxe_commons.encryption.enable_in_transit }}
+    mkdir -p /data/git/.postgresql/postgres
+    cp -f /pg-ssl/postgres/clicert.pem /data/git/.postgresql/postgres/postgresql.crt
+    cp -f /pg-ssl/gitea/clicert.pem  /data/git/.postgresql/postgresql.crt
+    cp -f /pg-ssl/postgres/cliprivkey.pem /data/git/.postgresql/postgres/postgresql.key
+    cp -f /pg-ssl/gitea/cliprivkey.pem /data/git/.postgresql/postgresql.key
+    cp -f /pg-ssl/root/ca.crt /data/git/.postgresql/root.crt
+    chown -R git:git /data/git/.postgresql/
+    chmod 400 /data/git/.postgresql/postgresql.key
+    chmod 400 /data/git/.postgresql/postgres/postgresql.key
+
+{{- end }}
+    function db_init() {
+      POSTGRESQL_SUPERUSER_USER=$(cat /etc/db-init/super-user)
+      POSTGRESQL_SUPERUSER_PWD=$(cat /etc/db-init/super-pwd)
+      POSTGRESQL_CREATEDUSER_USER=$(cat /etc/db-init/gitea-user)
+      POSTGRESQL_CREATEDUSER_PWD=$(cat /etc/db-init/gitea-pwd)
+
+      echo "${POSTGRESQL_SERVICE}:${PORT}:*:${POSTGRESQL_SUPERUSER_USER}:${POSTGRESQL_SUPERUSER_PWD}" > ~/.pgpass
+      chmod 0600 ~/.pgpass
+      echo "Host: ${POSTGRESQL_SERVICE}"
+      echo "Port: ${PORT}"
+      echo "User: ${POSTGRESQL_SUPERUSER_USER}"
+
+      export PGSSLCERT=/data/git/.postgresql/postgres/postgresql.crt
+      export PGSSLKEY=/data/git/.postgresql/postgres/postgresql.key
+
+      psql="psql --set=sslcert=/data/git/.postgresql/postgres/postgresql.crt --set=sslkey=/data/git/.postgresql/postgres/postgresql.key  --set=sslmode=verify-full --set=sslrootcert=/data/git/.postgresql/root.crt -U ${POSTGRESQL_SUPERUSER_USER} -h ${POSTGRESQL_SERVICE} -p ${PORT}"
+     
+      echo "Trying to connect..."      
+      for i in {1..60}; do
+      if $($psql -c "\echo true" 2>/dev/null || echo "false"); then
+          echo "Creating new user: ${POSTGRESQL_CREATEDUSER_USER}"
+          $psql <<EOF
+      CREATE OR REPLACE FUNCTION createuserifnotexists(username text, password text) RETURNS boolean AS \$\$
+      DECLARE
+        userCount integer;
+      BEGIN
+        EXECUTE 'SELECT COUNT(*) FROM pg_catalog.pg_roles WHERE rolname = \$1'
+        INTO userCount
+        USING username;
+
+        IF userCount = 0 THEN
+          EXECUTE format('CREATE role %I LOGIN PASSWORD %L', username, password);
+          RETURN true;
+        ELSE
+          EXECUTE format('ALTER role %I LOGIN PASSWORD %L', username, password);
+          RETURN false;
+        END IF;
+      END;
+    \$\$ LANGUAGE plpgsql;
+    EOF
+
+    $psql -v username="${POSTGRESQL_CREATEDUSER_USER}" -v pwd="${POSTGRESQL_CREATEDUSER_PWD}" <<EOF
+    SELECT createuserifnotexists(:'username', :'pwd');
+    EOF
+
+          echo "User created."
+
+          echo "Creating new database: ${POSTGRESQL_DB}"
+          if $psql -v dbname="${POSTGRESQL_DB}" -v username="${POSTGRESQL_CREATEDUSER_USER}" -v ON_ERROR_STOP=true <<EOF
+    CREATE DATABASE :"dbname" OWNER :'username';
+    EOF
+          then
+              echo "Database created."
+          else
+              echo "Database was already created.";
+          fi
+
+          echo "Modifying access rights for database..."
+          $psql -v dbname="${POSTGRESQL_DB}" -v username="${POSTGRESQL_SUPERUSER_USER}" <<EOF
+    REVOKE ALL PRIVILEGES ON DATABASE :"dbname" FROM :"username"
+    EOF
+          echo "Modification done."
+          break
+      else
+          echo -e "Connection failed!\nRetrying..."
+          sleep 10
+      fi
+    done
+    }
+
+    db_init

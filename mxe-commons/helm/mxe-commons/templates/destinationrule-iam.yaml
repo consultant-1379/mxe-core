@@ -1,0 +1,30 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: {{ include "mxe-commons.egress-iam-service-name" . }}-dr
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "eric-sec-access-mgmt"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-commons.egress-iam-service-name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+spec:
+  host: {{ include "mxe-commons.egress-iam-service-host" . }}
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+    portLevelSettings:
+    - port:
+        number: 8443
+      tls:
+        mode: {{ include "mxe-commons.egress-iam-tls-mode" . }}
+        clientCertificate: {{ include "mxe-commons.egress-iam-client-cert-path" . }}
+        privateKey: {{ include "mxe-commons.egress-iam-private-key-path" . }}
+        caCertificates: {{ include "mxe-commons.egress-ca-cert" . }}
+{{- end -}}

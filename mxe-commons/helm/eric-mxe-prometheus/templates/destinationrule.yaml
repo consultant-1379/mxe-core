@@ -1,0 +1,25 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ include "eric-mxe-prometheus.name" . }}-dr
+  labels:
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-prometheus.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-prometheus.labels" . | fromYaml -}}
+    {{- include "eric-mxe-prometheus.mergeLabels" (dict "location" .Template.Name "sources" (list $name $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-prometheus.annotations" . | nindent 4 }}
+spec:
+  host: {{ include "eric-mxe-prometheus.pm-service-host" . }}
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+    portLevelSettings:
+    - port:
+        number: 9089
+      tls:
+        mode: {{ include "eric-mxe-prometheus.tls-mode" . }}
+        clientCertificate: {{ include "eric-mxe-prometheus.egress-client-cert" .}}
+        privateKey: {{ include "eric-mxe-prometheus.egress-private-key" . }}
+        caCertificates: {{ include "eric-mxe-prometheus.egress-ca-cert" .}}
+{{- end }}  

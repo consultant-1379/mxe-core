@@ -1,0 +1,4 @@
+{{- $adminGroupName := (index .Values "config" "sso" "groups" "adminGroupName") -}}
+{{- $readOnlyGroupName := (index .Values "config" "sso" "groups" "readOnlyGroupName") -}}
+g, {{ $adminGroupName }}, role:admin
+g, {{ $readOnlyGroupName }}, role:readonly

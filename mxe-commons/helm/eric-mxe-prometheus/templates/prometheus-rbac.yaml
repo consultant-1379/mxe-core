@@ -1,0 +1,53 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "eric-mxe-prometheus.role-name" . | quote }}
+  labels:
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-prometheus.role-name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-prometheus.labels" . | fromYaml -}}
+    {{- include "eric-mxe-prometheus.mergeLabels" (dict "location" .Template.Name "sources" (list $name $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-prometheus.annotations" . | nindent 4 }}
+rules:
+- apiGroups: [""]
+  resources:
+  - services
+  - endpoints
+  - pods
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "eric-mxe-prometheus.service-account-name" . | quote }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-prometheus.service-account-name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-prometheus.labels" . | fromYaml -}}
+    {{- include "eric-mxe-prometheus.mergeLabels" (dict "location" .Template.Name "sources" (list $name $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-prometheus.annotations" . | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "eric-mxe-prometheus.role-binding-name" . | quote }}
+  labels:
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-prometheus.role-binding-name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-prometheus.labels" . | fromYaml -}}
+    {{- include "eric-mxe-prometheus.mergeLabels" (dict "location" .Template.Name "sources" (list $name $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-prometheus.annotations" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "eric-mxe-prometheus.role-name" . | quote }}
+subjects:
+- kind: ServiceAccount
+  name: eric-mxe-prometheus-service-account
+  namespace: {{ .Release.Namespace }}

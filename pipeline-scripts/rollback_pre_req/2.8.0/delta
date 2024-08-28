@@ -1,0 +1,76 @@
+#!/bin/bash
+set -x
+
+init_path="$(dirname $0)"
+STATEFULSET_NAME=eric-sec-access-mgmt
+IAM15_JOB=$STATEFULSET_NAME-shh-hook-iam15-job
+
+#scale down eric-sec-access-mgmt to 0 
+kubectl -n "$NAMESPACE" scale statefulset $STATEFULSET_NAME --replicas=0
+
+#check if all pods of eric-sec-access-mgmt are down
+POD_SCALE_DOWN_STATUS="FAILURE"
+for i in {1..20}
+do
+    POD_COUNT=$(kubectl get pods -n $NAMESPACE -l app=$STATEFULSET_NAME --no-headers | wc -l)
+    if [ $POD_COUNT -eq 0 ]; then
+        POD_SCALE_DOWN_STATUS="SUCCESS"
+        echo "All pods scaled down"
+        break
+    else
+        echo "Waiting for all pods to scale down..."
+        sleep 5
+    fi
+done
+
+if [ ${POD_SCALE_DOWN_STATUS} == "FAILURE" ]; then
+    echo "$STATEFULSET_NAME Pods are still running"
+    exit 1
+fi
+
+# port forward bro service
+kubectl -n "$NAMESPACE" port-forward service/eric-ctrl-bro 7002:7002 &
+sleep 5
+export BROSERVICE=localhost:7002
+
+# Data encryption in transit (mTLS) is enabled by default and so execute the following to fetch the relevant certificates
+kubectl -n "$NAMESPACE" get secret eric-sec-sip-tls-trusted-root-cert -o json | jq -r '.data."cacertbundle.pem"' | base64 -d > /tmp/cacertbundle.pem
+kubectl -n "$NAMESPACE" get secret eric-data-document-database-pg-bra-cert -o json | jq -r '.data."bra-cert.pem"' | base64 -d > /tmp/clientcert.pem
+kubectl -n "$NAMESPACE" get secret eric-data-document-database-pg-bra-cert -o json | jq -r '.data."bra-privkey.pem"' | base64 -d >  /tmp/clientprivkey.pem
+
+# Restore the whole database cluster in Document Database PG service.
+curl -i -X POST -H "Content-Type:application/json" -d '{ "action": "RESTORE", "payload": { "backupName": "mxe_pg_Backup" } }'  https://$BROSERVICE/v1/backup-manager/mxe-pg/action --cacert /tmp/cacertbundle.pem --key /tmp/clientprivkey.pem --cert /tmp/clientcert.pem > /tmp/action_id
+ACTION_ID=`tail -1 /tmp/action_id | awk -F"\"" '{print $4}'`
+
+# Verify the completion of the database restore by using action id
+RESTORE_STATUS="FAILURE"
+for i in {1..20}
+do
+    sleep 5
+    curl -i https://$BROSERVICE/v1/backup-manager/mxe-pg/action/"$ACTION_ID" --cacert /tmp/cacertbundle.pem --key /tmp/clientprivkey.pem --cert /tmp/clientcert.pem > /tmp/restore_result
+    tail -1 /tmp/restore_result | grep FINISHED
+    if [ $? -eq 0 ]; then
+        RESTORE_STATUS="FINISHED"
+        break
+    fi
+done
+
+if [ ${RESTORE_STATUS} == "FAILURE" ]; then
+    echo "Restore the whole Document PG database failed"
+    exit 1
+fi
+
+#Delete the role, rolebinding and serviceaccount for job eric-sec-access-mgmt-shh-hook-iam15-job
+kubectl delete -n $NAMESPACE role "$IAM15_JOB-role"
+kubectl delete -n $NAMESPACE serviceaccount "$IAM15_JOB-sa"
+kubectl delete -n $NAMESPACE rolebinding "$IAM15_JOB-rolebinding"
+
+cd $init_path
+cd ../../../
+
+sed -i -e 's/3-0-0/3-4-0/g' base-dir/mxe-test/testdata/argo_workflow_manifests/tc2_argo_workflow_spark_operator.yaml
+sed -i -e 's,gcr.io/spark-operator/spark,apache/spark,g' -e 's/v3.0.0/3.4.0-python3/g' -e 's/3.0.0/3.4.0/g' -e 's/spark-pi/spark-python/g' base-dir/mxe-test/testdata/argo_workflow_manifests/tc2_argo_workflow_spark_operator.yaml
+sed -i -e 's/2-4-5/3-4-0/g' base-dir/mxe-test/testdata/argo_workflow_manifests/tc3_argo_workflow_spark_operator-2.4.5.yaml
+sed -i -e 's,gcr.io/spark-operator/spark-py,apache/spark,g' -e 's/v2.4.5/3.4.0-python3/g' -e 's/2.4.5/3.4.0/g' -e 's/spark-pi/spark-python/g' base-dir/mxe-test/testdata/argo_workflow_manifests/tc3_argo_workflow_spark_operator-2.4.5.yaml
+
+exit 0

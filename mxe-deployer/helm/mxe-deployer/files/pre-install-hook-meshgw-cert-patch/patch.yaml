@@ -1,0 +1,8 @@
+spec:
+    certificate:
+        subjectAlternativeName:
+            dns:
+            - {{ .Values.global.mxeOauthApiHostname }}
+            - {{ .Values.global.mxeGiteaApiHostname }}
+            - {{ .Values.global.mxeDeployerApiHostname }}
+            - {{ .Values.global.mxeArgoCDApiHostname }}

@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "apps": [
+    {
+      "name": "model-lcm",
+      "displayName": "Model Lifecycle",
+      "type": "external",
+      "url": "",
+      "version": "1.0.0",
+      "descriptionShort": "Model Lifecycle Manager",
+      "groupNames": ["model-lcm"]
+    }
+  ],
+  "groups": [
+    {
+      "displayName": "Model Lifecycle",
+      "version": "1.0.0",
+      "name": "model-lcm",
+      "type": "domain",
+      "descriptionShort": "Model Lifecycle Manager"
+    }
+  ]
+}

@@ -1,0 +1,268 @@
+= Stateful Models Guide
+:author: Kristóf Nékám
+:signature: EKRINKM
+:department: BDGSJBAK
+:doc-name: USER GUIDE
+:doc-no: 4/1553-AVA 901 53
+:revnumber: PA1
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+//Template updated 2018-08-21 (keep to track template history)
+
+[[Introduction]]
+== Introduction
+
+MXE supports stateful model packages and services.
+
+Stateful model services can have several internal states (`sessionState`) identified by a unique ID (`sessionId`). The states are stored in a key-value cache internally by MXE, this is outside of the responsibility of the model code.
+
+The model receives the `sessionId` and `sessionState` attributes as metadata, and returns the updated state in a similar way.
+
+[[ModelImplementation]]
+== Model Implementation
+
+[[ModelMetadata]]
+=== Model Metadata
+
+In the `MXE-META-INF/INFO` file the `Type` has to be set to `StatefulModel` in order to indicate that the model package contains a model that is capable of state management.
+
+....
+Title: Model title
+Type: StatefulModel
+...
+....
+
+[[ReferenceImplementation]]
+=== Reference Implementation
+
+[[ModelCode]]
+==== Model Code
+
+`MxeStateful.py`
+
+....
+import sys
+ 
+class MxeStateful(object):
+ 
+    MXE_META = "mxe-meta"
+    META_ID = "sessionId"
+    META_STATE = "sessionState"
+     
+    def __init__(self):
+        print("Initializing")
+ 
+    def predict(self,X,feature_names):
+ 
+        id = X[self.MXE_META][self.META_ID]
+        state = X[self.MXE_META][self.META_STATE]
+        data = X["data"]
+ 
+        # Initialize state when there was no state stored for this sessionId yet
+        if state == None:
+            state = []
+ 
+        # This is where the state update happens
+        state.append(data)
+ 
+        X[self.MXE_META][self.META_STATE] = state
+ 
+        return X
+....
+
+[[MXEMETAINFINFO]]
+==== MXE-META-INF/INFO
+
+`MXE-META-INF/INFO`
+
+....
+Title: Python stateful test model
+Type: StatefulModel
+Id: com.ericsson.mxe.test.stateful.python
+Version: 0.1.0
+Author: MXE
+Description: Stateful Python reference model for MXE.
+....
+
+[[ModelRepository]]
+==== Model Repository
+
+This reference implementation for this stateful model in Python can be found in the https://gerrit.ericsson.se/#/admin/projects/MXE/models/stateful-test-python[] GIT repository.
+
+[[StatefulModelServices]]
+== Stateful Model Services
+
+[[LifecycleManagement]]
+=== Lifecycle Management
+
+When a new model service is created from a model package which is stateful, the model service is also automatically stateful.
+
+*Restrictions*:
+
+* Stateful model services can only contain exactly one model.
+* Statefulness of an existing model service cannot be changed. If the service has been started with a stateful model, then it cannot be changed to contain a stateless model or the other way around.
+* When the service is deleted, all related state information is deleted automatically, and it cannot be recovered.
+
+[[ExternalModelServiceAPI]]
+=== External Model Service API
+
+This is the data structure which has to be used for the model inference when the model service is called.
+
+The input and output are limited to jsonData only, other Seldon message formats (for example `ndarray`, `tensor`) cannot be used in case of stateful models. However the `<model input data>` and `<model output data>` can contain an `ndarray` or any arbitrary data structure.
+
+`<model input data>` and `<model output data>` can be any number of JSON fields, representing any format of data which can be represented in JSON.
+
+[[Input]]
+==== Input
+
+The unique identifier of the session has to be added to the request under `$.jsonData.mxe-meta.sessionId`.
+
+The `sessionId` has to be a string.
+
+*Stateful model service input (External model API)*
+
+....
+{
+    "jsonData": {
+        "mxe-meta": {
+            "sessionId": "<unique ID of model session>"
+        },
+        <model input data>
+    }
+}
+....
+
+The state of the specific session is automatically looked up by MXE, and added to the request meta data.
+
+When `sessionId` is `null`, then state lookup is skipped, and no `sessionState` data is passed to the model (`sessionState: null`).
+
+[[Output]]
+==== Output
+
+*Stateful model service output (External model API)*
+
+....
+{
+    "jsonData": {
+        "mxe-meta": {
+            "sessionId": "<unique ID of model session>"
+        },
+        <model output data>
+    }
+}
+....
+
+[[InternalModelAPI]]
+=== Internal Model API
+
+This API should be used by the model code. This data structure is visible only to the model itself, but not on the external service API.
+
+[[Input.1]]
+==== Input
+
+This data is received by the model:
+
+*Model Input*
+
+....
+{
+    "jsonData": {
+        "mxe-meta": {
+            "sessionId": "<unique ID of model session>",
+            "sessionState": <model session state, looked up from the DB automatically by MXE>
+        },
+        <model input data>
+    }
+}
+....
+
+The `$.jsonData.mxe-meta.sessionState` attribute is added to the request data by MXE. The state data can be of any data format represented in JSON.
+
+WARNING: The model is responsible for handling the scenario when `sessionState` is `null`. This can happen when state lookup was skipped (`sessionId` is `null`) or when there was no `sessionState` stored yet for that specific `sessionId`.
+
+[[Output.1]]
+==== Output
+
+The stateful model has to return it's response data in this format:
+
+*Model Output*
+
+....
+{
+    "jsonData": {
+        "mxe-meta": {
+            "sessionId": "<unique ID of model session>",
+            "sessionState": <updated state>
+        },
+        <model output data>
+    }
+}
+....
+
+The model can return its new, updated state in `sessionState`. MXE updates this state automatically in the internal cache.
+
+When this field does not exist (or is `null`), then state update is skipped, and no updated state is stored.
+
+[[RequestFlowfortheReferenceModel]]
+=== Request Flow for the Reference Model
+
+image::stateful_model_dataflow.png[title="Stateful Model Dataflow",scalefit="1"]
+
+*External Model Service Input*
+
+....
+{
+   "jsonData": {
+      "data": "foo",
+      "mxe-meta": {
+         "sessionId": "session1"
+      }
+   }
+}
+....
+
+*Internal Model Input*
+
+....
+{
+   "jsonData": {
+      "data": "foo",
+      "mxe-meta": {
+         "sessionId": "session1",
+         "sessionState": [1,2,3]
+      }
+   }
+}
+....
+
+*Internal Model Output*
+
+....
+{
+  "meta": {...},
+  "jsonData": {
+    "data": "foo",
+    "mxe-meta": {
+      "sessionId": "session1",
+      "sessionState": [1,2,3,"foo"]
+    }
+  }
+}
+....
+
+*External Model Service Output*
+
+....
+{
+  "meta": {...},
+  "jsonData": {
+    "data": "foo",
+    "mxe-meta": {
+      "sessionId": "session1"
+    }
+  }
+}
+....

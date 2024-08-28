@@ -1,0 +1,24 @@
+{{- $repo := (include "eric-mxe-model-catalogue-service.setImageRepo" (list . .Values.imageCredentials.modelBase.registry.url .Values.imageCredentials.modelBase.repoPath "modelBase")) -}}
+{{- $imageName := (index .Values "images" "modelBase" "name") -}}
+{{- $imageTag := (index .Values "images" "modelBase" "tag") -}}
+FROM "{{ $repo }}{{ $imageName }}:{{ $imageTag }}"
+
+# Define environment variable
+%ENVS%
+
+%MODEL_ENVS%
+
+RUN [ -n "$MODEL_NAME" ] && [ -n "$SERVICE_TYPE" ]
+
+COPY . /app
+WORKDIR /app
+
+RUN mkdir -p /home/mxe/python3.8/site-packages
+
+RUN if [ -f requirements.txt ]; then pip install --no-user -t /home/mxe/python3.8/site-packages --no-cache-dir -r requirements.txt; fi
+
+ENV PYTHONPATH=/home/mxe/python3.8/site-packages:/usr/local/lib/python3.8/site-packages
+
+EXPOSE 5000
+
+CMD exec seldon-core-microservice $MODEL_NAME --service-type $SERVICE_TYPE

@@ -1,0 +1,672 @@
+= CLI Guide
+:author: Kristóf Nékám
+:signature: EKRINKM
+:department: BDGSJBAK
+:doc-name: COMMAND LIST
+:doc-no: 1/190 77-AVA 901 53
+:revnumber: PK4
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+//Template updated 2018-08-21 (keep to track template history)
+
+[[AuthenticationandAuthorization]]
+== Authentication and Authorization
+
+Only authenticated users can execute commands. If a user is not authenticated yet, a prompt asking for the username and password appears. If the authentication is successful, the requested command executes and the CLI will not ask for the username and password later.
+
+NOTE: If the user was set up as temporary, then at the very first login attempt the password must be changed. However, the password cannot be changed through the CLI.
+
+For more information about user credentials setup during the installation procedure, see *Changing User Credentials (Optional)* in the doc-ref:[Installation Guide].
+
+For more information on creating a new user, see *Creating a New User* in the doc-ref:[GUI Guide].
+
+[[CLICommandsParameters]]
+== CLI Commands Parameters
+
+Mandatory parameters are listed as *bold* and optional parameters are listed as _italic_.
+
+[[GlobalFlags]]
+=== Global Flags
+
+....
+    --cluster clustername    The name of the MXE cluster to use. Optional. Default value is based on your configuration.
+-h, --help                   Prints out this help.
+-v, --verbose                Makes the output verbose, showing additional command output where applicable.
+....
+
+NOTE: Date and time in CLI
+
+.The date and time printed by the CLI commands follows a simplified format:
+* If the model was started today, only the time is printed (for example `13:45`)
+* If the model was started this year, the year is omitted (for example `Feb15 13:45`)
+* Otherwise the full date and time is printed (for example `2018 Feb15 13:45`)
+
+[[MXEModelLifecycleManagementCommands]]
+=== MXE Model Lifecycle Management Commands
+
+[[mxemodelpackage]]
+==== mxe-model package
+
+Builds the MXE model service package that can be started in MXE afterwards
+
+NOTE: Elevated privileges required +
+The `mxe-model package` command must be run as root, or the user must be member of the _docker_ Unix group.
+
+.Parameters:
+* *source*: Directory containing the model code.
+* *privatekey*: Path to the private key file of the model author.
+* *publickey*: Path to the public key file of the model author.
+* _docker-password_: The password for Armdocker.
+* _docker-username_: The username which will be used by Docker to fetch images from Armdocker (https://armdocker.rnd.ericsson.se/artifactory/webapp/[armdocker.rnd.ericsson.se]).
+* _network_: Specify the default Docker Network name to be used for s2i build.
+* _obfuscate_: Obfuscate the model code (beta IPR protection feature, only available for Python models).
+
+*Example with output:*
+
+....
+$ mxe-model package --source imagerecognition --privatekey private.key --publickey public.pem --obfuscate
+
+Python model is detected. Model main class: SeldonWrapper
+Success: obfuscated model image created.
+....
+
+[[mxemodelonboard]]
+==== mxe-model onboard
+
+Onboard a model docker image or a model source to an MXE cluster.
+
+.Parameters:
+* _id_: Unique model ID.
+* _version_: Version format: a.b.c, where a, b, and c are non-negative whole numbers.
+* _docker_: Docker image name. If set, source and archive must not be set.
+* _docker-registry-secret-name_: The secret to login to a Docker registry for model deployment.
+* _source_: Directory containing the model code. If set, other parameters must not be set.
+* _archive_: Path to the model service archive. If set, other parameters must not be set.
+* _description_: Optional short description.
+* _title_: Model title.
+* _author_: Optional model author.
+
+*Examples with output:*
+
+....
+$ mxe-model onboard --id "com.ericsson.iot.devicedetection" --description "This is the IoT device detection model description" --author "Jane Doe" --title "IoT device detection" --version 1.0.0 --docker iotdd:1.0.0
+
+Success: Model "iotdd" has been onboarded to cluster "prod" with ID "iot.device.detection" and version "1.0.0".
+....
+
+....
+$ mxe-model onboard --source /home/mxe/models/iotdd
+
+Archive /home/mxe/models/iotdd.zip created from model source.
+Success: Onboard of model "iotdd.zip" has been started to cluster "prod".
+....
+
+....
+$ mxe-model onboard --archive /home/mxe/models/iotdd.tar.gz
+
+Success: Onboard of model "iotdd.tar.gz" has been started to cluster "prod".
+....
+
+NOTE: From MXE 1.7 onwards, only signed model images can be imported from external archive by using the `mxe-model onboard --archive` command. The public key of the signer of the image has to registered via the `/v1/authors` REST endpoint before onboarding. See doc-ref:[REST API] for further details on how to add the public key.
+
+[[mxemodellist]]
+==== mxe-model list
+
+Lists the onboarded models.
+
+.Parameters:
+* No specific parameters.
+
+*Example:*
+
+....
+$ mxe-model list
+....
+
+*Example with output:*
+
+....
+$ mxe-model list onboarded
+
+ONBOARDED  USER      ID                                VERSION  IMAGE_NAME   TITLE                 AUTHOR   STATUS
+12:32      mxe-user  com.ericsson.iot.devicedetection  0.0.2    iotdd:1.0.0  IoT device detection  Jane Doe available
+....
+
+[[mxemodeldelete]]
+==== mxe-model delete
+
+Deletes a version of a model from the cluster.
+
+.Parameters:
+* *id*: Model identifier.
+* *version*: Model version to delete.
+
+*Example with output:*
+
+....
+$ mxe-model delete --id com.ericsson.bdgs.oss.oss.eea.aio --version 0.0.1
+
+Success: Model "com.ericsson.bdgs.oss.oss.eea.aio" version "0.0.1" has been deleted from cluster "nsc".
+....
+
+[[MXEModelServiceLife-cycleManagementCommands]]
+=== MXE Model Service Life-cycle Management Commands
+
+[[mxeservicecreate]]
+==== mxe-service create
+
+Creates a model service.
+
+.Parameters:
+* *name*: Model service name. The provided name shall be unique within the MXE cluster.
+* *models*: List of model identifiers and versions, separated by a colon: `<id>:<version>`.
+* _domain_: Model service domain. The provided domain must be a valid domain name.
+* _weights_: The weights of models in a static deployment. Optional, default value is 0.5,0.5.
+* _instances_: The number of service instances to start. Optional, default value is 1. If it is set to `auto`, then `minReplicas`, `maxReplicas`, `metric`, and `targetAverageValue` parameters have to be provided.
+* _minReplicas_: Minimum number of instances. Must be set in case of auto scaling.
+* _maxReplicas_: Maximum number of instances. Must be set in case of auto scaling.
+* _metric_: Auto scaling metric (cpu, memory). Must be set in case of auto scaling.
+* _targetAverageValue_: Target average value of the metric (m millicores in case of cpu, Mi MegaBytes in case of memory). Must be set in case of auto scaling.
+
+*Example with output:*
+
+....
+$ mxe-service create --name aio-service --models com.ericsson.bdgs.oss.oss.eea.aio:0.0.1 --instances 4
+
+Success: Model service "aio-service" has been created with model "com.ericsson.bdgs.oss.oss.eea.aio:0.0.1", with 4 instances
+....
+
+....
+$ mxe-service create --name imginception --models imginception3:1.0.0,imginception3:2.0.0 --weights 0.1,0.9
+
+Success: Model service "imginception" has been created with models "imginception3:1.0.0,imginception3:2.0.0" with weights 0.1,0.9, with 1 instance
+....
+
+....
+$ mxe-service create --name aio-service --models com.ericsson.bdgs.oss.oss.eea.aio:0.0.1 --instances auto --minReplicas 1 --maxReplicas 3 --metric cpu --targetAverageValue 50
+
+Success: Model service "aio-service" has been created with model "com.ericsson.bdgs.oss.oss.eea.aio:0.0.1", with 1-3 instances, with autoscaling metrics cpu:50m
+....
+
+....
+$ mxe-service create --name imginception --models com.ericsson.iminception:1.0.0 --domain com.ericsson.mxe.iminception
+
+Success: Model service "imginception" has been created with model "com.ericsson.iminception:1.0.0", with 1 instance in domain com.ericsson.mxe.iminception
+....
+
+[[mxeservicelist]]
+==== mxe-service list
+
+Lists the started model services.
+
+.Parameters:
+* No specific parameters.
+
+*Example with output:*
+
+....
+$ mxe-service list
+
+STARTED      NAME        INSTANCES  TYPE   STATUS   USER      MODEL                 ENDPOINT
+Jul17 16:26  inception3  1          model  running  mxe-user  img.inception3:0.0.1  <mxe-host>/model-endpoints/inception3
+....
+
+....
+$ mxe-service list
+
+STARTED  NAME        INSTANCES  TYPE    STATUS    USER      MODEL_A                 MODEL_B                  WEIGHTS    ENDPOINT
+10:50    inception1  4          model   running   mxe-user  imginception3:0.0.1                                         <mxe-host>/model-endpoints/inception1
+11:13    inception2  1          static  creating  mxe-user  imginception3:1.0.0     imginception3:2.0.0      0.1,0.9    <mxe-host>/model-endpoints/inception2
+....
+
+....
+$ mxe-service list
+
+STARTED      NAME        INSTANCES  AUTOSCALING  TYPE    STATUS    USER      MODEL_A               MODEL_B               WEIGHTS  ENDPOINT
+Jul17 16:26  inception3  1-3        cpu:50m      model   running   mxe-user  img.inception3:0.0.1                                 <mxe-host>/model-endpoints/inception3
+11:13        inception2  1                       static  creating  mxe-user  imginception3:1.0.0   imginception3:2.0.0   0.1,0.9  <mxe-host>/model-endpoints/inception2
+....
+
+[[mxeservicemodify]]
+==== mxe-service modify
+
+Modifies a model service. Set the number of model service instances, replace model(s) in an existing model service with new model(s).
+
+.Parameters:
+* *name*: Model service name.
+* _models_: List of model identifiers and versions, separated by a colon: `<id>:<version>`.
+* _domain_: Model service domain. The provided domain must be a valid domain name.
+* _weights_: The weights of models in a static deployment.
+* _instances_: The number of service instances. If it is set to `auto`, then `minReplicas`, `maxReplicas`, `metric`, and `targetAverageValue` parameters have to be provided.
+* _minReplicas_: Minimum number of instances. Must be set in case of auto scaling.
+* _maxReplicas_: Maximum number of instances. Must be set in case of auto scaling.
+* _metric_: Auto scaling metric (cpu, memory). Must be set in case of auto scaling.
+* _targetAverageValue_: Target average value of the metric (m millicores in case of cpu, Mi MegaBytes in case of memory). Must be set in case of auto scaling.
+
+*Example with output:*
+
+....
+$ mxe-service modify --name aio-service --models com.ericsson.bdgs.oss.oss.eea.aio:0.0.3
+
+Success: Model service "aio-service" has been updated to use model "com.ericsson.bdgs.oss.oss.eea.aio:0.0.3", with 1 instance
+....
+
+....
+$ mxe-service modify --name aio-service --instances 2
+
+Success: Model service "aio-service" has been updated to use model "com.ericsson.bdgs.oss.oss.eea.aio:0.0.3", with 2 instances
+....
+
+....
+$ mxe-service modify --name aio-service --models com.ericsson.bdgs.oss.oss.eea.aio:0.0.3 --instances 2
+
+Success: Model service "aio-service" has been updated to use model "com.ericsson.bdgs.oss.oss.eea.aio:0.0.3", with 2 instances
+....
+
+....
+$ mxe-service modify --name imginception3 --models imginception3:0.0.1,imginception3:0.0.2 --weights 0.2,0.8 --instances 2
+
+Success: Model service "imginception3" has been updated to use models "imginception3:0.0.1,imginception3:0.0.2" with weights 0.2,0.8, with 2 instances
+....
+
+....
+$ mxe-service modify --name imginception3 --weights 0.4,0.6
+
+Success: Model service "imginception3" has been updated to use models "imginception3:0.0.1,imginception3:0.0.2" with weights 0.4,0.6, with 2 instances
+....
+
+....
+$ mxe-service modify --name imginception3 --instances auto --minReplicas 1 --maxReplicas 3 --metric cpu --targetAverageValue 50
+
+Success: Model service "imginception3" has been updated to use models "imginception3:0.0.1,imginception3:0.0.2" with weights 0.4,0.6, with 1-3 instances, with autoscaling metrics cpu:50m
+....
+
+....
+$ mxe-service modify --name imginception --domain com.ericsson.iminception
+
+Success: Model service "imginception" has been updated to use model "com.ericsson.iminception:1.0.0", with 1 instance in domain com.ericsson.iminception
+....
+
+[[mxeservicedelete]]
+==== mxe-service delete
+
+Deletes a model service.
+
+.Parameters:
+* *name*: Model service name.
+
+*Example with output:*
+
+....
+$ mxe-service delete --name irservice
+
+Success: Model service "irservice" has been deleted on cluster "nsc"
+....
+
+[[mxeservicelogs]]
+==== mxe-service logs
+
+Print the recent logs for a model service.
+
+.Parameters:
+* *name*: Model service name.
+* _lines_: Return the specified number of last lines (default value: 100).
+* _seconds_: Return the logs for the specified number of last seconds.
+* _limit_: Limit the returned logs in bytes (default value: 50000).
+
+*Example with output:*
+
+....
+$ mxe-service logs --name alma  --lines 3
+
+Logs for container <alma-main-435c3d0-5474c8d95d-29868/seldon-container-engine>:
+2020-02-08 14:51:45.978  INFO 7 --- [         task-1] i.s.e.g.SeldonGrpcServer                 : Starting grpc server
+2020-02-08 14:51:46.084  INFO 7 --- [         task-1] i.s.e.g.SeldonGrpcServer                 : Server started, listening on 5001
+2020-02-08 14:51:46.549  INFO 7 --- [           main] i.s.e.App                                : Started App in 4.105 seconds (JVM running for 5.053)
+
+
+Logs for container <alma-main-435c3d0-5474c8d95d-29868/model>:
+2020-02-08 13:43:49,346 - seldon_core.microservice:main:277 - INFO:  REST microservice running on port 9000
+2020-02-08 13:43:49,347 - seldon_core.microservice:main:316 - INFO:  Starting servers
+2020-02-08 13:43:49,380 - werkzeug:_log:122 - INFO:   * Running on http://0.0.0.0:9000/ (Press CTRL+C to quit)
+....
+
+[[MXETrainingLife-cycleManagementCommands]]
+=== MXE Training Life-cycle Management Commands
+
+[[mxetrainingonboard]]
+==== mxe-training onboard
+
+Onboards a training source to an MXE cluster.
+
+.Parameter:
+* *source*: Directory containing the training package code.
+
+*Example with output:*
+
+....
+$ mxe-training onboard --source /home/mxe/training
+ 
+Compressing the given training package source
+Archive training.zip created from training package source.
+Sending the model training archive to the server
+Success: Packaging has been started
+....
+
+[[mxetrainingstart]]
+==== mxe-training start
+
+Starts the training job.
+
+.Parameters:
+* *packageId*: Package identifier.
+* *packageVersion*: Package version to start.
+
+*Example with output:*
+
+....
+$ mxe-training start --packageId trainingexample --packageVersion 0.0.1
+
+Success: Training package started with Id "b0f71b00-bf5b-4d0e-b53e-84ad812dd857"
+....
+
+[[mxetraininglist]]
+==== mxe-training list
+
+Lists the training packages and training jobs.
+
+.Parameters:
+* No specific parameters.
+
+*Example without output:*
+
+....
+$ mxe-training list
+....
+
+[[subcommandpackages]]
+===== Subcommand: packages
+
+List training packages.
+
+.Parameters:
+* No specific parameters.
+
+*Example with output:*
+
+....
+$ mxe-training list packages
+CREATED  ID               VERSION  IMAGE                  TITLE             AUTHOR           STATUS
+09:55    training.zip     unknown                                                            packaging
+09:55    trainingexample  0.0.1    trainingexample:0.0.1  Training example  MXE test         available
+....
+
+[[subcommandjobs]]
+===== Subcommand: jobs
+
+List training jobs.
+
+.Parameters:
+* No specific parameters.
+
+*Example with output:*
+
+....
+$ mxe-training list jobs
+CREATED   ID                                     PACKAGE ID        PACKAGE VERSION   STATUS      COMPLETED
+11:06     b0f71b00-bf5b-4d0e-b53e-84ad812dd857   trainingexample   0.0.1             completed   11:06
+....
+
+[[mxetrainingdelete]]
+==== mxe-training delete
+
+Deletes a training package or a training job.
+
+.Parameters:
+* No specific parameters.
+
+*Example without output:*
+
+....
+$ mxe-training delete
+....
+
+[[subcommandpackage]]
+===== Subcommand: package
+
+Deletes a training package from the cluster. It also deletes the jobs started from the given package.
+
+.Parameters:
+* *id*: Training package identifier.
+* *version*: Training package version to delete.
+
+*Example with output:*
+
+....
+$ mxe-training delete package --id trainingexample --version 0.0.1
+Success: Training package "trainingexample" version "0.0.1" has been deleted from cluster "nsc".
+....
+
+[[subcommandjob]]
+===== Subcommand: job
+
+Deletes training jobs from the cluster.
+
+.Parameters:
+* *id*: Training job identifier. If set, other parameters must not be set.
+* *packageId*: Training jobs package identifier. If set, `packageVersion` must be set.
+* *packageVersion*: Training jobs package version to delete. If set, `packageId` must be set.
+
+*Example with output:*
+
+....
+$ mxe-training delete job --id be0e40e6-d219-41a9-99ee-da627a778178
+Success: Training job with id "be0e40e6-d219-41a9-99ee-da627a778178" has been removed from cluster "nsc".
+....
+
+....
+$ mxe-training delete job --packageId trainingexample --packageVersion 0.0.1
+Success: Training jobs with packageId "trainingexample" and packageVersion "0.0.1" have been removed from cluster "nsc".
+....
+
+[[mxe-trainingdownload-results]]
+==== mxe-training download-results
+
+Downloads the results of a given training job.
+
+.Parameters:
+* *jobId*: Training job identifier.
+* _toDir_: Target directory to save the results into. If the directory does not exist then it will be created. Default value is the current working directory.
+
+*Example with output:*
+
+....
+$ mxe-training download-results --jobId be0e40e6-d219-41a9-99ee-da627a778178 --toDir /home/username/someplace
+
+Downloading results of the job
+Success: Download finished
+....
+
+[[MXEData-flowLifecycleManagementCommands]]
+=== MXE Data-flow Lifecycle Management Commands
+
+[[mxeflowonboard]]
+==== mxe-flow onboard
+
+Uploads a data-flow file and stores it in the MXE flow repository.
+
+.Parameters:
+* *file*: Path to the data-flow file to onboard.
+* *name*: Onboarded data-flow name.
+
+*Example with output:*
+
+....
+$ mxe-flow onboard --file flow.xml --name imageflow
+
+Success: onboarding finished!
+....
+
+[[mxeflowdeploy]]
+==== mxe-flow deploy
+
+Deploys a data-flow to an MXE cluster.
+
+.Parameters:
+* _flow-name_: The name of the already onboarded flow to be deployed. Must not be used together with `empty-flow`, but one of them is mandatory to be given.
+* _empty-flow_: To deploy an empty flow. Must not be used together with `flow-name`, but one of them is mandatory to be given.
+* _name_ : The name of the deployment. Only lower case alphanumeric characters, and - (dash) are allowed.  `flow-name` is used if missing.
+* _image_: The nifi image to be used during deploy. If missing, default nifi image is used.
+* _instances_: The number of Nifi instances to start. Default is 1.
+
+.Examples with output:
+
+....
+$ mxe-flow deploy --name irflow --flow-name imageflow  --image image --instances 2
+
+Success: Flow "imageflow" has been deployed to cluster "nsc"
+....
+
+....
+$ mxe-flow deploy --name irflow --empty-flow --instances 2
+
+Success: A new empty flow deployment has been created in cluster "nsc"
+....
+
+[[mxeflowscale]]
+==== mxe-flow scale
+
+Scales a data-flow deployment.
+
+.Parameters:
+* *name*: Data-flow deployment name.
+* _instances_: The number of Nifi instances.
+
+*Example with output:*
+
+....
+$ mxe-flow scale --name irflow --instances 2
+
+Success: "imageflow" has been modified
+....
+
+[[mxeflowlistflows]]
+==== mxe-flow list flows
+
+Lists the data-flows in the MXE flow repository.
+
+.Parameters:
+* No specific parameters.
+
+*Example with output:*
+
+....
+$ mxe-flow list flows
+
+testflow1
+imageflow
+....
+
+[[mxeflowlistdeployments]]
+==== mxe-flow list deployments
+
+Lists the data-flow deployments in the MXE flow repository.
+
+.Parameters:
+* No specific parameters.
+
+*Example with output:*
+
+....
+$ mxe-flow list deployments
+
+STARTED       NAME        FLOW_NAME   ACCESS_POINT
+Mar02 20:58   one-way1    one-way     <mxe-host>/nifi/one-way1/nifi/
+....
+
+[[mxeflowdeletedeployment]]
+==== mxe-flow delete deployment
+
+Deletes a data-flow deployment. The flow is stopped ungracefully, and all data being processed internally by the flow is lost.
+
+.Parameters:
+* *name*: The name of the deployed data-flow.
+
+*Example with output:*
+
+....
+$ mxe-flows delete deployment --name irflow
+
+Success: irflow has been deleted.
+....
+
+[[mxeflowdeleteflow]]
+==== mxe-flow delete flow
+
+Deletes a data-flow from the MXE flow repository. Deployments of the deleted flow can no longer be started.
+
+.Parameters:
+* *name*: The name of the data-flow.
+
+*Example with output:*
+
+....
+$ mxe-flow delete flow --name imageflow
+
+Success: imageflow has been deleted.
+....
+
+[[Authorization]]
+=== Authorization
+
+[[mxe-traininglist]]
+==== mxe-training list
+
+Lists the training packages and training jobs.
+
+.Parameters:
+* No specific parameters.
+
+*Example:*
+
+....
+$ mxe-training list
+....
+
+[[subcommandonpackages]]
+===== Subcommand: packages
+
+List training packages.
+
+.Parameters:
+* No specific parameters.
+
+*Example with output:*
+
+....
+$ mxe-training list packages
+
+CREATED  ID               VERSION  IMAGE                  TITLE             AUTHOR           STATUS
+09:55    training.zip     unknown                                                            packaging
+09:55    trainingexample  0.0.1    trainingexample:0.0.1  Training example  MXE test         available
+....
+
+[[subcommandjobs.1]]
+===== Subcommand: jobs
+
+List training jobs.
+
+.Parameters:
+* No specific parameters.
+
+*Example with output:*
+
+....
+$ mxe-training list jobs
+
+CREATED   ID                                     PACKAGE ID        PACKAGE VERSION   STATUS      COMPLETED
+11:06     b0f71b00-bf5b-4d0e-b53e-84ad812dd857   trainingexample   0.0.1             completed   11:06
+....

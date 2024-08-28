@@ -1,0 +1,234 @@
+# Default values for mxe.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# DR-D1121-011 - Includes global vales of sub-charts
+global:
+  pullSecret:
+  registry:
+    url:
+    pullSecret:
+    imagePullPolicy: IfNotPresent
+    repoPath: 
+  mxeApiTlsSecretName:
+  mxeApiHostname:
+  mxeApiport:
+  mxeOauthApiHostname:
+  mxeIamCaSecretName: iam-ca-cert
+  mxeDisableDefaultIngressControllerUse: false
+  mxeClusterDomain: cluster.local
+  mxeLogControlConfigMap: mxe-commons-log-control-configmap
+  mxePrometheusPath: /actuator/prometheus
+  mxePrometheusPort: '8081'
+  mxePrometheusScrape: 'true'
+  mxePrometheusScrapeRole: pod 
+  mxePrometheusScrapeInterval: 15s
+  security:
+    tls:
+      enabled: false
+  mtls:
+    auto:
+  multiTenancy:
+    enabled:
+  meshConfig:
+    accessLogFile:
+  internalRegistry:
+    username: admin
+    password: ""
+  fsGroup:
+    manual: 10000
+    namespace: false
+  internalIPFamily:
+  serviceMesh:
+    enabled: true
+    annotations:
+      serviceMesh:
+    egress:
+      ca:
+        secretName: egress-ca-secret
+        caCertsPath: /etc/istio/egress-ca-certs/
+        caCertificates: ca.crt
+        genSecretName: eric-sec-sip-tls-trusted-root-cert
+        readonly: true
+      lcmRegistry:
+        enabled: true
+        serviceName: eric-lcm-container-registry-registry
+        secretName: egress-lcm-secret
+        certsPath: /etc/istio/lcm/egress-certs/
+        genSecretName: eric-lcm-container-registry-client-cert
+        clientCertificate: clicert.pem
+        privateKey: cliprivkey.pem
+        optional: true
+        readonly: true
+        tlsMode: MUTUAL
+      iam:
+        enabled: true
+        serviceName: eric-sec-access-mgmt-http
+        secretName: egress-secret
+        certsPath: /etc/istio/egress-certs/
+        genSecretName: eric-sec-access-mgmt-iam-int-client-cert
+        clientCertificate: clicert.pem
+        privateKey: cliprivkey.pem
+        optional: true
+        readonly: true
+        tlsMode: MUTUAL
+        certificateCN: adp-iam-aa-client
+        caIssuer: eric-sec-access-mgmt-iam-client-ca
+      pmServer:
+        enabled: true
+        serviceName: eric-pm-server
+        caIssuer: eric-pm-server-query-ca
+        secretName: egress-pm-secret
+        certsPath: /etc/istio/pm/egress-certs/
+        genSecretName: eric-pm-server-query-cert
+        clientCertificate: clicert.pem
+        privateKey: cliprivkey.pem
+        optional: true
+        readonly: true
+      postgres:
+        serviceName: eric-data-document-database-pg
+        caIssuer: eric-data-document-database-pg-client-ca
+        clientCertificate: clicert.pem
+        privateKey: cliprivkey.pem
+  labels: {}
+  annotations: {}
+  nodeSelector: {}
+
+productInfo:
+# R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+# To automate it when packaging the helm chart rstate can be generated
+# and below value replaced with correct R-State
+  rstate:
+
+seldon-core-operator:
+  enabled: true
+  managerCreateResources: true 
+  crd:
+    create: true
+  defaultUserID: ''
+  ambassador:
+    enabled: false
+  istio:
+    enabled: true
+    gateway: mxe-commons-ingress-gw
+    tlsMode: DISABLE
+  image:
+    registry: armdocker.rnd.ericsson.se/proj-mxe
+    tag: 1.17.1-ubuntu-20240405
+    pullPolicy: 
+  executor:
+    image:
+      registry: armdocker.rnd.ericsson.se/proj-mxe
+      tag: 1.17.1-ubuntu-20240405
+      pullPolicy: 
+    serviceAccount:
+      name: eric-mxe-seldon-service-account-engine
+  serviceAccount:
+    create: false
+    name: seldon-manager
+
+seldon-core-analytics:
+  nodeExporter:
+    port: 9180
+
+imageCredentials:
+  registry: 
+    url:
+    pullSecret:
+  repoPath:
+
+
+eric-mxe-pre-upgrade-job:
+  statusCheckInterval: 60
+  includeReleaseNameSelector: true
+  nameOverride: eric-mxe-serving-pre-upgrade-job
+
+eric-mxe-serving-upgrade-jobs:
+  resources:
+    kubernetesModifier:
+      limits:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+
+eric-mxe-model-catalogue-service:
+  resources:
+    modelService:
+      requests:
+        cpu: 100m
+        memory: 1Gi
+        ephemeral-storage: 50Mi
+      limits:
+        cpu: 300m
+        memory: 2Gi
+        ephemeral-storage: 100Mi
+    kubernetesModifier:
+      limits:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+    dbInit:
+      limits:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+    minioCli:
+      limits:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+
+eric-mxe-model-service:
+  resources:
+    modelService:
+      requests:
+        cpu: 100m
+        memory: 1Gi
+        ephemeral-storage: 50Mi
+      limits:
+        cpu: 300m
+        memory: 2Gi
+        ephemeral-storage: 100Mi
+    cacerts:
+      limits:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+    kubernetesModifier:
+      limits:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+
+# Added to handle DR-D1121-068
+labels: {}
+
+#Added to handle DR_D1120_080
+terminationGracePeriodSeconds: 30
+
+#Added to handle DR_D1120_060
+tolerations: []

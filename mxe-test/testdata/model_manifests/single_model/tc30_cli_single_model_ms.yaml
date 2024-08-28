@@ -1,0 +1,24 @@
+---
+apiVersion: "machinelearning.seldon.io/v1"
+kind: "SeldonDeployment"
+metadata:
+  name: "tc30-cli-single-model-ms"
+spec:
+  predictors:
+  - name: "main"
+    annotations:
+      predictor_version: "v1"
+    replicas: 1
+    graph:
+      name: "model"
+      type: "MODEL"
+      implementation: "UNKNOWN_IMPLEMENTATION"
+      endpoint:
+        type: "REST"
+      children: []
+    componentSpecs:
+    - spec:
+        containers:
+        - image: "sample.java.model.cli.ext:0.1.0"
+          name: "model"
+          imagePullPolicy: Always

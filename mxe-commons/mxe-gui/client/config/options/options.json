@@ -1,0 +1,4 @@
+{
+  "prometheusBasePath": "/v1/prometheus/api/v1",
+  "mode": "default"
+}

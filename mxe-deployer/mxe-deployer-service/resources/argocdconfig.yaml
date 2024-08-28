@@ -1,0 +1,21 @@
+accounts.admin: apiKey
+repositories: |
+  - name: gaia-arm
+    passwordSecret:
+      key: password
+      name: repo-502223576
+    type: helm
+    url: https://arm.sero.gic.ericsson.se/artifactory/proj-gaia-dev-helm/
+    usernameSecret:
+      key: username
+      name: repo-502223576
+  - type: git
+    url: https://gitlab.internal.ericsson.com/enxxram/depmanager_test.git
+repository.credentials: |
+  - passwordSecret:
+      key: password
+      name: creds-2428244682
+    url: https://gitlab.internal.ericsson.com/
+    usernameSecret:
+      key: username
+      name: creds-2428244682

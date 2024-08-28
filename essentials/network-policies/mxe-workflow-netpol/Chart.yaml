@@ -1,0 +1,6 @@
+apiVersion: v2
+name: mxe-workflow-netpol
+description: Helm chart containing sample network policies for MXE Workflow
+type: application
+version: 0.1.0
+appVersion: 2.8.0

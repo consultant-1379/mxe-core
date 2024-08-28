@@ -1,0 +1,59 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  namespace: mxe-ci
+  generateName: artifact-passing-
+spec:
+  serviceAccountName: eric-mxe-argo-workflow-service-account
+  entrypoint: artifact-example
+  imagePullSecrets:
+  - name: mxe-pull-secret
+  volumes:
+  - name: workdir
+    emptyDir: {}
+  templates:
+  - name: artifact-example
+    steps:
+    - - name: generate-artifact
+        template: whalesay
+    - - name: consume-artifact
+        template: print-message
+        arguments:
+          artifacts:
+          - name: message
+            from: "{{steps.generate-artifact.outputs.artifacts.hello-art}}"
+ 
+  - name: whalesay
+    container:
+      image: docker/whalesay:latest
+      command: [sh, -c]
+      args: ["echo generating message in volume; cowsay hello world | tee /mnt/vol/hello_world.txt"]
+      # Mount workdir volume at /mnt/vol before invoking docker/whalesay
+      volumeMounts:
+      - name: workdir
+        mountPath: /mnt/vol
+      # by default MXE's Argo workflow has runAsNonRoot enabled both at pod level & 
+      # also MXE has a restricted security policy at main container level, 
+      # hence, we need to explicitly set the user to a non root user  
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+    outputs:
+      artifacts:
+      - name: hello-art
+        path: /mnt/vol/hello_world.txt
+  - name: print-message
+    container:
+      image: armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/alpine:latest
+      command: [sh, -c]
+      args: ["echo getting message from volume; find /mnt/vol; cat /mnt/vol/message"]
+      # by default MXE's Argo workflow has runAsNonRoot enabled both at pod level & 
+      # also MXE has a restricted security policy at main container level,
+      # hence, we need to explicitly set the user to a non root user  
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+    inputs:
+      artifacts:
+      - name: message
+        path: /mnt/vol/message

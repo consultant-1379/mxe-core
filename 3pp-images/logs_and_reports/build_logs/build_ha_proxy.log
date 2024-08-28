@@ -1,0 +1,1109 @@
++ set -e
+++ pwd
++ CWD=/home/evatsiv/gitViews/mxe-core/3pp-images
++ case "$(uname -s)" in
+++ uname -s
+++ readlink -f /home/evatsiv/gitViews/mxe-core/3pp-images/mxe-deployer/haproxy/build_haproxy_image.sh
++ SCRIPT=/home/evatsiv/gitViews/mxe-core/3pp-images/mxe-deployer/haproxy/build_haproxy_image.sh
+++ dirname /home/evatsiv/gitViews/mxe-core/3pp-images/mxe-deployer/haproxy/build_haproxy_image.sh
++ BASEDIR=/home/evatsiv/gitViews/mxe-core/3pp-images/mxe-deployer/haproxy
++++ dirname /home/evatsiv/gitViews/mxe-core/3pp-images/mxe-deployer/haproxy
+++ dirname /home/evatsiv/gitViews/mxe-core/3pp-images/mxe-deployer
++ MODULEROOT=/home/evatsiv/gitViews/mxe-core/3pp-images
++ source /home/evatsiv/gitViews/mxe-core/3pp-images/base_image.sh
+++ export LATEST_DATE_TAG=20240405
+++ LATEST_DATE_TAG=20240405
+++ export BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
+++ BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
+++ export LATEST_ALPINE_TAG=3.19.1
+++ LATEST_ALPINE_TAG=3.19.1
+++ export PYTHON_ALPINE_TAG=3.12.3-alpine3.19
+++ PYTHON_ALPINE_TAG=3.12.3-alpine3.19
+++ export ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
+++ ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
++ echo 'Base image is  armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405'
+Base image is  armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
++ REPO_URL=https://github.com/docker-library/haproxy.git
++ COMMIT_HASH=e678a5620de6784d8dbe42d1c81f5db47f9e8cbc
++ HA_PROXY_VERSION=2.6
++ HA_PROXY_PATCH_VERSION=9
++ IMAGE=armdocker.rnd.ericsson.se/proj-mxe/haproxy:2.6.9-ubuntu-20240405
++ [[ -d /home/evatsiv/gitViews/mxe-core/3pp-images/mxe-deployer/haproxy/haproxy ]]
++ git clone https://github.com/docker-library/haproxy.git /home/evatsiv/gitViews/mxe-core/3pp-images/mxe-deployer/haproxy/haproxy
+Cloning into '/home/evatsiv/gitViews/mxe-core/3pp-images/mxe-deployer/haproxy/haproxy'...
++ cd /home/evatsiv/gitViews/mxe-core/3pp-images/mxe-deployer/haproxy/haproxy
++ git checkout e678a5620de6784d8dbe42d1c81f5db47f9e8cbc
+Note: switching to 'e678a5620de6784d8dbe42d1c81f5db47f9e8cbc'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+HEAD is now at e678a56 Update 2.6 to 2.6.9
++ git reset --hard
+HEAD is now at e678a56 Update 2.6 to 2.6.9
++ cd /home/evatsiv/gitViews/mxe-core/3pp-images
++ DOCKER_BUILDKIT=1
++ docker build --no-cache --build-arg BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405 -t armdocker.rnd.ericsson.se/proj-mxe/haproxy:2.6.9-ubuntu-20240405 -f /home/evatsiv/gitViews/mxe-core/3pp-images/mxe-deployer/haproxy/Dockerfile /home/evatsiv/gitViews/mxe-core/3pp-images/mxe-deployer/haproxy/haproxy/2.6/ --progress plain
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 3.06kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
+#2 DONE 6.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/4] FROM armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405@sha256:1b8d8ff4777f36f19bfe73ee4df61e3a0b789caeff29caa019539ec7c9a57f95
+#4 CACHED
+
+#5 [internal] load build context
+#5 transferring context: 466B 0.2s done
+#5 DONE 0.2s
+
+#6 [2/4] RUN set -eux; 	groupadd --gid 99 --system haproxy; 	useradd 		--gid haproxy 		--home-dir /var/lib/haproxy 		--no-create-home 		--system 		--uid 99 		haproxy 	; 	mkdir /var/lib/haproxy; 	chown haproxy:haproxy /var/lib/haproxy
+#6 0.333 + groupadd --gid 99 --system haproxy
+#6 0.377 + useradd --gid haproxy --home-dir /var/lib/haproxy --no-create-home --system --uid 99 haproxy
+#6 0.431 + mkdir /var/lib/haproxy
+#6 0.433 + chown haproxy:haproxy /var/lib/haproxy
+#6 DONE 0.5s
+
+#7 [3/4] RUN set -eux; 		savedAptMark="$(apt-mark showmanual)"; 	apt-get update && apt-get install -y --no-install-recommends 		ca-certificates 		gcc 		libc6-dev 		liblua5.3-dev 		libpcre2-dev 		libssl-dev 		make 		wget 	; 	rm -rf /var/lib/apt/lists/*; 		wget -O haproxy.tar.gz "https://www.haproxy.org/download/2.6/src/haproxy-2.6.9.tar.gz"; 	echo "f01a1c5f465dc1b5cd175d0b28b98beb4dfe82b5b5b63ddcc68d1df433641701 *haproxy.tar.gz" | sha256sum -c; 	mkdir -p /usr/src/haproxy; 	tar -xzf haproxy.tar.gz -C /usr/src/haproxy --strip-components=1; 	rm haproxy.tar.gz; 		makeOpts=' 		TARGET=linux-glibc 		USE_GETADDRINFO=1 		USE_LUA=1 LUA_INC=/usr/include/lua5.3 		USE_OPENSSL=1 		USE_PCRE2=1 USE_PCRE2_JIT=1 		USE_PROMEX=1 				EXTRA_OBJS=" 		" 	'; 	dpkgArch="$(dpkg --print-architecture)"; 	case "$dpkgArch" in 		armel) makeOpts="$makeOpts ADDLIB=-latomic" ;; 	esac; 		nproc="$(nproc)"; 	eval "make -C /usr/src/haproxy -j '$nproc' all $makeOpts"; 	eval "make -C /usr/src/haproxy install-bin $makeOpts"; 		mkdir -p /usr/local/etc/haproxy; 	cp -R /usr/src/haproxy/examples/errorfiles /usr/local/etc/haproxy/errors; 	rm -rf /usr/src/haproxy; 		apt-mark auto '.*' > /dev/null; 	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; 	find /usr/local -type f -executable -exec ldd '{}' ';' 		| awk '/=>/ { print $(NF-1) }' 		| sort -u 		| xargs -r -I '{}' sh -c 'dpkg-query --search "$0" || dpkg-query --search "$(readlink -f "$0")"' '{}' 		| cut -d: -f1 		| sort -u 		| xargs -r apt-mark manual 	; 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; 		haproxy -v
+#7 0.431 + apt-mark showmanual
+#7 0.441 + savedAptMark=adduser
+#7 0.441 apt
+#7 0.441 base-files
+#7 0.441 base-passwd
+#7 0.441 bash
+#7 0.441 bsdutils
+#7 0.441 coreutils
+#7 0.441 dash
+#7 0.441 debconf
+#7 0.441 debianutils
+#7 0.441 diffutils
+#7 0.441 dpkg
+#7 0.441 e2fsprogs
+#7 0.441 findutils
+#7 0.441 gcc-12-base
+#7 0.441 gpgv
+#7 0.441 grep
+#7 0.441 gzip
+#7 0.441 hostname
+#7 0.441 init-system-helpers
+#7 0.441 libacl1
+#7 0.441 libapt-pkg6.0
+#7 0.441 libattr1
+#7 0.441 libaudit-common
+#7 0.441 libaudit1
+#7 0.441 libblkid1
+#7 0.441 libbz2-1.0
+#7 0.441 libc-bin
+#7 0.441 libc6
+#7 0.441 libcap-ng0
+#7 0.441 libcap2
+#7 0.441 libcom-err2
+#7 0.441 libcrypt1
+#7 0.441 libdb5.3
+#7 0.441 libdebconfclient0
+#7 0.441 libext2fs2
+#7 0.441 libffi8
+#7 0.441 libgcc-s1
+#7 0.441 libgcrypt20
+#7 0.441 libgmp10
+#7 0.441 libgnutls30
+#7 0.441 libgpg-error0
+#7 0.441 libgssapi-krb5-2
+#7 0.441 libhogweed6
+#7 0.441 libidn2-0
+#7 0.441 libk5crypto3
+#7 0.441 libkeyutils1
+#7 0.441 libkrb5-3
+#7 0.441 libkrb5support0
+#7 0.441 liblz4-1
+#7 0.441 liblzma5
+#7 0.441 libmount1
+#7 0.441 libncurses6
+#7 0.441 libncursesw6
+#7 0.441 libnettle8
+#7 0.441 libnsl2
+#7 0.441 libp11-kit0
+#7 0.441 libpam-modules
+#7 0.441 libpam-modules-bin
+#7 0.441 libpam-runtime
+#7 0.441 libpam0g
+#7 0.441 libpcre2-8-0
+#7 0.441 libpcre3
+#7 0.441 libprocps8
+#7 0.441 libseccomp2
+#7 0.441 libselinux1
+#7 0.441 libsemanage-common
+#7 0.441 libsemanage2
+#7 0.441 libsepol2
+#7 0.441 libsmartcols1
+#7 0.441 libss2
+#7 0.441 libssl3
+#7 0.441 libstdc++6
+#7 0.441 libsystemd0
+#7 0.441 libtasn1-6
+#7 0.441 libtinfo6
+#7 0.441 libtirpc-common
+#7 0.441 libtirpc3
+#7 0.441 libudev1
+#7 0.441 libunistring2
+#7 0.441 libuuid1
+#7 0.441 libxxhash0
+#7 0.441 libzstd1
+#7 0.441 login
+#7 0.441 logsave
+#7 0.441 lsb-base
+#7 0.441 mawk
+#7 0.441 mount
+#7 0.441 ncurses-base
+#7 0.441 ncurses-bin
+#7 0.441 passwd
+#7 0.441 perl-base
+#7 0.441 procps
+#7 0.441 sed
+#7 0.441 sensible-utils
+#7 0.441 sysvinit-utils
+#7 0.441 tar
+#7 0.441 ubuntu-keyring
+#7 0.441 usrmerge
+#7 0.441 util-linux
+#7 0.441 zlib1g
+#7 0.441 + apt-get update
+#7 6.142 Get:1 http://security.ubuntu.com/ubuntu jammy-security InRelease [110 kB]
+#7 6.253 Get:2 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]
+#7 7.304 Get:3 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [1755 kB]
+#7 8.778 Get:4 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [44.7 kB]
+#7 8.783 Get:5 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1077 kB]
+#7 8.934 Get:6 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [2265 kB]
+#7 10.42 Get:7 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [119 kB]
+#7 12.09 Get:8 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [109 kB]
+#7 13.84 Get:9 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
+#7 16.61 Get:10 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]
+#7 18.00 Get:11 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1792 kB]
+#7 30.45 Get:12 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]
+#7 80.97 Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1369 kB]
+#7 82.97 Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [51.1 kB]
+#7 82.97 Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [2035 kB]
+#7 86.15 Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [2339 kB]
+#7 88.81 Get:17 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [81.0 kB]
+#7 88.99 Get:18 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [31.9 kB]
+#7 89.16 Fetched 31.4 MB in 1min 29s (353 kB/s)
+#7 89.16 Reading package lists...
+#7 89.81 + apt-get install -y --no-install-recommends ca-certificates gcc libc6-dev liblua5.3-dev libpcre2-dev libssl-dev make wget
+#7 89.84 Reading package lists...
+#7 90.48 Building dependency tree...
+#7 90.62 Reading state information...
+#7 90.78 The following additional packages will be installed:
+#7 90.78   binutils binutils-common binutils-x86-64-linux-gnu cpp cpp-11 gcc-11
+#7 90.78   gcc-11-base libasan6 libatomic1 libbinutils libc-dev-bin libc6 libcc1-0
+#7 90.78   libcrypt-dev libctf-nobfd0 libctf0 libgcc-11-dev libgomp1 libisl23 libitm1
+#7 90.78   liblsan0 liblua5.3-0 libmpc3 libmpfr6 libncurses-dev libnsl-dev
+#7 90.78   libpcre2-16-0 libpcre2-32-0 libpcre2-posix3 libpsl5 libquadmath0
+#7 90.78   libreadline-dev libreadline8 libtirpc-dev libtsan0 libubsan1 linux-libc-dev
+#7 90.78   openssl readline-common rpcsvc-proto
+#7 90.78 Suggested packages:
+#7 90.78   binutils-doc cpp-doc gcc-11-locales gcc-multilib manpages-dev autoconf
+#7 90.78   automake libtool flex bison gdb gcc-doc gcc-11-multilib gcc-11-doc glibc-doc
+#7 90.78   locales ncurses-doc readline-doc libssl-doc make-doc
+#7 90.78 Recommended packages:
+#7 90.78   manpages manpages-dev libc-devtools libnss-nis libnss-nisplus pkg-config
+#7 90.78   libtool-bin publicsuffix
+#7 90.85 The following NEW packages will be installed:
+#7 90.85   binutils binutils-common binutils-x86-64-linux-gnu ca-certificates cpp
+#7 90.85   cpp-11 gcc gcc-11 gcc-11-base libasan6 libatomic1 libbinutils libc-dev-bin
+#7 90.85   libc6-dev libcc1-0 libcrypt-dev libctf-nobfd0 libctf0 libgcc-11-dev libgomp1
+#7 90.85   libisl23 libitm1 liblsan0 liblua5.3-0 liblua5.3-dev libmpc3 libmpfr6
+#7 90.85   libncurses-dev libnsl-dev libpcre2-16-0 libpcre2-32-0 libpcre2-dev
+#7 90.85   libpcre2-posix3 libpsl5 libquadmath0 libreadline-dev libreadline8 libssl-dev
+#7 90.85   libtirpc-dev libtsan0 libubsan1 linux-libc-dev make openssl readline-common
+#7 90.85   rpcsvc-proto wget
+#7 90.85 The following packages will be upgraded:
+#7 90.85   libc6
+#7 96.35 1 upgraded, 47 newly installed, 0 to remove and 2 not upgraded.
+#7 96.35 Need to get 58.9 MB of archives.
+#7 96.35 After this operation, 186 MB of additional disk space will be used.
+#7 96.35 Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libc6 amd64 2.35-0ubuntu3.7 [3235 kB]
+#7 97.76 Get:2 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 openssl amd64 3.0.2-0ubuntu1.15 [1186 kB]
+#7 97.81 Get:3 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 ca-certificates all 20230311ubuntu0.22.04.1 [155 kB]
+#7 97.81 Get:4 http://archive.ubuntu.com/ubuntu jammy/main amd64 readline-common all 8.1.2-1 [53.5 kB]
+#7 97.81 Get:5 http://archive.ubuntu.com/ubuntu jammy/main amd64 libreadline8 amd64 8.1.2-1 [153 kB]
+#7 97.82 Get:6 http://archive.ubuntu.com/ubuntu jammy/main amd64 libpsl5 amd64 0.21.0-1.2build2 [58.4 kB]
+#7 97.82 Get:7 http://archive.ubuntu.com/ubuntu jammy/main amd64 wget amd64 1.21.2-2ubuntu1 [367 kB]
+#7 97.83 Get:8 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 binutils-common amd64 2.38-4ubuntu2.6 [222 kB]
+#7 97.84 Get:9 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libbinutils amd64 2.38-4ubuntu2.6 [662 kB]
+#7 97.86 Get:10 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libctf-nobfd0 amd64 2.38-4ubuntu2.6 [108 kB]
+#7 97.92 Get:11 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libctf0 amd64 2.38-4ubuntu2.6 [103 kB]
+#7 103.3 Get:12 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 binutils-x86-64-linux-gnu amd64 2.38-4ubuntu2.6 [2326 kB]
+#7 104.7 Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 binutils amd64 2.38-4ubuntu2.6 [3200 B]
+#7 104.7 Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gcc-11-base amd64 11.4.0-1ubuntu1~22.04 [20.2 kB]
+#7 104.7 Get:15 http://archive.ubuntu.com/ubuntu jammy/main amd64 libisl23 amd64 0.24-2build1 [727 kB]
+#7 104.7 Get:16 http://archive.ubuntu.com/ubuntu jammy/main amd64 libmpfr6 amd64 4.1.0-3build3 [1425 kB]
+#7 104.8 Get:17 http://archive.ubuntu.com/ubuntu jammy/main amd64 libmpc3 amd64 1.2.1-2build1 [46.9 kB]
+#7 104.8 Get:18 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 cpp-11 amd64 11.4.0-1ubuntu1~22.04 [10.0 MB]
+#7 105.4 Get:19 http://archive.ubuntu.com/ubuntu jammy/main amd64 cpp amd64 4:11.2.0-1ubuntu1 [27.7 kB]
+#7 105.4 Get:20 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libcc1-0 amd64 12.3.0-1ubuntu1~22.04 [48.3 kB]
+#7 105.5 Get:21 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libgomp1 amd64 12.3.0-1ubuntu1~22.04 [126 kB]
+#7 105.5 Get:22 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libitm1 amd64 12.3.0-1ubuntu1~22.04 [30.2 kB]
+#7 110.8 Get:23 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libatomic1 amd64 12.3.0-1ubuntu1~22.04 [10.4 kB]
+#7 111.0 Get:24 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libasan6 amd64 11.4.0-1ubuntu1~22.04 [2282 kB]
+#7 112.1 Get:25 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 liblsan0 amd64 12.3.0-1ubuntu1~22.04 [1069 kB]
+#7 112.2 Get:26 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libtsan0 amd64 11.4.0-1ubuntu1~22.04 [2260 kB]
+#7 112.3 Get:27 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libubsan1 amd64 12.3.0-1ubuntu1~22.04 [976 kB]
+#7 112.3 Get:28 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libquadmath0 amd64 12.3.0-1ubuntu1~22.04 [154 kB]
+#7 112.3 Get:29 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libgcc-11-dev amd64 11.4.0-1ubuntu1~22.04 [2517 kB]
+#7 112.5 Get:30 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 gcc-11 amd64 11.4.0-1ubuntu1~22.04 [20.1 MB]
+#7 113.7 Get:31 http://archive.ubuntu.com/ubuntu jammy/main amd64 gcc amd64 4:11.2.0-1ubuntu1 [5112 B]
+#7 113.7 Get:32 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libc-dev-bin amd64 2.35-0ubuntu3.7 [20.3 kB]
+#7 113.7 Get:33 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 linux-libc-dev amd64 5.15.0-105.115 [1330 kB]
+#7 119.1 Get:34 http://archive.ubuntu.com/ubuntu jammy/main amd64 libcrypt-dev amd64 1:4.4.27-1 [112 kB]
+#7 119.9 Get:35 http://archive.ubuntu.com/ubuntu jammy/main amd64 rpcsvc-proto amd64 1.4.2-0ubuntu6 [68.5 kB]
+#7 120.0 Get:36 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libtirpc-dev amd64 1.3.2-2ubuntu0.1 [192 kB]
+#7 120.3 Get:37 http://archive.ubuntu.com/ubuntu jammy/main amd64 libnsl-dev amd64 1.3.0-2build2 [71.3 kB]
+#7 120.3 Get:38 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libc6-dev amd64 2.35-0ubuntu3.7 [2100 kB]
+#7 121.0 Get:39 http://archive.ubuntu.com/ubuntu jammy/main amd64 liblua5.3-0 amd64 5.3.6-1build1 [140 kB]
+#7 121.0 Get:40 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libncurses-dev amd64 6.3-2ubuntu0.1 [381 kB]
+#7 121.0 Get:41 http://archive.ubuntu.com/ubuntu jammy/main amd64 libreadline-dev amd64 8.1.2-1 [166 kB]
+#7 121.0 Get:42 http://archive.ubuntu.com/ubuntu jammy/main amd64 liblua5.3-dev amd64 5.3.6-1build1 [167 kB]
+#7 121.0 Get:43 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libpcre2-16-0 amd64 10.39-3ubuntu0.1 [203 kB]
+#7 121.0 Get:44 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libpcre2-32-0 amd64 10.39-3ubuntu0.1 [194 kB]
+#7 126.3 Get:45 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libpcre2-posix3 amd64 10.39-3ubuntu0.1 [6130 B]
+#7 126.5 Get:46 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libpcre2-dev amd64 10.39-3ubuntu0.1 [730 kB]
+#7 127.3 Get:47 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 libssl-dev amd64 3.0.2-0ubuntu1.15 [2376 kB]
+#7 127.7 Get:48 http://archive.ubuntu.com/ubuntu jammy/main amd64 make amd64 4.3-4.1build1 [180 kB]
+#7 127.8 debconf: delaying package configuration, since apt-utils is not installed
+#7 127.8 Fetched 58.9 MB in 37s (1601 kB/s)
+#7 127.9 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 4393 files and directories currently installed.)
+#7 127.9 Preparing to unpack .../libc6_2.35-0ubuntu3.7_amd64.deb ...
+#7 128.0 debconf: unable to initialize frontend: Dialog
+#7 128.0 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#7 128.0 debconf: falling back to frontend: Readline
+#7 128.0 debconf: unable to initialize frontend: Readline
+#7 128.0 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.34.0 /usr/local/share/perl/5.34.0 /usr/lib/x86_64-linux-gnu/perl5/5.34 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.34 /usr/share/perl/5.34 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
+#7 128.0 debconf: falling back to frontend: Teletype
+#7 128.0 Unpacking libc6:amd64 (2.35-0ubuntu3.7) over (2.35-0ubuntu3.6) ...
+#7 129.9 Setting up libc6:amd64 (2.35-0ubuntu3.7) ...
+#7 130.0 debconf: unable to initialize frontend: Dialog
+#7 130.0 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#7 130.0 debconf: falling back to frontend: Readline
+#7 130.0 debconf: unable to initialize frontend: Readline
+#7 130.0 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.34.0 /usr/local/share/perl/5.34.0 /usr/lib/x86_64-linux-gnu/perl5/5.34 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.34 /usr/share/perl/5.34 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
+#7 130.0 debconf: falling back to frontend: Teletype
+#7 131.1 Selecting previously unselected package openssl.
+#7 131.1 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 4393 files and directories currently installed.)
+#7 131.1 Preparing to unpack .../00-openssl_3.0.2-0ubuntu1.15_amd64.deb ...
+#7 131.1 Unpacking openssl (3.0.2-0ubuntu1.15) ...
+#7 131.2 Selecting previously unselected package ca-certificates.
+#7 131.2 Preparing to unpack .../01-ca-certificates_20230311ubuntu0.22.04.1_all.deb ...
+#7 131.2 Unpacking ca-certificates (20230311ubuntu0.22.04.1) ...
+#7 131.3 Selecting previously unselected package readline-common.
+#7 131.3 Preparing to unpack .../02-readline-common_8.1.2-1_all.deb ...
+#7 131.3 Unpacking readline-common (8.1.2-1) ...
+#7 131.4 Selecting previously unselected package libreadline8:amd64.
+#7 131.4 Preparing to unpack .../03-libreadline8_8.1.2-1_amd64.deb ...
+#7 131.4 Unpacking libreadline8:amd64 (8.1.2-1) ...
+#7 131.5 Selecting previously unselected package libpsl5:amd64.
+#7 131.5 Preparing to unpack .../04-libpsl5_0.21.0-1.2build2_amd64.deb ...
+#7 131.5 Unpacking libpsl5:amd64 (0.21.0-1.2build2) ...
+#7 131.6 Selecting previously unselected package wget.
+#7 131.6 Preparing to unpack .../05-wget_1.21.2-2ubuntu1_amd64.deb ...
+#7 131.6 Unpacking wget (1.21.2-2ubuntu1) ...
+#7 131.7 Selecting previously unselected package binutils-common:amd64.
+#7 131.7 Preparing to unpack .../06-binutils-common_2.38-4ubuntu2.6_amd64.deb ...
+#7 131.7 Unpacking binutils-common:amd64 (2.38-4ubuntu2.6) ...
+#7 131.7 Selecting previously unselected package libbinutils:amd64.
+#7 131.7 Preparing to unpack .../07-libbinutils_2.38-4ubuntu2.6_amd64.deb ...
+#7 131.8 Unpacking libbinutils:amd64 (2.38-4ubuntu2.6) ...
+#7 131.8 Selecting previously unselected package libctf-nobfd0:amd64.
+#7 131.8 Preparing to unpack .../08-libctf-nobfd0_2.38-4ubuntu2.6_amd64.deb ...
+#7 131.8 Unpacking libctf-nobfd0:amd64 (2.38-4ubuntu2.6) ...
+#7 131.9 Selecting previously unselected package libctf0:amd64.
+#7 131.9 Preparing to unpack .../09-libctf0_2.38-4ubuntu2.6_amd64.deb ...
+#7 131.9 Unpacking libctf0:amd64 (2.38-4ubuntu2.6) ...
+#7 132.0 Selecting previously unselected package binutils-x86-64-linux-gnu.
+#7 132.0 Preparing to unpack .../10-binutils-x86-64-linux-gnu_2.38-4ubuntu2.6_amd64.deb ...
+#7 132.0 Unpacking binutils-x86-64-linux-gnu (2.38-4ubuntu2.6) ...
+#7 132.1 Selecting previously unselected package binutils.
+#7 132.1 Preparing to unpack .../11-binutils_2.38-4ubuntu2.6_amd64.deb ...
+#7 132.1 Unpacking binutils (2.38-4ubuntu2.6) ...
+#7 132.2 Selecting previously unselected package gcc-11-base:amd64.
+#7 132.2 Preparing to unpack .../12-gcc-11-base_11.4.0-1ubuntu1~22.04_amd64.deb ...
+#7 132.2 Unpacking gcc-11-base:amd64 (11.4.0-1ubuntu1~22.04) ...
+#7 132.3 Selecting previously unselected package libisl23:amd64.
+#7 132.3 Preparing to unpack .../13-libisl23_0.24-2build1_amd64.deb ...
+#7 132.3 Unpacking libisl23:amd64 (0.24-2build1) ...
+#7 132.4 Selecting previously unselected package libmpfr6:amd64.
+#7 132.4 Preparing to unpack .../14-libmpfr6_4.1.0-3build3_amd64.deb ...
+#7 132.4 Unpacking libmpfr6:amd64 (4.1.0-3build3) ...
+#7 132.4 Selecting previously unselected package libmpc3:amd64.
+#7 132.4 Preparing to unpack .../15-libmpc3_1.2.1-2build1_amd64.deb ...
+#7 132.5 Unpacking libmpc3:amd64 (1.2.1-2build1) ...
+#7 132.5 Selecting previously unselected package cpp-11.
+#7 132.5 Preparing to unpack .../16-cpp-11_11.4.0-1ubuntu1~22.04_amd64.deb ...
+#7 132.5 Unpacking cpp-11 (11.4.0-1ubuntu1~22.04) ...
+#7 132.7 Selecting previously unselected package cpp.
+#7 132.7 Preparing to unpack .../17-cpp_4%3a11.2.0-1ubuntu1_amd64.deb ...
+#7 132.7 Unpacking cpp (4:11.2.0-1ubuntu1) ...
+#7 132.8 Selecting previously unselected package libcc1-0:amd64.
+#7 132.8 Preparing to unpack .../18-libcc1-0_12.3.0-1ubuntu1~22.04_amd64.deb ...
+#7 132.8 Unpacking libcc1-0:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 132.9 Selecting previously unselected package libgomp1:amd64.
+#7 132.9 Preparing to unpack .../19-libgomp1_12.3.0-1ubuntu1~22.04_amd64.deb ...
+#7 132.9 Unpacking libgomp1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 133.0 Selecting previously unselected package libitm1:amd64.
+#7 133.0 Preparing to unpack .../20-libitm1_12.3.0-1ubuntu1~22.04_amd64.deb ...
+#7 133.0 Unpacking libitm1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 133.1 Selecting previously unselected package libatomic1:amd64.
+#7 133.1 Preparing to unpack .../21-libatomic1_12.3.0-1ubuntu1~22.04_amd64.deb ...
+#7 133.1 Unpacking libatomic1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 133.2 Selecting previously unselected package libasan6:amd64.
+#7 133.2 Preparing to unpack .../22-libasan6_11.4.0-1ubuntu1~22.04_amd64.deb ...
+#7 133.2 Unpacking libasan6:amd64 (11.4.0-1ubuntu1~22.04) ...
+#7 133.3 Selecting previously unselected package liblsan0:amd64.
+#7 133.3 Preparing to unpack .../23-liblsan0_12.3.0-1ubuntu1~22.04_amd64.deb ...
+#7 133.3 Unpacking liblsan0:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 133.4 Selecting previously unselected package libtsan0:amd64.
+#7 133.4 Preparing to unpack .../24-libtsan0_11.4.0-1ubuntu1~22.04_amd64.deb ...
+#7 133.4 Unpacking libtsan0:amd64 (11.4.0-1ubuntu1~22.04) ...
+#7 133.5 Selecting previously unselected package libubsan1:amd64.
+#7 133.5 Preparing to unpack .../25-libubsan1_12.3.0-1ubuntu1~22.04_amd64.deb ...
+#7 133.5 Unpacking libubsan1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 133.6 Selecting previously unselected package libquadmath0:amd64.
+#7 133.6 Preparing to unpack .../26-libquadmath0_12.3.0-1ubuntu1~22.04_amd64.deb ...
+#7 133.6 Unpacking libquadmath0:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 133.6 Selecting previously unselected package libgcc-11-dev:amd64.
+#7 133.6 Preparing to unpack .../27-libgcc-11-dev_11.4.0-1ubuntu1~22.04_amd64.deb ...
+#7 133.7 Unpacking libgcc-11-dev:amd64 (11.4.0-1ubuntu1~22.04) ...
+#7 133.8 Selecting previously unselected package gcc-11.
+#7 133.8 Preparing to unpack .../28-gcc-11_11.4.0-1ubuntu1~22.04_amd64.deb ...
+#7 133.8 Unpacking gcc-11 (11.4.0-1ubuntu1~22.04) ...
+#7 134.1 Selecting previously unselected package gcc.
+#7 134.1 Preparing to unpack .../29-gcc_4%3a11.2.0-1ubuntu1_amd64.deb ...
+#7 134.1 Unpacking gcc (4:11.2.0-1ubuntu1) ...
+#7 134.2 Selecting previously unselected package libc-dev-bin.
+#7 134.2 Preparing to unpack .../30-libc-dev-bin_2.35-0ubuntu3.7_amd64.deb ...
+#7 134.2 Unpacking libc-dev-bin (2.35-0ubuntu3.7) ...
+#7 134.2 Selecting previously unselected package linux-libc-dev:amd64.
+#7 134.2 Preparing to unpack .../31-linux-libc-dev_5.15.0-105.115_amd64.deb ...
+#7 134.2 Unpacking linux-libc-dev:amd64 (5.15.0-105.115) ...
+#7 134.4 Selecting previously unselected package libcrypt-dev:amd64.
+#7 134.4 Preparing to unpack .../32-libcrypt-dev_1%3a4.4.27-1_amd64.deb ...
+#7 134.4 Unpacking libcrypt-dev:amd64 (1:4.4.27-1) ...
+#7 134.5 Selecting previously unselected package rpcsvc-proto.
+#7 134.5 Preparing to unpack .../33-rpcsvc-proto_1.4.2-0ubuntu6_amd64.deb ...
+#7 134.5 Unpacking rpcsvc-proto (1.4.2-0ubuntu6) ...
+#7 134.6 Selecting previously unselected package libtirpc-dev:amd64.
+#7 134.6 Preparing to unpack .../34-libtirpc-dev_1.3.2-2ubuntu0.1_amd64.deb ...
+#7 134.6 Unpacking libtirpc-dev:amd64 (1.3.2-2ubuntu0.1) ...
+#7 134.7 Selecting previously unselected package libnsl-dev:amd64.
+#7 134.7 Preparing to unpack .../35-libnsl-dev_1.3.0-2build2_amd64.deb ...
+#7 134.7 Unpacking libnsl-dev:amd64 (1.3.0-2build2) ...
+#7 134.7 Selecting previously unselected package libc6-dev:amd64.
+#7 134.7 Preparing to unpack .../36-libc6-dev_2.35-0ubuntu3.7_amd64.deb ...
+#7 134.7 Unpacking libc6-dev:amd64 (2.35-0ubuntu3.7) ...
+#7 134.9 Selecting previously unselected package liblua5.3-0:amd64.
+#7 134.9 Preparing to unpack .../37-liblua5.3-0_5.3.6-1build1_amd64.deb ...
+#7 134.9 Unpacking liblua5.3-0:amd64 (5.3.6-1build1) ...
+#7 135.0 Selecting previously unselected package libncurses-dev:amd64.
+#7 135.0 Preparing to unpack .../38-libncurses-dev_6.3-2ubuntu0.1_amd64.deb ...
+#7 135.0 Unpacking libncurses-dev:amd64 (6.3-2ubuntu0.1) ...
+#7 135.1 Selecting previously unselected package libreadline-dev:amd64.
+#7 135.1 Preparing to unpack .../39-libreadline-dev_8.1.2-1_amd64.deb ...
+#7 135.1 Unpacking libreadline-dev:amd64 (8.1.2-1) ...
+#7 135.2 Selecting previously unselected package liblua5.3-dev:amd64.
+#7 135.2 Preparing to unpack .../40-liblua5.3-dev_5.3.6-1build1_amd64.deb ...
+#7 135.2 Unpacking liblua5.3-dev:amd64 (5.3.6-1build1) ...
+#7 135.3 Selecting previously unselected package libpcre2-16-0:amd64.
+#7 135.3 Preparing to unpack .../41-libpcre2-16-0_10.39-3ubuntu0.1_amd64.deb ...
+#7 135.3 Unpacking libpcre2-16-0:amd64 (10.39-3ubuntu0.1) ...
+#7 135.4 Selecting previously unselected package libpcre2-32-0:amd64.
+#7 135.4 Preparing to unpack .../42-libpcre2-32-0_10.39-3ubuntu0.1_amd64.deb ...
+#7 135.4 Unpacking libpcre2-32-0:amd64 (10.39-3ubuntu0.1) ...
+#7 135.5 Selecting previously unselected package libpcre2-posix3:amd64.
+#7 135.5 Preparing to unpack .../43-libpcre2-posix3_10.39-3ubuntu0.1_amd64.deb ...
+#7 135.5 Unpacking libpcre2-posix3:amd64 (10.39-3ubuntu0.1) ...
+#7 135.6 Selecting previously unselected package libpcre2-dev:amd64.
+#7 135.6 Preparing to unpack .../44-libpcre2-dev_10.39-3ubuntu0.1_amd64.deb ...
+#7 135.6 Unpacking libpcre2-dev:amd64 (10.39-3ubuntu0.1) ...
+#7 135.7 Selecting previously unselected package libssl-dev:amd64.
+#7 135.7 Preparing to unpack .../45-libssl-dev_3.0.2-0ubuntu1.15_amd64.deb ...
+#7 135.7 Unpacking libssl-dev:amd64 (3.0.2-0ubuntu1.15) ...
+#7 135.8 Selecting previously unselected package make.
+#7 135.8 Preparing to unpack .../46-make_4.3-4.1build1_amd64.deb ...
+#7 135.8 Unpacking make (4.3-4.1build1) ...
+#7 135.9 Setting up gcc-11-base:amd64 (11.4.0-1ubuntu1~22.04) ...
+#7 135.9 Setting up libpsl5:amd64 (0.21.0-1.2build2) ...
+#7 136.0 Setting up wget (1.21.2-2ubuntu1) ...
+#7 136.1 Setting up binutils-common:amd64 (2.38-4ubuntu2.6) ...
+#7 136.1 Setting up linux-libc-dev:amd64 (5.15.0-105.115) ...
+#7 136.1 Setting up libctf-nobfd0:amd64 (2.38-4ubuntu2.6) ...
+#7 136.2 Setting up libgomp1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 136.2 Setting up libpcre2-16-0:amd64 (10.39-3ubuntu0.1) ...
+#7 136.3 Setting up libasan6:amd64 (11.4.0-1ubuntu1~22.04) ...
+#7 136.3 Setting up libpcre2-32-0:amd64 (10.39-3ubuntu0.1) ...
+#7 136.3 Setting up libtirpc-dev:amd64 (1.3.2-2ubuntu0.1) ...
+#7 136.4 Setting up rpcsvc-proto (1.4.2-0ubuntu6) ...
+#7 136.4 Setting up make (4.3-4.1build1) ...
+#7 136.4 Setting up libmpfr6:amd64 (4.1.0-3build3) ...
+#7 136.5 Setting up libquadmath0:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 136.5 Setting up libssl-dev:amd64 (3.0.2-0ubuntu1.15) ...
+#7 136.5 Setting up libmpc3:amd64 (1.2.1-2build1) ...
+#7 136.6 Setting up libatomic1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 136.6 Setting up libubsan1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 136.7 Setting up libpcre2-posix3:amd64 (10.39-3ubuntu0.1) ...
+#7 136.7 Setting up libnsl-dev:amd64 (1.3.0-2build2) ...
+#7 136.8 Setting up libcrypt-dev:amd64 (1:4.4.27-1) ...
+#7 136.8 Setting up liblua5.3-0:amd64 (5.3.6-1build1) ...
+#7 136.9 Setting up libbinutils:amd64 (2.38-4ubuntu2.6) ...
+#7 136.9 Setting up libisl23:amd64 (0.24-2build1) ...
+#7 137.0 Setting up libc-dev-bin (2.35-0ubuntu3.7) ...
+#7 137.0 Setting up openssl (3.0.2-0ubuntu1.15) ...
+#7 137.1 Setting up readline-common (8.1.2-1) ...
+#7 137.1 Setting up libcc1-0:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 137.2 Setting up liblsan0:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 137.2 Setting up libitm1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 137.2 Setting up libtsan0:amd64 (11.4.0-1ubuntu1~22.04) ...
+#7 137.3 Setting up libctf0:amd64 (2.38-4ubuntu2.6) ...
+#7 137.3 Setting up cpp-11 (11.4.0-1ubuntu1~22.04) ...
+#7 137.4 Setting up libreadline8:amd64 (8.1.2-1) ...
+#7 137.4 Setting up ca-certificates (20230311ubuntu0.22.04.1) ...
+#7 137.5 debconf: unable to initialize frontend: Dialog
+#7 137.5 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#7 137.5 debconf: falling back to frontend: Readline
+#7 137.5 debconf: unable to initialize frontend: Readline
+#7 137.5 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.34.0 /usr/local/share/perl/5.34.0 /usr/lib/x86_64-linux-gnu/perl5/5.34 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.34 /usr/share/perl/5.34 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
+#7 137.5 debconf: falling back to frontend: Teletype
+#7 137.8 Updating certificates in /etc/ssl/certs...
+#7 138.2 137 added, 0 removed; done.
+#7 138.2 Setting up libgcc-11-dev:amd64 (11.4.0-1ubuntu1~22.04) ...
+#7 138.3 Setting up cpp (4:11.2.0-1ubuntu1) ...
+#7 138.3 Setting up libc6-dev:amd64 (2.35-0ubuntu3.7) ...
+#7 138.4 Setting up binutils-x86-64-linux-gnu (2.38-4ubuntu2.6) ...
+#7 138.4 Setting up libncurses-dev:amd64 (6.3-2ubuntu0.1) ...
+#7 138.5 Setting up libpcre2-dev:amd64 (10.39-3ubuntu0.1) ...
+#7 138.5 Setting up binutils (2.38-4ubuntu2.6) ...
+#7 138.5 Setting up libreadline-dev:amd64 (8.1.2-1) ...
+#7 138.6 Setting up gcc-11 (11.4.0-1ubuntu1~22.04) ...
+#7 138.6 Setting up liblua5.3-dev:amd64 (5.3.6-1build1) ...
+#7 138.7 Setting up gcc (4:11.2.0-1ubuntu1) ...
+#7 138.8 Processing triggers for libc-bin (2.35-0ubuntu3.6) ...
+#7 138.8 Processing triggers for ca-certificates (20230311ubuntu0.22.04.1) ...
+#7 138.8 Updating certificates in /etc/ssl/certs...
+#7 139.1 0 added, 0 removed; done.
+#7 139.1 Running hooks in /etc/ca-certificates/update.d...
+#7 139.1 done.
+#7 139.2 + rm -rf /var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-backports_InRelease /var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-backports_main_binary-amd64_Packages.lz4 /var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-backports_universe_binary-amd64_Packages.lz4 /var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-updates_InRelease /var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-updates_main_binary-amd64_Packages.lz4 /var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-updates_multiverse_binary-amd64_Packages.lz4 /var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-updates_restricted_binary-amd64_Packages.lz4 /var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy-updates_universe_binary-amd64_Packages.lz4 /var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy_InRelease /var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy_main_binary-amd64_Packages.lz4 /var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy_multiverse_binary-amd64_Packages.lz4 /var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy_restricted_binary-amd64_Packages.lz4 /var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_jammy_universe_binary-amd64_Packages.lz4 /var/lib/apt/lists/auxfiles /var/lib/apt/lists/lock /var/lib/apt/lists/partial /var/lib/apt/lists/security.ubuntu.com_ubuntu_dists_jammy-security_InRelease /var/lib/apt/lists/security.ubuntu.com_ubuntu_dists_jammy-security_main_binary-amd64_Packages.lz4 /var/lib/apt/lists/security.ubuntu.com_ubuntu_dists_jammy-security_multiverse_binary-amd64_Packages.lz4 /var/lib/apt/lists/security.ubuntu.com_ubuntu_dists_jammy-security_restricted_binary-amd64_Packages.lz4 /var/lib/apt/lists/security.ubuntu.com_ubuntu_dists_jammy-security_universe_binary-amd64_Packages.lz4
+#7 139.2 + wget -O haproxy.tar.gz https://www.haproxy.org/download/2.6/src/haproxy-2.6.9.tar.gz
+#7 139.2 --2024-04-25 13:29:05--  https://www.haproxy.org/download/2.6/src/haproxy-2.6.9.tar.gz
+#7 139.2 Resolving www.haproxy.org (www.haproxy.org)... 51.15.8.218, 2001:bc8:35ee:100::1
+#7 144.3 Connecting to www.haproxy.org (www.haproxy.org)|51.15.8.218|:443... connected.
+#7 144.8 HTTP request sent, awaiting response... 200 OK
+#7 145.2 Length: 4045208 (3.9M) [application/x-tar]
+#7 145.2 Saving to: 'haproxy.tar.gz'
+#7 145.2 
+#7 145.2      0K .......... .......... .......... .......... ..........  1%  319K 12s
+#7 145.4     50K .......... .......... .......... .......... ..........  2% 1.45M 7s
+#7 145.4    100K .......... .......... .......... .......... ..........  3%  397K 8s
+#7 145.6    150K .......... .......... .......... .......... ..........  5% 1.68M 6s
+#7 145.6    200K .......... .......... .......... .......... ..........  6% 35.4K 26s
+#7 147.0    250K .......... .......... .......... .......... ..........  7% 9.56M 21s
+#7 147.0    300K .......... .......... .......... .......... ..........  8% 52.1M 18s
+#7 147.0    350K .......... .......... .......... .......... .......... 10% 37.9M 16s
+#7 147.0    400K .......... .......... .......... .......... .......... 11%  155K 16s
+#7 147.3    450K .......... .......... .......... .......... .......... 12% 83.6M 14s
+#7 147.3    500K .......... .......... .......... .......... .......... 13% 57.8M 13s
+#7 147.3    550K .......... .......... .......... .......... .......... 15%  107M 12s
+#7 147.3    600K .......... .......... .......... .......... .......... 16% 78.0M 11s
+#7 147.3    650K .......... .......... .......... .......... .......... 17% 85.8M 10s
+#7 147.3    700K .......... .......... .......... .......... .......... 18%  104M 9s
+#7 147.3    750K .......... .......... .......... .......... .......... 20%  390K 9s
+#7 147.5    800K .......... .......... .......... .......... .......... 21% 5.22M 8s
+#7 147.5    850K .......... .......... .......... .......... .......... 22% 4.04M 8s
+#7 147.5    900K .......... .......... .......... .......... .......... 24% 12.2M 7s
+#7 147.5    950K .......... .......... .......... .......... .......... 25%  363K 7s
+#7 147.6   1000K .......... .......... .......... .......... .......... 26% 3.47M 7s
+#7 147.6   1050K .......... .......... .......... .......... .......... 27% 13.4M 6s
+#7 147.6   1100K .......... .......... .......... .......... .......... 29%  384K 6s
+#7 147.8   1150K .......... .......... .......... .......... .......... 30% 5.27M 6s
+#7 147.8   1200K .......... .......... .......... .......... .......... 31% 3.37M 6s
+#7 147.8   1250K .......... .......... .......... .......... .......... 32% 28.7M 5s
+#7 147.8   1300K .......... .......... .......... .......... .......... 34%  381K 5s
+#7 147.9   1350K .......... .......... .......... .......... .......... 35% 2.17M 5s
+#7 147.9   1400K .......... .......... .......... .......... .......... 36% 13.1M 5s
+#7 148.0   1450K .......... .......... .......... .......... .......... 37%  392K 5s
+#7 148.1   1500K .......... .......... .......... .......... .......... 39% 5.10M 4s
+#7 148.1   1550K .......... .......... .......... .......... .......... 40% 2.92M 4s
+#7 148.1   1600K .......... .......... .......... .......... .......... 41% 19.3M 4s
+#7 148.1   1650K .......... .......... .......... .......... .......... 43%  394K 4s
+#7 148.2   1700K .......... .......... .......... .......... .......... 44% 4.79M 4s
+#7 148.2   1750K .......... .......... .......... .......... .......... 45% 2.78M 4s
+#7 148.3   1800K .......... .......... .......... .......... .......... 46% 37.9M 3s
+#7 148.3   1850K .......... .......... .......... .......... .......... 48%  395K 3s
+#7 148.4   1900K .......... .......... .......... .......... .......... 49% 4.79M 3s
+#7 148.4   1950K .......... .......... .......... .......... .......... 50% 3.05M 3s
+#7 148.4   2000K .......... .......... .......... .......... .......... 51% 18.6M 3s
+#7 148.4   2050K .......... .......... .......... .......... .......... 53%  395K 3s
+#7 148.5   2100K .......... .......... .......... .......... .......... 54% 5.29M 3s
+#7 148.6   2150K .......... .......... .......... .......... .......... 55% 2.73M 3s
+#7 148.6   2200K .......... .......... .......... .......... .......... 56% 16.3M 3s
+#7 148.6   2250K .......... .......... .......... .......... .......... 58%  400K 2s
+#7 148.7   2300K .......... .......... .......... .......... .......... 59% 4.95M 2s
+#7 148.7   2350K .......... .......... .......... .......... .......... 60% 3.47M 2s
+#7 148.7   2400K .......... .......... .......... .......... .......... 62% 8.06M 2s
+#7 148.7   2450K .......... .......... .......... .......... .......... 63%  403K 2s
+#7 148.9   2500K .......... .......... .......... .......... .......... 64% 5.32M 2s
+#7 148.9   2550K .......... .......... .......... .......... .......... 65% 3.26M 2s
+#7 148.9   2600K .......... .......... .......... .......... .......... 67% 6.65M 2s
+#7 148.9   2650K .......... .......... .......... .......... .......... 68%  406K 2s
+#7 149.0   2700K .......... .......... .......... .......... .......... 69% 5.12M 2s
+#7 149.0   2750K .......... .......... .......... .......... .......... 70% 3.99M 2s
+#7 149.0   2800K .......... .......... .......... .......... .......... 72% 6.12M 1s
+#7 149.0   2850K .......... .......... .......... .......... .......... 73% 1.15M 1s
+#7 149.1   2900K .......... .......... .......... .......... .......... 74%  575K 1s
+#7 149.2   2950K .......... .......... .......... .......... .......... 75% 3.03M 1s
+#7 149.2   3000K .......... .......... .......... .......... .......... 77% 5.57M 1s
+#7 149.2   3050K .......... .......... .......... .......... .......... 78% 13.1M 1s
+#7 149.2   3100K .......... .......... .......... .......... .......... 79%  404K 1s
+#7 149.3   3150K .......... .......... .......... .......... .......... 81% 5.47M 1s
+#7 149.3   3200K .......... .......... .......... .......... .......... 82% 4.07M 1s
+#7 149.3   3250K .......... .......... .......... .......... .......... 83% 5.23M 1s
+#7 149.4   3300K .......... .......... .......... .......... .......... 84%  404K 1s
+#7 149.5   3350K .......... .......... .......... .......... .......... 86% 5.58M 1s
+#7 149.5   3400K .......... .......... .......... .......... .......... 87% 3.25M 1s
+#7 149.5   3450K .......... .......... .......... .......... .......... 88% 9.08M 1s
+#7 149.5   3500K .......... .......... .......... .......... .......... 89% 3.18M 0s
+#7 149.5   3550K .......... .......... .......... .......... .......... 91%  447K 0s
+#7 149.6   3600K .......... .......... .......... .......... .......... 92% 5.78M 0s
+#7 149.6   3650K .......... .......... .......... .......... .......... 93% 3.16M 0s
+#7 149.7   3700K .......... .......... .......... .......... .......... 94% 2.14M 0s
+#7 149.7   3750K .......... .......... .......... .......... .......... 96%  461K 0s
+#7 149.8   3800K .......... .......... .......... .......... .......... 97% 6.77M 0s
+#7 149.8   3850K .......... .......... .......... .......... .......... 98% 3.73M 0s
+#7 149.8   3900K .......... .......... .......... .......... .......... 99% 17.2M 0s
+#7 149.8   3950K                                                       100%  760G=4.6s
+#7 149.8 
+#7 149.8 2024-04-25 13:29:16 (863 KB/s) - 'haproxy.tar.gz' saved [4045208/4045208]
+#7 149.8 
+#7 149.8 + echo f01a1c5f465dc1b5cd175d0b28b98beb4dfe82b5b5b63ddcc68d1df433641701 *haproxy.tar.gz
+#7 149.8 + sha256sum -c
+#7 149.8 haproxy.tar.gz: OK
+#7 149.8 + mkdir -p /usr/src/haproxy
+#7 149.8 + tar -xzf haproxy.tar.gz -C /usr/src/haproxy --strip-components=1
+#7 149.9 + rm haproxy.tar.gz
+#7 149.9 + makeOpts= 		TARGET=linux-glibc 		USE_GETADDRINFO=1 		USE_LUA=1 LUA_INC=/usr/include/lua5.3 		USE_OPENSSL=1 		USE_PCRE2=1 USE_PCRE2_JIT=1 		USE_PROMEX=1 				EXTRA_OBJS=" 		" 	
+#7 149.9 + dpkg --print-architecture
+#7 149.9 + dpkgArch=amd64
+#7 149.9 + nproc
+#7 149.9 + nproc=8
+#7 149.9 + eval make -C /usr/src/haproxy -j '8' all  		TARGET=linux-glibc 		USE_GETADDRINFO=1 		USE_LUA=1 LUA_INC=/usr/include/lua5.3 		USE_OPENSSL=1 		USE_PCRE2=1 USE_PCRE2_JIT=1 		USE_PROMEX=1 				EXTRA_OBJS=" 		" 	
+#7 149.9 + make -C /usr/src/haproxy -j 8 all TARGET=linux-glibc USE_GETADDRINFO=1 USE_LUA=1 LUA_INC=/usr/include/lua5.3 USE_OPENSSL=1 USE_PCRE2=1 USE_PCRE2_JIT=1 USE_PROMEX=1 EXTRA_OBJS= 		
+#7 149.9 make: Entering directory '/usr/src/haproxy'
+#7 150.0   CC      src/slz.o
+#7 150.0   CC      src/ev_poll.o
+#7 150.0   CC      src/ev_epoll.o
+#7 150.0   CC      src/cpuset.o
+#7 150.0   CC      src/ssl_sample.o
+#7 150.0   CC      src/ssl_sock.o
+#7 150.0   CC      src/ssl_crtlist.o
+#7 150.0   CC      src/ssl_ckch.o
+#7 150.0   CC      src/ssl_utils.o
+#7 150.1   CC      src/cfgparse-ssl.o
+#7 150.2   CC      src/jwt.o
+#7 150.2   CC      src/hlua.o
+#7 150.3   CC      src/hlua_fcn.o
+#7 150.4   CC      addons/promex/service-prometheus.o
+#7 150.5   CC      src/namespace.o
+#7 151.0   CC      src/mux_h2.o
+#7 151.0   CC      src/mux_fcgi.o
+#7 151.1   CC      src/mux_h1.o
+#7 151.1   CC      src/tcpcheck.o
+#7 151.2   CC      src/stream.o
+#7 151.6   CC      src/stats.o
+#7 151.6   CC      src/http_ana.o
+#7 153.2   CC      src/server.o
+#7 154.1   CC      src/stick_table.o
+#7 154.3   CC      src/sample.o
+#7 154.4   CC      src/flt_spoe.o
+#7 154.5   CC      src/tools.o
+#7 154.8   CC      src/log.o
+#7 155.4   CC      src/cfgparse.o
+#7 155.7   CC      src/peers.o
+#7 156.0   CC      src/backend.o
+#7 156.3   CC      src/resolvers.o
+#7 156.4   CC      src/cli.o
+#7 156.6   CC      src/connection.o
+#7 156.8   CC      src/proxy.o
+#7 157.1   CC      src/http_htx.o
+#7 157.5   CC      src/cfgparse-listen.o
+#7 157.8   CC      src/pattern.o
+#7 157.9   CC      src/check.o
+#7 158.0   CC      src/haproxy.o
+#7 158.1   CC      src/cache.o
+#7 158.2   CC      src/stconn.o
+#7 158.3   CC      src/http_act.o
+#7 158.5   CC      src/http_fetch.o
+#7 159.0   CC      src/http_client.o
+#7 159.2   CC      src/listener.o
+#7 159.3   CC      src/dns.o
+#7 159.5   CC      src/vars.o
+#7 159.5   CC      src/debug.o
+#7 159.5   CC      src/tcp_rules.o
+#7 159.6   CC      src/sink.o
+#7 159.6   CC      src/h1_htx.o
+#7 160.0   CC      src/task.o
+#7 160.3   CC      src/mjson.o
+#7 160.3   CC      src/h2.o
+#7 160.3   CC      src/filters.o
+#7 160.4   CC      src/server_state.o
+#7 160.4   CC      src/payload.o
+#7 160.4   CC      src/fcgi-app.o
+#7 160.5   CC      src/map.o
+#7 160.7   CC      src/htx.o
+#7 160.9   CC      src/h1.o
+#7 161.0   CC      src/pool.o
+#7 161.0   CC      src/cfgparse-global.o
+#7 161.0   CC      src/trace.o
+#7 161.0   CC      src/tcp_sample.o
+#7 161.1   CC      src/flt_http_comp.o
+#7 161.1   CC      src/mux_pt.o
+#7 161.3   CC      src/flt_trace.o
+#7 161.5   CC      src/mqtt.o
+#7 161.6   CC      src/acl.o
+#7 161.6   CC      src/sock.o
+#7 161.6   CC      src/mworker.o
+#7 161.7   CC      src/tcp_act.o
+#7 161.7   CC      src/ring.o
+#7 161.7   CC      src/session.o
+#7 161.9   CC      src/proto_tcp.o
+#7 162.1   CC      src/fd.o
+#7 162.1   CC      src/channel.o
+#7 162.1   CC      src/activity.o
+#7 162.2   CC      src/queue.o
+#7 162.2   CC      src/lb_fas.o
+#7 162.2   CC      src/http_rules.o
+#7 162.2   CC      src/extcheck.o
+#7 162.3   CC      src/thread.o
+#7 162.4   CC      src/http.o
+#7 162.5   CC      src/lb_chash.o
+#7 162.6   CC      src/applet.o
+#7 162.6   CC      src/compression.o
+#7 162.6   CC      src/raw_sock.o
+#7 162.6   CC      src/ncbuf.o
+#7 162.6   CC      src/frontend.o
+#7 162.7   CC      src/errors.o
+#7 162.8   CC      src/uri_normalizer.o
+#7 162.9   CC      src/http_conv.o
+#7 162.9   CC      src/lb_fwrr.o
+#7 162.9   CC      src/sha1.o
+#7 162.9   CC      src/proto_sockpair.o
+#7 162.9   CC      src/mailers.o
+#7 163.0   CC      src/lb_fwlc.o
+#7 163.0   CC      src/ebmbtree.o
+#7 163.2   CC      src/cfgcond.o
+#7 163.2   CC      src/action.o
+#7 163.2   CC      src/xprt_handshake.o
+#7 163.2   CC      src/protocol.o
+#7 163.2   CC      src/proto_uxst.o
+#7 163.2   CC      src/proto_udp.o
+#7 163.2   CC      src/lb_map.o
+#7 163.3   CC      src/fix.o
+#7 163.4   CC      src/ev_select.o
+#7 163.4   CC      src/arg.o
+#7 163.5   CC      src/sock_inet.o
+#7 163.5   CC      src/mworker-prog.o
+#7 163.5   CC      src/hpack-dec.o
+#7 163.5   CC      src/cfgparse-tcp.o
+#7 163.5   CC      src/sock_unix.o
+#7 163.5   CC      src/shctx.o
+#7 163.6   CC      src/proto_uxdg.o
+#7 163.6   CC      src/fcgi.o
+#7 163.7   CC      src/eb64tree.o
+#7 163.7   CC      src/clock.o
+#7 163.7   CC      src/chunk.o
+#7 163.7   CC      src/cfgdiag.o
+#7 163.7   CC      src/signal.o
+#7 163.7   CC      src/regex.o
+#7 163.8   CC      src/lru.o
+#7 163.8   CC      src/eb32tree.o
+#7 163.8   CC      src/eb32sctree.o
+#7 163.8   CC      src/cfgparse-unix.o
+#7 163.9   CC      src/hpack-tbl.o
+#7 163.9   CC      src/ebsttree.o
+#7 163.9   CC      src/ebimtree.o
+#7 163.9   CC      src/base64.o
+#7 164.0   CC      src/auth.o
+#7 164.0   CC      src/uri_auth.o
+#7 164.0   CC      src/time.o
+#7 164.0   CC      src/ebistree.o
+#7 164.0   CC      src/dynbuf.o
+#7 164.0   CC      src/wdt.o
+#7 164.1   CC      src/pipe.o
+#7 164.1   CC      src/init.o
+#7 164.1   CC      src/http_acl.o
+#7 164.1   CC      src/hpack-huff.o
+#7 164.1   CC      src/hpack-enc.o
+#7 164.1   CC      src/dict.o
+#7 164.2   CC      src/freq_ctr.o
+#7 164.2   CC      src/ebtree.o
+#7 164.2   CC      src/hash.o
+#7 164.2   CC      src/dgram.o
+#7 164.2   CC      src/version.o
+#7 164.3   CC      dev/flags/flags.o
+#7 164.3   LD      haproxy
+#7 164.6   LD      dev/flags/flags
+#7 164.6 make: Leaving directory '/usr/src/haproxy'
+#7 164.6 + eval make -C /usr/src/haproxy install-bin  		TARGET=linux-glibc 		USE_GETADDRINFO=1 		USE_LUA=1 LUA_INC=/usr/include/lua5.3 		USE_OPENSSL=1 		USE_PCRE2=1 USE_PCRE2_JIT=1 		USE_PROMEX=1 				EXTRA_OBJS=" 		" 	
+#7 164.6 + make -C /usr/src/haproxy install-bin TARGET=linux-glibc USE_GETADDRINFO=1 USE_LUA=1 LUA_INC=/usr/include/lua5.3 USE_OPENSSL=1 USE_PCRE2=1 USE_PCRE2_JIT=1 USE_PROMEX=1 EXTRA_OBJS= 		
+#7 164.6 make: Entering directory '/usr/src/haproxy'
+#7 164.8 'haproxy' -> '/usr/local/sbin/haproxy'
+#7 164.8 make: Leaving directory '/usr/src/haproxy'
+#7 164.8 + mkdir -p /usr/local/etc/haproxy
+#7 164.8 + cp -R /usr/src/haproxy/examples/errorfiles /usr/local/etc/haproxy/errors
+#7 164.8 + rm -rf /usr/src/haproxy
+#7 164.8 + apt-mark auto .*
+#7 164.8 + [ -z adduser
+#7 164.8 apt
+#7 164.8 base-files
+#7 164.8 base-passwd
+#7 164.8 bash
+#7 164.8 bsdutils
+#7 164.8 coreutils
+#7 164.8 dash
+#7 164.8 debconf
+#7 164.8 debianutils
+#7 164.8 diffutils
+#7 164.8 dpkg
+#7 164.8 e2fsprogs
+#7 164.8 findutils
+#7 164.8 gcc-12-base
+#7 164.8 gpgv
+#7 164.8 grep
+#7 164.8 gzip
+#7 164.8 hostname
+#7 164.8 init-system-helpers
+#7 164.8 libacl1
+#7 164.8 libapt-pkg6.0
+#7 164.8 libattr1
+#7 164.8 libaudit-common
+#7 164.8 libaudit1
+#7 164.8 libblkid1
+#7 164.8 libbz2-1.0
+#7 164.8 libc-bin
+#7 164.8 libc6
+#7 164.8 libcap-ng0
+#7 164.8 libcap2
+#7 164.8 libcom-err2
+#7 164.8 libcrypt1
+#7 164.8 libdb5.3
+#7 164.8 libdebconfclient0
+#7 164.8 libext2fs2
+#7 164.8 libffi8
+#7 164.8 libgcc-s1
+#7 164.8 libgcrypt20
+#7 164.8 libgmp10
+#7 164.8 libgnutls30
+#7 164.8 libgpg-error0
+#7 164.8 libgssapi-krb5-2
+#7 164.8 libhogweed6
+#7 164.8 libidn2-0
+#7 164.8 libk5crypto3
+#7 164.8 libkeyutils1
+#7 164.8 libkrb5-3
+#7 164.8 libkrb5support0
+#7 164.8 liblz4-1
+#7 164.8 liblzma5
+#7 164.8 libmount1
+#7 164.8 libncurses6
+#7 164.8 libncursesw6
+#7 164.8 libnettle8
+#7 164.8 libnsl2
+#7 164.8 libp11-kit0
+#7 164.8 libpam-modules
+#7 164.8 libpam-modules-bin
+#7 164.8 libpam-runtime
+#7 164.8 libpam0g
+#7 164.8 libpcre2-8-0
+#7 164.8 libpcre3
+#7 164.8 libprocps8
+#7 164.8 libseccomp2
+#7 164.8 libselinux1
+#7 164.8 libsemanage-common
+#7 164.8 libsemanage2
+#7 164.8 libsepol2
+#7 164.8 libsmartcols1
+#7 164.8 libss2
+#7 164.8 libssl3
+#7 164.8 libstdc++6
+#7 164.8 libsystemd0
+#7 164.8 libtasn1-6
+#7 164.8 libtinfo6
+#7 164.8 libtirpc-common
+#7 164.8 libtirpc3
+#7 164.8 libudev1
+#7 164.8 libunistring2
+#7 164.8 libuuid1
+#7 164.8 libxxhash0
+#7 164.8 libzstd1
+#7 164.8 login
+#7 164.8 logsave
+#7 164.8 lsb-base
+#7 164.8 mawk
+#7 164.8 mount
+#7 164.8 ncurses-base
+#7 164.8 ncurses-bin
+#7 164.8 passwd
+#7 164.8 perl-base
+#7 164.8 procps
+#7 164.8 sed
+#7 164.8 sensible-utils
+#7 164.8 sysvinit-utils
+#7 164.8 tar
+#7 164.8 ubuntu-keyring
+#7 164.8 usrmerge
+#7 164.8 util-linux
+#7 164.8 zlib1g ]
+#7 164.8 + apt-mark manual adduser apt base-files base-passwd bash bsdutils coreutils dash debconf debianutils diffutils dpkg e2fsprogs findutils gcc-12-base gpgv grep gzip hostname init-system-helpers libacl1 libapt-pkg6.0 libattr1 libaudit-common libaudit1 libblkid1 libbz2-1.0 libc-bin libc6 libcap-ng0 libcap2 libcom-err2 libcrypt1 libdb5.3 libdebconfclient0 libext2fs2 libffi8 libgcc-s1 libgcrypt20 libgmp10 libgnutls30 libgpg-error0 libgssapi-krb5-2 libhogweed6 libidn2-0 libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 liblz4-1 liblzma5 libmount1 libncurses6 libncursesw6 libnettle8 libnsl2 libp11-kit0 libpam-modules libpam-modules-bin libpam-runtime libpam0g libpcre2-8-0 libpcre3 libprocps8 libseccomp2 libselinux1 libsemanage-common libsemanage2 libsepol2 libsmartcols1 libss2 libssl3 libstdc++6 libsystemd0 libtasn1-6 libtinfo6 libtirpc-common libtirpc3 libudev1 libunistring2 libuuid1 libxxhash0 libzstd1 login logsave lsb-base mawk mount ncurses-base ncurses-bin passwd perl-base procps sed sensible-utils sysvinit-utils tar ubuntu-keyring usrmerge util-linux zlib1g
+#7 164.8 adduser set to manually installed.
+#7 164.8 apt set to manually installed.
+#7 164.8 base-files set to manually installed.
+#7 164.8 base-passwd set to manually installed.
+#7 164.8 bash set to manually installed.
+#7 164.8 bsdutils set to manually installed.
+#7 164.8 coreutils set to manually installed.
+#7 164.8 dash set to manually installed.
+#7 164.8 debconf set to manually installed.
+#7 164.8 debianutils set to manually installed.
+#7 164.8 diffutils set to manually installed.
+#7 164.8 dpkg set to manually installed.
+#7 164.8 e2fsprogs set to manually installed.
+#7 164.8 findutils set to manually installed.
+#7 164.8 gcc-12-base set to manually installed.
+#7 164.8 gpgv set to manually installed.
+#7 164.8 grep set to manually installed.
+#7 164.8 gzip set to manually installed.
+#7 164.8 hostname set to manually installed.
+#7 164.8 init-system-helpers set to manually installed.
+#7 164.8 libacl1 set to manually installed.
+#7 164.8 libapt-pkg6.0 set to manually installed.
+#7 164.8 libattr1 set to manually installed.
+#7 164.8 libaudit-common set to manually installed.
+#7 164.8 libaudit1 set to manually installed.
+#7 164.8 libblkid1 set to manually installed.
+#7 164.8 libbz2-1.0 set to manually installed.
+#7 164.8 libc-bin set to manually installed.
+#7 164.8 libc6 set to manually installed.
+#7 164.8 libcap-ng0 set to manually installed.
+#7 164.8 libcap2 set to manually installed.
+#7 164.8 libcom-err2 set to manually installed.
+#7 164.8 libcrypt1 set to manually installed.
+#7 164.8 libdb5.3 set to manually installed.
+#7 164.8 libdebconfclient0 set to manually installed.
+#7 164.8 libext2fs2 set to manually installed.
+#7 164.8 libffi8 set to manually installed.
+#7 164.8 libgcc-s1 set to manually installed.
+#7 164.8 libgcrypt20 set to manually installed.
+#7 164.8 libgmp10 set to manually installed.
+#7 164.8 libgnutls30 set to manually installed.
+#7 164.8 libgpg-error0 set to manually installed.
+#7 164.8 libgssapi-krb5-2 set to manually installed.
+#7 164.8 libhogweed6 set to manually installed.
+#7 164.8 libidn2-0 set to manually installed.
+#7 164.8 libk5crypto3 set to manually installed.
+#7 164.8 libkeyutils1 set to manually installed.
+#7 164.8 libkrb5-3 set to manually installed.
+#7 164.8 libkrb5support0 set to manually installed.
+#7 164.8 liblz4-1 set to manually installed.
+#7 164.8 liblzma5 set to manually installed.
+#7 164.8 libmount1 set to manually installed.
+#7 164.8 libncurses6 set to manually installed.
+#7 164.8 libncursesw6 set to manually installed.
+#7 164.8 libnettle8 set to manually installed.
+#7 164.8 libnsl2 set to manually installed.
+#7 164.8 libp11-kit0 set to manually installed.
+#7 164.8 libpam-modules set to manually installed.
+#7 164.8 libpam-modules-bin set to manually installed.
+#7 164.8 libpam-runtime set to manually installed.
+#7 164.8 libpam0g set to manually installed.
+#7 164.8 libpcre2-8-0 set to manually installed.
+#7 164.8 libpcre3 set to manually installed.
+#7 164.8 libprocps8 set to manually installed.
+#7 164.8 libseccomp2 set to manually installed.
+#7 164.8 libselinux1 set to manually installed.
+#7 164.8 libsemanage-common set to manually installed.
+#7 164.8 libsemanage2 set to manually installed.
+#7 164.8 libsepol2 set to manually installed.
+#7 164.8 libsmartcols1 set to manually installed.
+#7 164.8 libss2 set to manually installed.
+#7 164.8 libssl3 set to manually installed.
+#7 164.8 libstdc++6 set to manually installed.
+#7 164.8 libsystemd0 set to manually installed.
+#7 164.8 libtasn1-6 set to manually installed.
+#7 164.8 libtinfo6 set to manually installed.
+#7 164.8 libtirpc-common set to manually installed.
+#7 164.8 libtirpc3 set to manually installed.
+#7 164.8 libudev1 set to manually installed.
+#7 164.8 libunistring2 set to manually installed.
+#7 164.8 libuuid1 set to manually installed.
+#7 164.8 libxxhash0 set to manually installed.
+#7 164.8 libzstd1 set to manually installed.
+#7 164.8 login set to manually installed.
+#7 164.8 logsave set to manually installed.
+#7 164.8 lsb-base set to manually installed.
+#7 164.8 mawk set to manually installed.
+#7 164.8 mount set to manually installed.
+#7 164.8 ncurses-base set to manually installed.
+#7 164.8 ncurses-bin set to manually installed.
+#7 164.8 passwd set to manually installed.
+#7 164.8 perl-base set to manually installed.
+#7 164.8 procps set to manually installed.
+#7 164.8 sed set to manually installed.
+#7 164.8 sensible-utils set to manually installed.
+#7 164.8 sysvinit-utils set to manually installed.
+#7 164.8 tar set to manually installed.
+#7 164.8 ubuntu-keyring set to manually installed.
+#7 164.8 usrmerge set to manually installed.
+#7 164.8 util-linux set to manually installed.
+#7 164.8 zlib1g set to manually installed.
+#7 164.8 + find /usr/local -type f -executable -exec ldd {} ;
+#7 164.8 + awk /=>/ { print $(NF-1) }
+#7 164.8 + sort -u
+#7 164.8 + sort -u+ 
+#7 164.8 + cut -d: -f1
+#7 164.8 xargs+ xargs -r -I {} sh -c dpkg-query --search "$0" || dpkg-query --search "$(readlink -f "$0")" {} -r apt-mark manual
+#7 164.8 
+#7 164.8 	not a dynamic executable
+#7 164.9 dpkg-query: no path found matching pattern /lib/x86_64-linux-gnu/libcrypto.so.3
+#7 164.9 dpkg-query: no path found matching pattern /lib/x86_64-linux-gnu/liblua5.3.so.0
+#7 164.9 dpkg-query: no path found matching pattern /lib/x86_64-linux-gnu/libpcre2-8.so.0
+#7 164.9 dpkg-query: no path found matching pattern /lib/x86_64-linux-gnu/libssl.so.3
+#7 164.9 libc6 was already set to manually installed.
+#7 164.9 libcrypt1 was already set to manually installed.
+#7 164.9 libpcre2-8-0 was already set to manually installed.
+#7 164.9 libssl3 was already set to manually installed.
+#7 164.9 liblua5.3-0 set to manually installed.
+#7 164.9 + apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
+#7 164.9 Reading package lists...
+#7 164.9 Building dependency tree...
+#7 164.9 Reading state information...
+#7 164.9 The following packages will be REMOVED:
+#7 164.9   binutils* binutils-common* binutils-x86-64-linux-gnu* ca-certificates* cpp*
+#7 164.9   cpp-11* gcc* gcc-11* gcc-11-base* libasan6* libatomic1* libbinutils*
+#7 164.9   libc-dev-bin* libc6-dev* libcc1-0* libcrypt-dev* libctf-nobfd0* libctf0*
+#7 164.9   libgcc-11-dev* libgomp1* libisl23* libitm1* liblsan0* liblua5.3-dev*
+#7 164.9   libmpc3* libmpfr6* libncurses-dev* libnsl-dev* libpcre2-16-0* libpcre2-32-0*
+#7 164.9   libpcre2-dev* libpcre2-posix3* libpsl5* libquadmath0* libreadline-dev*
+#7 164.9   libreadline8* libssl-dev* libtirpc-dev* libtsan0* libubsan1* linux-libc-dev*
+#7 164.9   make* openssl* readline-common* rpcsvc-proto* wget*
+#7 165.0 0 upgraded, 0 newly installed, 46 to remove and 0 not upgraded.
+#7 165.0 After this operation, 185 MB disk space will be freed.
+#7 165.0 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7617 files and directories currently installed.)
+#7 165.0 Removing gcc (4:11.2.0-1ubuntu1) ...
+#7 165.1 Removing gcc-11 (11.4.0-1ubuntu1~22.04) ...
+#7 165.3 Removing binutils (2.38-4ubuntu2.6) ...
+#7 165.4 Removing binutils-x86-64-linux-gnu (2.38-4ubuntu2.6) ...
+#7 165.5 Removing libctf0:amd64 (2.38-4ubuntu2.6) ...
+#7 165.6 Removing libbinutils:amd64 (2.38-4ubuntu2.6) ...
+#7 165.7 Removing binutils-common:amd64 (2.38-4ubuntu2.6) ...
+#7 165.9 Removing ca-certificates (20230311ubuntu0.22.04.1) ...
+#7 165.9 Removing dangling symlinks from /etc/ssl/certs... done.
+#7 166.1 Removing cpp (4:11.2.0-1ubuntu1) ...
+#7 166.2 Removing cpp-11 (11.4.0-1ubuntu1~22.04) ...
+#7 166.3 Removing libgcc-11-dev:amd64 (11.4.0-1ubuntu1~22.04) ...
+#7 166.6 Removing libtsan0:amd64 (11.4.0-1ubuntu1~22.04) ...
+#7 166.7 Removing libasan6:amd64 (11.4.0-1ubuntu1~22.04) ...
+#7 166.8 Removing gcc-11-base:amd64 (11.4.0-1ubuntu1~22.04) ...
+#7 166.9 Removing libatomic1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 167.0 Removing liblua5.3-dev:amd64 (5.3.6-1build1) ...
+#7 167.1 Removing libreadline-dev:amd64 (8.1.2-1) ...
+#7 167.2 Removing libncurses-dev:amd64 (6.3-2ubuntu0.1) ...
+#7 167.3 Removing libpcre2-dev:amd64 (10.39-3ubuntu0.1) ...
+#7 167.4 Removing libc6-dev:amd64 (2.35-0ubuntu3.7) ...
+#7 167.5 Removing libc-dev-bin (2.35-0ubuntu3.7) ...
+#7 167.6 Removing libcc1-0:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 167.8 Removing libcrypt-dev:amd64 (1:4.4.27-1) ...
+#7 167.9 Removing libctf-nobfd0:amd64 (2.38-4ubuntu2.6) ...
+#7 168.0 Removing libgomp1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 168.1 Removing libisl23:amd64 (0.24-2build1) ...
+#7 168.3 Removing libitm1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 168.4 Removing liblsan0:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 168.5 Removing libmpc3:amd64 (1.2.1-2build1) ...
+#7 168.6 Removing libmpfr6:amd64 (4.1.0-3build3) ...
+#7 168.7 Removing libnsl-dev:amd64 (1.3.0-2build2) ...
+#7 168.8 Removing libpcre2-16-0:amd64 (10.39-3ubuntu0.1) ...
+#7 168.9 Removing libpcre2-32-0:amd64 (10.39-3ubuntu0.1) ...
+#7 169.0 Removing libpcre2-posix3:amd64 (10.39-3ubuntu0.1) ...
+#7 169.1 Removing wget (1.21.2-2ubuntu1) ...
+#7 169.2 Removing libpsl5:amd64 (0.21.0-1.2build2) ...
+#7 169.3 Removing libquadmath0:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 169.5 Removing libreadline8:amd64 (8.1.2-1) ...
+#7 169.6 Removing libssl-dev:amd64 (3.0.2-0ubuntu1.15) ...
+#7 169.7 Removing libtirpc-dev:amd64 (1.3.2-2ubuntu0.1) ...
+#7 169.9 Removing libubsan1:amd64 (12.3.0-1ubuntu1~22.04) ...
+#7 170.0 Removing linux-libc-dev:amd64 (5.15.0-105.115) ...
+#7 170.1 Removing make (4.3-4.1build1) ...
+#7 170.2 Removing openssl (3.0.2-0ubuntu1.15) ...
+#7 170.3 Removing readline-common (8.1.2-1) ...
+#7 170.4 Removing rpcsvc-proto (1.4.2-0ubuntu6) ...
+#7 170.5 Processing triggers for libc-bin (2.35-0ubuntu3.6) ...
+#7 170.6 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 4404 files and directories currently installed.)
+#7 170.6 Purging configuration files for wget (1.21.2-2ubuntu1) ...
+#7 170.7 Purging configuration files for ca-certificates (20230311ubuntu0.22.04.1) ...
+#7 170.8 debconf: unable to initialize frontend: Dialog
+#7 170.8 debconf: (TERM is not set, so the dialog frontend is not usable.)
+#7 170.8 debconf: falling back to frontend: Readline
+#7 170.8 debconf: unable to initialize frontend: Readline
+#7 170.8 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.34.0 /usr/local/share/perl/5.34.0 /usr/lib/x86_64-linux-gnu/perl5/5.34 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.34 /usr/share/perl/5.34 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
+#7 170.8 debconf: falling back to frontend: Teletype
+#7 170.8 Removing dangling symlinks from /etc/ssl/certs... done.
+#7 170.9 Purging configuration files for openssl (3.0.2-0ubuntu1.15) ...
+#7 171.0 Purging configuration files for readline-common (8.1.2-1) ...
+#7 171.1 + haproxy -v
+#7 171.1 HAProxy version 2.6.9-3a3700a 2023/02/14 - https://haproxy.org/
+#7 171.1 Status: long-term supported branch - will stop receiving fixes around Q2 2027.
+#7 171.1 Known bugs: http://www.haproxy.org/bugs/bugs-2.6.9.html
+#7 171.1 Running on: Linux 5.10.102.1-microsoft-standard-WSL2 #1 SMP Wed Mar 2 00:30:59 UTC 2022 x86_64
+#7 DONE 171.2s
+
+#8 [4/4] COPY docker-entrypoint.sh /usr/local/bin/
+#8 DONE 0.1s
+
+#9 exporting to image
+#9 exporting layers
+#9 exporting layers 0.2s done
+#9 writing image sha256:fa7dc94c6d3e01cff7e07fb41a5fc2ddff1b83268fb5f96a8fb48a9a7b718668 done
+#9 naming to armdocker.rnd.ericsson.se/proj-mxe/haproxy:2.6.9-ubuntu-20240405 0.0s done
+#9 DONE 0.2s
++ buildStatus=0
++ [[ 0 == 0 ]]
++ docker push armdocker.rnd.ericsson.se/proj-mxe/haproxy:2.6.9-ubuntu-20240405
+The push refers to repository [armdocker.rnd.ericsson.se/proj-mxe/haproxy]
+96d88ea67d24: Preparing
+e789ff22c7e8: Preparing
+0c47b6cbe163: Preparing
+e0a9f5911802: Preparing
+e0a9f5911802: Layer already exists
+96d88ea67d24: Pushed
+0c47b6cbe163: Pushed
+e789ff22c7e8: Pushed
+2.6.9-ubuntu-20240405: digest: sha256:0686bafacdb1b57531aaf8ba9a7732686c4b1e33d1ba7be3b472973f8946f0e9 size: 1156
++ pushed=0
++ [[ 0 == 0 ]]
++ [[ -d /home/evatsiv/gitViews/mxe-core/3pp-images/mxe-deployer/haproxy/haproxy ]]
++ rm -rf /home/evatsiv/gitViews/mxe-core/3pp-images/mxe-deployer/haproxy/haproxy

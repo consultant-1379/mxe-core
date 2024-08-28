@@ -1,0 +1,26 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: {{ include "mxe-commons.egress-iam-service-name" . }}-se
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "eric-sec-access-mgmt"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-commons.egress-iam-service-name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+spec:
+  hosts: 
+  - {{ include "mxe-commons.egress-iam-service-host" . }}
+  ports:
+  - number: 8443
+    name: https
+    protocol: HTTPS
+  resolution: DNS
+  location: MESH_EXTERNAL
+{{- end -}}

@@ -1,0 +1,465 @@
+Base dir is /home/evatsiv/gitViews/mxe-core/3pp-images/spark-operator
+Base image is  armdocker.rnd.ericsson.se/proj-ldc/common_base_os_release/sles:6.14.0-10
+Cloning into '/home/evatsiv/gitViews/mxe-core/3pp-images/spark-operator/spark-operator'...
+Note: switching to 'bd2eda216b79733c992861f257b28dad36bb4c62'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 5.55kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for armdocker.rnd.ericsson.se/proj-ldc/common_base_os_release/sles:6.14.0-10
+#2 ...
+
+#3 [internal] load metadata for armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/golang:1.19.2-alpine
+#3 ...
+
+#4 [auth] proj-ldc/common_base_os_release/sles:pull token for armdocker.rnd.ericsson.se
+#4 DONE 0.0s
+
+#3 [internal] load metadata for armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/golang:1.19.2-alpine
+#3 ...
+
+#5 [auth] dockerhub-ericsson-remote/golang:pull golang:pull token for armdocker.rnd.ericsson.se
+#5 DONE 0.0s
+
+#3 [internal] load metadata for armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/golang:1.19.2-alpine
+#3 ...
+
+#2 [internal] load metadata for armdocker.rnd.ericsson.se/proj-ldc/common_base_os_release/sles:6.14.0-10
+#2 DONE 26.3s
+
+#3 [internal] load metadata for armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/golang:1.19.2-alpine
+#3 DONE 26.3s
+
+#6 [internal] load .dockerignore
+#6 transferring context: 47B done
+#6 DONE 0.0s
+
+#7 [builder 1/9] FROM armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/golang:1.19.2-alpine@sha256:e4dcdac3ed37d8c2b3b8bcef2909573b2ad9c2ab53ba53c608909e8b89ccee36
+#7 DONE 0.0s
+
+#8 [base 1/5] FROM armdocker.rnd.ericsson.se/proj-ldc/common_base_os_release/sles:6.14.0-10@sha256:129df8f22980aafd05ac70b06d8e5d7bf31bb96abdbe23ba062b1627dd408fb9
+#8 resolve armdocker.rnd.ericsson.se/proj-ldc/common_base_os_release/sles:6.14.0-10@sha256:129df8f22980aafd05ac70b06d8e5d7bf31bb96abdbe23ba062b1627dd408fb9 0.0s done
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 0B / 33.20MB 0.1s
+#8 sha256:129df8f22980aafd05ac70b06d8e5d7bf31bb96abdbe23ba062b1627dd408fb9 741B / 741B done
+#8 sha256:e0377c2ff7abcdc6c97cb2199c90686653a8cd550018423341742a489d45a2eb 1.70kB / 1.70kB done
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 0B / 15.08MB 0.1s
+#8 ...
+
+#9 [internal] load build context
+#9 transferring context: 899.29kB 0.5s done
+#9 DONE 0.6s
+
+#8 [base 1/5] FROM armdocker.rnd.ericsson.se/proj-ldc/common_base_os_release/sles:6.14.0-10@sha256:129df8f22980aafd05ac70b06d8e5d7bf31bb96abdbe23ba062b1627dd408fb9
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 0B / 33.20MB 5.3s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 0B / 15.08MB 5.3s
+#8 ...
+
+#10 [base 2/5] ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini /sbin/tini
+#10 ...
+
+#8 [base 1/5] FROM armdocker.rnd.ericsson.se/proj-ldc/common_base_os_release/sles:6.14.0-10@sha256:129df8f22980aafd05ac70b06d8e5d7bf31bb96abdbe23ba062b1627dd408fb9
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 0B / 33.20MB 10.3s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 0B / 15.08MB 10.3s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 1.05MB / 15.08MB 11.1s
+#8 ...
+
+#10 [base 2/5] ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini /sbin/tini
+#10 DONE 11.6s
+
+#8 [base 1/5] FROM armdocker.rnd.ericsson.se/proj-ldc/common_base_os_release/sles:6.14.0-10@sha256:129df8f22980aafd05ac70b06d8e5d7bf31bb96abdbe23ba062b1627dd408fb9
+#8 ...
+
+#10 [base 2/5] ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini /sbin/tini
+#10 CACHED
+
+#11 [builder 5/9] RUN go mod download     && mkdir -p /spark/apache-log4j     && wget -q https://archive.apache.org/dist/spark/spark-3.4.1/spark-3.4.1-bin-hadoop3.tgz     && tar -xzf spark-3.4.1-bin-hadoop3.tgz     && mv spark-3.4.1-bin-hadoop3/* /spark       && rm spark-3.4.1-bin-hadoop3.tgz
+#11 CACHED
+
+#12 [builder 8/9] RUN go mod tidy
+#12 CACHED
+
+#13 [builder 6/9] COPY main.go main.go
+#13 CACHED
+
+#14 [builder 7/9] COPY pkg/ pkg/
+#14 CACHED
+
+#15 [builder 2/9] WORKDIR /workspace
+#15 CACHED
+
+#16 [builder 3/9] COPY go.mod go.mod
+#16 CACHED
+
+#17 [builder 4/9] COPY go.sum go.sum
+#17 CACHED
+
+#18 [builder 9/9] RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o /usr/bin/spark-operator main.go
+#18 CACHED
+
+#8 [base 1/5] FROM armdocker.rnd.ericsson.se/proj-ldc/common_base_os_release/sles:6.14.0-10@sha256:129df8f22980aafd05ac70b06d8e5d7bf31bb96abdbe23ba062b1627dd408fb9
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 2.10MB / 33.20MB 14.1s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 2.10MB / 15.08MB 15.7s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 4.19MB / 33.20MB 17.8s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 3.15MB / 15.08MB 17.9s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 6.29MB / 33.20MB 19.8s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 4.19MB / 15.08MB 19.9s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 8.39MB / 33.20MB 21.0s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 5.24MB / 15.08MB 21.6s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 10.49MB / 33.20MB 21.9s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 12.58MB / 33.20MB 22.6s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 14.68MB / 33.20MB 23.3s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 6.29MB / 15.08MB 23.5s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 16.78MB / 33.20MB 24.2s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 18.87MB / 33.20MB 24.9s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 7.34MB / 15.08MB 25.1s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 20.97MB / 33.20MB 25.7s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 23.07MB / 33.20MB 26.4s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 8.39MB / 15.08MB 26.4s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 25.17MB / 33.20MB 27.0s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 9.44MB / 15.08MB 27.6s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 27.26MB / 33.20MB 27.8s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 29.36MB / 33.20MB 28.3s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 10.49MB / 15.08MB 28.3s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 31.46MB / 33.20MB 28.9s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 11.53MB / 15.08MB 29.1s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 33.20MB / 33.20MB 29.5s
+#8 sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 33.20MB / 33.20MB 29.5s done
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 12.58MB / 15.08MB 29.9s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 13.63MB / 15.08MB 30.6s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 14.68MB / 15.08MB 31.2s
+#8 sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 15.08MB / 15.08MB 31.5s done
+#8 extracting sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 0.1s
+#8 extracting sha256:80a38e635e7c1b0fd5e236edfdb59779e210d49aaedba2d6d1acd8e4e82528bd 1.2s done
+#8 extracting sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448
+#8 extracting sha256:2aae1c37e8433af4ec266e3f02f488c14f11b53831768e66545e0490c6029448 0.7s done
+#8 DONE 34.3s
+
+#19 [base 2/5] ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini /sbin/tini
+#19 DONE 0.9s
+
+#20 [base 3/5] RUN chmod +x /sbin/tini
+#20 DONE 4.2s
+
+#21 [base 4/5] RUN set -ex;                                                          echo "mxe:x:1000:1000::/home/mxe:/bin/bash" >> /etc/passwd;       echo "mxe:x:1000:" >> /etc/group;                                 mkdir -p /home/mxe;                                               chown mxe:mxe /home/mxe
+#21 6.446 + echo mxe:x:1000:1000::/home/mxe:/bin/bash
+#21 6.453 + echo mxe:x:1000:
+#21 6.458 + mkdir -p /home/mxe
+#21 6.459 + chown mxe:mxe /home/mxe
+#21 DONE 6.5s
+
+#22 [base 5/5] RUN set -ex;                                                                                                    update-ca-certificates;                                                                                     zypper addrepo --gpgcheck-strict --refresh https://arm.sero.gic.ericsson.se/artifactory/proj-ldc-repo-rpm-local/adp-dev/adp-build-env/6.14.0-10 CBO_DEVEL;             zypper addrepo --gpgcheck-strict --refresh https://arm.sero.gic.ericsson.se/artifactory/proj-ldc-repo-rpm-local/common_base_os/sles/6.14.0-10 CBO_RUNTIME;           zypper addrepo --gpgcheck-strict --refresh https://arm.sero.gic.ericsson.se/artifactory/proj-ldc-repo-rpm-local/common_base_os/sles/6.14.0-10_devel CBO_HEADERS;     zypper --gpg-auto-import-keys refresh;                                                                      zypper update --auto-agree-with-licenses --no-confirm;                                                      zypper install --auto-agree-with-licenses --no-confirm wget curl;                                           curl -L0 -k --output /usr/share/pki/trust/anchors/EGADIssuingCA3.crt  http://pki.ericsson.se/CertData/EGADIssuingCA3.crt;      curl -L0 -k --output /usr/share/pki/trust/anchors/EGADRootCA.crt http://pki.ericsson.se/CertData/EGADRootCA.crt;               zypper clean --all
+#22 6.917 + update-ca-certificates
+#22 7.123 + zypper addrepo --gpgcheck-strict --refresh https://arm.sero.gic.ericsson.se/artifactory/proj-ldc-repo-rpm-local/adp-dev/adp-build-env/6.14.0-10 CBO_DEVEL
+#22 7.220 Adding repository 'CBO_DEVEL' [...done]
+#22 7.231 Repository 'CBO_DEVEL' successfully added
+#22 7.231 
+#22 7.231 URI         : https://arm.sero.gic.ericsson.se/artifactory/proj-ldc-repo-rpm-local/adp-dev/adp-build-env/6.14.0-10
+#22 7.231 Enabled     : Yes
+#22 7.231 GPG Check   : Yes
+#22 7.231 Autorefresh : Yes
+#22 7.231 Priority    : 99 (default priority)
+#22 7.231 
+#22 7.231 Repository priorities are without effect. All enabled repositories share the same priority.
+#22 7.234 + zypper addrepo --gpgcheck-strict --refresh https://arm.sero.gic.ericsson.se/artifactory/proj-ldc-repo-rpm-local/common_base_os/sles/6.14.0-10 CBO_RUNTIME
+#22 7.486 Adding repository 'CBO_RUNTIME' [...done]
+#22 7.487 Repository 'CBO_RUNTIME' successfully added
+#22 7.487 
+#22 7.487 URI         : https://arm.sero.gic.ericsson.se/artifactory/proj-ldc-repo-rpm-local/common_base_os/sles/6.14.0-10
+#22 7.487 Enabled     : Yes
+#22 7.487 GPG Check   : Yes
+#22 7.487 Autorefresh : Yes
+#22 7.487 Priority    : 99 (default priority)
+#22 7.487 
+#22 7.488 Repository priorities are without effect. All enabled repositories share the same priority.
+#22 7.490 + zypper addrepo --gpgcheck-strict --refresh https://arm.sero.gic.ericsson.se/artifactory/proj-ldc-repo-rpm-local/common_base_os/sles/6.14.0-10_devel CBO_HEADERS
+#22 7.763 Adding repository 'CBO_HEADERS' [...done]
+#22 7.764 Repository 'CBO_HEADERS' successfully added
+#22 7.764 
+#22 7.764 URI         : https://arm.sero.gic.ericsson.se/artifactory/proj-ldc-repo-rpm-local/common_base_os/sles/6.14.0-10_devel
+#22 7.764 Enabled     : Yes
+#22 7.764 GPG Check   : Yes
+#22 7.764 Autorefresh : Yes
+#22 7.764 Priority    : 99 (default priority)
+#22 7.764 
+#22 7.764 Repository priorities are without effect. All enabled repositories share the same priority.
+#22 7.767 + zypper --gpg-auto-import-keys refresh
+#22 8.041 Retrieving repository 'CBO_DEVEL' metadata [............................................
+#22 38.63 
+#22 38.63 Automatically importing the following key:
+#22 38.63 
+#22 38.63   Repository:       CBO_DEVEL
+#22 38.63   Key Fingerprint:  EB30 96D0 1DB6 C9E8 7E41 1860 E5F1 7AB0 A1C6 5DBA
+#22 38.63   Key Name:         ARM SEKI (Debian repositories) <nathalie.leong@ericsson.com>
+#22 38.63   Key Algorithm:    RSA 2048
+#22 38.63   Key Created:      Tue 31 May 2016 11:07:57 PM UTC
+#22 38.63   Key Expires:      (does not expire)
+#22 38.63   Subkey:           BB0CD369BB397FCD 2016-05-31 [does not expire]
+#22 38.63   Rpm Name:         gpg-pubkey-a1c65dba-574e194d
+#22 38.63 
+#22 38.63 
+#22 38.63 
+#22 38.63     Note: A GPG pubkey is clearly identified by its fingerprint. Do not rely on the key's name. If
+#22 38.63     you are not sure whether the presented key is authentic, ask the repository provider or check
+#22 38.63     their web site. Many providers maintain a web page showing the fingerprints of the GPG keys they
+#22 38.63     are using.
+#22 38.81 .........................done]
+#22 46.14 Building repository 'CBO_DEVEL' cache [....done]
+#22 46.26 Retrieving repository 'CBO_HEADERS' metadata [....................................................................done]
+#22 83.55 Building repository 'CBO_HEADERS' cache [...done]
+#22 83.63 Retrieving repository 'CBO_RUNTIME' metadata [.......................................................................done]
+#22 121.4 Building repository 'CBO_RUNTIME' cache [...done]
+#22 121.4 All repositories have been refreshed.
+#22 121.4 + zypper update --auto-agree-with-licenses --no-confirm
+#22 121.7 Loading repository data...
+#22 121.7 Reading installed packages...
+#22 121.7 Nothing to do.
+#22 121.7 + zypper install --auto-agree-with-licenses --no-confirm wget curl
+#22 121.9 Loading repository data...
+#22 122.0 Reading installed packages...
+#22 122.0 Resolving package dependencies...
+#22 122.0 
+#22 122.0 The following 5 NEW packages are going to be installed:
+#22 122.0   curl libcares2 libmetalink3 libpcre2-8-0 wget
+#22 122.0 
+#22 122.0 The following 5 packages have no support information from their vendor:
+#22 122.0   curl libcares2 libmetalink3 libpcre2-8-0 wget
+#22 122.0 
+#22 122.0 5 new packages to install.
+#22 122.0 Overall download size: 1.3 MiB. Already cached: 0 B. After the operation, additional 2.6 MiB will be used.
+#22 122.0 
+#22 122.0 Backend:  classic_rpmtrans
+#22 122.0 Continue? [y/n/v/...? shows all options] (y): y
+#22 122.0 Retrieving: libmetalink3-0.1.3-150000.3.2.1.x86_64 (CBO_DEVEL) (1/5),  27.6 KiB    
+#22 122.0 Retrieving: libmetalink3-0.1.3-150000.3.2.1.x86_64.rpm [.....................done (3.3 KiB/s)]
+#22 128.7 Retrieving: curl-8.0.1-150400.5.44.1.x86_64 (CBO_DEVEL) (2/5), 549.6 KiB    
+#22 128.7 Retrieving: curl-8.0.1-150400.5.44.1.x86_64.rpm [........................done (58.2 KiB/s)]
+#22 135.9 Retrieving: libpcre2-8-0-10.39-150400.4.9.1.x86_64 (CBO_DEVEL) (3/5), 342.5 KiB    
+#22 135.9 Retrieving: libpcre2-8-0-10.39-150400.4.9.1.x86_64.rpm [.......................done (28.5 KiB/s)]
+#22 142.9 Retrieving: libcares2-1.19.1-150000.3.26.1.x86_64 (CBO_DEVEL) (4/5),  61.2 KiB    
+#22 142.9 Retrieving: libcares2-1.19.1-150000.3.26.1.x86_64.rpm [.......................done (6.5 KiB/s)]
+#22 149.4 Retrieving: wget-1.20.3-150000.3.17.1.x86_64 (CBO_DEVEL) (5/5), 386.9 KiB    
+#22 149.4 Retrieving: wget-1.20.3-150000.3.17.1.x86_64.rpm [.......................done (37.6 KiB/s)]
+#22 156.3 
+#22 156.3 Checking for file conflicts: [..done]
+#22 156.3 (1/5) Installing: libmetalink3-0.1.3-150000.3.2.1.x86_64 [..done]
+#22 156.4 (2/5) Installing: curl-8.0.1-150400.5.44.1.x86_64 [..done]
+#22 156.4 (3/5) Installing: libpcre2-8-0-10.39-150400.4.9.1.x86_64 [..done]
+#22 156.5 (4/5) Installing: libcares2-1.19.1-150000.3.26.1.x86_64 [..done]
+#22 156.5 (5/5) Installing: wget-1.20.3-150000.3.17.1.x86_64 [..
+#22 156.6 install-info: No such file or directory for /usr/share/info/wget.info.gz
+#22 156.6 done]
+#22 156.6 + curl -L0 -k --output /usr/share/pki/trust/anchors/EGADIssuingCA3.crt http://pki.ericsson.se/CertData/EGADIssuingCA3.crt
+#22 156.6   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+#22 156.6                                  Dload  Upload   Total   Spent    Left  Speed
+#22 156.6   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:05 --:--:--     0100  2358  100  2358    0     0    395      0  0:00:05  0:00:05 --:--:--   563
+#22 162.6 + curl -L0 -k --output /usr/share/pki/trust/anchors/EGADRootCA.crt http://pki.ericsson.se/CertData/EGADRootCA.crt
+#22 162.6   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+#22 162.6                                  Dload  Upload   Total   Spent    Left  Speed
+#22 162.6   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:03 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0100  2004  100  2004    0     0    361      0  0:00:05  0:00:05 --:--:--   426
+#22 168.1 + zypper clean --all
+#22 168.4 All repositories have been cleaned up.
+#22 DONE 169.0s
+
+#23 [spark-operator  1/11] RUN zypper --gpg-auto-import-keys refresh                                                                           && zypper update --auto-agree-with-licenses --no-confirm                                                        && zypper install --auto-agree-with-licenses --no-confirm java-1_8_0-openjdk-headless openssl     && zypper clean --all
+#23 8.372 Retrieving repository 'CBO_DEVEL' metadata [.....................................................................done]
+#23 46.00 Building repository 'CBO_DEVEL' cache [....done]
+#23 46.14 Retrieving repository 'CBO_HEADERS' metadata [...................................................................done]
+#23 83.90 Building repository 'CBO_HEADERS' cache [...done]
+#23 83.98 Retrieving repository 'CBO_RUNTIME' metadata [...............................................................................done]
+#23 125.7 Building repository 'CBO_RUNTIME' cache [...done]
+#23 125.8 All repositories have been refreshed.
+#23 126.2 Loading repository data...
+#23 126.2 Reading installed packages...
+#23 126.2 Nothing to do.
+#23 126.3 Loading repository data...
+#23 126.3 Reading installed packages...
+#23 126.3 Resolving package dependencies...
+#23 126.3 
+#23 126.3 The following 17 NEW packages are going to be installed:
+#23 126.3   fontconfig java-1_8_0-openjdk-headless javapackages-filesystem javapackages-tools libfontconfig1 libfreebl3 libfreetype6 libjpeg8 liblcms2-2 libpcsclite1 libpng16-16 libsoftokn3 lksctp-tools mozilla-nspr mozilla-nss mozilla-nss-certs openssl
+#23 126.3 
+#23 126.3 The following 17 packages have no support information from their vendor:
+#23 126.3   fontconfig java-1_8_0-openjdk-headless javapackages-filesystem javapackages-tools libfontconfig1 libfreebl3 libfreetype6 libjpeg8 liblcms2-2 libpcsclite1 libpng16-16 libsoftokn3 lksctp-tools mozilla-nspr mozilla-nss mozilla-nss-certs openssl
+#23 126.3 
+#23 126.3 17 new packages to install.
+#23 126.3 Overall download size: 54.5 MiB. Already cached: 0 B. After the operation, additional 96.0 MiB will be used.
+#23 126.3 
+#23 126.3 Backend:  classic_rpmtrans
+#23 126.3 Continue? [y/n/v/...? shows all options] (y): y
+#23 126.4 Retrieving: javapackages-filesystem-6.2.0-150200.3.12.1.x86_64 (CBO_DEVEL) (1/17),  21.6 KiB    
+#23 126.4 Retrieving: javapackages-filesystem-6.2.0-150200.3.12.1.x86_64.rpm [......................done (1.1 KiB/s)]
+#23 132.8 Retrieving: openssl-1.1.1l-150400.1.5.noarch (CBO_DEVEL) (2/17),  25.7 KiB    
+#23 132.8 Retrieving: openssl-1.1.1l-150400.1.5.noarch.rpm [.....................done (4.3 KiB/s)]
+#23 138.8 Retrieving: libjpeg8-8.2.2-150400.15.9.x86_64 (CBO_DEVEL) (3/17), 170.4 KiB    
+#23 138.8 Retrieving: libjpeg8-8.2.2-150400.15.9.x86_64.rpm [.......................done (20.5 KiB/s)]
+#23 145.9 Retrieving: liblcms2-2-2.12-150400.1.10.x86_64 (CBO_DEVEL) (4/17), 146.1 KiB    
+#23 145.9 Retrieving: liblcms2-2-2.12-150400.1.10.x86_64.rpm [.......................done (13.6 KiB/s)]
+#23 152.3 Retrieving: libpcsclite1-1.9.4-150400.1.9.x86_64 (CBO_DEVEL) (5/17),  32.8 KiB    
+#23 152.3 Retrieving: libpcsclite1-1.9.4-150400.1.9.x86_64.rpm [...................done (2.7 KiB/s)]
+#23 158.3 Retrieving: libpng16-16-1.6.34-3.9.1.x86_64 (CBO_DEVEL) (6/17), 134.2 KiB    
+#23 158.3 Retrieving: libpng16-16-1.6.34-3.9.1.x86_64.rpm [.....................done (17.2 KiB/s)]
+#23 165.1 Retrieving: libfreebl3-3.90.2-150400.3.39.1.x86_64 (CBO_DEVEL) (7/17), 416.6 KiB    
+#23 165.1 Retrieving: libfreebl3-3.90.2-150400.3.39.1.x86_64.rpm [..............................done (41.7 KiB/s)]
+#23 174.3 Retrieving: mozilla-nspr-4.35-150000.3.29.1.x86_64 (CBO_DEVEL) (8/17), 117.5 KiB    
+#23 174.3 Retrieving: mozilla-nspr-4.35-150000.3.29.1.x86_64.rpm [.....................done (15.9 KiB/s)]
+#23 180.8 Retrieving: javapackages-tools-6.2.0-150200.3.12.1.x86_64 (CBO_DEVEL) (9/17),  41.8 KiB    
+#23 180.8 Retrieving: javapackages-tools-6.2.0-150200.3.12.1.x86_64.rpm [.......................done (7.0 KiB/s)]
+#23 187.3 Retrieving: libfreetype6-2.10.4-150000.4.15.1.x86_64 (CBO_DEVEL) (10/17), 447.3 KiB    
+#23 187.3 Retrieving: libfreetype6-2.10.4-150000.4.15.1.x86_64.rpm [.........................done (58.2 KiB/s)]
+#23 194.4 Retrieving: mozilla-nss-certs-3.90.2-150400.3.39.1.x86_64 (CBO_DEVEL) (11/17), 302.0 KiB    
+#23 194.4 Retrieving: mozilla-nss-certs-3.90.2-150400.3.39.1.x86_64.rpm [......................done (31.9 KiB/s)]
+#23 201.1 Retrieving: fontconfig-2.13.1-150400.1.4.x86_64 (CBO_DEVEL) (12/17),  72.7 KiB    
+#23 201.1 Retrieving: fontconfig-2.13.1-150400.1.4.x86_64.rpm [.....................done (5.6 KiB/s)]
+#23 207.5 Retrieving: libfontconfig1-2.13.1-150400.1.4.x86_64 (CBO_DEVEL) (13/17), 118.6 KiB    
+#23 207.5 Retrieving: libfontconfig1-2.13.1-150400.1.4.x86_64.rpm [.....................done (14.5 KiB/s)]
+#23 214.2 Retrieving: mozilla-nss-3.90.2-150400.3.39.1.x86_64 (CBO_DEVEL) (14/17), 768.9 KiB    
+#23 214.2 Retrieving: mozilla-nss-3.90.2-150400.3.39.1.x86_64.rpm [.........................done (79.9 KiB/s)]
+#23 221.8 Retrieving: libsoftokn3-3.90.2-150400.3.39.1.x86_64 (CBO_DEVEL) (15/17), 303.2 KiB    
+#23 221.8 Retrieving: libsoftokn3-3.90.2-150400.3.39.1.x86_64.rpm [......................done (27.3 KiB/s)]
+#23 228.6 Retrieving: lksctp-tools-1.0.17-150000.3.3.1.x86_64 (CBO_RUNTIME) (16/17), 248.0 KiB    
+#23 228.6 Retrieving: lksctp-tools-1.0.17-150000.3.3.1.x86_64.rpm [.......................done (25.0 KiB/s)]
+#23 235.8 Retrieving: java-1_8_0-openjdk-headless-1.8.0.412-150000.3.91.1.x86_64 (CBO_RUNTIME) (17/17),  51.2 MiB    
+#23 235.8 Retrieving: java-1_8_0-openjdk-headless-1.8.0.412-150000.3.91.1.x86_64.rpm [.................................................................done (4.2 MiB/s)]
+#23 248.3 
+#23 248.3 Checking for file conflicts: [..done]
+#23 248.4 ( 1/17) Installing: javapackages-filesystem-6.2.0-150200.3.12.1.x86_64 [..done]
+#23 248.6 ( 2/17) Installing: openssl-1.1.1l-150400.1.5.noarch [..done]
+#23 248.6 ( 3/17) Installing: libjpeg8-8.2.2-150400.15.9.x86_64 [..done]
+#23 248.6 ( 4/17) Installing: liblcms2-2-2.12-150400.1.10.x86_64 [..done]
+#23 248.7 ( 5/17) Installing: libpcsclite1-1.9.4-150400.1.9.x86_64 [..done]
+#23 248.7 ( 6/17) Installing: libpng16-16-1.6.34-3.9.1.x86_64 [..done]
+#23 248.8 ( 7/17) Installing: libfreebl3-3.90.2-150400.3.39.1.x86_64 [..done]
+#23 248.8 ( 8/17) Installing: mozilla-nspr-4.35-150000.3.29.1.x86_64 [..done]
+#23 248.8 ( 9/17) Installing: javapackages-tools-6.2.0-150200.3.12.1.x86_64 [..done]
+#23 248.9 (10/17) Installing: libfreetype6-2.10.4-150000.4.15.1.x86_64 [..done]
+#23 248.9 (11/17) Installing: mozilla-nss-certs-3.90.2-150400.3.39.1.x86_64 [..done]
+#23 249.0 (12/17) Installing: fontconfig-2.13.1-150400.1.4.x86_64 [..done]
+#23 249.0 (13/17) Installing: libfontconfig1-2.13.1-150400.1.4.x86_64 [..done]
+#23 249.0 (14/17) Installing: mozilla-nss-3.90.2-150400.3.39.1.x86_64 [..done]
+#23 249.1 (15/17) Installing: libsoftokn3-3.90.2-150400.3.39.1.x86_64 [..done]
+#23 249.2 (16/17) Installing: lksctp-tools-1.0.17-150000.3.3.1.x86_64 [..done]
+#23 249.2 (17/17) Installing: java-1_8_0-openjdk-headless-1.8.0.412-150000.3.91.1.x86_64 [...................................
+#23 252.7 update-alternatives: using /usr/lib64/jvm/jre-1.8.0-openjdk/bin/java to provide /usr/bin/java (java) in auto mode
+#23 252.7 update-alternatives: warning: skip creation of /usr/share/man/man1/java.1.gz because associated file /usr/share/man/man1/java-java-1.8.0-openjdk.1.gz (of link group java) doesn't exist
+#23 252.7 update-alternatives: warning: skip creation of /usr/share/man/man1/keytool.1.gz because associated file /usr/share/man/man1/keytool-java-1.8.0-openjdk.1.gz (of link group java) doesn't exist
+#23 252.7 update-alternatives: warning: skip creation of /usr/share/man/man1/orbd.1.gz because associated file /usr/share/man/man1/orbd-java-1.8.0-openjdk.1.gz (of link group java) doesn't exist
+#23 252.7 update-alternatives: warning: skip creation of /usr/share/man/man1/policytool.1.gz because associated file /usr/share/man/man1/policytool-java-1.8.0-openjdk.1.gz (of link group java) doesn't exist
+#23 252.7 update-alternatives: warning: skip creation of /usr/share/man/man1/rmid.1.gz because associated file /usr/share/man/man1/rmid-java-1.8.0-openjdk.1.gz (of link group java) doesn't exist
+#23 252.7 update-alternatives: warning: skip creation of /usr/share/man/man1/rmiregistry.1.gz because associated file /usr/share/man/man1/rmiregistry-java-1.8.0-openjdk.1.gz (of link group java) doesn't exist
+#23 252.7 update-alternatives: warning: skip creation of /usr/share/man/man1/servertool.1.gz because associated file /usr/share/man/man1/servertool-java-1.8.0-openjdk.1.gz (of link group java) doesn't exist
+#23 252.7 update-alternatives: warning: skip creation of /usr/share/man/man1/tnameserv.1.gz because associated file /usr/share/man/man1/tnameserv-java-1.8.0-openjdk.1.gz (of link group java) doesn't exist
+#23 252.7 update-alternatives: warning: skip creation of /usr/share/man/man1/pack200.1.gz because associated file /usr/share/man/man1/pack200-java-1.8.0-openjdk.1.gz (of link group java) doesn't exist
+#23 252.7 update-alternatives: warning: skip creation of /usr/share/man/man1/unpack200.1.gz because associated file /usr/share/man/man1/unpack200-java-1.8.0-openjdk.1.gz (of link group java) doesn't exist
+#23 252.7 update-alternatives: using /usr/lib64/jvm/jre-1.8.0-openjdk to provide /usr/lib64/jvm/jre-openjdk (jre_openjdk) in auto mode
+#23 252.7 update-alternatives: using /usr/lib64/jvm/jre-1.8.0-openjdk to provide /usr/lib64/jvm/jre-1.8.0 (jre_1.8.0) in auto mode
+#23 252.7 done]
+#23 252.7 Running post-transaction scripts [..
+#23 252.7 %posttrans(java-1_8_0-openjdk-headless-1.8.0.412-150000.3.91.1.x86_64) script output:
+#23 252.7 /var/adm/update-scripts/posttransvmcO8w/java-1_8_0-openjdk-headless-1.8.0.412-150000.3.91.1.x86_64HyYRwv: line 7: /usr/bin/file: No such file or directory
+#23 252.9 /var/adm/update-scripts/posttransvmcO8w/java-1_8_0-openjdk-headless-1.8.0.412-150000.3.91.1.x86_64HyYRwv: line 19: /usr/bin/file: No such file or directory
+#23 252.9 ..done]
+#23 253.1 All repositories have been cleaned up.
+#23 DONE 254.4s
+
+#24 [spark-operator  2/11] COPY --from=builder /spark/jars/spark*     /spark/jars/scala-library*     /spark/jars/hadoop*     /spark/jars/commons*     /spark/jars/kubernetes*     /spark/jars/stax*     /spark/jars/woodstox*     /spark/jars/okhttp*     /spark/jars/okio*     /spark/jars/logging*     /spark/jars/json4s*     /spark/jars/jackson*     /spark/jars/log4j*     /spark/jars/guava*     /spark/jars/ivy*     /spark/jars/snakeyaml*     /spark/jars/slf4j*     /spark/jars/jcl-over-slf4j-2.0.6.jar     /spark/jars/jul-to-slf4j-2.0.6.jar     /opt/spark/jars/
+#24 DONE 1.1s
+
+#25 [spark-operator  3/11] RUN chown mxe:mxe /opt/spark/jars/*jar
+#25 DONE 8.0s
+
+#26 [spark-operator  4/11] COPY --from=builder /spark/bin /opt/spark/bin/
+#26 DONE 0.2s
+
+#27 [spark-operator  5/11] COPY --from=builder /spark/sbin /opt/spark/sbin/
+#27 DONE 0.2s
+
+#28 [spark-operator  6/11] COPY --from=builder /spark/kubernetes/tests /opt/spark/tests/
+#28 DONE 0.2s
+
+#29 [spark-operator  7/11] COPY --from=builder /spark/examples /opt/spark/examples/
+#29 DONE 0.4s
+
+#30 [spark-operator  8/11] COPY --from=builder /usr/bin/spark-operator /usr/bin/
+#30 DONE 0.6s
+
+#31 [spark-operator  9/11] COPY hack/gencerts.sh /usr/bin/
+#31 DONE 0.1s
+
+#32 [spark-operator 10/11] COPY entrypoint.sh /usr/bin/
+#32 DONE 0.1s
+
+#33 [spark-operator 11/11] RUN sed -i s@/usr/bin/tini@/sbin/tini@g /usr/bin/entrypoint.sh
+#33 DONE 5.3s
+
+#34 exporting to image
+#34 exporting layers
+#34 exporting layers 1.4s done
+#34 writing image sha256:0542417befafb82902680b592a1c9bc59056faff2e23cf2dc880874b569619ee done
+#34 naming to armdocker.rnd.ericsson.se/proj-mxe/spark/spark-operator:6.14.0-10-1.1.27-01 0.0s done
+#34 DONE 1.5s
+The push refers to repository [armdocker.rnd.ericsson.se/proj-mxe/spark/spark-operator]
+fdf9760b44e9: Preparing
+e4091cb853d4: Preparing
+117af1c887d4: Preparing
+4b191982e2ca: Preparing
+65ab3ddfbfd0: Preparing
+e14d068d7667: Preparing
+b21426ce436e: Preparing
+65a728fd7312: Preparing
+b63096bb8cbd: Preparing
+d37a7a325dab: Preparing
+1cf8d2c9fab2: Preparing
+676ff6f29880: Preparing
+b6afc83097df: Preparing
+4914cc665296: Preparing
+ab38d9c09425: Preparing
+dbfd16625a14: Preparing
+697db960bc50: Preparing
+d37a7a325dab: Waiting
+1cf8d2c9fab2: Waiting
+676ff6f29880: Waiting
+b6afc83097df: Waiting
+4914cc665296: Waiting
+ab38d9c09425: Waiting
+dbfd16625a14: Waiting
+697db960bc50: Waiting
+b21426ce436e: Waiting
+65a728fd7312: Waiting
+b63096bb8cbd: Waiting
+e14d068d7667: Waiting
+e4091cb853d4: Pushed
+65ab3ddfbfd0: Pushed
+117af1c887d4: Pushed
+fdf9760b44e9: Pushed
+e14d068d7667: Pushed
+4b191982e2ca: Pushed
+65a728fd7312: Pushed
+b21426ce436e: Pushed
+b63096bb8cbd: Pushed
+b6afc83097df: Pushed
+676ff6f29880: Pushed
+1cf8d2c9fab2: Pushed
+697db960bc50: Layer already exists
+dbfd16625a14: Layer already exists
+4914cc665296: Pushed
+d37a7a325dab: Pushed
+ab38d9c09425: Pushed
+6.14.0-10-1.1.27-01: digest: sha256:0b655ee048926cc2b79494254d05358f6ecbd4c64d5a0cf8a8d6a73a00ab96f5 size: 3884

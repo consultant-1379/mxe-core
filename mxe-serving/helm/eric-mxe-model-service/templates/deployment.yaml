@@ -1,0 +1,168 @@
+{{- $global := fromJson (include "eric-mxe-model-service.global" .) -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "eric-mxe-model-service.name" . }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: model-service"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-model-service.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-model-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-model-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-model-service.annotations" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: "mxe"
+      app.kubernetes.io/component: "model-service"
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+  {{- include "eric-mxe-model-service.update-strategy" . | nindent 2 }}
+  template:
+    metadata:
+      labels:
+      {{- $component := printf "%s" "app.kubernetes.io/component: model-service"  | fromYaml -}}
+      {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-model-service.name" .)  | fromYaml -}}
+      {{- $istioLabels := include "eric-mxe-model-service.istio-sidecar-labels" . | fromYaml -}}
+      {{- $labels := include "eric-mxe-model-service.labels" . | fromYaml -}}
+      {{- include "eric-mxe-model-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $istioLabels $labels )) | trim | nindent 8 }}
+      annotations:
+        {{- $annotations := include "eric-mxe-model-service.annotations" . | fromYaml -}}
+        {{- $istioAnn := include "eric-mxe-model-service.istio-sidecar-annotations" . | fromYaml -}}
+        {{- $productInfoAnn := include "eric-mxe-model-service.product-info" . | fromYaml -}}
+        {{- $prometheusAnn := include "eric-mxe-model-service.prometheus-annotations" . | fromYaml -}}
+        {{- $securityAnn := include "eric-mxe-model-service.security-annotations" . | fromYaml -}}
+        {{- include "eric-mxe-model-service.mergeAnnotations" (dict "location" .Template.Name "sources" (list $annotations $istioAnn $productInfoAnn $prometheusAnn $securityAnn)) | trim | nindent 8 }}
+    spec:
+      {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "eric-mxe-model-service.topologySpreadConstraints" . | trim | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "eric-mxe-model-service.serviceaccount" . | quote }}
+      {{- if include "eric-mxe-model-service.podPriority" . }}
+      priorityClassName: {{- include "eric-mxe-model-service.podPriority" . | indent 2 }}
+      {{- end }}
+      initContainers:
+        - name: init-cacerts
+        # Since CBO image does not include java-certs or jdk, model-service image is being pulled in for a copy of system wide java-certs.
+          {{- with .Values.imageCredentials.modelService }}
+          image: "{{ include "eric-mxe-model-service.setImageRepo" (list $ .registry.url .repoPath "modelService") }}{{ $.Values.images.modelService.name }}:{{ $.Values.images.modelService.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-model-service.registryImagePullPolicy" (list . .Values.imageCredentials.modelService.registry.imagePullPolicy) }}
+          command:
+            - bash
+            - -c
+            - |
+              cp /var/lib/ca-certificates/java-cacerts /cacerts/
+              chmod u+w /cacerts/java-cacerts
+              keytool -noprompt -importcert -alias startssl -keystore /cacerts/java-cacerts -storepass changeit -file /run/secrets/iam-ca-cert/ca.crt
+          {{- include "eric-mxe-model-service.add-externalca-command" . | nindent 14 }}
+          {{- include "eric-mxe-model-service.usercontainer-security-context" . | nindent 10 }}
+          resources:
+            {{- toYaml .Values.resources.cacerts | trim | nindent 12 }}
+          volumeMounts:
+          - mountPath: /cacerts
+            name: cacerts
+          - name: iam-ca-cert
+            mountPath: /run/secrets/iam-ca-cert
+          {{- include "eric-mxe-model-service.add-externalca-volume-mounts" . | nindent 10 }}
+        - name: {{ printf "%s-%s" .Chart.Name "kubectl" | trunc 63 | trimSuffix "-" }}
+          {{- with (index .Values "imageCredentials" "kubernetes-modifier") }}
+          image: "{{ include "eric-mxe-model-service.setImageRepo" (list $ .registry.url .repoPath "kubernetes-modifier") }}{{ index $.Values "images" "kubernetes-modifier" "name" }}:{{ index $.Values "images" "kubernetes-modifier" "tag" }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-model-service.registryImagePullPolicy" (list . (index .Values "imageCredentials" "kubernetes-modifier" "registry" "imagePullPolicy")) }}
+          {{- include "eric-mxe-model-service.initcontainer-security-context" . | nindent 10 }}
+          env:
+            - name: KEYCLOAK_STATEFULSET_NAME
+              value: {{ .Values.keycloak.statefulset.name | quote }}
+            - name: KEYCLOAK_STATEFULSET_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            {{- toYaml .Values.resources.kubernetesModifier | trim | nindent 12 }}
+          volumeMounts:
+            - mountPath: "/etc/kubernetes-run-script/"
+              name: wait-for-keycloak-script
+      containers:
+        - name: {{ .Chart.Name | quote }}
+          {{- with .Values.imageCredentials.modelService }}
+          image: "{{ include "eric-mxe-model-service.setImageRepo" (list $ .registry.url .repoPath "modelService") }}{{ $.Values.images.modelService.name }}:{{ $.Values.images.modelService.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-model-service.registryImagePullPolicy" (list . .Values.imageCredentials.modelService.registry.imagePullPolicy) }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: mgmt
+              containerPort: 8081
+              protocol: TCP
+          env:
+            - name: MODEL_CATALOGUE_SERVICE_SERVICE_NAME
+              value: {{ include "eric-mxe-model-service.model-catalogue-service-name" . }}
+            - name: MODEL_CATALOGUE_SERVICE_PORT_NAME
+              value: {{ .Values.modelCatalogueService.portName }}
+            - name: DOCKER_REGISTRY_HOSTNAME
+              value: {{ include "eric-mxe-model-service.docker-registry-full-host" . }}
+            - name: DOCKER_REGISTRY_SECRET_NAME
+              value: {{ include "eric-mxe-model-service.docker-registry-secret-name" . }}
+            - name: SELDON_CRD_NAME
+              value: {{ include "eric-mxe-model-service.seldon-crd-name" . | quote }}
+            - name: SELDON_ENGINE_SERVICE_ACCOUNT_NAME
+              value: {{ include "eric-mxe-model-service.seldon-service-account-name" . | quote }}
+            - name: SERVER_TOMCAT_CONNECTION_TIMEOUT
+              value: {{ .Values.tomcat.connectionTimeout | quote }}
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI
+              value: "{{ include "eric-mxe-model-service.oauth-api-host-path-url" . }}/auth/realms/mxe/protocol/openid-connect/certs"
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              value: "{{ include "eric-mxe-model-service.oauth-api-host-path-url" . }}/auth/realms/mxe"
+            - name: SERVICE_MESH_MTLS_ENABLED
+              value: {{ .Values.global.serviceMesh.enabled | quote }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: mgmt
+            initialDelaySeconds: {{ .Values.probes.modelService.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.modelService.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.probes.modelService.livenessProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.probes.modelService.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: mgmt
+            initialDelaySeconds: {{ .Values.probes.modelService.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.modelService.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.probes.modelService.readinessProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.probes.modelService.readinessProbe.timeoutSeconds }}
+          resources:
+            {{- toYaml .Values.resources.modelService | trim | nindent 12 }}
+          {{- include "eric-mxe-model-service.usercontainer-security-context" . | nindent 10 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: cacerts
+              mountPath: /var/lib/ca-certificates
+            - name: log-control
+              mountPath: /app/config/logcontrol
+            {{- include "eric-mxe-model-service.pg-cert-volume-mounts" . | nindent 12 }} 
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: cacerts
+          emptyDir: {}
+        - name: log-control
+          configMap:
+            name: {{ include "eric-mxe-model-service.log-control-configmap" . | quote }}
+        - name: wait-for-keycloak-script
+          configMap:
+            name: {{ include "eric-mxe-model-service.wait-for-keycloak-configmap" . | quote }}
+        - name: iam-ca-cert
+          secret:
+            secretName: {{ include "eric-mxe-model-service.iam-ca-cert-name" . | quote }}
+        {{- include "eric-mxe-model-service.pg-cert-volumes" . | nindent 8 }}            
+      {{- include "eric-mxe-model-service.image-pull-secrets" . | nindent 6 }}
+      {{- if (or .Values.nodeSelector $global.nodeSelector) }}
+      nodeSelector: {{- include "eric-mxe-model-service.nodeSelector" . | nindent 8 }}
+      {{- end }}
+      affinity:
+        {{- tpl (toYaml .Values.affinity) . | nindent 8 }}
+      tolerations: {{ include "eric-mxe-model-service.merge-tolerations" (dict "root" . "podbasename" "eric-mxe-model-service") | nindent 8}}

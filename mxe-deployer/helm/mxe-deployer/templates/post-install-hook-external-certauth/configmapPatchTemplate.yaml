@@ -1,0 +1,21 @@
+{{- if .Values.mxeGitea.isExtCA -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "post-install-hook-external-certauth-configmap-patchtemplate"
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "post-install-hook-external-certauth-configmap-patchtemplate"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: "post-install-hook-external-certauth-configmap-patchtemplate"
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-deployer.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- include "mxe-deployer.product-info" . | nindent 4 }}
+data:
+  gitea-deployment-patch.yaml-template: |
+    {{- (.Files.Get "files/post-install-hook-external-certauth/gitea-deployment-patch.yaml-template") | nindent 4 }}
+  argocd-deployment-patch.yaml-template: |
+    {{- (.Files.Get "files/post-install-hook-external-certauth/argocd-deployment-patch.yaml-template") | nindent 4 }}
+{{- end -}}

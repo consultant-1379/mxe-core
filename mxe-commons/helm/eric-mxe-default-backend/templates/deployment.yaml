@@ -1,0 +1,86 @@
+{{- $global := fromJson (include "eric-mxe-default-backend.global" .) -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "eric-mxe-default-backend.fullname" . | quote }}
+  labels:
+    {{- include "eric-mxe-default-backend.labels" . | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-default-backend.annotations" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: "mxe"
+      app.kubernetes.io/component: "default-backend"
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+  {{- include "eric-mxe-default-backend.update-strategy" . | nindent 2 }}
+  template:
+    metadata:
+      labels:
+        {{- $labels := include "eric-mxe-default-backend.labels" . | fromYaml -}}
+        {{- $istioLabels := include "eric-mxe-default-backend.istio-sidecar-labels" . | fromYaml -}}
+        {{- include "eric-mxe-default-backend.mergeLabels" (dict "location" .Template.Name "sources" (list $labels $istioLabels )) | trim | nindent 8 }}
+      annotations:
+        {{- $defaultBackendAnn := include "eric-mxe-default-backend.annotations" . | fromYaml -}}
+        {{- $productInfoAnn := include "eric-mxe-default-backend.product-info" . | fromYaml -}}
+        {{- $istioAnn := include "eric-mxe-default-backend.istio-sidecar-annotations" . | fromYaml -}}
+        {{- $securityAnn := include "eric-mxe-default-backend.security-annotations" . | fromYaml -}}
+        {{- $prometheusAnn := include "eric-mxe-default-backend.prometheus-annotations" . | fromYaml -}}
+        {{- include "eric-mxe-default-backend.mergeAnnotations" (dict "location" .Template.Name "sources" (list $defaultBackendAnn $istioAnn $productInfoAnn $securityAnn $prometheusAnn)) | trim | nindent 8 }}
+    spec:
+      {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "eric-mxe-default-backend.topologySpreadConstraints" . | trim | nindent 8 }}
+      {{- end }}
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- if include "eric-mxe-default-backend.podPriority" . }}
+      priorityClassName: {{- include "eric-mxe-default-backend.podPriority" . | indent 2 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name | quote }}
+          {{- with .Values.imageCredentials.defaultBackend }}
+          image: "{{ include "eric-mxe-default-backend.setImageRepo" (list $ .registry.url .repoPath "defaultBackend") }}{{ $.Values.images.defaultBackend.name }}:{{ $.Values.images.defaultBackend.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-default-backend.registryImagePullPolicy" (list . .Values.imageCredentials.defaultBackend.registry.imagePullPolicy) | quote }}
+          {{- include "eric-mxe-default-backend.container-security-context" . | nindent 10 }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: mgmt
+              containerPort: 8081
+              protocol: TCP
+          volumeMounts:
+          - name: tmp
+            mountPath: /tmp
+          {{- include "eric-mxe-default-backend.pg-cert-volume-mounts" . | nindent 10 }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: mgmt
+            initialDelaySeconds: {{ .Values.probes.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.probes.livenessProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.probes.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: mgmt
+            initialDelaySeconds: {{ .Values.probes.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.probes.readinessProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.probes.readinessProbe.timeoutSeconds }}
+          resources:
+            {{- toYaml .Values.resources.defaultBackend | trim | nindent 12 -}}
+      {{- include "eric-mxe-default-backend.image-pull-secrets" . | nindent 6 }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        {{- include "eric-mxe-default-backend.pg-cert-volumes" . | nindent 8 }}
+      {{- if (or .Values.nodeSelector $global.nodeSelector) }}
+      nodeSelector: {{- include "eric-mxe-default-backend.nodeSelector" . | nindent 8 }}
+      {{- end }}
+      affinity:
+        {{- tpl (toYaml .Values.affinity) . | nindent 8 }}
+      tolerations: {{ include "eric-mxe-default-backend.merge-tolerations" (dict "root" . "podbasename" "eric-mxe-default-backend") | nindent 8}}       

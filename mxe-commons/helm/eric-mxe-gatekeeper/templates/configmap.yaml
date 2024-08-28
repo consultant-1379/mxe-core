@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "eric-mxe-gatekeeper.template" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: gatekeeper-template"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-gatekeeper.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-gatekeeper.labels" . | fromYaml -}}
+    {{- include "eric-mxe-gatekeeper.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations: {{ include "eric-mxe-gatekeeper.annotations" . | nindent 4 }}
+data:
+  template.html: |
+    <html>
+      <head>
+          <script>
+              let realDomain = window.location.protocol + "//" + window.location.host;
+              let url = "{{"{{"}} .redirect {{"}}"}}".replace(/{{- .Values.keycloak.service.http.protocol -}}:\/\/{{- .Values.keycloak.service.http.name -}}{{- if .Values.keycloak.service.http.port -}}:{{- .Values.keycloak.service.http.port -}}{{- end -}}/gi, realDomain);
+              
+              let meshEnabled= {{- .Values.global.serviceMesh.enabled -}};
+              if(meshEnabled){
+                  url = "{{"{{"}} .redirect {{"}}"}}".replace(/{{- .Values.keycloak.service.http.protocol -}}:\/\/{{- .Values.keycloak.service.https.name -}}{{- if .Values.keycloak.service.https.port -}}:{{- .Values.keycloak.service.https.port -}}{{- end -}}/gi, realDomain);
+              }
+              window.location.href = url;
+          </script>
+      </head>
+      <body>Redirecting...</body>
+    </html>

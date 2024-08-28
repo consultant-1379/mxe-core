@@ -1,0 +1,54 @@
+= MXE-META-INF
+:author: Kristóf Nékám
+:signature: EKRINKM
+:department: BDGSJBAK
+:doc-name: INTERFACE DESCRIPT
+:doc-no: 2/155 19-AVA 901 53
+:revnumber: PB1
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+//Template updated 2018-08-21 (keep to track template history)
+
+[[MXEMETAINF]]
+== MXE-META-INF
+
+[[MXEMETAINFDirectory]]
+=== MXE-META-INF Directory
+
+This directory must be present in the model source root folder when the model is onboarded to MXE or packaged with the CLI command `mxe-model package`. It contains the model metadata required to identify the model in MXE.
+
+[[MXEMETAINFINFO]]
+==== MXE-META-INF/INFO
+
+The format is similar to the Debian deb package INFO file format.
+
+*MXE-META-INF/INFO*
+
+....
+Title: <model title, can be anything, e.g. Anomaly Detection>
+Id: <FQN, company-wide unique ID of the model; alphanumeric lowercase separated by dots; e.g. com.ericsson.bdgs.oss.oss.eea.aio>
+Version: <in a.b.c format; see semantic versioning; e.g. 2.14.1>
+Author: <Name of the model author; e.g. István Szabolcs>
+Type: <required only for training packages and it`s value should be Training>
+Description: <Description of the model; e.g.: Convolutional networks are at the core of most state-of-the-art computer vision solutions for a wide variety of tasks. Since 2014 very deep convolutional networks started to become mainstream, yielding substantial gains in various benchmarks. Although increased model size and computational cost tend to translate to immediate quality gains for most tasks (as long as enough labeled data is provided for training), computational efficiency and low parameter count are still enabling factors for various use cases such as mobile vision and big-data scenarios.
+
+Here we explore ways to scale up networks in ways that aim at utilizing the added computation as efficiently as possible by suitably factorized convolutions and aggressive regularization. We benchmark our methods on the ILSVRC 2012 classification challenge validation set demonstrate substantial gains over the state of the art: 21.2% top-1 and 5.6% top-5 error for single frame evaluation using a network with a computational cost of 5 billion multiply-adds per inference and with using less than 25 million parameters. With an ensemble of 4 models and multi-crop evaluation, we report 3.5% top-5 error on the validation set (3.6% error on the test set) and 17.3% top-1 error on the validation set>
+....
+
+[[Requirements]]
+==== Requirements
+
+* INFO file is placed in the `MXE-META-INF` directory
+* All fields are filled
+* The order of the fields matches the order above: `Title`, `Id`, `Version`, `Author`, `Type`, `Description`
+* `Id` can only contain lowercase alphanumeric characters, separated by dots (for example `com.ericsson.bdgs.oss.oss.eea.aio`)
+* `Type` required only for training packages and it`s value should be Training
+* `Description` can contain multiple lines as it is parsed until the end of the file
+
+[[MXE-META-INFiconjpgoptional]]
+==== MXE-META-INF/icon.jpg (optional)
+
+If the `MXE-META-INF` directory contains an `icon.jpg` file it is displayed as the model icon on the GUI. The default MXE model icon is used otherwise.

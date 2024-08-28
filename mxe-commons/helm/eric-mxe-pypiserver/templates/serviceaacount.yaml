@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "eric-mxe-pypiserver.serviceaccount" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: pypiserver"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-pypiserver.labels" . | fromYaml -}}
+    {{- include "eric-mxe-pypiserver.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-pypiserver.annotations" . | nindent 4 }}
+automountServiceAccountToken: false

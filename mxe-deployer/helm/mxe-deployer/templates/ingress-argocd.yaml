@@ -1,0 +1,37 @@
+{{- $argocdIngressConf := .Values.argocdIngress -}}
+{{ if $argocdIngressConf.enabled}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name}}-argocd-server 
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app.kubernetes.io/part-of: "mxe-deployer"
+    app.kubernetes.io/component: "mxe-argocd"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ .Release.Name}}-argocd-server
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-deployer.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- $annotations := include "mxe-deployer.product-info" . | fromYaml -}}
+    {{- $ingressAnn := $argocdIngressConf.annotations -}}
+    {{- include "eric-mxe-deployer-service.mergeAnnotations" (dict "location" .Template.Name "sources" (list $ingressAnn $annotations )) | trim | nindent 4 }}
+spec:
+  ingressClassName: {{ $argocdIngressConf.ingressClassName | quote }}
+  {{- with $argocdIngressConf.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    - host: {{ $argocdIngressConf.hostname | quote}}
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ $argocdIngressConf.serviceName }}
+              port:
+                number: 80
+{{- end -}}

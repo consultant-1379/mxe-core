@@ -1,0 +1,250 @@
+def onlyDocModified = true
+def onlyGuiModified = true
+def rebuildIAM = false
+def SLAVE_NODE = null
+
+node(label: 'docker-weekly') {
+    stage('Nominating build node') {
+        SLAVE_NODE = "${NODE_NAME}"
+        echo "Executing build on ${SLAVE_NODE}"
+    }
+}
+
+pipeline {
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '200', artifactNumToKeepStr: '30'))
+    }
+
+    agent {
+        node {
+            label "${SLAVE_NODE}"
+        }
+    }
+
+    parameters {          
+        choice(
+          choices: ['develop', 'master'],
+          description: 'Select branch to run Offline MXE Installation pipeline',
+          name: 'BRANCH'
+        )
+        booleanParam(name: 'CLEANUP_SLAVE', defaultValue: true, description: 'Cleanup the slave after test')
+    }
+
+    environment {
+        GIT_AUTHOR_NAME = "mxecifunc"
+        GIT_AUTHOR_EMAIL = "PDLMMECIMM@pdl.internal.ericsson.com"
+        GIT_COMMITTER_NAME = "${USER}"
+        GIT_COMMITTER_EMAIL = "${GIT_AUTHOR_EMAIL}"
+        GERRIT_BRANCH = "${GIT_BRANCH}"
+        GIT_SSH_COMMAND = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GSSAPIAuthentication=no -o PubKeyAuthentication=yes"
+        GERRIT_CREDENTIALS_ID = 'gerrit-http-password-mxecifunc'
+        //GOCACHE = "${WORKSPACE}/gocache"
+        //GOPATH = "${WORKSPACE}/gopath"
+        GOPATH = "${WORKSPACE}/.bob/gopath"
+        VERSION_PREFIX_FILE="VERSION_PREFIX_WEEKLY"
+        SCAN_REPORTS_DIR=".bob/scan-reports"
+        OFFLINE_INSTALLATION="true"
+    }
+
+    stages {
+        stage('Environment info') {
+            steps {
+                script{
+                    env.STABLE_MXE_VERSION = getLastSuccessfulMXEBuild()
+                }
+                sh 'printenv | sort'
+            }
+        }
+
+        stage('Prepare') {
+            steps {
+                sshagent(credentials: ['ssh-key-mxecifunc']) {
+                    sh 'git clean -xdff'
+                    sh 'git submodule sync'
+                    sh 'git submodule update --init --recursive'
+                    sh './bob/bob clean'
+                }
+            }
+        }
+
+        stage('Init') {
+            steps {
+                sh './bob/bob init'
+                sh './bob/bob init-drop:docker-helm-generic-settings-public'
+                sh './bob/bob offline-install-prep:set-offline-packages-version'
+                script {
+                    currentBuild.description = readFile('.bob/var.version')
+                }
+            }
+        }
+
+        stage("Prepare essentials & cli"){
+            environment{
+                API_TOKEN=credentials("arm-api-token-mxecifunc")
+            }
+            steps {
+                script{
+                    sh './bob/bob offline-install-prep:get-essentials'
+                    sh './bob/bob offline-install-prep:get-cli'
+                }
+            }
+        }
+
+        stage('Package offline images') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'arm-api-token-mxecifunc', variable: 'API_TOKEN'),
+                    string(credentialsId: 'sero-api-token-mxecifunc', variable: 'API_TOKEN_SERO'),
+                ]){
+                    sh './bob/bob package-offline-images'
+                    sh './bob/bob list-tags-in-offline-tar'
+                }
+            }            
+        }
+
+        stage('Lock k8s cluster') {
+            options {
+                lock(resource: null, label: 'bob-ci-weekly', quantity: 1, variable: 'SYSTEM')
+            }
+            environment{
+                KUBECONFIG=credentials("kubeconfig-${env.SYSTEM}")
+                MXESECRETS=credentials("mxek8ssecrets-${env.SYSTEM}")
+                TESTMXEENDPOINT=credentials("secure-mxeendpoint-${env.SYSTEM}")
+                TESTDEPLOYERENDPOINT=credentials("secure-deployerendpoint-${env.SYSTEM}")
+                TESTDEPLOYERAUTHENDPOINT=credentials("secure-oauthendpoint-${env.SYSTEM}")
+                PRIVATE_DOCKER_REGISTRY_HOST=credentials("secure-dockerregistry-${env.SYSTEM}")
+                GITOPS_REPO=credentials("secure-gitopsrepoendpoint-${env.SYSTEM}")
+                PRIVATE_REGISTRY_USER=credentials("PRIVATE_REGISTRY_USER")
+                PRIVATE_REGISTRY_PASSWORD=credentials("PRIVATE_REGISTRY_PASSWORD")
+                PRIVATE_REGISTRY_CERTS=credentials("registryk8ssecrets-${env.SYSTEM}")
+                HELM_TOKEN=credentials("SERO_ARM_TOKEN")
+            }
+            stages {
+                stage("Print Cluster Info") {
+                    steps {
+                        echo "Target kubernetes system: ${env.SYSTEM}"
+                        sh './bob/bob test-cluster:print-info'
+                    }
+                }
+                stage('Setup Private Registry'){
+                    steps{
+                        sh "./bob/bob offline-install-prep:private-registry-setup"
+                    }
+                }
+                stage('Install Helm Charts'){
+                    steps{
+                        sh "./bob/bob push-offline-images-to-private-registry:mxe-pre-req"
+                        sh "./bob/bob install-prequisite-helm-packages"
+                        sh "./bob/bob generate-values-using-mxe-generate-linux"
+                        sh "./bob/bob init-install-helm-charts"
+                        sh "./bob/bob push-offline-images-to-private-registry:mxe-commons"
+                        sh "./bob/bob push-offline-images-to-private-registry:mxe-deployer"
+                        sh "./bob/bob install-mandatory-base-packages"
+                    }
+                }
+                stage('Deploy MXE Serving Application'){
+                    steps{
+                        sh './bob/bob push-offline-images-to-private-registry:mxe-serving'
+                        sh './bob/bob install-mxe-serving-package'
+                    }
+                }
+                stage('Deploy MXE Workflow Application'){
+                    steps{
+                        sh './bob/bob push-offline-images-to-private-registry:mxe-workflow'
+                        sh './bob/bob install-optional-packages:mxe-workflow'
+                    }
+                }
+                stage('Deploy MXE Training Application'){
+                    steps{
+                        sh './bob/bob push-offline-images-to-private-registry:mxe-training'
+                        sh './bob/bob install-optional-packages:mxe-training'
+                    }
+                }
+                stage('Deploy MXE Exploration Application'){
+                    steps{
+                        sh './bob/bob push-offline-images-to-private-registry:mxe-exploration'
+                        sh './bob/bob install-optional-packages:mxe-exploration'
+                    }
+                }
+                stage('System test') {
+                    steps {
+                        sh './bob/bob validate-images'
+                        archiveArtifacts artifacts: 'images/mxe-images.json'
+                        sh './bob/bob test-weekly'  /* does not do cleanup as there are subsequent steps to be run after testing*/
+                    }
+                }
+                stage('Cleanup'){
+                    steps{
+                        sh './bob/bob mxe-cleanup'
+                    }
+                }
+            }
+            post {
+                always {
+                    timeout(time: 4, unit: 'HOURS') {
+                        script {
+                            if ("${params.CLEANUP_SLAVE}".toString() == 'true') {
+                                parallel getCleanupJob(env.NODE_NAME)
+                            }
+                        }
+                    }
+                    archiveArtifacts artifacts: 'mxe-test-reports/**/*.*', allowEmptyArchive: true
+                    publishHTML(target: [
+                            allowMissing         : true,
+                            alwaysLinkToLastBuild: false,
+                            keepAll              : true,
+                            reportDir            : 'mxe-test-reports',
+                            reportFiles          : '*/report.html',
+                            reportName           : "MXE Test Report"
+                    ])
+                }
+                success {
+                    gerritReview labels: ['System-Test': 1]
+                }
+                unsuccessful {
+                    gerritReview labels: ['System-Test': -1]
+                    withCredentials([
+                            file(credentialsId: 'kubeconfig-' + env.SYSTEM, variable: 'KUBECONFIG'),
+                    ]) {
+                        catchError {
+                            sh './bob/bob fetch-logs'
+                            archiveArtifacts artifacts: 'logs/**', allowEmptyArchive: true
+                            sh './bob/bob mxe-cleanup'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+def getCleanupJob(slaveNodeName) {
+    def jobs = [:]
+    def slave = slaveNodeName
+    jobs[slave] = {
+        node(slave) {
+            stage(slave) {
+                lock(resource: slave) {
+                    sh '''docker rmi --force $(docker image ls | grep 'armdocker.rnd.ericsson.se/proj-' | awk '{print $3}')||true'''
+                    sh '''docker rmi --force $(docker images --quiet --filter dangling=true)||true'''
+                    sh '''docker system prune --force || true'''
+                }
+            }
+        }
+    }
+    jobs
+}
+def getLastSuccessfulMXEBuild() {
+    println("GERRIT_BRANCH env:" + env.GERRIT_BRANCH)
+    def pipelineName
+    if (params.BRANCH == 'develop') {
+        pipelineName = "mxe-core-dev-pipeline"
+    } else if (params.BRANCH == 'master') {
+        pipelineName = "mxe-core-master-pipeline"
+    }
+    def displayName = Jenkins.instance.getItem(pipelineName).lastSuccessfulBuild.displayName
+    println("Selected pipeline:" + pipeline )
+    println("Pipeline Name:" + pipelineName )
+    println("Last Build:" + displayName )
+    return displayName.replaceAll("\\s", "")
+}

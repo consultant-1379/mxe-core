@@ -1,0 +1,63 @@
+---
+apiVersion: "machinelearning.seldon.io/v1"
+kind: "SeldonDeployment"
+metadata:
+  name: "test-ab-model"
+spec:
+  predictors:
+  - name: "main"
+    annotations:
+      predictor_version: "v1"
+    replicas: 1
+    graph:
+      name: ab-test
+      endpoint: {}
+      implementation: RANDOM_ABTEST
+      parameters:
+      - name: ratioA
+        value: "0.5"
+        type: FLOAT
+      children:
+      - name: model-1
+        endpoint:
+          type: REST
+        type: MODEL
+        children: []
+      - name: model-2
+        endpoint:
+          type: REST
+        type: MODEL
+        children: []
+    componentSpecs:
+    - spec:
+        containers:
+        - image: "mxe.manifest.stateless:2.0.0"
+          name: "model-2"
+      hpaSpec:
+        minReplicas: 2
+        maxReplicas: 1
+        metrics:
+        - type: "Resource"
+          resource:
+            name: "cpu"
+            targetAverageValue: 10m
+        - type: "Resource"
+          resource:
+            name: "memory"
+            targetAverageValue: 20Mi
+    - spec:
+        containers:
+        - image: "mxe.manifest.stateless:2.0.1"
+          name: "model-2"
+      hpaSpec:
+        minReplicas: 2
+        maxReplicas: 1
+        metrics:
+        - type: "Resource"
+          resource:
+            name: "cpu"
+            targetAverageValue: 10m
+        - type: "Resource"
+          resource:
+            name: "memory"
+            targetAverageValue: 20Mi

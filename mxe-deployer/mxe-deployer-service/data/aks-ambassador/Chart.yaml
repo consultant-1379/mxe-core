@@ -1,0 +1,14 @@
+apiVersion: v2
+appVersion: 5.3.1-master-2009040449
+dependencies:
+- name: mee-ambassador
+  repository: https://arm.sero.gic.ericsson.se/artifactory/proj-gaia-dev-helm/
+  version: 5.3.1-master-2009040449
+description: helm chart for mee-ambassador
+keywords:
+- api gateway
+maintainers:
+- email: PDLMEESUPP@pdl.internal.ericsson.com
+  name: MEE
+name: mee-ambassador-setup
+version: "1"

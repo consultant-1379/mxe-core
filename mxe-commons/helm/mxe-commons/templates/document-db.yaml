@@ -1,0 +1,52 @@
+{{- if or ((.Values.global.documentDatabasePg).operator).enabled .Values.global.documentDatabasePG.operator.enabled -}}
+{{- if .Values.documentDatabasePG.customObject.enabled -}}
+apiVersion: docdb.data.ericsson.com/v1beta1
+kind: DocumentDB
+metadata:
+  name: {{ include "mxe-commons.pg-co-name" . }}
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "eric-data-document-database-pg"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-commons.pg-co-name" . | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+spec:
+  {{- if index .Values "documentDatabasePG" "customObject" "instanceName" }}
+  instanceName: {{ index .Values "documentDatabasePG" "customObject" "instanceName" | trunc 63 | trimSuffix "-" | quote }}
+  {{- end }}
+  {{- if index .Values "documentDatabasePG" "customObject" "replicaCount" }}
+  replicas: {{ include "mxe-commons.pg-co-replicas" . }}
+  {{- end }}
+  {{- if index .Values "documentDatabasePG" "customObject" "backupRestore" "enabled" }}
+  backupRestore:
+    globalDataSet: fullPGClusterBackup
+  {{- end }}
+  log:
+    level: {{ include "mxe-commons.pg-co-log-level" . }}
+    streamingMethod: ""
+  databaseServerConfig:
+    authentication:
+      mode: {{ include "mxe-commons.pg-auth-mode" . }}
+      passwordsSecretReference: {{ index .Values "documentDatabasePG" "customObject" "databaseServerConfig" "authentication" "passwordsSecretReference" | quote }}
+    {{- if index .Values "documentDatabasePG" "customObject" "databaseServerConfig" "settings" }}
+    settings: {{ index .Values "documentDatabasePG" "customObject" "databaseServerConfig" "settings" | toYaml | nindent 6 }}
+    {{- end }}
+  resources:
+    flavor: {{ index .Values "documentDatabasePG" "customObject" "resources" "flavor" | quote }}
+    persistentStorage:
+      {{- if index .Values "documentDatabasePG" "customObject" "resources" "persistentStorage" "housekeepingThresholdPercentage" }}
+      housekeepingThresholdPercentage: {{ include "mxe-commons.pg-housekeeping-threshold" . }}
+      {{- end }}
+      documentDatabasePGVolume:
+        persistentVolumeClaim:
+          size: {{ index .Values "documentDatabasePG" "customObject" "resources" "persistentStorage" "documentDatabasePGVolume" "persistentVolumeClaim" "size" | quote }}
+          {{- if index .Values "documentDatabasePG" "customObject" "resources" "persistentStorage" "documentDatabasePGVolume" "persistentVolumeClaim" "storageClassName" }}
+          storageClassName: {{ index .Values "documentDatabasePG" "customObject" "resources" "persistentStorage" "documentDatabasePGVolume" "persistentVolumeClaim" "storageClassName" | quote }}
+          {{- end }}
+{{- end }}
+{{- end }}
+  

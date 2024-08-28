@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ include "mxe-commons.mesh-ingress-gw-name" . }}-dr
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "controller"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-commons.mesh-ingress-gw-name" . }}-dr
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+spec:
+  host: {{ include "mxe-commons.mesh-ingress-gw-svc-name" . }}
+  {{- include "mxe-commons.destination-rule-traffic-policy" . | nindent 2 -}}

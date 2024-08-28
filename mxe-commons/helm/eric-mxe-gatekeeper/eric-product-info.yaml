@@ -1,0 +1,32 @@
+productName: "MXE"
+productNumber: "CXD 101 0221"
+
+images:
+  gatekeeper:
+    productName: "MXE"
+    productNumber: "CXU 101 0059"
+    registry:  "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-gatekeeper"
+    tag: "VERSION"
+  dbInit:
+    productName: "MXE"
+    productNumber: "CXU 101 0056"
+    registry:  "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-db-init"
+    tag: "VERSION"
+  keycloakinit:
+    productName: "MXE"
+    productNumber: "CXU 101 0061"
+    registry:  "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-keycloak-init"
+    tag: "VERSION"
+  kubernetes-modifier:
+    productName: "MXE"
+    productNumber: "CXU 101 0060"
+    registry:  "armdocker.rnd.ericsson.se"
+    repoPath: "REPO_PATH"
+    name: "mxe/eric-mxe-kubernetes-modifier"
+    tag: "VERSION"

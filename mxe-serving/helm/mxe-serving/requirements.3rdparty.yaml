@@ -1,0 +1,5 @@
+dependencies:
+  - condition: seldon-core-operator.enabled
+    name: seldon-core-operator
+    repository: https://arm.seli.gic.ericsson.se/artifactory/proj-mxe-deps-helm/
+    version: 1.17.1

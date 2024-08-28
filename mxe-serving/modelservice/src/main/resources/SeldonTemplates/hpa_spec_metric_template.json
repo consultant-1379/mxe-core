@@ -1,0 +1,7 @@
+{
+  "type": "Resource",
+  "resource": {
+    "name": "<AUTOSCALING_RESOURCE_NAME>",
+    "targetAverageValue": "<AUTOSCALING_TARGET_AVERAGE_VALUE>"
+  }
+}

@@ -1,0 +1,126 @@
+{{- if .Values.enabled -}}
+{{- $global := fromJson (include "eric-mxe-pypiserver.global" .) -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "eric-mxe-pypiserver.name" . }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: pypiserver"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-pypiserver.labels" . | fromYaml -}}
+    {{- include "eric-mxe-pypiserver.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-pypiserver.annotations" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: "mxe"
+      app.kubernetes.io/component: "pypiserver"
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+  {{- include "eric-mxe-pypiserver.update-strategy" . | nindent 2 }}
+  serviceName: {{ include "eric-mxe-pypiserver.name" . }}
+  template:
+    metadata:
+      labels:
+        {{- $component := printf "%s" "app.kubernetes.io/component: pypiserver"  | fromYaml -}}
+        {{- $istioLabels := include "eric-mxe-pypiserver.istio-sidecar-labels" . | fromYaml -}}
+        {{- $labels := include "eric-mxe-pypiserver.labels" . | fromYaml -}}
+        {{- include "eric-mxe-pypiserver.mergeLabels" (dict "location" .Template.Name "sources" (list $component $istioLabels $labels )) | trim | nindent 8 }}
+      annotations:
+        {{- $authSrvAnn := include "eric-mxe-pypiserver.annotations" . | fromYaml -}}
+        {{- $istioAnn := include "eric-mxe-pypiserver.istio-sidecar-annotations" . | fromYaml -}}
+        {{- $productInfoAnn := include "eric-mxe-pypiserver.product-info" . | fromYaml -}}
+        {{- $securityAnn := include "eric-mxe-pypiserver.security-annotations" . | fromYaml -}}
+        {{- $appArmorAnn := include "eric-mxe-pypiserver.appArmorAnnotation.init" . | fromYaml -}}
+        {{- $prometheusAnn := include "eric-mxe-pypiserver.prometheus-annotations" . | fromYaml -}}
+        {{- include "eric-mxe-pypiserver.mergeAnnotations" (dict "location" .Template.Name "sources" (list $authSrvAnn $istioAnn $productInfoAnn $appArmorAnn $securityAnn $prometheusAnn)) | trim | nindent 8 }}
+    spec:
+      {{- if include "eric-mxe-pypiserver.podPriority" . }}
+      priorityClassName: {{- include "eric-mxe-pypiserver.podPriority" . | indent 2 }}
+      {{- end }}
+      {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "eric-mxe-pypiserver.topologySpreadConstraints" . | trim | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name | quote }}
+          {{- with .Values.imageCredentials.pypiserver }}
+          image: "{{ include "eric-mxe-pypiserver.setImageRepo" (list $ .registry.url .repoPath "pypiserver") }}{{ $.Values.images.pypiserver.name }}:{{ $.Values.images.pypiserver.tag }}"
+          {{- end }}
+          {{- include "eric-mxe-pypiserver.container-security-context" . | nindent 10 }}
+          imagePullPolicy: "{{ include "eric-mxe-pypiserver.registryImagePullPolicy" (list . (index .Values "images" "pypiserver" "pullPolicy" )) }}"
+          command: ["pypi-server"]
+          args:
+            - --passwords=/run/secrets/config/.htpasswd
+            - --authenticate={{ .Values.auth.actions }}
+            - --port=8080
+            {{- range .Values.pypiserver.extraArgs }}
+            - {{ . }}
+            {{- end }}
+            - /data/packages
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            # must override the path of Dockerfile's VOLUME here
+            - mountPath: /data/packages
+              name: packages
+              subPath: packages
+            - mountPath: /run/secrets/config
+              name: secrets
+              readOnly: true
+            {{- include "eric-mxe-pypiserver.pg-cert-volume-mounts" . | nindent 12 }} 
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.probes.pypiserver.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.probes.pypiserver.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.pypiserver.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.probes.pypiserver.readinessProbe.initialDelaySeconds }} 
+            timeoutSeconds: {{ .Values.probes.pypiserver.readinessProbe.timeoutSeconds }} 
+            periodSeconds: {{ .Values.probes.pypiserver.readinessProbe.periodSeconds }} 
+          resources:
+            {{- toYaml .Values.resources.pypiserver | nindent 12 }}
+      volumes:
+        - name: secrets
+          secret:
+            secretName: {{ template "eric-mxe-pypiserver.name" . }}
+        {{- include "eric-mxe-pypiserver.pg-cert-volumes" . | nindent 8 }}
+      {{- include "eric-mxe-pypiserver.image-pull-secrets" . | nindent 6 }}
+      {{- if (or .Values.nodeSelector $global.nodeSelector) }}
+      nodeSelector: {{- include "eric-mxe-pypiserver.nodeSelector" . | nindent 8 }}
+      {{- end }}
+      affinity:
+        {{- tpl (toYaml .Values.affinity) . | nindent 8 }}
+      tolerations: {{ include "eric-mxe-pypiserver.merge-tolerations" (dict "root" . "podbasename" "eric-mxe-pypiserver") | nindent 8}}
+  volumeClaimTemplates:
+    - metadata:
+        name: packages
+        labels:
+          app.kubernetes.io/part-of: "mxe"
+          app.kubernetes.io/component: "pypiserver-pvc"
+          app.kubernetes.io/name: {{ include "eric-mxe-pypiserver.name" . | quote }}
+          app.kubernetes.io/instance: {{ .Release.Name | quote }}
+          app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        {{- if .Values.persistence.persistentVolumeClaim.annotations }}
+        annotations:
+          {{ toYaml .Values.persistence.persistentVolumeClaim.annotations | indent 10 }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.persistence.persistentVolumeClaim.accessModes }}
+        {{- if .Values.persistence.persistentVolumeClaim.storageClassName -}}
+        {{- if eq .Values.persistence.persistentVolumeClaim.storageClassName "-" }}
+        storageClassName: ""
+        {{- else }}
+        storageClassName: {{ .Values.persistence.persistentVolumeClaim.storageClassName | quote }}
+        {{- end -}}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.persistentVolumeClaim.size | quote }}
+  {{- end }}

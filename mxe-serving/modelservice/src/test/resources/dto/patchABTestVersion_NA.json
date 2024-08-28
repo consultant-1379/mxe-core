@@ -1,0 +1,14 @@
+{
+  "models": [
+    {
+      "id": "IoT model A (fake not available)",
+      "version": "0.0.2",
+      "weight": 0.5
+    },
+    {
+      "id": "IoT model A (fake not available)",
+      "version": "0.0.2",
+      "weight": 0.5
+    }
+  ]
+}

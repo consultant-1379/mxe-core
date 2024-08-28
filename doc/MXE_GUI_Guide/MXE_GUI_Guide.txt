@@ -1,0 +1,632 @@
+= GUI Guide
+:author: Kristóf Nékám
+:signature: EKRINKM
+:department: BDGSJBAK
+:doc-name: OPERATING INSTRUCS
+:doc-no: 1/1543-COA 252 0017
+:revnumber: PL1
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+//Template updated 2018-08-21 (keep to track template history)
+
+[[Introduction]]
+== Introduction
+
+The Graphical User Interface (GUI) of Machine Learning Model Execution Environment (MXE) is a web-based GUI that covers a subset of the functionality of the Command Line Interface (CLI). It presents information about the status of the system and the models in a clear and concise manner, including health, utilization, model quality, and so on.
+
+It is divided into the following main tabs:
+
+* *Dashboard*
+* *Model Packages*
+* *Model Services*
+* *Flow Deployments*
+* *Training Packages*
+* *Training Jobs*
+* *Notebooks*
+
+All of the above tabs have a set of common GUI elements, detailed in the following sections.
+
+[[GenericGUIElements]]
+== Generic GUI Elements
+
+[[LogonScreen]]
+=== Logon Screen
+
+Users are redirected to this page if they have not logged in yet. Logging in is performed by entering the credentials (username and password) and then clicking on the *Sign in* button.
+
+For more information about user credentials setup during the installation procedure, see *Changing User Credentials (Optional)* in the doc-ref:[Installation Guide].
+
+For more information about creating a new user, see  <<CreatingaNewUser,Creating a New User>>.
+
+The initial page has a standard black frame with the full name of the product on the left, and the *User settings* on the right side.
+
+[[UpdatePasswordScreen]]
+=== Update Password Screen
+
+Users with temporary credentials have to change their password after trying to login for the first time.
+
+[[UserSettings]]
+=== User Settings
+
+.Under *User Settings*, the following options are available:
+* *My Settings*: The username and profile picture is displayed.
+* *Switch Theme*: Switch the toggle button to change the background color from light to dark.
+* *View Access Rights*: Opens a dialog window where users can see access control information for each target.
+* *Sign Out*: Sign out by clicking the *Sign Out* button at the bottom of the *User Settings* sidebar.
+
+[[GenericControls]]
+== Generic Controls
+
+After logon, the main menu is displayed below the product name. It has the following main tabs: *Dashboard*, *Model Packages*, *Model Services*, *Flow Deployments*, *Training Packages*, and *Training Jobs*. The menu can be collapsed or expanded by clicking the "x" and "=" icons.
+
+[[SortBy]]
+=== Sort By
+
+The Sort by option is located at the upper right corner of the screen for the *Model Packages* tab. The sorting rule can be chosen after clicking on the arrow icon.
+
+[[Dashboard]]
+== Dashboard
+
+The *Dashboard* displays a summary of general information about the running models. Its two main parts are *MXE Vital Statistics* and *Recently onboarded Models*.
+
+image::gui_dashboard.png[title="GUI - Dashboard",scalefit="1"]
+
+[[MXEVitalStatistics]]
+=== MXE Vital Statistics
+
+.The first section of the *MXE Vital Statistics* contains the following charts:
+* *Cluster memory usage*: Displays the percentage of the used and total cluster memory.
+* *Cluster CPU usage*: Displays the percentage of the used and total cores.
+* *Cluster filesystem usage*: Displays the percentage of the used and total file system.
+
+The second section of *MXE Vital Statistics* presents general information in dashed line rectangles. The following data is displayed:
+
+* Number of running model services
+* Global request rate (request/sec)
+
+[[RecentlyOnboardedModels]]
+=== Recently Onboarded Models
+
+*Recently onboarded Models* contains a list of models that were recently made ready to run. The model cards contain basic information, including health, model quality, and so on.
+
+[[ModelPackages]]
+== Model Packages
+
+The *Model Packages* is a collection of all models in the system to which the user has access. Models are represented with a rectangular card. The cards have the name of the model in the top left corner. Below the name, the id of the model is displayed.
+
+If a model has multiple versions, it is represented with stacked cards. Click on the cards and choose from the versions to perform any action on the model.
+
+image::gui_model_packages.png[title="GUI - Model Packages",scalefit="1"]
+
+[[SearchinModelPackages]]
+=== Searching in Model Packages
+
+Search in the *Model Packages* can be used to search for names of the models. Search results are generated in real time during typing, and are wildcard searches. Search results can be cleared by clicking the blue `clear` superscript text above the search field.
+
+[[FilterbyStatus]]
+=== Filtering by Status
+
+.Models can be filtered according to their status by selecting the check boxes under the *Filter by Status* area. The following statuses are available:
+* *Packaging*: A new model was imported to the cluster. This is a temporary state.
+* *Packaging Failed*: Packaging of the model was not successful.
+* *Available*: Packaging of the model was successful. The model is onboarded.
+
+Filtering can be cleared by unchecking the checkboxes or by clicking the blue `clear` superscript text.
+
+[[DeleteModel]]
+=== Deleting a Model
+
+.A model can be deleted using the GUI:
+. Click on the model to open the *Model Versions View*.
+. Click on the *bin icon* in the top right corner or navigate through the model detail page (card title click / table row click), and delete with the *Delete* button in the top right corner.
+. Click Confirm in the Confirmation window.
+
+NOTE: The *Delete* button is not shown for users who do not have sufficient privileges.
+
+[[OnboardaModel]]
+=== Onboarding a Model
+
+.A model can be onboarded by uploading a zip containing the model:
+. Click on the *Onboard model* button.
+. Click the *Browse* button or drag and drop the `.zip` file.
+. Wait for the upload progress to be finished.
+. Click the *Ok* button.
+
+NOTE: The *Onboard model* button is not shown for users who do not have sufficient privileges. Onboarding fails during packaging if a user tries to onboard a model with an id having a domain to which the user does not have sufficient privileges.
+
+[[ChecktheModelErrorLog]]
+=== Checking the Model Error Log
+
+.If an error occurred it can be checked by clicking on the model card:
+. Click on the model card with the error.
+. A dialog opens containing the error log as a body, and the error message as the title.
+. Click the *Ok* button to close the dialog, or delete the model.
+
+[[ModelDetailPage]]
+== Model Detail Page
+
+To access the *Model Detail* page click a selected model, and from the right side panel select a version, and click the card title (or table row).
+
+[[ModelInformation]]
+=== Model Information
+
+This page displays the model information we have on the selected model:
+
+* Model icon
+* Author
+* Model id
+* Description
+* Date of onboarding
+* Onboarded by
+
+[[ServicesUsingtheSelectedModel]]
+=== Services Using the Selected Model
+
+This page displays a table containing all the model services which use the selected model.
+
+[[ModelServices]]
+== Model Services
+
+*Model Services* is a collection of all model services in the system to which the user has access. Services are represented in a table. Each row displays the *service name*, *status*, *instances*, *contained model*, *creation date*, and the *creator of the service*.
+
+[[CreateaModelService]]
+=== Creating a Model Service
+
+NOTE: The *Create model service* button is not shown for users who do not have sufficient privileges.
+
+.To create a model service:
+
+. Click the *Create model service* button.
+. Choose a model service name. The name must consist of alphanumeric characters and dashes only.
+. Choose a domain for the service to limit who can access this service (those with access rights to this domain).
+. Choose the scaling method for the service by unfolding the *Scaling* accordion. If you skip this step, scaling is set to manual and the number of instances to 1.
+.. If you choose manual scaling, you have to set an instance number.
+.. If you choose automatic scaling, you have to select the target metric that drives the scaling, and a target value. You must also select the minimum and maximum number of instances allowed.
+. Select a model from the combobox with the desired version.
+. Click the *Ok* button.
+
+.To create a model with A/B testing:
+
+. Click the *Create model service* button.
+. Choose a model service name that consists of alphanumeric characters and dashes only.
+. Choose a domain for the service to limit who can access this service (those with access rights to this domain).
+. Choose the scaling method for the service by unfolding the *Scaling* accordion. If you skip this step, scaling is set to manual and the number of instances to 1.
+.. If you choose manual scaling, you have to set an instance number.
+.. If you choose automatic scaling, you have to select the target metric that drives the scaling, and a target value. You must also select the minimum and maximum number of instances allowed.
+. Select a model from the combobox with the desired version (A model).
+. Click the *Add another* button, then select the desired model with the version (B model).
+. Set the weights on the B model, and the A model's weight is automatically aligned.
+. Click the *OK* button.
+
+[[SortModelServices]]
+=== Sorting Model Services
+
+Click on the arrows in each column in the table header to sort model services.
+
+[[SearchinModelServices]]
+=== Searching in Model Services
+
+Search in the *Model Services* can be used to search for names of the model services. Search results are generated in real time during typing, and are wildcard searches. Search results can be cleared by clicking the blue `clear` superscript text above the search field.
+
+[[FilterbyStatus.4]]
+=== Filtering by Status
+
+Model Services can be filtered according to their status by selecting the check boxes under the *Filter by Status* area. The following statuses are available:
+
+* *Running*: service is running.
+* *Error*: service has an error.
+* *Creating*: service is being created.
+
+Filtering can be cleared by clearing the checkboxes or by clicking the blue `clear` superscript text.
+
+[[FilterbyDate]]
+=== Filtering by Date
+
+Model Services can be filtered according to their creating date by selecting a date range under the *Created* area. 
+
+[[ServiceDetail]]
+== Service Detail
+
+Click on the desired row to navigate to the service detail.
+
+[[ServiceInstance]]
+=== Service Instance
+
+In the service detail page, the user can edit the running instances of the chosen model service by clicking on the *Edit scaling* button, located in the top right corner of the *Basic information* box.
+
+After setting the instance number, the user must click on the blue *Edit scaling* button to save it, or the *Cancel* button to discard the changes.
+
+[[ScalingtheService]]
+=== Scaling the Service
+
+To change the number of instances scale a model taking the following steps:
+
+. Click on the *Edit scaling* button in the model service *Basic information* box.
+. If scaling is set to manual, set the number of instances using the up and down arrows.
+. If scaling is set to automatic, set the minimum and maximum number of instances using the up and down arrows.
+. Confirm the number of instances by clicking on the blue *Edit scaling* button.
+
+NOTE: The *pencil icon* is not shown for users who do not have sufficient privileges.
+
+[[ModelsintheService]]
+=== Models in the Service
+
+The included models are displayed right next to the service information box.
+
+[[ChangeModelsintheService]]
+=== Changing Models in the Service
+
+To change the model, click the *Change models* button on the top right service models section. Type or select the desired models in the appearing popup.
+
+NOTE: The *Change models* button is not shown for users who do not have sufficient privileges.
+
+[[DeleteService]]
+=== Deleting a Service
+
+To delete the model service and go back to the *Model Services* view click the *Delete* button in the upper right corner.
+
+NOTE: The *Delete* button is not shown for users who do not have sufficient privileges.
+
+[[ServiceChartsandCustomMetrics]]
+=== Service Charts and Custom Metrics
+
+In *Monitoring Information*, two charts is displayed about the service, *Latency* and *Request Rate* to show the minimum, maximum, average, and current values for the time interval for delays and the rate of requests.
+
+Both charts can be filtered according to the time interval by clicking the arrow icon next to the filter field. Time intervals vary between five minutes and one year.
+
+Also all the custom metrics are displayed below the *Latency* and *Request Rate* charts.
+
+For more information on custom metrics, see *Model with Metrics* in the doc-ref:[Tutorial].
+
+[[ServiceLogs]]
+=== Service Logs
+
+In the *Service Logs* accordion the user can check the logs of the service containers.
+
+The sidebar containing the containers can be minimized by clicking the close sidebar icon, and can be opened if the open sidebar icon is clicked.
+
+When selecting a container from the sidebar, the log viewer is filled with the container log data, based on the filters above.
+
+The filters can be set manually by writing in the input field or changing the dropdown, and click the *Apply* button, or selecting a *Quick Search* pill.
+
+Selecting a different container does not modify the filter query.
+
+[[FlowDeployments]]
+== Flow Deployments
+
+*Flow Deployments* is a collection of all running flow deployments in the system. Flow deployments are represented with a rectangular card. The cards have the name of the flow deployment in the top left corner. Below the name, the status of the flow deployment is displayed with colorful text.
+
+The status of the flow deployment can be changed by interacting with the NiFi GUI.
+
+[[SearchinFlowDeployments]]
+=== Search in Flow Deployments
+
+Search in the *Flow Deployments* can be used to search for names of the flow deployments. Search results are generated in real time during typing, and are wildcard searches. Search results can be cleared by clicking the blue `clear` superscript text above the search field.
+
+[[FilterbyStatus.1]]
+=== Filter by Status
+
+.To filter flow deployments according to their status, select the check boxes under the *Filter by Status* area. The following statuses are available:
+* *Running*: deployment is running and all processors are running
+* *Stopped*: deployment is running and at least 1 processor is stopped
+* *Empty*: deployment is running and there are no processors in the flow
+* *Error*: deployment is running and at least 1 processor has error
+* *Creating*: deployment is being created
+* *Failed*: deployment has failed (failed creating or went to failure state for some reason)
+* *Deleting*: deployment is being deleted
+
+Filtering can be cleared by clearing the checkboxes or by clicking the blue `clear` superscript text.
+
+[[CreatingaFlowDeployment]]
+=== Creating a Flow Deployment
+
+.To create a flow deployment choose a name as follows:
+. Click the *Create deployment* button.
+. Choose a name containing lowercase alphanumeric characters and dashes, for example `my-flow-deployment`.
+. Click the *Ok* button.
+. Wait for the flow deployment to start properly. This typically takes around a minute.
+
+[[DeleteaFlowDeployment]]
+=== Deleting a Flow Deployment
+
+.To delete a flow deployment using the GUI:
+. Click the bin icon on the flow deployment card.
+. Click *Confirm* in the *Confirmation* window to have the flow deployment deleted.
+
+[[ReachingtheNiFiGUI]]
+=== Reaching the NiFi GUI
+
+.To access the flow deployment's NiFi GUI, click the card:
+. Click the flow deployment card. If the flow deployment is running properly, the NiFi GUI shows up in another browser window.
+
+For more information on the NiFi GUI, see https://nifi.apache.org/docs/nifi-docs/html/getting-started.html#i-started-nifi-now-what[].
+
+[[ModelTrainingPackages]]
+== Model Training Packages
+
+*Model Training packages* is a collection of all the model training packages in the system. Model training packages are represented with a rectangular card. The cards have the name of the training package in the top left corner. The ID of the training package is displayed below the name. Below that there is either an error status, or a packaging in progress status.
+
+[[SearchinTrainingPackages]]
+=== Searching in Training Packages
+
+Search in the *Training packages* can be used to search for names of the training packages. Search results are generated in real time during typing, and are wildcard searches. Search results can be cleared by clicking the blue `clear` superscript text above the search field.
+
+[[FilterbyStatus.2]]
+=== Filtering by Status
+
+Training packages can be filtered according to their status by selecting the check boxes under the *Filter by Status* area. The filter sidebar can be opened by clicking on the filter icon on the left side. The following statuses are available:
+
+* *Available*: the training package can be run
+* *Packaging*: the training package is being processed by the backend
+* *Error*: the training package has generated an error
+
+Filtering can be cleared by unchecking the checkboxes or by clicking the blue `clear` superscript text.
+
+[[OnboardaTrainingPackage]]
+=== Onboarding a Training Package
+
+A training package can be onboarded as follows:
+
+. Click the *Onboard package* button.
+. Click the *Browse* button or drag and drop the .zip file.
+. Wait for the upload progress to be finished.
+. Click the *Ok* button.
+
+
+[[CheckingtheTrainingPackageVersions]]
+=== Checking the Training Package Versions
+
+This can be done by clicking on the package card, and on the right side a versions panel will appear.
+
+[[DeleteaTrainingPackage]]
+=== Deleting a Training Package
+
+A training package can be deleted using the GUI as follows:
+
+. Choose a training package by clicking on the card.
+. On the right side versions panel, choose a version card to delete.
+. Click the bin icon in the top right of the card.
+
+[[ExecuteTrainingPackage]]
+=== Executing Training Package
+
+Training packages can be executed as follows:
+
+. Choose a training package by clicking on the card.
+. Choose the training package version.
+. Click the *Execute* button.
+
+[[CheckTrainingPackageDetailbyVersion]]
+=== Checking Training Package Detail by Version
+
+Details of training packages can be displayed as follows:
+
+. Choose a training package by clicking on the card.
+. Choose the training package version.
+. Click on the card.
+. The detail page appears with the selected training package version.
+
+[[ModelTrainingJobs]]
+== Model Training Jobs
+
+Model training jobs are the results of the execution of the previously chosen training packages. They are represented in a sortable table.
+
+[[SearchinTrainingJobs]]
+=== Searching in Training Jobs
+
+Search in the *Training jobs* can be used to search for names of the training jobs. Search results are generated in real time during typing, and are wildcard searches. Search results can be cleared by clicking the blue `clear` superscript text above the search field.
+
+[[FilterbyStatus.3]]
+=== Filtering by Status
+
+Training jobs can be filtered according to their status by selecting the check boxes under the *Filter by Status* area. The filter sidebar can be opened by clicking on the filter icon on the left side. The following statuses are available:
+
+* *Failed*: the training job has failed.
+* *Running*: the training is running.
+* *Completed*: the training job is finished, results can be downloaded.
+
+Filtering can be cleared by unchecking the checkboxes or by clicking the blue `clear` superscript text.
+
+[[ViewTrainingJobsLogs]]
+=== Viewing Training Jobs Logs
+
+If the training job failed, the log can be viewed. Click the *View log* button after hovering on the specific row.
+
+[[DownloadTrainingJobResult]]
+=== Downloading a Training Job Result
+
+If the training job finished successfully, the result can be downloaded. Click the *Download result* button after hovering on the specific row.
+
+Multiple rows can be selected to download the results in batch as follows:
+
+. Select the rows to include in the batch.
+. Click the *Download* button.
+. If the browser prompts to *Allow batch download files*, click the *Allow* button.
+. Multiple files will be downloaded.
+
+[[Notebooks]]
+== Notebooks
+
+*Notebooks* is a page showing the logged in MXE user's JupyterLab instance. JupyterLab is represented with a rectangular card. The card have the name of the JupyterLab in the top left corner.
+
+[[ReachingtheJupyterLabUI]]
+=== Reaching the JupyterLab UI
+
+.The JupyterLab's UI can be reached through clicking the card:
+. Click the user's JupyterLab card.
+. If JupyterLab is running properly the JupyterLab UI will show up in another browser window.
+
+[[Workflows]]
+== Workflows
+
+Workflows can be accessed by the GUI of *Argo*, under the `/argo` path. Argo's documentation is at https://argoproj.github.io/docs/argo/readme.html[].
+
+For workflows, the same namespace must be used as MXE uses. With the default installation method, the namespace is `mxe`. The service account which has the necessary permissions is called `eric-mxe-argo-workflow-service-account`. Argo in MXE uses the `k8sapi` workflow executor. For its restrictions, see https://argoproj.github.io/docs/argo/workflow-executors.html#kubernetes-api-k8sapi[]. The main restriction is that file output artifacts must be on volumes. Input artifacts can be used as usual. Artifacts are handled automatically by the internal MinIO instance.
+
+[[UserAdministration]]
+== User Administration
+
+Users may access the administration page by entering the `/auth/admin` path. This opens the Keycloak admin console page. The credentials of the admin user are set in a secret prior to installation. See the doc-ref:[Installation Guide] for more information.
+
+[[CreatingaNewUser]]
+=== Creating a New User
+
+.Follow these steps to create a new user:
+. Select the `Mxe` realm on the top left corner.
+. Select the `Users` menu on the left panel.
+. Click on the `Add User` button on the top right of the screen.
+. Fill the necessary information and click on the `Save` button.
+. Click on the `Credentials` tab.
+. Set the password.
+. Set `Temporary` to `off` if you do not want to update the password on the first login.
+. Click on `Reset password`.
+. A pop-up will appear, click on `Change password`.
+
+[[AccessControlAdministration]]
+== Access Control Administration
+
+Access control management is available on the Keycloak administration page at path `/auth/admin`.
+
+The credentials of the admin user is set in a secret prior to installation, see doc-ref:[Installation Guide].
+
+Access rights are configured via Roles in Keycloak. Roles can be directly assigned to users or you can define groups with a set of roles and add users to the groups.
+
+Associating an access privilege with a domain for a particular target or all targets is configured via Role attributes:
+
+....
+Key: domain name
+Value: <target>:<privilege>;<target>:<privilege>
+....
+
+NOTE: `target` can be omitted if `privilege` is defined for all targets.
+
+[[GlobalRoles]]
+=== Global Roles
+
+*Administrator* global role is introduced to help handling permission changes in the GUI.
+
+[[CreateaRole]]
+=== Create a Role
+
+Create a role:
+
+. Make sure you are in the MXE realm by checking in the top left corner.
+. Click on the *Roles* menu on the left.
+. Click on the *Add Role* button.
+. Give the role a name and an arbitrary description.
++
+NOTE: Roles meant to be used for access control must start with the `mxe_` prefix.
++
+. Select the *Attributes* tab to setup access privileges.
+. Assign this role directly to the user or create a group then add the role to it and join the user to the that group. See sections <<AssignaRoletoaUser,Assign a Role to a User>>, <<CreateaGroup,Create a Group>>, and <<JoinUserintoaGroup,Join User into a Group>>, respectively.
+
+*Examples of role attribute settings:*
+
+....
+Key: com.ericsson
+Value: models:all;model-services:read
+....
+
+This role makes sure that the user can get, list, onboard, and delete models, but can only get and list model services in the com.ericsson domain and all of its subdomains.
+
+....
+Key: com.ericsson
+Value: models:read
+....
+
+This role makes sure that the user can only execute non-modifying operations (read, list) on the models in the com.ericsson domain and all of its subdomains.
+
+....
+Key: com.ericsson.something
+Value: all
+....
+
+This role makes sure that the user can execute all available operations on all models and model services in the com.ericsson.something domain and all of its subdomains.
+
+....
+Key: com.ericsson.something
+Value: read
+....
+
+This role makes sure that the user can only execute non-modifying operations (read, list) on all models and model services in the com.ericsson.something domain and all of its subdomains.
+
+....
+Key: *
+Value: all
+....
+
+This role allows the user to execute all available operations on all targets in any domain.
+
+NOTE: The asterisk `*` character can only be used as in the above example. It cannot be used as a wildcard otherwise.
+
+WARNING: Subdomains can only be more permissive, than the domain they belong to.
+
+For example `com.ericsson=all, com.ericsson.internal=read` is properly configured, while `com.ericsson=read, com.ericsson.internal=all` is not.
+
+NOTE: Incorrect configurations are ignored. Log in with an affected user to check which rights got applied.
+
+[[AssignaRoletoaUser]]
+=== Assign a Role to a User
+
+. Make sure you are in the MXE realm by checking in the top left corner.
+. Go to the *Users* menu on the left.
+. Click the *View all users* button.
+. Click the *Edit* button in the row of the user you are looking for.
+. Select the *Role Mappings* tab.
+. Select a set of roles in the *Available Roles* section.
+. Click the *Add selected* button.
+
+[[CreateaGroup]]
+=== Create a Group
+
+. Make sure you are in the MXE realm by checking in the top left corner.
+. Click the *Groups* menu on the left.
+. Click the *New* button.
+. Select the *Role Mappings* tab.
+. Select a set of roles in the *Available roles* section.
+. Click the *Add selected* button.
+
+[[JoinUserintoaGroup]]
+=== Join User into a Group
+
+. Make sure you are in the MXE realm by checking in the top left corner.
+. Click the *Users* menu on the left.
+. Click the *View all users* button.
+. Click the *Edit* button in the row of the user you are looking for.
+. Select a set of roles in the *Available roles* section.
+. Click the *Add selected* button.
+
+[[Settings]]
+== Settings
+
+The *Settings* menu implements the handling of the access control of model authors.
+
+The *Settings* menu can be found on the top system bar, next to the user profile. It's icon is a gear cog.
+
+Only users with the *administrator* global role can see and access it, otherwise users are instantly redirected to the dashboard.
+
+[[Authors]]
+== Authors
+
+The first tab of the settings page is the management area of the access control for permitted authors.
+
+The table lists all the permitted authors.
+
+[[AddPermittedAuthor]]
+=== Add Permitted Author
+
+. Click the *Add author* button in the top right area.
+. Fill the name and the public key text areas.
+. Click the *Add author* button.
+
+This adds a permitted author to the list.
+
+[[DeleteAuthor]]
+=== Delete Author
+
+. Hover over the line containing the author to delete to make the *Delete* button appear.
+. Click on the *Delete* button.
+. Click on the *Delete* button in the confirmation dialog.

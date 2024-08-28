@@ -1,0 +1,206 @@
+repositories:
+  - name: adp 
+    url: https://arm.sero.gic.ericsson.se/artifactory/proj-adp-gs-released-helm
+
+helmDefaults:
+    wait: true 
+    waitForJobs: true 
+    timeout: 1800
+
+releases: 
+  {{- if eq (toString .StateValues.encryption.enable_in_transit) "true" }}
+  - name: eric-sec-sip-tls-crd
+    namespace: {{ requiredEnv "MXE_NAMESPACE" }}
+    chart: adp/eric-sec-sip-tls-crd
+    version: {{ requiredEnv "ERIC_SEC_SIP_TLS_CRD_VERSION" }}
+    hooks:
+    - events: ['postuninstall']
+      showlogs: true
+      command: "/bin/bash"
+      args: 
+       - "-c"
+       - |
+          set -x;
+          echo "Cleaning up resources left behind by eric-sec-sip-tls-crd";
+          SIP_TLS_CRD_RELEASE_NAME='{{`{{.Release.Name}}`}}';
+          NAMESPACE='{{`{{ requiredEnv "MXE_NAMESPACE" }}`}}';
+          kubectl delete deployment,statefulset,jobs,pods,svc,ingress,configmap,secret,sa,role,rolebinding,clusterrole,clusterrolebinding,pdb,hpa -n ${NAMESPACE} -l app.kubernetes.io/instance=${SIP_TLS_CRD_RELEASE_NAME};
+          kubectl delete CustomResourceDefinition -l app.kubernetes.io/name=eric-sec-sip-tls-crd;
+  - name: eric-data-distributed-coordinator-ed
+    namespace: {{ requiredEnv "MXE_NAMESPACE" }}
+    chart: adp/eric-data-distributed-coordinator-ed
+    version: {{ requiredEnv "ERIC_DATA_DISTRIBUTED_COORDINATOR_ED_VERSION" }}
+    values:
+      - global:
+          featureGates:
+            caBootstrap_v2: true
+          registry:
+            url: {{ .StateValues.registry.url }}
+          pullSecret: {{ .StateValues.registry.pullSecret }}
+        persistence:
+          persistentVolumeClaim:
+            storageClassName: {{ .StateValues.storage_class }}
+        affinity:
+          podAntiAffinity: soft
+    needs:
+      - eric-sec-sip-tls-crd
+    hooks:
+    - events: ['postuninstall']
+      showlogs: true
+      command: "/bin/bash"
+      args: 
+       - "-c"
+       - |
+          set -x;
+          NAMESPACE='{{`{{ requiredEnv "MXE_NAMESPACE" }}`}}';
+          kubectl delete pvc data-eric-data-distributed-coordinator-ed-0 data-eric-data-distributed-coordinator-ed-1 data-eric-data-distributed-coordinator-ed-2 -n ${NAMESPACE} --ignore-not-found=true;
+          kubectl delete secret eric-data-distributed-coordinator-creds eric-sec-sip-tls-trusted-root-cert eric-sec-certm-deployment-configuration cmpca-cert-consumer-secret eric-sec-sip-tls-hkln-inventory -n ${NAMESPACE} --ignore-not-found=true;
+  - name: eric-sec-key-management
+    namespace: {{ requiredEnv "MXE_NAMESPACE" }} 
+    chart: adp/eric-sec-key-management
+    version: {{ requiredEnv "ERIC_SEC_KEY_MANAGEMENT_VERSION" }}
+    values:
+      - global:
+          featureGates:
+            caBootstrap_v2: true
+          registry:
+            url: {{ .StateValues.registry.url }}
+          pullSecret: {{ .StateValues.registry.pullSecret }}
+          persistence:
+            pvc:
+              storageClassName: {{ .StateValues.storage_class }}
+    needs:
+      - eric-sec-sip-tls-crd
+    hooks:
+    - events: ['postuninstall']
+      showlogs: true
+      command: "/bin/bash"
+      args: 
+       - "-c"
+       - |
+          set -x;
+          echo "Cleaning up resources left behind by eric-sec-key-management";
+          NAMESPACE='{{`{{ requiredEnv "MXE_NAMESPACE" }}`}}';
+          kubectl delete secret --namespace ${NAMESPACE} eric-data-object-storage-mn-kms-set --ignore-not-found=true;      
+  - name: eric-sec-sip-tls
+    namespace: {{ requiredEnv "MXE_NAMESPACE" }}  
+    chart: adp/eric-sec-sip-tls
+    version: {{ requiredEnv "ERIC_SEC_SIP_TLS" }}
+    values:
+      - global:
+          featureGates:
+            caBootstrap_v2: true
+          registry:
+            url: {{ .StateValues.registry.url }}
+          pullSecret: {{ .StateValues.registry.pullSecret }}
+    needs:
+      - eric-sec-sip-tls-crd
+    hooks:
+    - events: ['postuninstall']
+      showlogs: true
+      command: "/bin/bash"
+      args: 
+       - "-c"
+       - |
+          set -x;
+          echo "Cleaning up resources left behind by eric-sec-sip-tls";
+          SIP_TLS_RELEASE_NAME='{{`{{.Release.Name}}`}}';
+          NAMESPACE='{{`{{ requiredEnv "MXE_NAMESPACE" }}`}}';
+          kubectl delete deployment,statefulset,jobs,pods,svc,ingress,configmap,secret,sa,role,rolebinding,clusterrole,clusterrolebinding,pdb,hpa -n ${NAMESPACE} -l com.ericsson.sec.tls/created-by=${SIP_TLS_RELEASE_NAME};
+          kubectl delete configmap -n ${NAMESPACE} eric-sec-sip-tls-ha eric-sec-sip-tls-supervisor-ha --ignore-not-found=true;
+  {{- end }}
+  - name: eric-mesh-controller-crd
+    namespace: {{ requiredEnv "MXE_NAMESPACE" }}  
+    chart: adp/eric-mesh-controller-crd
+    version: {{ requiredEnv "ERIC_MESH_CONTROLLER_CRD_VERSION" }}
+    values:
+      - global:
+          registry:
+            url: {{ .StateValues.registry.url }}
+          pullSecret: {{ .StateValues.registry.pullSecret }}
+    hooks:
+    - events: ['postuninstall']
+      showlogs: true
+      command: "/bin/bash"
+      args: 
+       - "-c"
+       - |
+          set -x;
+          echo "Cleaning up resources left behind by eric-mesh-controller-crd";
+          MESH_CRD_RELEASE_NAME='{{`{{.Release.Name}}`}}';
+          NAMESPACE='{{`{{ requiredEnv "MXE_NAMESPACE" }}`}}';
+          kubectl delete deployment,statefulset,jobs,pods,svc,ingress,configmap,secret,sa,role,rolebinding,clusterrole,clusterrolebinding,pdb,hpa ${MXE_COMMONS_RELEASE_NAME} -l app.kubernetes.io/instance=${MESH_CRD_RELEASE_NAME};
+          kubectl delete CustomResourceDefinition -l app.kubernetes.io/name=eric-mesh-controller-crd;
+  - name: eric-mesh-controller
+    namespace: {{ requiredEnv "MXE_NAMESPACE" }} 
+    chart: adp/eric-mesh-controller
+    version: {{ requiredEnv "ERIC_MESH_CONTROLLER_VERSION"}}
+    values: 
+      - global:
+          registry:
+            url: {{ .StateValues.registry.url }}
+          pullSecret: {{ .StateValues.registry.pullSecret }}
+          accessLogFile: /dev/stdout
+          proxy:
+            autoinject: disabled
+            logLevel: debug
+            holdApplicationUntilProxyStarts: true
+          meshConfig:
+            enablePrometheusMerge: false
+            multiTenancy:
+              enabled: true
+        autoScaling:
+          enabled: false
+        replicaCount: 1 
+        telemetry:
+          enabled: true
+          v2:
+            enabled: true
+    set:
+      - name: pilot.jwksResolverExtraRootCA
+        file: {{ requiredEnv "EGADROOTCA_LOCATION" }}
+    needs:
+      - eric-mesh-controller-crd
+  - name: eric-ctrl-bro
+    namespace: {{ requiredEnv "MXE_NAMESPACE" }}  
+    chart: adp/eric-ctrl-bro
+    version: {{ requiredEnv "ERIC_CTRL_BRO_VERSION" }}
+    values: 
+      - global:
+          registry:
+            url: {{ .StateValues.registry.url }}
+          pullSecret: {{ .StateValues.registry.pullSecret }}
+          security:
+            tls:
+              enabled: {{ .StateValues.encryption.enable_in_transit }}
+        metrics:
+          enabled: false
+        persistence:
+          persistentVolumeClaim:
+            storageClassName: {{ .StateValues.storage_class }}
+    {{- if eq (toString .StateValues.encryption.enable_in_transit) "true" }}
+    needs:
+      - eric-sec-sip-tls
+    {{- end }}
+  - name: eric-data-document-database-pg-crd
+    namespace: {{ requiredEnv "MXE_NAMESPACE" }}  
+    chart: adp/eric-data-document-database-pg-crd
+    version: {{ requiredEnv "ERIC_DATA_DOCUMENT_DATABASE_PG_CRD_VERSION" }}
+    values:
+      - global:
+          registry:
+            url: {{ .StateValues.registry.url }}
+          pullSecret: {{ .StateValues.registry.pullSecret }}
+    hooks:
+    - events: ['postuninstall']
+      showlogs: true
+      command: "/bin/bash"
+      args: 
+       - "-c"
+       - |
+          set -x;
+          echo "Cleaning up resources left behind by eric-data-document-database-pg-crd";
+          DOC_DB_CRD_RELEASE_NAME='{{`{{.Release.Name}}`}}';
+          NAMESPACE='{{`{{ requiredEnv "MXE_NAMESPACE" }}`}}';
+          kubectl delete deployment,statefulset,jobs,pods,svc,ingress,configmap,secret,sa,role,rolebinding,clusterrole,clusterrolebinding,pdb,hpa -n ${NAMESPACE} -l app.kubernetes.io/instance=${DOC_DB_CRD_RELEASE_NAME};
+          kubectl delete CustomResourceDefinition -l app.kubernetes.io/name=eric-data-document-database-pg-crd;

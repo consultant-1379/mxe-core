@@ -1,0 +1,105 @@
+realm:
+  realm: argocd
+  accountTheme: ericsson-base-modified-theme
+  loginTheme: ericsson-base-modified-theme
+  enabled: true
+clientScope:
+  name: groups
+  protocol: openid-connect
+  attributes:
+    include.in.token.scope: true
+    display.on.consent.screen: true
+  protocolMappers:
+    - name: groups
+      protocol: openid-connect
+      protocolMapper: oidc-group-membership-mapper
+      config:
+        id.token.claim: true
+        access.token.claim: true
+        userinfo.token.claim: true
+        claim.name: groups
+client:
+  clientId: argocd
+  name: argocd
+  protocol: openid-connect
+  rootUrl: https://argocdui.olah015.rnd.gic.ericsson.se
+  redirectUris:
+    - https://argocdui.olah015.rnd.gic.ericsson.se/auth/callback
+  adminUrl: https://argocdui.olah015.rnd.gic.ericsson.se
+  webOrigins:
+    - https://argocdui.olah015.rnd.gic.ericsson.se
+  baseUrl: /applications
+  bearerOnly: false
+  publicClient: false
+  standardFlowEnabled: true
+  implicitFlowEnabled: false
+  directAccessGrantsEnabled: true
+  consentRequired: false
+  defaultClientScopes:
+    - email
+    - groups 
+    - profile
+    - roles 
+    - web-origins 
+  optionalClientScopes:
+    - address 
+    - microprofile-jwt
+    - offline_access 
+    - phone
+restClient:
+  clientId: argocd-rest-client
+  name: argocd-rest-client
+  protocol: openid-connect
+  rootUrl: https://argocdui.olah015.rnd.gic.ericsson.se
+  redirectUris:
+    - https://argocdui.olah015.rnd.gic.ericsson.se/auth/callback
+  adminUrl: https://argocdui.olah015.rnd.gic.ericsson.se
+  webOrigins:
+    - https://argocdui.olah015.rnd.gic.ericsson.se
+  baseUrl: /applications
+  bearerOnly: false
+  publicClient: true
+  standardFlowEnabled: true
+  implicitFlowEnabled: false
+  directAccessGrantsEnabled: true
+  consentRequired: false
+  defaultClientScopes:
+    - email
+    - groups 
+    - profile
+    - roles 
+    - web-origins 
+  optionalClientScopes:
+    - address 
+    - microprofile-jwt
+    - offline_access 
+    - phone
+groups:
+  - name: ArgocdAdmins
+  - name: ArgocdReadOnlyUsers
+users:
+ - keycloakUser:
+    username:
+    enabled: true
+    groups:
+      - ArgocdAdmins
+    credentials:
+      - type: password
+        value:
+   secrets:
+    userNameSecret: 
+        name: argocd-sso-creds-hooked
+        key:  adminUserName
+    passwordSecret: 
+      name: argocd-sso-creds-hooked
+      key:  adminUserPassword
+ - keycloakUser: 
+    username: argocd-readonly
+    enabled: true
+    groups:
+    - ArgocdReadOnlyUsers
+    credentials:
+      - temporary: true
+        type: password
+        value: argocd-ro-user-secret-pw
+

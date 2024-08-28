@@ -1,0 +1,76 @@
+modelVersion: 2.0
+
+properties:
+  - mxe-commons-docker-images-3pp: >
+      k8s.gcr.io/ingress-nginx/controller:v1.8.1-3.19.1,
+      pypiserver/pypiserver:2.0.1-alpine3.19.1,
+      certificate-sidecar:ubuntu-20240405,
+
+  - mxe-deployer-docker-images-3pp: >
+      argoproj/argocd:v2.11.0-ubuntu-20240405,
+      redis:7.0.9-ubuntu-20240405,
+      haproxy:2.6.9-ubuntu-20240405,
+      gitea/mxe-gitea:v1.20.2-ubuntu-20240405-rootless,
+
+  - mxe-serving-docker-images-3pp: >
+      seldonio/seldon-core-operator:1.17.1-ubuntu-20240405,
+      seldonio/seldon-core-executor:1.17.1-ubuntu-20240405,
+      minio/mc:RELEASE.2024-04-18T16-45-29Z-ubuntu-20240405,
+
+  - mxe-workflow-docker-images-3pp: >
+      quay.io/argoproj/argocli:v3.4.9-cbos-6.14.0-10,
+      quay.io/argoproj/argoexec:v3.4.9-cbos-6.14.0-10,
+      quay.io/argoproj/workflow-controller:v3.4.9-cbos-6.14.0-10,
+      spark/spark-operator:6.14.0-10-1.1.27-01,
+
+  - mxe-training-docker-images-3pp: ""
+
+  - mxe-exploration-docker-images-3pp: ""
+
+  - docker-images-3pp: >
+      ${mxe-commons-docker-images-3pp}
+      ${mxe-deployer-docker-images-3pp}
+      ${mxe-serving-docker-images-3pp}
+      ${mxe-workflow-docker-images-3pp}
+      ${mxe-training-docker-images-3pp}
+      ${mxe-exploration-docker-images-3pp}
+
+  - adp-gs-all-repo: https://arm.sero.gic.ericsson.se/artifactory/proj-adp-gs-all-helm
+  - adp-gs-released-repo: https://arm.sero.gic.ericsson.se/artifactory/proj-adp-gs-released-helm
+
+  - eric-sec-sip-tls-crd-version: 6.1.0+1
+  - eric-mesh-controller-crd-version: 13.0.0+50
+  - eric-mesh-controller-version: 13.0.0+50
+  - eric-sec-sip-tls-version: 11.1.0+16
+  - eric-sec-key-management-version: 8.1.0+18
+  - eric-data-distributed-coordinator-ed-version: 10.9.0+24
+  - eric-ctrl-bro-version: 10.0.0+26
+  - eric-data-document-database-pg-crd-version: 1.5.0+66
+
+   ##FIXME Remove these properties as we are now managing versions via helmfile
+   ## Removal depends on modification of obsolete rulesets which refer these - deferred for now
+  - helm-chart-adp-eric-ctrl-bro: ${adp-gs-all-repo}/eric-ctrl-bro/eric-ctrl-bro-${eric-ctrl-bro-version}.tgz
+  - helm-chart-adp-sm-controller-crd: ${adp-gs-all-repo}/eric-mesh-controller-crd/eric-mesh-controller-crd-${eric-mesh-controller-crd-version}.tgz
+  - helm-chart-eric-sec-sip-tls-crd:  ${adp-gs-released-repo}/eric-sec-sip-tls-crd/eric-sec-sip-tls-crd-${eric-sec-sip-tls-crd-version}.tgz
+  - helm-chart-eric-data-distributed-coordinator-ed:  ${adp-gs-released-repo}/eric-data-distributed-coordinator-ed/eric-data-distributed-coordinator-ed-${eric-data-distributed-coordinator-ed-version}.tgz
+  - helm-chart-eric-sec-key-management:  ${adp-gs-released-repo}/eric-sec-key-management/eric-sec-key-management-${eric-sec-key-management-version}.tgz
+  - helm-chart-eric-sec-sip-tls: ${adp-gs-released-repo}/eric-sec-sip-tls/eric-sec-sip-tls-${eric-sec-sip-tls-version}.tgz
+  - helm-chart-eric-mesh-controller: ${adp-gs-all-repo}/eric-mesh-controller/eric-mesh-controller-${eric-mesh-controller-version}.tgz
+  - helm-chart-eric-data-document-database-pg-crd: ${adp-gs-all-repo}/eric-data-document-database-pg-crd/eric-data-document-database-pg-crd-${eric-data-document-database-pg-crd-version}.tgz
+
+env:
+  - COMMON_BASE_OS_VERSION (default=6.14.0-10)
+  - CBO_DEVEL_VERSION (default=6.14.0-10)
+  - GOVERSION (default=1.20.6)
+  - IAM_VERSION (default=21.1.0-14)
+  - MESH_INGRESS_GATEWAY (default=8.0.0-31)
+  - KEYCLOAK_VERSION (default=21.1.1)
+  - NODE_VERSION (default=v18.14.2)
+  - NPM_VERSION (default=v9.5.0)
+  - JUPYTERHUB_VERSION (default=1.2.0-2.5-2)
+  - JUPYTERLAB_VERSION (default=1.2.0-2.5-1)
+  - PYPISERVER_VERSION (default=1.5.1-alpine3.19.1)
+  - KUBECTL_VERSION (default=1.24.13)
+  - KANIKO_VERSION (default=v1.12.1)
+  - CRANE_VERSION (default=v0.15.2)
+  - SELDON_CORE_VERSION (default=1.17.1)

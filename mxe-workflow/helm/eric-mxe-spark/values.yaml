@@ -1,0 +1,66 @@
+# Default values for eric-mxe-argo.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+enabled: true
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "-"
+
+nameOverride: null
+
+imageCredentials:
+  registry:
+    url:
+    pullSecret:
+  repoPath:
+  kubernetes-modifier:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+
+# DR-D1121-011 - Present in Top Level Helm Chart Values.yaml
+# global:
+#   registry:
+#     url: "armdocker.rnd.ericsson.se"
+#     pullSecret:
+#   labels: {}
+#   annotations: {}
+
+images:
+  kubernetes-modifier:
+    name: "mxe/eric-mxe-kubernetes-modifier"
+    tag: "VERSION"
+
+resources:
+  kubernetesModifier:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+
+terminationGracePeriodSeconds: 30
+
+tolerations: []
+
+labels: {}
+annotations: {}
+
+# DR-D1123-127 -  ADP services shall define AppArmor profile
+appArmorProfile:
+  type: runtime/default
+  localhostProfile:
+
+# DR-D1123-128 - ADP services shall define Seccomp profile
+seccompProfile:
+  type: RuntimeDefault
+  localhostProfile:

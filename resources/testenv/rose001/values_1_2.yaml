@@ -1,0 +1,183 @@
+# Set values for Helm charts of MXE
+# This is a YAML-formatted file.
+
+### DO NOT CHANGE ANCHORS! ###
+
+# These fields are all mandatory. Please set them/change them according to your desire.
+
+# The storage class which will be used by MXE to create persistent volumes
+storageClass: &storageClass erikube-rbd
+
+# The domain name by which MXE's api and gui will be accessible
+apiHostname: &apiHostname rose001.rnd.gic.ericsson.se
+
+# The name of a secret which contains a tls for the given hostname of the api
+apiSecretName: &apiSecretName api-tls
+
+# Whether MXE will be accessible through a default ingress controller already present on the Kubernetes cluster, or a new internal one which will be installed by MXE.
+disableDefaultIngressControllerUse: &disableDefaultIngressControllerUse false
+
+# The port on which MXE will be accessible.
+apiPort: &apiPort 443
+
+# The docker registry which is used by majority of MXE's components
+installerDockerRegistry: &installerDockerRegistry armdocker.rnd.ericsson.se
+
+# The docker registry which is used by Seldon images
+installerSeldonDockerRegistry: &installerSeldonDockerRegistry armdocker.rnd.ericsson.se/proj-mxe
+
+# The docker registry which is used by Ambassador
+installerAmbassadorDockerRegistry: &installerAmbassadorDockerRegistry armdocker.rnd.ericsson.se/proj-mxe/quay.io/datawire/ambassador
+
+# User provided credentials in a form of a secret and given by its name for administering the realms in Keycloak. If not CHANGED, then the defaults are going to be used, see the Installation Guide for details.
+# If this value is changed, then the corresponding secret needs to be created beforehand.
+# Mandatory fields in the user provided secret:
+# - kcadminid (for the admin username)
+# - kcpasswd (for the admin user password)
+mxeAdminSecret: &mxeAdminSecret eric-sec-access-mgmt-creds
+
+# User provided credentials in a form of a secret and given by its name for the initial MXE user If not provided, then the defaults are going to be used, see the Installation Guide for details.
+# Mandatory fields in the user provided secret:
+# - username (for the initial MXE username)
+# - password (for the initial MXE user password)
+mxeUserSecret: &mxeUserSecret
+
+### DO NOT MODIFY BELOW THIS LINE! Only change anything below this line if you know what you're doing! ###
+
+global:
+  # To secure MXE's API endpoint, a certificate must be stored in a secret. This secret must be in the mxe namespace.
+  # The name of the secret can be given with the next key.
+  mxeApiTlsSecretName: *apiSecretName
+
+  # To secure MXE's API endpoint, a hostname must be defined, through which the endpoint will be reachable.
+  # This hostname can be given with the next key.
+  mxeApiHostname: *apiHostname
+
+  # By default, MXE uses a default ingress controller.
+  # To use an internal one change the next setting to false. The behaviour of this ingress controller can be modified under mxe-ingress-controller key.
+  mxeDisableDefaultIngressControllerUse: *disableDefaultIngressControllerUse
+
+  registry:
+    # The docker registry which will be used by the majority of containers in MXE.
+    url: *installerDockerRegistry
+
+eric-mxe-package-source-repository:
+  # Package source repository can be disabled. In default case, a new instance is created.
+  # If disabled then please specify the how Model catalogue service can reach a package source repository with mxe-model-catalogue-service.modelRepository keys.
+  # enabled:
+
+  persistentVolumeClaim:
+    # Set Storage class for package source repository
+    # If this is not set, then the default storage class will be used
+    storageClassName: nfs-client
+
+eric-mxe-gatekeeper:
+  service:
+    # The port where gatekeeper, MXE's main endpoint will be exposed
+    httpsPort: *apiPort
+  keycloak:
+    realm:
+      master:
+        secret:
+          secretName: *mxeAdminSecret
+      mxe:
+        secret:
+          secretName: *mxeUserSecret
+          temporalUser: false
+
+eric-sec-access-mgmt:
+  statefulset:
+    adminSecret: *mxeAdminSecret
+  ingress:
+    # The host where MXE's user handling service will be exposed
+    host: *apiHostname
+    tls:
+      # This setting defines whether https communication will be used for user handling.
+      # It must be only enabled when there is no default ingress controller.
+      enabled: *disableDefaultIngressControllerUse
+
+      # The certificate for https communication when it is enabled.
+      existingSecret: *apiSecretName
+
+# The model service which starts models in the cluster
+mxe-model-service:
+  dockerRegistry:
+    # The host name of the internal Docker registry. This will be used by the used Kubernetes cluster to start stored models
+    externalHostname: *apiHostname
+
+    # The port of the internal Docker registry. If the default ingress controller is disabled, then this will be the same as the internal ingress controller's port
+    externalPort: *apiPort
+
+# Documentation of Seldon core's options: https://github.com/SeldonIO/seldon-core/blob/v0.4.0/helm-charts/seldon-core-operator/values.yaml
+seldon-core-operator:
+  image:
+    # The docker repository where Seldon operator's image can be found
+    registry: *installerSeldonDockerRegistry
+  engine:
+    image:
+      # The docker repository where Seldon's sidecar image can be found
+      registry: *installerSeldonDockerRegistry
+
+# Documentation of Seldon core analytics' options: https://github.com/SeldonIO/seldon-core/tree/v0.2.6/helm-charts/seldon-core-analytics
+seldon-core-analytics:
+  enabled: true
+
+  #  Documentation of storage options https://prometheus.io/docs/prometheus/latest/storage/.
+  persistence:
+    # In order to persist historical metrics data (in case of reinstall, upgrade, system failure, etc.) persistence shall be enabled.
+    # enabled:
+
+    # In case of enabled metrics persistence a persistent volume claim definition must be existent or can be created during install. If the "create" flag is set to true then it will be created, otherwise the one will
+    # be used which provided in the "name" property.
+    claim:
+      storageClassName: nfs-client
+      # create:
+      # name:
+      # capacity:
+
+    # The Write-Ahead-Log files store the data in raw format, and they can be compressed therefore you can expect the WAL size to be halved https://prometheus.io/docs/prometheus/latest/storage/#operational-aspects
+    # walCompression:
+
+    # Both time and size based retention can be in force at once.
+    # Formula: needed_disk_space = retention_time_seconds * ingested_samples_per_second * bytes_per_sample
+    # retention:
+      # This value determines the maximum number of bytes that storage blocks can use (note that this does not include the WAL size, which can be substantial).
+      # size:
+
+      # This value determines when to remove old data.
+      # time:
+
+ambassador:
+  image:
+    # The docker repository where Ambassador's images can be found
+    repository: *installerAmbassadorDockerRegistry
+
+# Document of Document Database PG's options: http://calstore.internal.ericsson.com/elex?LI=EN/LZN7020476/2R*&FN=1_1531-CAV10116_2Uen.*.html&HT=id_sjxl
+eric-data-document-database-pg:
+  persistence:
+    # The storage class which is used by Document database as a main storage. By default it tries to use erikube-rbd, and NOT the default storage class.
+    storageClassName: *storageClass
+
+    backup:
+      # The storage class which is used by Document database for backup purposes. By default it tries to use erikube-rbd, and NOT the default storage class.
+      storageClassName: *storageClass
+
+# Documentation of Docker registry's options: http://calstore.internal.ericsson.com/elex?LI=EN/LZN7020497/1R*&FN=1_1531-CAV10168_1Uen.*.html&HT=id_775u
+eric-lcm-container-registry:
+  ingress:
+    # It's mandatory to give a hostname, by which the Docker container will be accessible to nodes in the cluster
+    host: *apiHostname
+
+    tls:
+      # For ingress, https is forced by default. This means that the registry will work as a secure registry.
+      # For insecure registry, the next line should be uncommented.
+      enabled: *disableDefaultIngressControllerUse
+
+      # The certificate for https must be stored in a kubernetes tls secret.
+      # In the next line, the name of the secret must be given, if tls is enabled.
+      secretName: *apiSecretName
+  registry:
+    volumes:
+      data:
+        # The storage class which is used to store images. By default it uses the default storage class. If there is no default storage class, and it's not specified, then pod creation will fail.
+        storageClass: *storageClass

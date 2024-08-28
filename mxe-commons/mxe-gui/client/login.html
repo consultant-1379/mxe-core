@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MXE Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="title" content="MXE" />
+    <meta name="description" content="Machine Learning Execution Environment" />
+    <meta
+      name="keywords"
+      content="ericsson, mxe, machine learning, execution environment, dashboard"
+    />
+    <meta name="robots" content="index, follow" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="language" content="English" />
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="assets/css/login.css" media="screen" />
+    <script src="polyfills/webcomponents-lite.js"></script>
+    <script src="libs/@eui/base/0/eui-base-umd.js"></script>
+  </head>
+
+  <body class="dark">
+    <div class="signin">
+      <div class="watermark">
+        <img src="assets/icons/elogo_white.svg" width="55" height="55" alt="logo" />
+        <div class="product">MXE</div>
+      </div>
+
+      <div class="loginForm">
+        <div class="field">
+          <eui-base-v0-text-field
+            id="username"
+            labeltext="Username"
+            placeholder="Email"
+            fullwidth
+          ></eui-base-v0-text-field>
+        </div>
+        <div class="field">
+          <eui-base-v0-password-field
+            id="password"
+            class="field"
+            labeltext="Password"
+            placeholder=""
+            fullwidth
+          ></eui-base-v0-password-field>
+        </div>
+        <!--  <div class="field">
+          <eui-base-v0-checkbox class="field" name="rememberme">Remember me</eui-base-v0-checkbox>
+        </div>-->
+        <eui-base-v0-button
+          id="submit"
+          class="field"
+          big
+          primary
+          fullwidth
+          onclick="authenticateRedirect()"
+        >
+          Sign in
+        </eui-base-v0-button>
+      </div>
+
+      <div class="help">
+        <a class="subtle-link" href="#">Having trouble signing in?</a>
+      </div>
+
+      <div class="footer">
+        © Ericsson AB 2013-2018 - All Rights Reserved. <br />
+        No part of this software may be reproduced in any form without the written permission of the
+        copyright holder.
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      function authenticateRedirect() {
+        if (typeof Storage !== 'undefined') {
+          var storage = window.localStorage;
+          var session = window.sessionStorage;
+          storage.setItem('token', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+          storage.setItem('username', getName());
+          window.location = './';
+        }
+      }
+      function getName() {
+        const el = document.getElementById('username');
+        return el.value || 'username';
+      }
+    </script>
+    <!-- Matomo -->
+    <!-- <script type="text/javascript">
+      var _paq = window._paq || [];
+      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function () {
+        var u = '//soi.tsp.eth.ericsson.se:28443/';
+        _paq.push(['setTrackerUrl', u + 'matomo.php']);
+        _paq.push(['setSiteId', '1']);
+        var d = document,
+          g = d.createElement('script'),
+          s = d.getElementsByTagName('script')[0];
+        g.type = 'text/javascript';
+        g.async = true;
+        g.defer = true;
+        g.src = u + 'matomo.js';
+        s.parentNode.insertBefore(g, s);
+      })();
+    </script> -->
+    <!-- End Matomo Code -->
+  </body>
+</html>

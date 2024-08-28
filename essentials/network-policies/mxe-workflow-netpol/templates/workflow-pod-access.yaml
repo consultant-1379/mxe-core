@@ -1,0 +1,30 @@
+{{ $podSelector:= .Values.networkPolicy.argoWorkflows.workflowPod.podSelector}}
+{{ $ingressRules := .Values.networkPolicy.argoWorkflows.workflowPod.ingress}}
+{{ $egressRules := .Values.networkPolicy.argoWorkflows.workflowPod.egress}}
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mxe-workflow-argo-workflowpod-access
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/name:  mxe-workflow-argo-workflowpod-access
+spec:
+  podSelector:
+    {{- $podSelector | toYaml | nindent 4 }}
+  policyTypes:
+  {{- if $ingressRules }}
+    - Ingress
+  {{- end }}
+  {{- if $egressRules }}
+    - Egress
+  {{- end }}
+  {{- if $ingressRules }}
+  ingress:
+  {{- $ingressRules | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if $egressRules }}
+  egress:
+  {{- $egressRules | toYaml | nindent 4 }}
+  {{- end }}
+

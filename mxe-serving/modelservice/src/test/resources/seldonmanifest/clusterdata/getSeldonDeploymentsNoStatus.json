@@ -1,0 +1,126 @@
+{
+  "apiVersion" : "machinelearning.seldon.io/v1",
+  "items" : [ {
+    "apiVersion" : "machinelearning.seldon.io/v1",
+    "kind" : "SeldonDeployment",
+    "metadata" : {
+      "clusterName" : "",
+      "creationTimestamp" : "2019-03-12T15:49:39Z",
+      "generation" : 1.0,
+      "labels" : {
+        "app" : "seldon",
+        "mxe/component" : "production-model-img",
+        "mxe/version" : "0.0.1beta",
+        "mxe/deploymenttype": "model",
+        "mxe/createdbyuserid": "1234-5678-9012",
+        "mxe/createdbyusername": "mxe-user"
+      },
+      "name" : "production-model-img",
+      "namespace" : "mxe",
+      "resourceVersion" : "24718796",
+      "selfLink" : "/apis/machinelearning.seldon.io/v1/namespaces/mxe/seldondeployments/production-model-img",
+      "uid" : "71e4b476-44de-11e9-b4a8-0050569a0898"
+    },
+    "spec" : {
+      "annotations" : {
+        "deployment_version" : "v1",
+        "project_name" : "production-model-img",
+        "seldon.io/rest-read-timeout": "0"
+      },
+      "name" : "production-model-img",
+      "predictors" : [ {
+        "annotations" : {
+          "predictor_version" : "v1"
+        },
+        "componentSpecs" : [ {
+          "metadata" : {
+            "labels" : {
+              "seldon-app-production-model-img" : "production-model-img-production-model-img-production-model-img"
+            }
+          },
+          "spec" : {
+            "containers" : [ {
+              "env" : [ {
+                "name" : "PREDICTIVE_UNIT_SERVICE_PORT",
+                "value" : "9000"
+              }, {
+                "name" : "PREDICTIVE_UNIT_PARAMETERS",
+                "value" : "[]"
+              }, {
+                "name" : "PREDICTIVE_UNIT_ID",
+                "value" : "production-model-img"
+              }, {
+                "name" : "PREDICTOR_ID",
+                "value" : "production-model-img"
+              }, {
+                "name" : "SELDON_DEPLOYMENT_ID",
+                "value" : "production-model-img"
+              } ],
+              "image" : "vmx-eea166.ete.ka.sw.ericsson.se:32222/img_vgg16:v0.0.1",
+              "imagePullPolicy" : "IfNotPresent",
+              "lifecycle" : {
+                "preStop" : {
+                  "exec" : {
+                    "command" : [ "/bin/sh", "-c", "/bin/sleep 5" ]
+                  }
+                }
+              },
+              "livenessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "name" : "production-model-img",
+              "ports" : [ {
+                "containerPort" : 9000.0,
+                "name" : "http"
+              } ],
+              "readinessProbe" : {
+                "failureThreshold" : 3.0,
+                "handler" : {
+                  "tcpSocket" : {
+                    "port" : "http"
+                  }
+                },
+                "initialDelaySeconds" : 100.0,
+                "periodSeconds" : 5.0,
+                "successThreshold" : 1.0,
+                "timeoutSeconds" : 1.0
+              },
+              "volumeMounts" : [ {
+                "mountPath" : "/etc/podinfo",
+                "name" : "podinfo",
+                "readOnly" : true
+              } ]
+            } ],
+            "terminationGracePeriodSeconds" : 1.0
+          }
+        } ],
+        "graph" : {
+          "endpoint" : {
+            "service_host" : "production-model-img-production-model-img-production-model-img",
+            "service_port" : 9000.0,
+            "type" : "REST"
+          },
+          "name" : "production-model-img",
+          "type" : "MODEL"
+        },
+        "name" : "production-model-img",
+        "replicas" : 1.0
+      } ]
+    }
+  } ],
+  "kind" : "SeldonDeploymentList",
+  "metadata" : {
+    "continue" : "",
+    "resourceVersion" : "28100958",
+    "selfLink" : "/apis/machinelearning.seldon.io/v1/namespaces/mxe/seldondeployments"
+  }
+}

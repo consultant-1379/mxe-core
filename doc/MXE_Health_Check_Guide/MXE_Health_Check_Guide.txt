@@ -1,0 +1,207 @@
+= Health Check Guide
+:author: Kristóf Nékám
+:signature: EKRINKM
+:department: BDGSJBAK
+:doc-name: OPERATING INSTRUCS
+:doc-no: 3/1543-AVA 901 53
+:revnumber: PH2
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+//Template updated 2018-08-21 (keep to track template history)
+
+[[Introduction]]
+== Introduction
+
+The purpose of health check is to monitor the existence and status of the MXE services and pods.
+
+[[ListMXENamespaces]]
+== List MXE Namespaces
+
+List MXE namespaces:
+
+....
+$ kubectl get namespaces | grep mxe
+
+mxe                          Active   26d
+....
+
+[[ChecktheExistenceofMXEServices]]
+== Check the Existence of MXE Services
+
+Check the existence of MXE services:
+
+....
+$ kubectl get services --namespace mxe
+
+NAME                                             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                   AGE
+eric-data-coordinator-zk                         ClusterIP   10.233.11.223   <none>        2181/TCP,8080/TCP         33m
+eric-data-coordinator-zk-ensemble-service        ClusterIP   None            <none>        2888/TCP,3888/TCP         33m
+eric-data-document-database-pg                   ClusterIP   10.233.55.96    <none>        5432/TCP,9187/TCP         33m
+eric-data-document-database-pg-replica           ClusterIP   10.233.3.222    <none>        5432/TCP,9187/TCP         33m
+eric-lcm-container-registry-registry             ClusterIP   10.233.55.132   <none>        80/TCP,443/TCP,5000/TCP   33m
+eric-mxe-dind                                    ClusterIP   10.233.15.122   <none>        2375/TCP                  33m
+eric-mxe-gatekeeper                              NodePort    10.233.46.155   <none>        3000:30895/TCP            33m
+eric-mxe-nifi-service                            ClusterIP   10.233.56.244   <none>        8080/TCP                  33m
+eric-mxe-package-source-repository               ClusterIP   10.233.9.250    <none>        22/TCP                    33m
+eric-mxe-prometheus-kube-state-metrics-service   ClusterIP   10.233.30.12    <none>        8080/TCP                  33m
+eric-pm-server                                   ClusterIP   10.233.59.62    <none>        9090/TCP                  33m
+eric-sec-access-mgmt-headless                    ClusterIP   None            <none>        8080/TCP                  33m
+eric-sec-access-mgmt-http                        ClusterIP   10.233.50.103   <none>        8080/TCP                  33m
+mxe-ambassador                                   ClusterIP   10.233.2.189    <none>        80/TCP                    33m
+mxe-ambassador-admins                            ClusterIP   10.233.26.218   <none>        8877/TCP                  33m
+mxe-mxe-default-backend                          ClusterIP   10.233.20.157   <none>        8080/TCP                  33m
+mxe-mxe-flow-repository                          ClusterIP   10.233.23.220   <none>        22/TCP                    33m
+mxe-mxe-gui                                      ClusterIP   10.233.45.98    <none>        80/TCP                    33m
+mxe-mxe-ingress-controller                       ClusterIP   10.233.27.250   <none>        80/TCP,443/TCP            33m
+mxe-mxe-model-catalogue-service                  ClusterIP   10.233.9.89     <none>        8080/TCP                  33m
+mxe-mxe-model-service                            ClusterIP   10.233.23.72    <none>        8080/TCP                  33m
+seldon-webhook-service                           ClusterIP   10.233.3.217    <none>        443/TCP                   33m
+....
+
+[[ChecktheExistenceandStatusofMXEPods]]
+== Check the Existence and Status of MXE Pods
+
+Check the existence and status of MXE pods:
+
+....
+$ kubectl get pods --namespace mxe
+
+NAME                                             TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
+eric-data-coordinator-zk                         ClusterIP   10.108.197.143   <none>        2181/TCP,8080/TCP            4d3h
+eric-data-coordinator-zk-ensemble-service        ClusterIP   None             <none>        2888/TCP,3888/TCP            4d3h
+eric-data-document-database-pg                   ClusterIP   10.105.161.222   <none>        5432/TCP,9187/TCP            4d3h
+eric-data-document-database-pg-replica           ClusterIP   10.107.70.160    <none>        5432/TCP,9187/TCP            4d3h
+eric-data-object-storage-mn                      ClusterIP   10.99.176.115    <none>        9000/TCP                     4d3h
+eric-data-object-storage-mn-svc                  ClusterIP   None             <none>        9000/TCP                     4d3h
+eric-lcm-container-registry-registry             ClusterIP   10.104.211.43    <none>        80/TCP,443/TCP,5000/TCP      4d3h
+eric-mxe-dind                                    ClusterIP   10.105.26.216    <none>        2375/TCP                     4d3h
+eric-mxe-gatekeeper                              ClusterIP   10.97.187.239    <none>        3000/TCP                     4d3h
+eric-mxe-jupyterhub                              ClusterIP   10.109.123.148   <none>        8081/TCP                     4d3h
+eric-mxe-jupyterhub-proxy-api                    ClusterIP   10.103.251.131   <none>        8001/TCP                     4d3h
+eric-mxe-jupyterhub-proxy-public                 ClusterIP   10.100.10.57     <none>        80/TCP                       4d3h
+eric-mxe-nifi-service                            ClusterIP   10.98.56.219     <none>        8080/TCP                     4d3h
+eric-mxe-package-source-repository               ClusterIP   10.97.225.215    <none>        22/TCP                       4d3h
+eric-mxe-prometheus-kube-state-metrics-service   ClusterIP   10.111.121.185   <none>        8080/TCP                     4d3h
+eric-pm-server                                   ClusterIP   10.100.48.20     <none>        9090/TCP                     4d3h
+eric-sec-access-mgmt-headless                    ClusterIP   None             <none>        8080/TCP                     4d3h
+eric-sec-access-mgmt-http                        ClusterIP   10.98.186.174    <none>        8080/TCP,8444/TCP            4d3h
+image-recognition-image-recognition-main         ClusterIP   10.98.56.47      <none>        8000/TCP,5001/TCP            3d1h
+mxe-ambassador                                   ClusterIP   10.96.190.13     <none>        80/TCP                       4d3h
+mxe-ambassador-admins                            ClusterIP   10.99.5.190      <none>        8877/TCP                     4d3h
+mxe-argo-server                                  ClusterIP   10.97.102.175    <none>        2746/TCP                     4d3h
+mxe-mxe-author-service                           ClusterIP   10.105.173.165   <none>        8080/TCP                     4d3h
+mxe-mxe-default-backend                          ClusterIP   10.98.203.93     <none>        8080/TCP                     4d3h
+mxe-mxe-flow-repository                          ClusterIP   10.109.46.131    <none>        22/TCP                       4d3h
+mxe-mxe-gui                                      ClusterIP   10.104.5.215     <none>        80/TCP                       4d3h
+mxe-mxe-ingress-controller                       ClusterIP   10.104.47.196    <none>        80/TCP,443/TCP               4d3h
+mxe-mxe-model-catalogue-service                  ClusterIP   10.109.204.22    <none>        8080/TCP                     4d3h
+mxe-mxe-model-service                            ClusterIP   10.109.40.210    <none>        8080/TCP                     4d3h
+seldon-webhook-service                           ClusterIP   10.101.219.222   <none>        443/TCP                      4d3h
+....
+
+[[ChecktheExistenceofMXEIngressServices]]
+== Check the Existence of MXE Ingress Services
+
+Check the existence of MXE ingress services:
+
+....
+$ kubectl get services --namespace mxe mxe-mxe-ingress-controller
+
+NAME                         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+mxe-mxe-ingress-controller   ClusterIP   10.233.48.139   <none>        80/TCP,443/TCP   19m
+....
+
+[[ChecktheExistenceandStatusofMXEIngressPods]]
+== Check the Existence and Status of MXE Ingress Pods
+
+Check the existence and status of MXE ingress pods:
+
+....
+$ kubectl get pods -n mxe -l app.kubernetes.io/name=mxe-ingress-controller
+
+NAME                                          READY   STATUS    RESTARTS   AGE
+mxe-mxe-ingress-controller-7d5b57d967-645wz   1/1     Running   0          51m
+mxe-mxe-ingress-controller-7d5b57d967-cngc4   1/1     Running   0          51m
+....
+
+[[ChecktheExistenceofGatekeeperServices]]
+== Check the Existence of Gatekeeper Services
+
+Check the Existence of Gatekeeper Services:
+
+....
+$ kubectl get services -n mxe eric-mxe-gatekeeper
+
+NAME                  TYPE       CLUSTER-IP    EXTERNAL-IP   PORT(S)          AGE
+eric-mxe-gatekeeper   NodePort   10.233.11.4   <none>        3000:30895/TCP   13m
+....
+
+[[ChecktheExistenceofGatekeeperPods]]
+== Check the Existence of Gatekeeper Pods
+
+Check the Existence of Gatekeeper Pods:
+
+....
+$ kubectl get pods -n mxe -l app.kubernetes.io/name=eric-mxe-gatekeeper
+
+NAME                                  READY   STATUS    RESTARTS   AGE
+eric-mxe-gatekeeper                   1/1     Running   0          15m
+....
+
+[[ChecktheExistenceofKeycloackServices]]
+== Check the Existence of Keycloack Services
+
+Check the Existence of Keycloack Services:
+
+....
+$ kubectl get services -n mxe eric-sec-access-mgmt-http
+
+NAME                        TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
+eric-sec-access-mgmt-http   ClusterIP   10.233.55.3   <none>        8080/TCP   16m
+....
+
+....
+$ kubectl get services -n mxe eric-sec-access-mgmt-headless
+
+NAME                            TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
+eric-sec-access-mgmt-headless   ClusterIP   None         <none>        8080/TCP   16m
+....
+
+[[ChecktheExistenceofKeycloakPods]]
+== Check the Existence of Keycloak Pods
+
+Check the Existence of Keycloak Pods:
+
+....
+$ kubectl get pods -n mxe eric-sec-access-mgmt-0
+
+NAME                     READY   STATUS    RESTARTS   AGE
+eric-sec-access-mgmt-0   1/1     Running   0          34m
+....
+
+[[CheckIngressConfiguration]]
+== Check Ingress Configuration
+
+Check ingress configuration:
+
+....
+$ kubectl get ingress --all-namespaces
+NAMESPACE   NAME                                          HOSTS                     ADDRESS      PORTS     AGE
+mxe         eric-lcm-container-registry-ingress           mxe.ews.gic.ericsson.se                80        4d3h
+mxe         eric-mxe-ambassador-ingress                   mxe.ews.gic.ericsson.se                80        4d3h
+mxe         eric-mxe-argo-ingress                         mxe.ews.gic.ericsson.se                80        4d3h
+mxe         eric-mxe-gatekeeper                           mxe.ews.gic.ericsson.se                80, 443   4d3h
+mxe         eric-mxe-gatekeeper-ingress-admin             mxe.ews.gic.ericsson.se                80        4d3h
+mxe         eric-mxe-jupyterhub-ingress                   mxe.ews.gic.ericsson.se                80        4d3h
+mxe         eric-mxe-nifi-service                         mxe.ews.gic.ericsson.se                80        4d3h
+mxe         eric-mxe-prometheus-ingress                   mxe.ews.gic.ericsson.se                80        4d3h
+mxe         eric-sec-access-mgmt                          mxe.ews.gic.ericsson.se                80        4d3h
+mxe         mxe-model-catalogue-service-ingress-file      mxe.ews.gic.ericsson.se                80        4d3h
+mxe         mxe-model-catalogue-service-ingress-secured   mxe.ews.gic.ericsson.se                80        4d3h
+mxe         mxe-mxe-author-service                        mxe.ews.gic.ericsson.se                80        4d3h
+mxe         mxe-mxe-gui                                   mxe.ews.gic.ericsson.se                80        4d3h
+mxe         mxe-mxe-model-service                         mxe.ews.gic.ericsson.se                80        4d3h
+....

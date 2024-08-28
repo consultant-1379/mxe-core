@@ -1,0 +1,23 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: {{ include "eric-mxe-model-catalogue-service.serviceEntry" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: model-catalogue-service"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-model-catalogue-service.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-model-catalogue-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-model-catalogue-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-model-catalogue-service.annotations" . | nindent 4 }}
+spec:
+  hosts:
+  - eric-data-object-storage-mn
+  ports:
+  - number: 9000
+    name: service-tls
+    protocol: HTTPS
+  resolution: DNS
+  location: MESH_EXTERNAL
+{{ end }}

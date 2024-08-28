@@ -1,0 +1,947 @@
+= Tutorial
+:author: Kristóf Nékám
+:signature: EKRINKM
+:department: BDGSJBAK
+:doc-name: TRAINING MATERIAL
+:doc-no: 1/038 13-AVA 901 53
+:revnumber: PK3
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+//Template updated 2018-08-21 (keep to track template history)
+
+[[Preparations]]
+== Preparations
+
+.To successfully complete this tutorial, the following preparations are required:
+* Install a Machine Learning Model Execution Environment (MXE) cluster by following the instructions in the doc-ref:[Installation Guide].
+* Download the MXE model from https://gerrit.ericsson.se/#/admin/projects/MXE/models/image-recognition[MXE/models/image-recognition] repository in Gerrit.
+* Install the following command line tools on the client:
+** command line environment, preferably a Unix shell
+** Git
+** curl
+** https://github.com/openshift/source-to-image/releases[s2i]
+** https://github.com/stedolan/jq/releases[jq]
+* For a Windows environment, installing https://github.com/git-for-windows/git/releases/latest[Git for Windows] is recommended, which includes Git, bash, and curl by default.
+
+[[ModelManagement]]
+== Model Management
+
+.MXE offers the following options to onboard machine learning models::
+* Onboard a model through its source code. This creates a Docker image on the cluster from an already trained and s2i compliant model source code. The model image is registered automatically in MXE. For more information, see <<OnboardingaModelfromSourceCode,Onboarding a Model from Source Code>>.
+* Package a model from its source code on an external host. This generates a signed model package archive, which can be then onboarded to any number of MXE clusters. For more information, see <<PackagingaModel,Packaging a Model>>.
+* Onboard an already packaged model from an external Docker registry. This registers an external model image in MXE. For more information, see <<OnboardingaModelfromExternalRegistry,Onboarding a Model from External Registry>>.
+
+The detailed description of the `mxe-model` command can be found here: doc-ref:[CLI Guide].
+
+The `MXE/models/image-recognition` repository contains an already trained deep neural network Python model for image recognition. The actual model code and files are under `models/inception3`. We demonstrate the MXE model LCM capabilities through this example.
+
+[[RequirementsforModels]]
+=== Requirements for Models
+
+.The model source directory must conform to the requirements of Seldon Core:
+* Python models: https://docs.seldon.io/projects/seldon-core/en/latest/python/python_wrapping_s2i.html[]
+* Java models: https://docs.seldon.io/projects/seldon-core/en/latest/java/README.html[]
+
+Additionally, MXE compliant models must also provide an INFO file in the MXE-META-INF directory. For more information, see doc-ref:[MXE-META-INF].
+
+NOTE: The model must be able to execute prediction within three seconds, otherwise service timeouts occur.
+
+[[OnboardingaModelfromSourceCode]]
+=== Onboarding a Model from Source Code
+
+The source code of an already trained MXE-compliant model can be onboarded directly to an MXE cluster.
+
+.This type of onboarding consists of three phases:
+* Uploading the source code: This creates a compressed file from the source code of the models, and uploads it to our cluster.
+* Packaging the source code: This wraps the model code in a web service, and create a Docker image ouf of it. This phase happens entirely inside the MXE cluster.
+* Storing the created image: The model image is stored in an internal Docker registry.
+
+The model must provide an INFO file in the MXE-META-INF directory. More information on the INFO file structure can be found in doc-ref:[MXE-META-INF].
+
+.To onboard the example model from source code:
+. Clone the Git repository containing the example model:
++
+NOTE: Gerrit requires Ericsson credentials for authentication.
++
+....
+git clone https://<euserid>@gerrit.ericsson.se/a/MXE/models/image-recognition
+....
+. Onboard the example model:
++
+....
+$ mxe-model onboard --source <image-recognition repo path>/models/inception3
+
+Compressing the given model source -
+Archive <image-recognition repo path>/models/inception3.zip created from model source.
+Sending the model source to the server -
+Success: Packaging has been started
+....
++
+*Result:* The processing of the model source is started.
+
+. Optionally, check the processing progress with the `mxe-model list` command.
++
+First a dummy record is listed. It's ID consists of the .zip file name followed by a UUID:
++
+....
+$ mxe-model list
+
+ONBOARDED    ID                                                    VERSION  IMAGE_NAME  TITLE  AUTHOR    STATUS
+Aug28 13:02  inception3.zip-e0a72f77-2019-4ac1-b209-446feca85441   unknown                               packaging
+....
++
+After a while, when the INFO file has been already processed then the model metadata is filled:
++
+....
+$ mxe-model list
+
+ONBOARDED    ID               VERSION  IMAGE_NAME            TITLE                         AUTHOR    STATUS
+Aug28 13:02  img.inception3   0.0.1    img.inception3:0.0.1  Image Recognition Inception3  MXE test  packaging
+....
++
+The `STATUS` column shows what the current situation is with the onboarded model. When it is done, the status becomes `available`:
++
+....
+$ mxe-model list
+
+ONBOARDED    ID               VERSION  IMAGE_NAME            TITLE                         AUTHOR    STATUS
+Aug28 13:02  img.inception3   0.0.1    img.inception3:0.0.1  Image Recognition Inception3  MXE test  available
+....
+
+[[PackagingaModel]]
+=== Packaging a Model
+
+NOTE: This section can be skipped if the activities listed in the <<OnboardingaModelfromSourceCode,Onboarding a Model from Source Code>> section have been performed.
+
+The `mxe-model` command offers a package sub-command to enable the packaging of model source code without an MXE cluster. The generated model package archive can be later onboarded to an MXE cluster.
+
+.The following prerequisites must be met to use this feature:
+* Docker is available on the host system, the Docker daemon is running, and the Docker CLI is installed and available for the current user.
+* s2i is installed and the `s2i` command is in the system's `PATH`.
+
+All models which are packaged by the `mxe-model package` command are signed. For this you need to provide the private and public keys of the model author (signer).
+
+The following commands can be used to generate a new private and public key for testing purposes:
+
+....
+openssl genrsa -out package-test.key 2048
+openssl rsa -in package-test.key -outform PEM -pubout -out package-test.pem
+....
+
+As a result of these commands two files will be generated:
+
+* `package-test.key`: private key file
+* `package-test.pem`: public key file
+
+. Package the example model:
++
+NOTE: The `mxe-model package` command must be executed with root privileges or the user has to be a member of the Docker group. +
+If the model source code is in a Git project, only the committed changes are packaged.
++
+To package the model, issue the following command:
++
+....
+mxe-model package --source <image-recognition repo path>/models/inception3 --privatekey package-test.key --publickey package-test.pem
+....
++
+*Example output:*
++
+....
+Python model is detected. Model main class: SeldonWrapper
+Success: model archive created:
+com.google.img.inception3_3.0.1.tgz
+....
+
+. Verify that the created model package archive file is available in the current directory with the `ls` command.
++
+*Example output:*
++
+....
+$ ls -l com.google.img.inception3_3.0.1.tgz
+-rw-r--r--. 1 root root 1108365977 Apr 17 10:49 com.google.img.inception3_3.0.1.tgz
+....
+
+[[OnboardingaModelfromaModelPackageArchiveFile]]
+=== Onboarding a Model from a Model Package Archive File
+
+.Register the public key used during packaging with the `/v1/authors` endpoint to onboard the model package archive:
+. Get the access token by authenticating.
++
+....
+$ export ACCESS_TOKEN=$(curl -s -X POST -H 'Accept: application/json' -H 'Content-Type: application/x-www-form-urlencoded' -d 'username=<mxe-user>' -d 'password=<password>' -d 'grant_type=password' -d 'client_id=mxe-rest-client' -d 'scope=offline_access' https://<mxe-host>/auth/realms/mxe/protocol/openid-connect/token | jq -r .access_token)
+....
++
+. Register the public key from the `package-test.pem` file with a curl command.
++
+....
+$ echo "{\"name\":\"My test author\",\"publicKey\":\"`cat package-test.pem`\""} | \
+curl -X POST https://<mxe-host>/v1/authors \
+-H 'Content-type:application/json' -H "Authorization: Bearer ${ACCESS_TOKEN}" -d @-
+....
++
+For more information, see the doc-ref:[CLI Guide].
++
+. Onboard the model package archive
++
+....
+mxe-model onboard --archive <filename of the model package archive>.tgz
+
+Success: Packaging has been started
+....
+
+[[OnboardingaModelfromExternalRegistry]]
+=== Onboarding a Model from External Registry
+
+NOTE: This section can be skipped if the activities listed in the <<OnboardingaModelfromSourceCode,Onboarding a Model from Source Code>> section have been performed.
+
+Once a model has been packaged and stored in a Docker registry, it can be onboarded to MXE. Any registry can be used, the recommended one is armdocker.rnd.ericsson.se[].
+
+If the registry does not support anonymous pulls, then a secret must be created with the Docker registry credentials and it must be used during onboarding. The credentials in the secret will be used by MXE when pulling an image from the given registry.
+
+....
+$ kubectl create secret docker-registry <secret-name> --docker-server <docker-server> --docker-username <docker-user> --docker-password <docker-password> -n <mxe-namespace>
+....
+
+....
+$ kubectl create secret docker-registry example-docker-secret --docker-server armdocker.rnd.ericsson.se --docker-username username --docker-password password -n mxe
+....
+
+. The example image recognition model is already in armdocker, so issue the following command to onboard it:
++
+....
+mxe-model onboard --id "img.inception3" --description "Image recognition model inception 3" --author "MXE test" --title "Image Recognition Inception3" --version "0.0.1" --docker "armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:v0.0.1"
+....
++
+....
+mxe-model onboard --id "img.inception3" --description "Image recognition model inception 3" --author "MXE test" --title "Image Recognition Inception3" --version "0.0.1" --docker "armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:v0.0.1" --docker-registry-secret-name example-docker-secret
+....
++
+NOTE: Whenever a model is packaged or repackaged make sure that the docker image name defined by the `--docker` argument is unique in the target MXE cluster. This is due to the image pull policy of Kubernetes which by default is set to `IfNotPresent`, meaning that images are only pulled from the given registry if not already present at the node's Docker. Rule of thumb is not to overwrite images in a docker registry but to always use new tags.
++
+*Example output:*
++
+....
+Success: Model "armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:v0.0.1" has been onboarded to cluster with ID "img.inception3" and version "0.0.1".
+....
+
+. Verify that the model is available on MXE:
++
+....
+$ mxe-model list
+
+ONBOARDED      ID               VERSION   IMAGE_NAME                                                              TITLE                          AUTHOR     STATUS
+Aug28 13:02    img.inception3   0.0.1     armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:v0.0.1   Image Recognition Inception3   MXE test   available
+....
+
+[[StartingandInvokingaModel]]
+=== Starting and Invoking a Model
+
+To actually invoke a model that has been onboarded it has to be started. This results creating a model service in MXE which exposes the model's prediction function through a public HTTP endpoint.
+
+. Start a model service with the example image recognition model:
++
+....
+$ mxe-service create --name image-recognition --models com.google.img.inception3:3.0.1
+
+Success: Model service "image-recognition" has been created with model "com.google.img.inception3:3.0.1", with 1 instance
+....
+
+. Verify that the service has been started:
++
+....
+$ mxe-service list
+
+STARTED   INSTANCES   NAME                TYPE    STATUS    USER       MODEL                  ENDPOINT
+16:26     1           image-recognition   model   running   mxe-user   img.inception3:0.0.1   <mxe-host>/model-endpoints/image-recognition
+....
+
+.The model service can be now invoked through the displayed endpoint:
+* The HTTP method must be `POST`.
+* The client has to be authenticated with user name and password and the corresponding bearer token has to be passed in the header.
+* The payload must be a JSON document and therefore, the header `Content-type:application/json` has to be used.
+* The JSON content must conform the https://docs.seldon.io/projects/seldon-core/en/latest/reference/apis/external-prediction.html#prediction[Seldon External Microservice API] and the specific API implemented by the model being invoked.
+
+In case of the image recognition model in this tutorial:
+
+*JSON input for inception3 model:*
+
+....
+
+{
+    "data": {
+        "ndarray": [
+            [
+                "<base64 encoded image file>"
+            ]
+        ]
+    }
+}
+....
+
+The CURL commands and response of invoking the example model:
+
+*Get access token by authenticating:*
+
+....
+$ export ACCESS_TOKEN=$(curl -s -X POST -H 'Accept: application/json' -H 'Content-Type: application/x-www-form-urlencoded' -d 'username=<mxe-user>' -d 'password=<password>' -d 'grant_type=password' -d 'client_id=mxe-rest-client' -d 'scope=offline_access' https://<mxe-host>/auth/realms/mxe/protocol/openid-connect/token | jq -r .access_token)
+....
+
+Click here to download an embedded file containing a TXT file with the curl command to invoke the model.
+
+image::elephant.jpg[title="Input Image",scalefit="1"]
+
+*Model invocation result for the input image:*
+
+....
+{
+    "meta": {
+        "puid": "hbhv5ht7lm9f80l346f856cves",
+        "tags": {
+        },
+        "routing": {
+        },
+        "requestPath": {
+            "inception3": "armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:v0.0.1"
+        },
+        "metrics": []
+    },
+    "data": {
+        "names": [
+            "t:0",
+            "t:1",
+            "t:2"
+        ],
+        "ndarray": [
+            [
+                "n01871265",
+                "tusker",
+                "0.5162483"
+            ],
+            [
+                "n02504458",
+                "African_elephant",
+                "0.4377479"
+            ],
+            [
+                "n02504013",
+                "Indian_elephant",
+                "0.044613887"
+            ]
+        ]
+    }
+}
+....
+
+[[InvokeModelfromCode]]
+=== Invoke Model from Code
+
+A running model service can be invoked from code.
+
+Click here for an example, located in the `restclient` folder. This is a Java Spring Boot project. You can build it yourself with https://maven.apache.org/[maven] by issuing the `mvn package` command.
+
+You can use the `application.yml` file under the `\src\main\resources\` folder for configuration:
+
+....
+mxe:
+  model-service-uri: https://<mxe-url-or-ip:port>/model-endpoints/<model-service-name>
+  access-token-uri: https://<mxe-url-or-ip:port>/auth/realms/mxe/protocol/openid-connect/token
+  client-id: mxe-rest-client
+  username: <mxe-user>
+  password: <password>
+
+security:
+  disableSslCertVerification: true
+
+logging:
+  level:
+    root: info
+....
+
+.Configuration Parameters
+[cols=",,",options="header"]
+|===
+|Parameter |Description |More Information
+|mxe/ +
+  model-service-uri |+https://<mxe-url-or-ip:port>/model-endpoints/<your model service name>+ or copy it from model-services GUI |
+|mxe/ +
+  access-token-uri |+https://<mxe-url-or-ip:port>/auth/realms/mxe/protocol/openid-connect/token+ |
+|mxe/ +
+  client-id |This is your `client-id`, its comes from keycloak. The default value is `mxe-rest-client`. |https://www.keycloak.org/docs/latest/getting_started/index.html#creating-and-registering-the-client[]
+|mxe/ +
+  username, password |This is your username and password. |https://www.keycloak.org/docs/latest/getting_started/index.html#_create-new-user[]
+|security/ +
+  disableSslCertVerification |Enable or disable SSL certificate verification. Set to `true` on Windows computers. |
+|logging/ +
+  level/ +
+    root |Set the logging level. Possible values: trace, debug, info, error.
+|===
+
+[[ModifyingaModelService]]
+=== Modifying a Model Service
+
+A running model service can be scaled, that is, the number of instances serving an endpoint can be modified. The CLI command for this iss `mxe--service modify`. For example, scale the already running example image recognition model service to 3 instances:
+
+....
+$ mxe-service modify --name image-recognition --instances 3
+
+Success: Model service "image-recognition" has been updated to use model "img.inception3:0.0.1", with 3 instances
+....
+
+The model in a running model service can be also changed with the `mxe-service modify` command. To change our model in the already running model service, to use a different model:
+
+....
+$ mxe-service modify --name image-recognition --models img.inception3:0.0.2
+
+Success: Model service "image-recognition" has been updated to use model "img.inception3:0.0.2", with 3 instances
+....
+
+Both the model and the instance number can be changed within one command:
+
+....
+$ mxe-service modify --name image-recognition --models img.inception3:0.0.3 --instances 5
+
+Success: Model service "image-recognition" has been updated to use model "img.inception3:0.0.3", with 5 instances
+....
+
+[[DeletingaModelService]]
+=== Deleting a Model Service
+
+A model service can be deleted from the system by using the `mxe-service delete` command:
+
+....
+$ mxe-service delete --name image-recognition
+
+Success: Model service "image-recognition" has been deleted on cluster "nsc"
+....
+
+[[CreatingaModelServicewithTwoModels]]
+=== Creating a Model Service with Two Models
+
+To start an AB Test in MXE, a model service has to be created with two models. It also has to be defined what ratio of the traffic is to be sent towards Model A, and Model B. Weight values must be floating point numbers between 0 and 1, and the sum of the weights must equal 1:
+
+....
+$ mxe-service create --name image-recognition-abtest --models img.inception3:0.0.1,img.inception3:0.0.2 --weights 0.2,0.8 --instances 2
+
+Success: Model service "image-recognition-abtest" has been created with models "img.inception3:0.0.1,img.inception3:0.0.2" with weights 0.2,0.8, with 2 instances
+....
+
+It is also allowed to define model weight only for Model A when creating a service:
+
+....
+$ mxe-service create --name image-recognition-abtest --models img.inception3:0.0.1,img.inception3:0.0.2 --weights 0.2
+
+Success: Model service "image-recognition-abtest" has been created with models "img.inception3:0.0.1,img.inception3:0.0.2" with weights 0.2,0.8, with 1 instance
+....
+
+[[ModifyingaModelServicewithTwoModels]]
+=== Modifying a Model Service with Two Models
+
+Model services with two models can be modified similarly to single model services.
+
+Models can be replaced:
+
+....
+$ mxe-service modify --name image-recognition-abtest --models img.inception3:0.0.3,img.inception3:0.0.4
+
+Success: Model service "image-recognition-abtest" has been updated to use models "imginception3:0.0.3,imginception3:0.0.4" with weights 0.2,0.8, with 1 instance
+....
+
+Instance number can be updated:
+
+....
+$ mxe-service modify --name image-recognition-abtest --instances 2
+
+Success: Model service "image-recognition-abtest" has been updated to use models "imginception3:0.0.3,imginception3:0.0.4" with weights 0.2,0.8, with 2 instances
+....
+
+Weights can be changed:
+
+....
+$ mxe-service modify --name image-recognition-abtest --weights 0.4,0.6
+
+Success: Model service "image-recognition-abtest" has been updated to use models "imginception3:0.0.3,imginception3:0.0.4" with weights 0.4,0.6, with 2 instances
+....
+
+Models, weights and instances can also be changed in one command:
+
+....
+$ mxe-service modify --name image-recognition-abtest --models img.inception3:0.0.5,img.inception3:0.0.6 --weights 0.7,0.3 --instances 4
+
+Success: Model service "image-recognition-abtest" has been updated to use models "imginception3:0.0.5,imginception3:0.0.6" with weights 0.7,0.3, with 4 instances
+....
+
+[[CreatingaModelServicewithAutoscaling]]
+=== Creating a Model Service with Autoscaling
+
+[[AutoscalinginGeneral]]
+==== Autoscaling in General
+
+Seldon provides the ability to autoscale your Seldon deployments using Kubernetes Horizontal Pod Autoscaler (HPA).
+
+From the most basic perspective, the Horizontal Pod Autoscaler controller operates on the ratio between desired metric value and current metric value:
+
+`desiredReplicas = ceil[currentReplicas * ( currentMetricValue / desiredMetricValue )]`
+
+For example, if the current metric value is 200m, and the desired value is 100m, the number of replicas will be doubled, since 200.0 / 100.0 == 2.0. If the current value is instead 50m, we halve the number of replicas, since 50.0 / 100.0 == 0.5. Scaling is skipped if the ratio is sufficiently close to 1.0.
+
+For more information about kubernetes horizontal pod autoscaler, see https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/[].
+
+[[AutoscalinginMXE]]
+==== Autoscaling in MXE
+
+Parameters:
+
+* `instances`: The number of service instances to start. Optional, default value is 1. If it is set to `auto`, then `minReplicas`, `maxReplicas`, `metric`, `targetAverageValue` parameters have to be provided.
+* `minReplicas`: Minimum number of instances. Must be set in case of auto scaling.
+* `maxReplicas`: Maximum number of instances. Must be set in case of auto scaling.
+* `metric`: Auto scaling metric (cpu, memory). Must be set in case of auto scaling.
+* `targetAverageValue`: Target average value of the metric (m millicores in case of cpu, Mi MegaBytes in case of memory). Must be set in case of auto scaling.
+
+Autoscaling can be set on the model service level, it means that the same autoscaling parameters are used for all models in the model service.
+
+In case of a service with two models the parameters are the same for both models. Both models could have `minReplicas` to `maxReplicas` instances, but the 2 models are scaled independently, and can have a different number of instances at a given time.
+
+`TargetAverageValue` unit is m (millicores) if the metric is cpu and Mi (MegaBytes) if the metric is memory.
+
+For more information about compute resources refer to https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/[].
+
+[[CreatingaModelServicewithAutoscaling.1]]
+==== Creating a Model Service with Autoscaling
+
+Use the following commands to create a model service with autoscaling:
+
+....
+$ mxe-service create --name test-model-service --models com.ericsson.img.inception3:0.0.1 --instances auto --minReplicas 1 --maxReplicas 3 --metric cpu --targetAverageValue 100
+
+Success: Model service "test-model-service" has been created with model "com.ericsson.img.inception3:0.0.1", with 1-3 instances, with autoscaling metrics cpu:100m
+
+$ mxe-service list
+
+STARTED  NAME                INSTANCES  AUTOSCALING   TYPE   STATUS    USER      MODEL                              ENDPOINT
+07:15    test-model-service  1-3        cpu:100m      model  creating  mxe-user  com.ericsson.img.inception3:0.0.1  /model-endpoints/test-model-service
+....
+
+....
+$ mxe-service create --name test-model-service --models com.ericsson.img.inception3:0.0.1 --instances auto --minReplicas 2 --maxReplicas 4 --metric memory --targetAverageValue 500
+
+Success: Model service "test-model-service" has been created with model "com.ericsson.img.inception3:0.0.1", with 2-4 instances, with autoscaling metrics memory:500Mi
+
+$ mxe-service list
+
+STARTED  NAME                INSTANCES  AUTOSCALING    TYPE   STATUS    USER      MODEL                              ENDPOINT
+07:15    test-model-service  2-4        memory:500Mi   model  running   mxe-user  com.ericsson.img.inception3:0.0.1  /model-endpoints/test-model-service
+....
+
+[[CreatingaModelServicewithTwoModelsandAutoscaling]]
+==== Creating a Model Service with Two Models and Autoscaling
+
+Use the following commands to create a model service with two models and autoscaling:
+
+....
+$ mxe-service create --name image-recognition-abtest --models img.inception3:0.0.1,img.inception3:0.0.2 --weights 0.2,0.8 --instances auto --minReplicas 2 --maxReplicas 4 --metric memory --targetAverageValue 500
+
+Success: Model service "image-recognition-abtest" has been created with models "img.inception3:0.0.1,img.inception3:0.0.2" with weights 0.2,0.8, with 2-4 instances, with autoscaling metrics memory:500Mi
+
+$ mxe-service list
+
+STARTED  NAME                      INSTANCES  AUTOSCALING   TYPE    STATUS    USER      MODEL_A               MODEL_B               WEIGHTS  ENDPOINT
+11:45    image-recognition-abtest  2-4        memory:500Mi  static  running   mxe-user  img.inception3:0.0.1  img.inception3:0.0.2  0.2,0.8  <mxe-host>/model-endpoints/image-recognition-abtest
+....
+
+[[ModifyingScalingMethodofaModelService]]
+=== Modifying Scaling Method of a Model Service
+
+[[ModificationofScalingMethod]]
+==== Modification of Scaling Method
+
+Scaling method can be changed from static instances to autoscaling and from autoscaling to static instances.
+
+Autoscaling parameters can be modified.
+
+[[ModifyingaModelServicewithStaticInstancestoUseAutoscaling]]
+==== Modifying a Model Service with Static Instances to Use Autoscaling
+
+Use the following commands to modify a model service with static instances to use autoscaling:
+
+....
+$ mxe-service create --name test-model-service --models com.ericsson.img.inception3:0.0.1 --instances 2
+
+Success: Model service "test-model-service" has been created with model "com.ericsson.img.inception3:0.0.1", 2
+
+$ mxe-service list
+
+STARTED  NAME                INSTANCES  TYPE   STATUS    USER      MODEL                              ENDPOINT
+07:15    test-model-service  2          model  running   mxe-user  com.ericsson.img.inception3:0.0.1  /model-endpoints/test-model-service
+
+$ mxe-service modify --name test-model-service --instances auto --minReplicas 1 --maxReplicas 3 --metric cpu --targetAverageValue 100
+
+Success: Model service "test-model-service" has been updated to use model "com.ericsson.img.inception3:0.0.1", with 1-3 instances, with autoscaling metrics cpu:100m
+
+$ mxe-service list
+
+STARTED  NAME                INSTANCES  AUTOSCALING  TYPE   STATUS    USER      MODEL                              ENDPOINT
+07:15    test-model-service  1-3        cpu:100m     model  running   mxe-user  com.ericsson.img.inception3:0.0.1  /model-endpoints/test-model-service
+....
+
+[[ModifyingtheModelServiceAutoscalingParameters]]
+==== Modifying the Model Service Autoscaling Parameters
+
+Use the following commands to modify the model service autoscaling parameters:
+
+....
+$ mxe-service create --name test-model-service --models com.ericsson.img.inception3:0.0.1 --instances auto --minReplicas 1 --maxReplicas 3 --metric cpu --targetAverageValue 100
+
+Success: Model service "test-model-service" has been created with model "com.ericsson.img.inception3:0.0.1", with 1-3 instances, with autoscaling metrics cpu:100m
+
+$ mxe-service list
+
+STARTED  NAME                INSTANCES  AUTOSCALING  TYPE   STATUS    USER      MODEL                              ENDPOINT
+07:15    test-model-service  1-3        cpu:100m     model  running   mxe-user  com.ericsson.img.inception3:0.0.1  /model-endpoints/test-model-service
+
+$ mxe-service modify --name test-model-service --instances auto --minReplicas 2 --maxReplicas 4 --metric memory --targetAverageValue 500
+
+Success: Model service "test-model-service" has been updated to use model "com.ericsson.img.inception3:0.0.1", with 2-4 instances, with autoscaling metrics memory:500Mi
+
+$ mxe-service list
+
+STARTED  NAME                INSTANCES  AUTOSCALING    TYPE   STATUS    USER      MODEL                              ENDPOINT
+07:15    test-model-service  2-4        memory:500Mi   model  running   mxe-user  com.ericsson.img.inception3:0.0.1  /model-endpoints/test-model-service
+....
+
+[[ModifyingAutoscalingtoStaticInstancesinaModelService]]
+==== Modifying Autoscaling to Static Instances in a Model Service
+
+Use the following commands to modify autoscaling to static instances in a model service:
+
+....
+$ mxe-service create --name test-model-service --models com.ericsson.img.inception3:0.0.1 --instances auto --minReplicas 1 --maxReplicas 3 --metric cpu --targetAverageValue 100
+
+Success: Model service "test-model-service" has been created with model "com.ericsson.img.inception3:0.0.1", with 1-3 instances, with autoscaling metrics cpu:100m
+
+$ mxe-service list
+
+STARTED  NAME                INSTANCES  AUTOSCALING  TYPE   STATUS    USER       MODEL                              ENDPOINT
+07:15    test-model-service  1-3        cpu:100m     model  running   mxe-user   com.ericsson.img.inception3:0.0.1  /model-endpoints/test-model-service
+
+$ mxe-service modify --name test-model-service --instances 2
+
+Success: Model service "test-model-service" has been updated to use model "com.ericsson.img.inception3:0.0.1", with 2 instances
+
+$ mxe-service  list
+
+STARTED  NAME                INSTANCES  TYPE   STATUS    USER      MODEL                              ENDPOINT
+07:15    test-model-service  2          model  running   mxe-user  com.ericsson.img.inception3:0.0.1  /model-endpoints/test-model-servic
+....
+
+[[ModelswithCustomMetrics]]
+=== Models with Custom Metrics
+
+.Each model service exposes the following metrics by default:
+* request rate (request/sec)
+* latency (millisec)
+
+These metrics can be monitored on the MXE GUI on the model service detail page.
+
+Additionally, when developing a model the model developer can expose custom metrics, which are specific to that model. These metrics are also shown on the model service detail page.
+
+Metrics can be of type:
+
+* *Counter*: the returned value will increment the current value
+* *Gauge*: the returned value will overwrite the current value
+* *Timer*: a number of milliseconds. Prometheus SUM and COUNT metrics are created.
+
+*Example code:*
+
+....
+class SeldonWrapper(object):
+
+    def __init__(self):
+        print("Initializing - start")
+        self.model = p.load_model()
+        print("Initializing - end")
+
+    def class_names(self):
+        return ["class","description","probability"]
+
+    def metrics(self):
+        return [
+            {"type":"COUNTER","key":"mycounter","value":1}, # a counter which will increase by the given value
+            {"type":"GAUGE","key":"mygauge","value":100}, # a gauge which will be set to given value
+            {"type":"TIMER","key":"mytimer","value":20.2}, # a timer which will add sum and count metrics - assumed millisecs
+            ]
+
+    def predict(self, X, features_names):
+        ...
+....
+
+For more information, see https://docs.seldon.io/projects/seldon-core/en/v0.4.0/analytics/custom_metrics.html[].
+
+[[ModelTrainingManagement]]
+== Model Training Management
+
+MXE offers the following functions to train machine learning models, manage training packages and jobs:
+
+* Onboard a training through its source code. This creates a docker image on the cluster from the python training source code. The training image is registered automatically in MXE.
+* Start a training job. This starts the training code and stores the result.
+* Deleting training packages and jobs.
+* Downloading training result.
+
+The detailed description of the `mxe-training` CLI command can be found in the doc-ref:[CLI Guide].
+
+The `https://gerrit.ericsson.se/#/admin/projects/MXE/models/tf-mnist-training-python` repository contains a model training written in python. This tutorial uses this example to demonstrate the MXE training capabilities. You can clone this repository for yourself by issuing:
+
+....
+$ git clone https://<euserid>@gerrit.ericsson.se/a/MXE/models/tf-mnist-training-python
+....
+
+[[ModelTrainingSourceCodeRequirements]]
+=== Model Training Source Code Requirements
+
+* Only Pyhton 3.7 model training is supported.
+* The `MXE-META-INF/INFO` must be included in the package, containing the training metadata MXE-META-INF.
+* Training is executed by calling the script called `train.sh`, which has to be contained in the root directory of the training package. `train.sh` must not have any parameters and it must call the python training script. `train.sh` is a bash script starting with the line `#!/bin/bash`
+* If there are any pyhton dependencies needed by the training code, those are described in the `requirements.txt` file in the root of the training package. If there are no additional dependencies an empty `requirements.txt` file is required.
+* All output files written by the training code goes into a directory with name `output` in the root directory of the training package.
+* It is not recommended to add training data to the training package itself. It must be fetched from an external central location. The training data sources must be available from within the training container, that is, from the MXE cluster. The training code must be able to access those.
+
+[[OnboardingaModelTrainingfromSourceCode]]
+=== Onboarding a Model Training from Source Code
+
+A python model training source code can be onboarded to MXE. This type of onboarding consists of three phases:
+
+* Uploading the source code: This creates a compressed file from the source code of the models, and uploads it to our cluster.
+* Packaging the source code: This wraps the training, and creates a Docker image from it.
+* Storing the created image: MXE uses an internal Docker registry to store images of models.
+
+Issue the following command to onboard the example model training package:
+
+....
+$ mxe-training onboard --source <path to the training source code written>
+....
+
+Example output:
+
+....
+Compressing the given training package source
+Archive training.zip created from training package source.
+Sending the model training archive to the server
+Success: Packaging has been started
+....
+
+*Result:* The processing of the model source has been started after this.
+
+. Optionally, check the processing progress with the `mxe-training list packages` command.
++
+If the INFO file has been already processed then:
++
+....
+$ mxe-training list packages
+ONBOARDED  ID                        VERSION  IMAGE                           TITLE                                     AUTHOR        STATUS
+09:55      tf.mnist.training.python  0.0.1    tf.mnist.training.python:0.0.1  TensorFlow Mnist training python example  MXE test      packaging
+....
++
+If it is not processed, then a dummy record is listed:
++
+....
+$ mxe-training list packages
+ONBOARDED  ID               VERSION  IMAGE                  TITLE             AUTHOR           STATUS
+09:55      training.zip     unknown                                                            packaging
+....
++
+If the onboarding is done and the model is available, the value in the status column is `available`:
++
+....
+$ mxe-training list packages
+ONBOARDED  ID                        VERSION  IMAGE                           TITLE                                     AUTHOR        STATUS
+09:55      tf.mnist.training.python  0.0.1    tf.mnist.training.python:0.0.1  TensorFlow Mnist training python example  MXE test      available
+....
+
+[[StartingaTrainingJob]]
+=== Starting a Training Job
+
+To execute the onboarded training package, a training job needs to be started, which executes the training and saves the results for later use.
+
+. Start a training example:
++
+....
+$ mxe-training start --packageId tf.mnist.training.python --packageVersion 0.0.1
+Training package started with Id "b0f71b00-bf5b-4d0e-b53e-84ad812dd857"
+....
+
+. Verify that the job has been started:
++
+....
+$ mxe-training list jobs
+CREATED   ID                                     PACKAGE ID                 PACKAGE VERSION   STATUS      COMPLETED
+11:06     b0f71b00-bf5b-4d0e-b53e-84ad812dd857   tf.mnist.training.python   0.0.1             completed   11:06
+....
+
+[[DownloadingTrainingResults]]
+=== Downloading Training Results
+
+Training results can be downloaded after the training job execution has completed. To do this, use the `mxe-training download-results` command:
+
+....
+$ mxe-training download-results --jobId b0f71b00-bf5b-4d0e-b53e-84ad812dd857 --toDir /home/username/someplace
+
+Downloading results of the job
+Success: Download finished
+....
+
+[[DeleteTrainingJobs]]
+=== Delete Training Jobs
+
+Training jobs can be deleted from the system. In this case, stored job results are also deleted.
+
+. To delete the training job:
++
+....
+$ mxe-training delete job --id be0e40e6-d219-41a9-99ee-da627a778178
+Success: Training job with id "be0e40e6-d219-41a9-99ee-da627a778178" has been removed from cluster "nsc".
+....
+
+[[DeleteTrainingPackages]]
+=== Delete Training Packages
+
+Training packages can be deleted from the system. It also deletes the jobs started from the given package and the stored data.
+
+. To delete the traning package:
++
+....
+$ mxe-training delete package --id tf.mnist.training.python --version 0.0.1
+Success: Training package "tf.mnist.training.python" version "0.0.1" has been deleted from cluster "nsc".
+....
+
+WARNING: If a Python library in the `requirements.txt` can not be obtained the packaging will fail and the error log will only be available for a short period of time, after which the `Sigterm or sigint during packaging` error message appears on the GUI. This is a known bug and shall be fixed in an upcoming release.
+
+[[ModelIntegrationFlowCreationandManagement]]
+== Model Integration Flow Creation and Management
+
+Model services can be invoked directly through their HTTP endpoints. An application that uses a model service in MXE has to implement its own logic for getting the data, invoking the model, then collect results for further processing. The model services can only be used through HTTP and the model service has to be stateless in the sense that it must not write a local file or try to connect to any services. The model must act solely on the input it receives in the request.
+
+ML workflow use-cases where the models are to be applied to a given data source and the resulting predictions collected in some data sink are supported out-of-the-box in MXE through managed Apache NiFi deployments. In MXE terminology these are referred to as flow deploments.
+
+Working with Apache NiFi is not discussed in this tutorial. For that, see the https://nifi.apache.org/docs/nifi-docs/html/user-guide.html[Apache NiFi User Guide].
+
+[[CreateaFlowDeployment]]
+=== Create a Flow Deployment
+
+Flow deployments can be created on the MXE GUI under the *Flow Deployments* tab by clicking the *Create Deployment* button and then providing a name. Once the deployment has been created the NiFi GUI may be opened by clicking on its card. Whatever changes are made to the running NiFis will be preserved, even if there is a node failure.
+
+[[MXEModelInvocationProcessor]]
+=== MXE Model Invocation Processor
+
+MXE provides a custom NiFi processor to help working with MXE model services. The processor is called `InvokeModel`. After dragging an instance of it to the workspace the processor has to be configured. For this either double-click it or right-click and choose *Configure*. The processor has the following properties:
+
+* *Model name:* name of the model service that must be invoked. The list of available models is refreshed only when a new instance of `InvokeModel` processor is created on the NiFi GUI workspace.
+* *Input format:* see Input/output format below.
+* *Feature names:* optional comma-separated list of feature names. Used only if the input `FlowFile` does not have the `featureNames` attribute, otherwise this property is ignored.
+
+[[InputOutputFormatDataTypes]]
+==== Input/Output Format - Data Types
+
+There are six data types that can be used as input format when using the `InvokeModel` NiFi processor. The input format set in the processor's property has to match the input data type of the chosen model. Model output types can also be the same as input types.
+
+.Data input types with input `FlowFile` content examples:
+* binData: `nJvbSBvdGhlciBhbmltYWx`
+* strData: `anyString`
+* jsonData: `{"a": [1,2,3]}`
+* ndarray: `[[1,2,3],[4,5,6],[7,8,9]]`
+* tensor: `{"shape":[2,2], "values":[1,2,3,4]}`
+* tftensor: see tftensor protobuf definition: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/tensor.proto[tensor.proto]
+
+See also full protobuf definition: https://docs.seldon.io/projects/seldon-core/en/latest/reference/apis/prediction.html[SeldonMessage].
+
+[[ImageRecognitionExample]]
+=== Image Recognition Example
+
+This example shows how to invoke the previously used image recogntition model service through an MXE managed NiFi flow. Click here to download the template. To make this example work the following steps need to be performed:
+
+. Create a new empty NiFi deployment in MXE as described previously.
+. Import the template and add it to the workspace. For more information, see the https://nifi.apache.org/docs/nifi-docs/html/user-guide.html#Import_Template[official Apache NiFi user guide].
+. Configure the `InvokeModel` processor by selecting the model service name in the properties tab of its configuration dialog (double click on the processor). Note that the model service must be available by the time of importing the template.
+. The example offers two ways to get image data to the model:
+.. By starting the `GenerateFlowFile` processor it generates a flow file of the image data in the previous curl example.
+.. By configuring and starting the Fetch images via SFTP process group it is possible to load images from a given directory through SFTP. For this, double-click on the process group and then configure the `GetSFTP` processor with the proper hostname and access credentials.
+. Start the Seldon ndarray encapsulation process group and the `InvokeModel` processor.
+
+Responses of the model invocation can be checked out by right-clicking on the `InvokeModel` processor and selecting *View data provenance*.
+
+image::mxe_image_recognition_flow.png[title="Image Recognition Flow",scalefit="1"]
+
+[[WorkflowSupport]]
+== Workflow Support
+
+Workflows can be created inside the internal *Argo*. It is exposed at the `/argo` path with its GUI page.
+
+.To create a new workflow:
+. Select *Workflows* in the left menu.
+. Click *Submit new workflow*.
+. Paste the following workflow descriptor in the text field:
++
+....
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  namespace: mxe
+  generateName: artifact-passing-
+spec:
+  serviceAccountName: eric-mxe-argo-workflow-service-account
+  entrypoint: artifact-example
+  volumes:
+  - name: workdir
+    emptyDir: {}
+  templates:
+  - name: artifact-example
+    steps:
+    - - name: generate-artifact
+        template: whalesay
+    - - name: consume-artifact
+        template: print-message
+        arguments:
+          artifacts:
+          - name: message
+            from: "{{steps.generate-artifact.outputs.artifacts.hello-art}}"
+
+  - name: whalesay
+    container:
+      image: docker/whalesay:latest
+      command: [sh, -c]
+      args: ["echo generating message in volume; cowsay hello world | tee /mnt/vol/hello_world.txt"]
+      # Mount workdir volume at /mnt/vol before invoking docker/whalesay
+      volumeMounts:
+      - name: workdir
+        mountPath: /mnt/vol
+    outputs:
+      artifacts:
+      - name: hello-art
+        path: /mnt/vol/hello_world.txt
+  - name: print-message
+    container:
+      image: alpine:latest
+      command: [sh, -c]
+      args: ["echo getting message from volume; find /mnt/vol; cat /mnt/vol/message"]
+    inputs:
+      artifacts:
+      - name: message
+        path: /mnt/vol/message
+....
++
+. Click *Submit*.
+
+image::mxe_submit_new_workflow.png[title="Submit New Workflow",scalefit="1"]
+
+You can follow the status of the created workflow on the next page.
+
+image::mxe_workflow_status.png[title="Workflow Status",scalefit="1"]
+
+The logs of a given step can be checked by clicking on a step, then clicking on the *Logs* button.
+
+image::mxe_workflow_logs.png[title="Workflow Logs",scalefit="1"]
+
+Output artifacts can be checked on the step details page on the *Artifacts* tab.
+
+image::mxe_workflow_artifacts.png[title="Output Artifacts",scalefit="1"]

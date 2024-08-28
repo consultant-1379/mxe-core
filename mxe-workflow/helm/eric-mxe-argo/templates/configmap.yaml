@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "eric-mxe-argo.post-install-hook-configmap" . | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: argo-post-install-hook-configmap"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-argo.post-install-hook-configmap" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-argo.labels" . | fromYaml -}}
+    {{- include "eric-mxe-argo.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-argo.annotations" . | nindent 4 }}
+data:
+  {{- (.Files.Glob "files/init.sh").AsConfig | nindent 2 }}

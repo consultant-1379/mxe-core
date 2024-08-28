@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -x
+
+# Labels and annotations are added to mxe-workflow CRDs for the helm to handle the CRD upgrade
+echo "Applying label and annotations for mxe-workflow CRDs"
+MXE_RELEASENAME="mxe-workflow"
+ 
+for crd in "clusterworkflowtemplates.argoproj.io" "cronworkflows.argoproj.io" "workfloweventbindings.argoproj.io" "workflows.argoproj.io" "workflowtaskresults.argoproj.io" "workflowtasksets.argoproj.io" "workflowtemplates.argoproj.io";
+do   
+ kubectl label --overwrite crd $crd app.kubernetes.io/managed-by=Helm;
+ kubectl annotate --overwrite crd $crd meta.helm.sh/release-namespace="$NAMESPACE";
+ kubectl annotate --overwrite crd $crd meta.helm.sh/release-name="$MXE_RELEASENAME";
+done
+
+# Argo UI extensions is in tech preview stage and so it is removed
+echo "Removing argocdextensions crd in mxe-deployer"
+kubectl delete crd argocdextensions.argoproj.io

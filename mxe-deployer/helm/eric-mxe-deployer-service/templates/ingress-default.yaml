@@ -1,0 +1,40 @@
+{{- if  .Values.ingress.enabled -}}
+{{- $internalIngressName := include "eric-mxe-deployer-service.name" . -}}
+{{- $name := print $internalIngressName "-default" -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: mxe-deployer-default"  | fromYaml -}}
+    {{- $nameLabel := printf "%s: %s" "app.kubernetes.io/name" $name  | fromYaml -}}
+    {{- $labels := include "eric-mxe-deployer-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-deployer-service.mergeLabels" (dict "location" .Template.Name "sources" (list $nameLabel $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $ingressAnn := include "eric-mxe-deployer-service.ingress-annotations" . | fromYaml -}}
+    {{- $annotations := include "eric-mxe-deployer-service.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-deployer-service.mergeAnnotations" (dict "location" .Template.Name "sources" (list $ingressAnn $annotations )) | trim | nindent 4 }}
+spec:
+  ingressClassName: {{ index .Values "ingress" "clusterWideIngressClass" | quote }}
+  rules:
+    - http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "eric-mxe-deployer-service.mesh-ingress-gw-svc-name" . | quote }}
+              port:
+                number: {{ include "eric-mxe-deployer-service.mesh-ingress-gw-port" . }}
+      {{- if .Values.ingress.hostname }}
+      host: {{ .Values.ingress.hostname | quote }}
+      {{- end }}
+  {{ if .Values.ingress.tlsSecretName -}}
+  tls:
+    - secretName: {{ .Values.ingress.tlsSecretName }}
+      hosts:
+        {{- if .Values.ingress.hostname }}
+        - {{ .Values.ingress.hostname -}}
+        {{- end }}
+  {{ end -}}
+{{- end }}

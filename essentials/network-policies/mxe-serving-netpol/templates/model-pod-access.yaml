@@ -1,0 +1,30 @@
+{{ $podSelector:= .Values.networkPolicy.mxeServingModelPod.podSelector}}
+{{ $ingressRules := .Values.networkPolicy.mxeServingModelPod.ingress}}
+{{ $egressRules := .Values.networkPolicy.mxeServingModelPod.egress}}
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mxe-serving-model-pod-access
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/name:  mxe-serving-model-pod-access
+spec:
+  podSelector:
+    {{- $podSelector | toYaml | nindent 4 }}
+  policyTypes:
+  {{- if $ingressRules }}
+    - Ingress
+  {{- end }}
+  {{- if $egressRules }}
+    - Egress
+  {{- end }}
+  {{- if $ingressRules }}
+  ingress:
+  {{- $ingressRules | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if $egressRules }}
+  egress:
+  {{- $egressRules | toYaml | nindent 4 }}
+  {{- end }}
+

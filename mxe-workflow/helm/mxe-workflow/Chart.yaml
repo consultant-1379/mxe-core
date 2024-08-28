@@ -1,0 +1,12 @@
+apiVersion: v2
+appVersion: 1.0.0
+dependencies:
+- condition: argo-workflows.enabled
+  name: eric-mxe-argo
+  version: MXE_VERSION
+- condition: spark-operator.enabled
+  name: eric-mxe-spark
+  version: MXE_VERSION
+description: A Helm chart for MXE Workflow
+name: mxe-workflow
+version: 1.0.0-0

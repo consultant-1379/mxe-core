@@ -1,0 +1,50 @@
+
+
+networkPolicy:
+  mxeServingModelPod:
+    podSelector:
+      matchLabels:
+        seldon.io/model: "true"
+    ingress:
+    # Allow traffic from PM Server to scrape metrics
+    - ports:
+      - port: 8000
+        protocol: TCP
+      from:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: eric-pm-server
+    # Allow traffic from Service Mesh Ingress Gateway
+    - ports:
+      - port: 8000
+        protocol: TCP
+      from:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: eric-mesh-ingressgateway
+    egress:
+    # Allow traffic to kube-dns for DNS resolution eg: service to IP translation
+    # below example uses podSelector and namespaceSelector to allow traffic to kube-dns
+      # replace <svc-port> with the port of kube-dns service
+    # this can be also achieved using ipBlock with the CIDR of the kube-dns service
+    - to:
+      - podSelector:
+          matchLabels:
+            k8s-app: kube-dns
+        namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kube-system
+      ports:
+      - protocol: UDP
+        port: <svc-port>
+      - protocol: TCP
+        port: <svc-port>
+    # Allow traffic to istiod
+    - ports:
+      - port: 15012
+        protocol: TCP
+      to:
+      - podSelector:
+          matchLabels:
+            app: istiod
+            app.kubernetes.io/name: eric-mesh-controller

@@ -1,0 +1,76 @@
+:host {
+  text-align: left;
+}
+.notification-panel {
+  margin-left: 8px;
+}
+
+.panel-title {
+  margin: -38px 0 24px 8px;
+  font-size: 22px;
+}
+
+.notification-panel .clear {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.notification-log-item {
+  position: relative;
+  margin-right: 8px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #4e4e4e;
+  user-select: none;
+  cursor: pointer;
+  transition: transform 300ms ease-out;
+}
+
+.notification-log-item:hover {
+  transform: translate3d(4px, 0, 0);
+}
+
+.notification-log-item .title {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.notification-log-item .date {
+  font-weight: lighter;
+  margin-bottom: 8px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+.notification-log-item .description {
+  max-width: 900px;
+  margin-bottom: 0;
+}
+
+.notification-log-item::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  height: calc(100% - 8px);
+  width: 4px;
+}
+
+.notification-log-item.error::before {
+  background-color: var(--red);
+}
+.notification-log-item.success::before {
+  background-color: var(--green);
+}
+.notification-log-item.warning::before {
+  background-color: var(--orange);
+}
+
+.notification-log-item .close {
+  cursor: pointer;
+  position: absolute;
+  padding: 8px;
+  right: 8px;
+  top: 16px;
+  opacity: 0.8;
+  font-weight: 400;
+  font-size: 12px;
+  float: right;
+}

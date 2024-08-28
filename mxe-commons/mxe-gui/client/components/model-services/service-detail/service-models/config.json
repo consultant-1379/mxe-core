@@ -1,0 +1,7 @@
+{
+  "script": "service-models/ServiceModels",
+  "id": "ServiceModels",
+  "dependencies": {
+    "@eui/lit-component": "^0.9.0"
+  }
+}

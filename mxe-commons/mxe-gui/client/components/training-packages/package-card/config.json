@@ -1,0 +1,8 @@
+{
+  "script": "package-card/PackageCard",
+  "id": "PackageCard",
+  "data": {},
+  "dependencies": {
+    "@eui/lit-component": "^0.9.0"
+  }
+}

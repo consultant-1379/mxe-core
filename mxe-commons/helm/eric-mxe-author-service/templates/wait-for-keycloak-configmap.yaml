@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "eric-mxe-author-service.wait-for-keycloak-configmap" . | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: wait-for-keycloak-configmap"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-author-service.wait-for-keycloak-configmap" .)  | fromYaml -}}
+    {{- $authSrvLabels := include "eric-mxe-author-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-author-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $authSrvLabels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-author-service.annotations" . | nindent 4 }}
+data:
+  run.sh: |
+    {{- (.Files.Get "files/wait-for-keycloak.sh") | nindent 4 }}

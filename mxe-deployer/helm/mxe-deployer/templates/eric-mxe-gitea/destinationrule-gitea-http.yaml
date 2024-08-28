@@ -1,0 +1,22 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: mxe-deployer-gitea-http-dr
+  labels:
+    app.kubernetes.io/part-of: "mxe-gitea"
+    app.kubernetes.io/component: "mxe-gitea"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name:  mxe-deployer-gitea-http-dr
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-gitea.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- include "mxe-gitea.product-info" . | nindent 4 }}
+spec:
+  host: "mxe-deployer-gitea-http"
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+{{- end -}}

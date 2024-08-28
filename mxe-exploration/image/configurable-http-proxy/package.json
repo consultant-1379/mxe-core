@@ -1,0 +1,7 @@
+{
+    "version": "2.6.0",
+    "name": "mxe-exploration-configurable-http-proxy",
+    "dependencies": {
+        "configurable-http-proxy": "~4.5.5"
+    }
+}

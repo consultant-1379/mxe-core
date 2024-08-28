@@ -1,0 +1,141 @@
+{
+  "apiVersion" : "machinelearning.seldon.io/v1",
+  "kind" : "SeldonDeployment",
+  "metadata" : {
+    "clusterName" : "",
+    "creationTimestamp" : "2019-03-04T22:14:35Z",
+    "generation" : 1.0,
+    "labels" : {
+      "app" : "seldon",
+      "mxe/component" : "iot-model-a",
+      "mxe/version" : "0.0.1beta",
+      "mxe/deploymenttype": "model",
+      "mxe/createdbyuserid": "1234-5678-9012",
+      "mxe/createdbyusername": "mxe-user"
+    },
+    "name" : "iot-model-a",
+    "namespace" : "mxe",
+    "resourceVersion" : "22889648",
+    "selfLink" : "/apis/machinelearning.seldon.io/v1/namespaces/mxe/seldondeployments/iot-model-a",
+    "uid" : "e4f6e1cf-3eca-11e9-b4a8-0050569a0898"
+  },
+  "spec" : {
+    "annotations" : {
+      "deployment_version" : "v1",
+      "project_name" : "iot-model-a",
+      "seldon.io/rest-read-timeout": "0"
+    },
+    "name" : "iot-model-a",
+    "predictors" : [ {
+      "annotations" : {
+        "predictor_version" : "v1"
+      },
+      "componentSpecs" : [ {
+        "metadata" : {
+          "labels" : {
+            "seldon-app-iot-model-a" : "iot-model-a-iot-model-a-iot-model-a"
+          }
+        },
+        "spec" : {
+          "containers" : [ {
+            "env" : [ {
+              "name" : "PREDICTIVE_UNIT_SERVICE_PORT",
+              "value" : "9000"
+            }, {
+              "name" : "PREDICTIVE_UNIT_PARAMETERS",
+              "value" : "[]"
+            }, {
+              "name" : "PREDICTIVE_UNIT_ID",
+              "value" : "iot-model-a"
+            }, {
+              "name" : "PREDICTOR_ID",
+              "value" : "iot-model-a"
+            }, {
+              "name" : "SELDON_DEPLOYMENT_ID",
+              "value" : "iot-model-a"
+            } ],
+            "image" : "vmx-eea166.ete.ka.sw.ericsson.se:32222/iot/machine-detection-a-model:0.0.1",
+            "imagePullPolicy" : "IfNotPresent",
+            "lifecycle" : {
+              "preStop" : {
+                "exec" : {
+                  "command" : [ "/bin/sh", "-c", "/bin/sleep 5" ]
+                }
+              }
+            },
+            "livenessProbe" : {
+              "failureThreshold" : 3.0,
+              "handler" : {
+                "tcpSocket" : {
+                  "port" : "http"
+                }
+              },
+              "initialDelaySeconds" : 100.0,
+              "periodSeconds" : 5.0,
+              "successThreshold" : 1.0,
+              "timeoutSeconds" : 1.0
+            },
+            "name" : "model",
+            "ports" : [ {
+              "containerPort" : 9000.0,
+              "name" : "http"
+            } ],
+            "readinessProbe" : {
+              "failureThreshold" : 3.0,
+              "handler" : {
+                "tcpSocket" : {
+                  "port" : "http"
+                }
+              },
+              "initialDelaySeconds" : 100.0,
+              "periodSeconds" : 5.0,
+              "successThreshold" : 1.0,
+              "timeoutSeconds" : 1.0
+            },
+            "volumeMounts" : [ {
+              "mountPath" : "/etc/podinfo",
+              "name" : "podinfo",
+              "readOnly" : true
+            } ]
+          } ],
+          "terminationGracePeriodSeconds" : 1.0
+        },
+        "hpaSpec": {
+          "minReplicas": 1,
+          "maxReplicas": 3,
+          "metrics": [ {
+            "type": "Resource",
+            "resource": {
+              "name": "cpu",
+              "targetAverageValue": "12m"
+            }
+          } ]
+        }
+      } ],
+      "graph" : {
+        "endpoint" : {
+          "service_host" : "iot-model-a-iot-model-a-iot-model-a",
+          "service_port" : 9000.0,
+          "type" : "REST"
+        },
+        "name" : "model",
+        "type" : "MODEL"
+      },
+      "name" : "main",
+      "replicas" : 1
+    } ]
+  },
+  "status" : {
+    "predictorStatus" : [ {
+      "name" : "iot-model-a-iot-model-a-iot-model-a-0",
+      "replicas" : 1.0,
+      "replicasAvailable" : 1.0
+    }, {
+      "name" : "iot-model-a-iot-model-a-svc-orch",
+      "replicas" : 1.0,
+      "replicasAvailable" : 1.0
+    } ],
+    "state" : "Available"
+  }
+}
+

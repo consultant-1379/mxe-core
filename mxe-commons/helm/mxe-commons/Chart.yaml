@@ -1,0 +1,26 @@
+apiVersion: v2
+appVersion: 1.0.0
+description: A Helm chart for MXE Commons
+name: mxe-commons
+version: 1.0.0-0
+dependencies:
+  - name: eric-mxe-meshgw-ingress
+    version: MXE_VERSION
+  - name: eric-mxe-gatekeeper
+    version: MXE_VERSION
+  - name: eric-mxe-prometheus
+    version: MXE_VERSION
+  - name: eric-mxe-pypiserver
+    version: MXE_VERSION
+  - name: eric-mxe-upgrade-jobs 
+    version: MXE_VERSION
+  - name: eric-mxe-author-service
+    version: MXE_VERSION
+  - name: eric-mxe-default-backend
+    version: MXE_VERSION
+  - name: eric-mxe-gui
+    version: MXE_VERSION
+  - name: eric-mxe-ingress-controller
+    version: MXE_VERSION
+  - name: eric-mxe-commons-pre-upgrade-job
+    version: MXE_VERSION

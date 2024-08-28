@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MXE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="title" content="MXE" />
+    <meta name="description" content="Machine Learning Execution Environment" />
+    <meta
+      name="keywords"
+      content="ericsson, mxe, machine learning, execution environment, dashboard"
+    />
+    <meta name="robots" content="index, follow" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="language" content="English" />
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link rel="stylesheet" href="assets/css/container.shared.css" media="screen" />
+    <link rel="stylesheet" href="assets/css/notifications.css" media="screen" />
+    <link rel="stylesheet" href="assets/css/loading-overlay.css" media="screen" />
+    <script>
+      var isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
+      var isEdge = /Edge/.test(navigator.userAgent);
+      if (isIE11 || isEdge) {
+        window.location = 'browser.support.html';
+      }
+    </script>
+    <!-- Matomo -->
+    <!-- <script type="text/javascript">
+      var _paq = window._paq || [];
+      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function () {
+        var u = 'https://node-10-210-58-251.rnd.gic.ericsson.se/';
+        _paq.push(['setTrackerUrl', u + 'matomo.php']);
+        _paq.push(['setSiteId', '1']);
+        var d = document,
+          g = d.createElement('script'),
+          s = d.getElementsByTagName('script')[0];
+        g.type = 'text/javascript';
+        g.async = true;
+        g.defer = true;
+        g.src = u + 'matomo.js';
+        s.parentNode.insertBefore(g, s);
+      })();
+    </script> -->
+    <!-- End Matomo Code -->
+  </head>
+  <body class="level-0">
+    <script src="config/defaults.js"></script>
+    <script src="libs/polyfills/webcomponents-lite.js"></script>
+    <script src="libs/polyfills/ie-polyfill.js"></script>
+    <script src="libs/polyfills/ie-finally.js"></script>
+    <script src="libs/system.js"></script>
+    <script src="libs/@eui/container/0/eui-container-umd.js"></script>
+    <div class="notifications"></div>
+    <div class="loading-overlay">
+      <eui-base-v0-loader size="large" color="white"></eui-base-v0-loader>
+    </div>
+  </body>
+</html>

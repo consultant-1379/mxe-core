@@ -1,0 +1,172 @@
+= Upgrade Instruction
+:author: Erzsebet Laszlo V
+:signature: ELASERZ
+:department: BNEWIFAC
+:doc-name: UPGRADE INSTRUCTIONS
+:doc-no: 1/153 72-AVA 901 53
+:revnumber: PG4
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+//Template updated 2018-08-21 (keep to track template history)
+
+[[Introduction]]
+== Introduction
+
+WARNING: Upgrade from previous releases of MXE to MXE 1.8 is not supported. The following procedure is kept for reference, but it is not applicable to upgrade to MXE 1.8. User must perform a fresh installation.
+
+The following sections describe the complete upgrade procedure for Machine Learning Model Execution Environment (MXE) to a cluster.
+
+.The following systems are involved in the upgrade:
+* The system where the MXE cluster is installed. It can be:
+** A node of the cluster Kubernetes is installed on
+** A separate terminal through which the user has access to the target Kubernetes. For example it can be a Windows laptop.
++
+NOTE: Proper kube configuration is required in both cases.
++
+* The target Kubernetes system where MXE is deployed. It is not necessary that the user has access to the underlying system.
+
+The upgrade and initial configuration takes around 30 minutes, from which the MXE upgrade part is around 10 minutes.
+
+NOTE: Upgrade time is hardware-dependent.
+
+[[ModelEndpointTrafficDuringanUpgrade]]
+== Model Endpoint Traffic During an Upgrade
+
+Upgrade may impact model prediction traffic and cause model endpoint outage.
+
+For more information, see the doc-ref:[Dimensioning Guide].
+
+[[Prerequisites]]
+== Prerequisites
+
+For upgrade prerequisites, please see the *Prerequisites* section of the doc-ref:[Installation Guide].
+
+WARNING: The contents of the `values.yaml` file tend to change with every release. Make sure the proper version is used.
+
+It is recommended to not have running training jobs during upgrade. Please wait until every running training job is finished before initiating the upgrade.
+
+[[Preparations]]
+== Preparations
+
+For upgrade preparation steps, please see the *Preparations* section of the doc-ref:[Installation Guide].
+
+NOTE: The *Acquire a Certificate from Ericsson Certificate Services* step of the *Secure API Endpoint* section should only be performed if it has not been done before during installation. Secret existence can be checked by issuing the following command:
+
+....
+$ kubectl get secret api-tls -n mxe
+....
+
+NOTE: The *Acquiring a Certificate from Ericsson Certificate Services* step of the *Securing API Endpoint* section should only be performed if it has not been done before during installation. Secret existence can be checked by issuing the following command:
+
+....
+$ kubectl get secret api-tls -n mxe
+....
+
+The helm upgrade process waits until every model packager job is finished before it starts the actual upgrade. It is still recommended to not start the upgrade process when model or flow onboarding processes are running.
+
+[[UpgradeFlow]]
+== Upgrade Flow
+
+MXE is upgraded by Helm. The Helm chart used for the upgrade is available in the MXE release Helm repository, and in GASK.
+
+[[CreatingaNewvaluesyamlFile]]
+=== Creating a New values.yaml File
+
+Fill the `values.yaml` file that comes with the version to which MXE is upgraded. Follow the doc-ref:[Installation Guide] for the given version to prepare it. You can reuse elements from the version which you want to replace.
+
+[[UpgradingMXEUsingtheReleaseHelmRepository]]
+=== Upgrading MXE Using the Release Helm Repository
+
+For upgrading MXE using the release helm repository, follow the steps in the *Install MXE Using the Release Helm Repository* section in doc-ref:[Installation Guide].
+
+NOTE: The syntax of `helm install mxe` differs from the syntax of `helm upgrade mxe`.
+
+To upgrade MXE, use `helm upgrade mxe` according to the following syntax:
+....
+helm upgrade mxe mxe/mxe --version <version> -f values.yaml --wait --namespace mxe --timeout 20m
+....
+
+[[UpgradingMXEUsingtheHelmChartDownloadedfromGASK]]
+=== Upgrading MXE Using the Helm Chart Downloaded from GASK
+
+For upgrading MXE using the helm chart downloaded from GASK, follow the steps in the *Install MXE Using the Helm Chart Downloaded from GASK* section in doc-ref:[Installation Guide].
+
+WARNING: Make sure to use the `helm upgrade` command instead of the `helm install` command, but with the same parameters.
+
+[[UpgradingMXEUsingDownloadedOfflineImagesArchive]]
+=== Upgrading MXE Using Downloaded Offline Images Archive
+
+For upgrading MXE in an offline environment, follow the steps in the *Install MXE Using Downloaded Offline Images Archive* section in doc-ref:[Installation Guide].
+
+WARNING: Make sure to use the `helm upgrade` command instead of the `helm install` command, but with the same parameters.
+
+[[PostUpgradeCheck]]
+== Post Upgrade Check
+
+For post upgrade check steps, please see the *Post Installation Check* section of the doc-ref:[Installation Guide].
+
+[[CheckingVersionAfterUpgrade]]
+=== Checking Version After Upgrade
+
+Check that the `APP_VERSION` of the application is the expected new one:
+
+....
+$ helm list --namespace mxe
+....
+
+Check if there are running deployments with the new version:
+
+....
+$ kubectl get deployments -l 'app.kubernetes.io/version==<version>' -n mxe
+....
+
+Check that there are no running deployments with the old version:
+
+....
+$ kubectl get deployments -l 'app.kubernetes.io/version==<old version>' -n mxe
+....
+
+[[UpgradingtheCLI]]
+== Upgrading the CLI
+
+[[Prerequisites.1]]
+=== Prerequisites
+
+* An installed MXE cluster.
+* Linux or Windows operating system.
+* Docker engine is installed, as described in the https://docs.docker.com/install/[official guide].
+* `s2i` is installed, as described in https://github.com/openshift/source-to-image#installation[its documentation].
+* Optional: `kubectl` is installed. Only required if the internal ingress controller is used, and its ports are not known, see the https://kubernetes.io/docs/tasks/tools/install-kubectl/[installation instructions].
+
+[[SavePreviousCLIConfiguration]]
+=== Save Previous CLI Configuration
+
+CLI commands are configured by the `clusters.json` file, which has to be placed either under the `data` folder located relative to the MXE CLI executables or into the `.mxe` folder in the user's `HOME` directory.
+
+NOTE: Save the `clusters.json` file before CLI upgrade.
+
+[[GettingtheCLI]]
+=== Getting the CLI
+
+The CLI component of MXE consists of two executables and a data folder with a configuration file contained in the release package. Extract these to a freely chosen folder, and optionally add this directory to the `PATH` (on Linux), or `Path` (on Windows) environmental variables to access MXE commands from anywhere in the file system tree.
+
+[[ConfiguringAccesstotheMXECluster]]
+=== Configuring Access to the MXE Cluster
+
+Restore the `cluters.json` configuration file if it was saved from a previous installation.
+
+If there is no saved `cluters.json` configuration file, please see the *Configuring Access to the MXE Cluster* section of the doc-ref:[Installation Guide].
+
+[[TestingtheConnection]]
+=== Testing the Connection
+
+Issue the following command to test the connection towards the MXE cluster:
+
+....
+$ mxe-model list onboarded
+....
+
+If an empty list is returned, the connection is up.

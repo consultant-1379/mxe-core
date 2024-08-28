@@ -1,0 +1,219 @@
+# Default values for eric-mxe-author-service.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+ingress:
+  enabled: true
+  hostname: null
+  secretName: null
+  ingressClass: eric-mxe-ingress-controller-class
+  annotationPrefix: null
+  defaultBackendFullNameOverride: null
+  defaultBackendNameOverride: null
+
+nameOverride: null
+
+dockerRegistry:
+  ingressEnabled: true
+  nameOverride:
+
+docker:
+  hostOverride:
+
+service:
+  type: ClusterIP
+  port: 8080
+  metrics: 8081
+
+database:
+  create: true
+  # nameOverride:
+  serviceName: "eric-data-document-database-pg"
+  portName: "postgresql"
+  superUserSecretName: "mxe-db-password"
+  superUserIdKey: "super-user"
+  superUserPwdKey: "super-pwd"
+  # customUserSecretFullNameOverride:
+  createCustomUserSecret: true
+  customUserIdKey: "user"
+  customUserPwdKey: "password"
+  customUserPwd:
+
+resources:
+  authorService:
+    limits:
+      cpu: 400m
+      ephemeral-storage: 100Mi
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      ephemeral-storage: 50Mi
+      memory: 256Mi
+  initCacerts:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+  certificateSidecarService:
+    limits:
+      cpu: 100m
+      ephemeral-storage: 100Mi
+      memory: 200Mi
+    requests:
+      cpu: 100m
+      ephemeral-storage: 50Mi
+      memory: 200Mi
+  kubernetesModifier:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+  dbInit:
+    limits:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+
+labels: {}
+annotations: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+topologySpreadConstraints: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchExpressions:
+              - key: "app.kubernetes.io/part-of"
+                operator: "In"
+                values:
+                  - "mxe"
+              - key: "app.kubernetes.io/component"
+                operator: "In"
+                values:
+                  - "author-service"
+              - key: "app.kubernetes.io/instance"
+                operator: "In"
+                values:
+                  - "{{ .Release.Name }}"
+
+imageCredentials:
+  registry:
+     url:
+     pullSecret:
+  repoPath:
+  authorService:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+  dbInit:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+  kubernetes-modifier:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "-"
+
+images:
+  authorService:
+    name: "mxe/eric-mxe-author-service"
+    tag: "VERSION"
+  dbInit:
+    name: "mxe/eric-mxe-db-init"
+    tag: "VERSION"
+  kubernetes-modifier:
+    name: "mxe/eric-mxe-kubernetes-modifier"
+    tag: "VERSION"
+
+updateStrategy:
+  type: "RollingUpdate"
+  rollingUpdate:
+    maxUnavailable: 25%
+    maxSurge: 25%
+
+keycloak:
+  statefulset:
+    name: eric-sec-access-mgmt
+
+# DR-D1121-011 - Present in Top Level Helm Chart Values.yaml
+# global:
+#   registry:
+#     url: "armdocker.rnd.ericsson.se"
+#     pullSecret:
+#   mxeApiTlsSecretName:
+#   mxeApiHostname:
+#   mxeIamCaSecretName: iam-ca-cert
+#   mxeDisableDefaultIngressControllerUse: false
+#   security:
+#     tls:
+#       # DR-D1123-133 (Security)
+#       trustedInternalRootCa:
+#         secret: "eric-sec-sip-tls-trusted-root-cert"
+
+
+probes:
+  mxeAuthorService:
+    livenessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      failureThreshold: 5
+      timeoutSeconds: 5
+    readinessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      failureThreshold: 5
+      timeoutSeconds: 5
+
+serviceMesh:
+  enabled: true
+  tlsMode: ISTIO_MUTUAL
+
+terminationGracePeriodSeconds: 30
+
+podPriority:
+  mxeAuthorService:
+    priorityClassName:
+
+# DR-D1123-127 -  ADP services shall define AppArmor profile
+appArmorProfile:
+  type:
+  localhostProfile:
+
+# ADP services shall define Seccomp profile
+seccompProfile:
+  type: RuntimeDefault
+  localhostProfile:

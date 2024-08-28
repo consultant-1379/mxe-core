@@ -1,0 +1,4 @@
+confluent-kafka==2.3.0
+requests==2.25.1
+kazoo==2.8.0
+boto3==1.17.60

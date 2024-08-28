@@ -1,0 +1,22 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: mxe-deployer-redis-ha-announce-2-dr
+  labels:
+    app.kubernetes.io/part-of: "mxe-deployer"
+    app.kubernetes.io/component: "mxe-deployer"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name:  mxe-deployer-redis-ha-announce-2-dr
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-deployer.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- include "mxe-deployer.product-info" . | nindent 4 }}
+spec:
+  host: "mxe-deployer-redis-ha-announce-2"
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+{{- end -}}

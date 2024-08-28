@@ -1,0 +1,24 @@
+ARG PYTHON_BASE_IMAGE  
+
+FROM ${PYTHON_BASE_IMAGE}
+
+{{range $key, $value := .}}
+ENV {{$key}}={{$value}}
+{{end}}
+
+RUN [ -n "$MODEL_NAME" ] && [ -n "$SERVICE_TYPE" ]
+
+COPY . /microservice
+WORKDIR /microservice
+
+ARG USER_PACKAGES_DIR=/home/mxe/python3/site-packages
+
+RUN mkdir -p ${USER_PACKAGES_DIR}
+
+RUN if [ -f requirements.txt ]; then pip install --no-user -t ${USER_PACKAGES_DIR} --no-cache-dir -r requirements.txt; fi
+
+ENV PYTHONPATH=$USER_PACKAGES_DIR:/usr/local/lib/python3.8/site-packages
+
+EXPOSE 5000
+
+CMD exec seldon-core-microservice $MODEL_NAME --service-type ${SERVICE_TYPE}

@@ -1,0 +1,15 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ include "eric-mxe-default-backend.name" . }}-dr
+  labels:
+    {{- include "eric-mxe-default-backend.labels" . | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-default-backend.annotations" . | nindent 4 }}
+spec:
+  host: {{ include "eric-mxe-default-backend.name" . | quote }}
+  trafficPolicy:
+    tls:
+      mode: {{ .Values.serviceMesh.tlsMode }}
+{{ end }}

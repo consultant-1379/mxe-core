@@ -1,0 +1,35 @@
+---
+apiVersion: "machinelearning.seldon.io/v1"
+kind: "SeldonDeployment"
+metadata:
+  name: "single-stateless-model"
+spec:
+  predictors:
+  - name: "main"
+    annotations:
+      predictor_version: "v1"
+    replicas: -1
+    graph:
+      name: "model"
+      type: "MODEL"
+      implementation: "UNKNOWN_IMPLEMENTATION"
+      endpoint:
+        type: "REST"
+      children: []
+    componentSpecs:
+    - spec:
+        containers:
+        - image: "mxe.manifest.stateless:2.0.0"
+          name: "model"
+      hpaSpec:
+        minReplicas: 1
+        maxReplicas: 3
+        metrics:
+        - type: "Resource"
+          resource:
+            name: "cpu"
+            targetAverageValue: 10m
+        - type: "Resource"
+          resource:
+            name: "memory"
+            targetAverageValue: 20Mi

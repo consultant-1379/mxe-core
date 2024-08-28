@@ -1,0 +1,28 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="MxeScalabilityTestSuite">
+
+    <listeners>
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGTestListener" />
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGSuiteListener" />
+    </listeners>
+
+    <parameter name="cluster" value="cluster3" />
+
+    <test name="Scalability Test">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeScalabilityTest">
+                <parameter name="packageName" value="armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:v0.0.1" />
+                <parameter name="modelName" value="imginception3" />
+                <parameter name="modelVersion" value="0.0.1" />
+                <parameter name="instance" value="1" />
+                <parameter name="maxInstance" value="4" />
+                <parameter name="sendRate" value="6" />
+                <parameter name="measurementLength" value="300" />
+                <methods>
+                    <include name="testMxeModelScalability" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>

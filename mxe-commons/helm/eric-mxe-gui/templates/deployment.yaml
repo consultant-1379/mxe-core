@@ -1,0 +1,111 @@
+{{- $global := fromJson (include "eric-mxe-gui.global" .) -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "eric-mxe-gui.fullname" . }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: eric-mxe-gui"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-gui.labels" . | fromYaml -}}
+    {{- include "eric-mxe-gui.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-gui.annotations" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: "mxe"
+      app.kubernetes.io/component: "eric-mxe-gui"
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+  {{- include "eric-mxe-gui.update-strategy" . | nindent 2 }}
+  template:
+    metadata:
+      labels:
+        {{- $component := printf "%s" "app.kubernetes.io/component: eric-mxe-gui"  | fromYaml -}}
+        {{- $istioLabels := include "eric-mxe-gui.istio-sidecar-labels" . | fromYaml -}}
+        {{- $labels := include "eric-mxe-gui.labels" . | fromYaml -}}
+        {{- include "eric-mxe-gui.mergeLabels" (dict "location" .Template.Name "sources" (list $component $istioLabels $labels )) | trim | nindent 8 }}
+      annotations:
+        {{- $annotations := include "eric-mxe-gui.annotations" . | fromYaml -}}
+        {{- $istioAnn := include "eric-mxe-gui.istio-sidecar-annotations" . | fromYaml -}}
+        {{- $prodInfoAnn := include "eric-mxe-gui.product-info" . | fromYaml -}}
+        {{- $securityAnn := include "eric-mxe-gui.security-annotations" . | fromYaml -}}
+        {{- $prometheusAnn := include "eric-mxe-gui.prometheus-annotations" . | fromYaml -}}
+        {{- include "eric-mxe-gui.mergeAnnotations" (dict "location" .Template.Name "sources" (list $prodInfoAnn $securityAnn $istioAnn $annotations $prometheusAnn)) | trim | nindent 8 }}
+    spec:
+      {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "eric-mxe-gui.topologySpreadConstraints" . | trim | nindent 8 }}
+      {{- end }}
+      automountServiceAccountToken: false
+      {{- if include "eric-mxe-gui.podPriority" . }}
+      priorityClassName: {{- include "eric-mxe-gui.podPriority" . | indent 2 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.imageCredentials.guiService }}
+          image: "{{ include "eric-mxe-gui.setImageRepo" (list $ .registry.url .repoPath "guiService") }}{{ $.Values.images.guiService.name }}:{{ $.Values.images.guiService.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ include "eric-mxe-gui.registryImagePullPolicy" (list . .Values.imageCredentials.guiService.registry.imagePullPolicy) }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.probes.mxeGui.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.mxeGui.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.probes.mxeGui.livenessProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.probes.mxeGui.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.probes.mxeGui.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.mxeGui.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.probes.mxeGui.readinessProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.probes.mxeGui.readinessProbe.timeoutSeconds }}
+          resources:
+            {{- toYaml .Values.resources.gui | nindent 12 }}
+          volumeMounts:
+            - mountPath: /var/www/legal
+              name: legal
+            - mountPath: /var/www/public/config/menu
+              name: menu-config
+            - mountPath: /var/www/public/config/options
+              name: options-config
+            - mountPath: /var/www/public/config/config
+              name: config-json
+            {{- include "eric-mxe-gui.pg-cert-volume-mounts" . | nindent 12 }}
+          {{- include "eric-mxe-gui.container-security-context" . | nindent 10 }}
+      volumes:
+        - name: menu-config
+          configMap:
+            name: {{ template "eric-mxe-gui.name" . }}-menu-config
+            items:
+               - key: config.menu.json
+                 path: config.menu.json
+        - name: options-config
+          configMap:
+            name: {{ template "eric-mxe-gui.name" . }}-options-config
+            items:
+               - key: options.json
+                 path: options.json
+        - name: config-json
+          configMap:
+            name: {{ template "eric-mxe-gui.name" . }}-config
+            items:
+               - key: config.json
+                 path: config.json
+        - name: legal
+          configMap:
+            name: {{ include "eric-mxe-gui.legal-warning-message" . | quote }}
+        {{- include "eric-mxe-gui.pg-cert-volumes" . | nindent 8 }}
+      {{- include "eric-mxe-gui.image-pull-secrets" . | nindent 6 }}
+      {{- if (or .Values.nodeSelector $global.nodeSelector) }}
+      nodeSelector: {{- include "eric-mxe-gui.nodeSelector" . | nindent 8 }}
+      {{- end }}
+      affinity:
+        {{- tpl (toYaml .Values.affinity) . | nindent 8 }}
+      tolerations: {{ include "eric-mxe-gui.merge-tolerations" (dict "root" . "podbasename" "eric-mxe-gui") | nindent 8}}

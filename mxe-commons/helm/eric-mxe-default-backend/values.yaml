@@ -1,0 +1,122 @@
+# Default values for mxe-services.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+nameOverride: null
+
+enabled: true
+
+service:
+  type: ClusterIP
+  port: 8080
+
+resources:
+  defaultBackend:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+      ephemeral-storage: 25Mi
+    limits:
+      cpu: 400m
+      memory: 2Gi
+      ephemeral-storage: 256Mi
+
+labels: {}
+annotations: {}
+nodeSelector: {}
+
+tolerations: []
+ 
+  
+topologySpreadConstraints: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchExpressions:
+              - key: "app.kubernetes.io/part-of"
+                operator: "In"
+                values:
+                  - "mxe"
+              - key: "app.kubernetes.io/component"
+                operator: "In"
+                values:
+                  - "default-backend"
+              - key: "app.kubernetes.io/instance"
+                operator: "In"
+                values:
+                  - "{{ .Release.Name }}"
+
+imageCredentials:
+  registry:
+    url:
+    pullSecret:
+  repoPath:
+  defaultBackend:
+    repoPath:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+
+productInfo:
+  # R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+  # To automate it when packaging the helm chart rstate can be generated
+  # and below value replaced with correct R-State
+  rstate: "-"
+
+images:
+  defaultBackend:
+    name: "mxe/eric-mxe-default-backend"
+    tag: "VERSION"
+
+updateStrategy:
+  type: "RollingUpdate"
+  rollingUpdate:
+    maxUnavailable: 25%
+    maxSurge: 25%
+
+# DR-D1121-011 - Present in Top Level Helm Chart Values.yaml
+# global:
+#   registry:
+#     url: "armdocker.rnd.ericsson.se"
+#     pullSecret:
+#   labels: {}
+#   annotations: {}
+probes:
+  livenessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 30
+    failureThreshold: 5
+    timeoutSeconds: 5
+  readinessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    failureThreshold: 5
+    timeoutSeconds: 5
+
+podPriority:
+  mxeDefaultBackend:
+    priorityClassName:
+
+terminationGracePeriodSeconds: 30
+
+serviceMesh:
+  enabled: true
+  tlsMode: ISTIO_MUTUAL
+
+# DR-D1123-127 -  ADP services shall define AppArmor profile
+appArmorProfile:
+  type:
+  localhostProfile:
+
+# ADP services shall define Seccomp profile
+seccompProfile:
+  type: RuntimeDefault
+  localhostProfile:

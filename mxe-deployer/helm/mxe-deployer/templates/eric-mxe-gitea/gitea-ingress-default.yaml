@@ -1,0 +1,43 @@
+{{- if not .Values.global.mxeDisableDefaultIngressControllerUse -}}
+{{- if .Values.internalGitopsRepoEnabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "mxe-gitea.ingress-default.name" . }}
+  labels:
+    app.kubernetes.io/part-of: "mxe-deployer"
+    app.kubernetes.io/component: "mxe-deployer-gitea-default"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-gitea.ingress-default.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-gitea.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    nginx.ingress.kubernetes.io/session-cookie-expires: "36000"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "36000"
+    nginx.ingress.kubernetes.io/proxy-body-size: 20G
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+    nginx.ingress.kubernetes.io/backend-protocol: {{ include "mxe-gitea.mesh-ingress-gw-protocol" . | quote }}
+    {{- include "mxe-gitea.product-info" . | nindent 4 }}
+spec:
+  ingressClassName: {{ index .Values "mxeGitea" "ingress" "clusterWideIngressClass" | quote }}
+  rules:
+    - http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "mxe-gitea.mesh-ingress-gw-svc-name" . | quote }}
+              port: 
+                number: {{ include "mxe-gitea.mesh-ingress-gw-port" . }}
+      host: {{ .Values.mxeGitea.giteaIngressHost | quote }}
+  tls:
+    - secretName: {{ .Values.mxeGitea.giteaApiTls | quote }}
+      hosts:
+        - {{ .Values.mxeGitea.giteaIngressHost | quote }}
+{{- end }}
+{{- end }}

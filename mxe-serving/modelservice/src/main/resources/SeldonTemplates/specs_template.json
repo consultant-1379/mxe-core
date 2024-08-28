@@ -1,0 +1,173 @@
+{
+  "metadata": {
+    "labels": {
+      "app.kubernetes.io/part-of": "mxe",
+      "app.kubernetes.io/component": "model-service-instance",
+      "app.kubernetes.io/instance": "<MXE_MODELDEPLOYMENT_NAME>",
+      "mxe.ericsson.com/model-service-component": "<MXE_MODEL_SERVICE_COMPONENT_NAME>"
+    }
+  },
+  "spec": {
+    "containers": [
+      <MXE_MODELDEPLOYMENT_CONTAINERS>
+    ],
+    "imagePullSecrets": [
+      <MXE_IMAGEPULLSECRET>
+    ],
+    "terminationGracePeriodSeconds": 1,
+    "volumes": [
+    ],
+    "affinity": {
+      "podAntiAffinity": {
+        "preferredDuringSchedulingIgnoredDuringExecution": [
+          {
+            "weight": 75,
+            "podAffinityTerm": {
+              "topologyKey": "kubernetes.io/hostname",
+              "labelSelector": {
+                "matchExpressions": [
+                  {
+                    "key": "app.kubernetes.io/part-of",
+                    "operator": "In",
+                    "values": ["mxe"]
+                  },
+                  {
+                    "key": "app.kubernetes.io/component",
+                    "operator": "In",
+                    "values": ["model-service-instance"]
+                  },
+                  {
+                    "key": "app.kubernetes.io/instance",
+                    "operator": "In",
+                    "values": ["<MXE_MODELDEPLOYMENT_NAME>"]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "weight": 25,
+            "podAffinityTerm": {
+              "topologyKey": "kubernetes.io/hostname",
+              "labelSelector": {
+                "matchExpressions": [
+                  {
+                    "key": "app.kubernetes.io/part-of",
+                    "operator": "In",
+                    "values": ["mxe"]
+                  },
+                  {
+                    "key": "app.kubernetes.io/component",
+                    "operator": "In",
+                    "values": ["model-service-instance"]
+                  },
+                  {
+                    "key": "app.kubernetes.io/instance",
+                    "operator": "NotIn",
+                    "values": ["<MXE_MODELDEPLOYMENT_NAME>"]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "weight": 50,
+            "podAffinityTerm": {
+              "topologyKey": "kubernetes.io/hostname",
+              "labelSelector": {
+                "matchExpressions": [
+                  {
+                    "key": "app.kubernetes.io/part-of",
+                    "operator": "In",
+                    "values": ["mxe"]
+                  },
+                  {
+                    "key": "app.kubernetes.io/component",
+                    "operator": "In",
+                    "values": ["trainer"]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "weight": 50,
+            "podAffinityTerm": {
+              "topologyKey": "kubernetes.io/hostname",
+              "labelSelector": {
+                "matchExpressions": [
+                  {
+                    "key": "app.kubernetes.io/part-of",
+                    "operator": "In",
+                    "values": ["mxe"]
+                  },
+                  {
+                    "key": "app.kubernetes.io/component",
+                    "operator": "In",
+                    "values": ["packager"]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "weight": 10,
+            "podAffinityTerm": {
+              "topologyKey": "kubernetes.io/hostname",
+              "labelSelector": {
+                "matchExpressions": [
+                  {
+                    "key": "app.kubernetes.io/part-of",
+                    "operator": "In",
+                    "values": ["mxe"]
+                  },
+                  {
+                    "key": "app.kubernetes.io/component",
+                    "operator": "In",
+                    "values": ["gatekeeper"]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "weight": 10,
+            "podAffinityTerm": {
+              "topologyKey": "kubernetes.io/hostname",
+              "labelSelector": {
+                "matchExpressions": [
+                  {
+                    "key": "app.kubernetes.io/part-of",
+                    "operator": "In",
+                    "values": ["mxe"]
+                  },
+                  {
+                    "key": "app.kubernetes.io/component",
+                    "operator": "In",
+                    "values": ["ingress-controller"]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "weight": 5,
+            "podAffinityTerm": {
+              "topologyKey": "kubernetes.io/hostname",
+              "labelSelector": {
+                "matchExpressions": [
+                  {
+                    "key": "app",
+                    "operator": "In",
+                    "values": ["nginx-ingress"]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+  <MXE_HPA_SPECS>
+}

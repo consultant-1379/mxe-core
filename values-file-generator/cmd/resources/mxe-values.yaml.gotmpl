@@ -1,0 +1,863 @@
+# Set values for Helm charts of MXE
+# This is a YAML-formatted file generated using mxe-generate-linux cli tool version {{ .MXE_VERSION }}
+
+### DO NOT CHANGE ANCHORS! ###
+
+# These fields are all mandatory. Please set them/change them according to your desire.
+
+# Set appropriate AppArmor Profile supported by the cluster node.
+appArmorProfile: &appArmorProfile {{ .appArmorProfile_type }}
+
+# Set appropriate SeccompProfile Profile supported by the cluster node.
+seccompProfile: &seccompProfile {{ .seccompProfile_type }}
+
+# The storage class which will be used by MXE to create persistent volumes
+storageClass: &storageClass {{ .storage_class }}
+
+# The name of the secure storage class to be used for encrypting Postgres and Container registry data at rest
+# In case such a storage class is not available, configure same value as the storage class
+encyrptedStorageClass:  &encryptedStorageClass {{ default .storage_class .encrypted_storage_class }}
+
+
+
+# The domain name by which MXE's api and gui will be accessible
+apiHostname: &apiHostname {{ .api.mxe.host }}
+
+# The domain name to access MXE's keycloak
+oauthApiHostname: &oauthApiHostname {{ .api.oauth.host }}
+
+# The name of a secret which contains a tls for the given hostname of the api
+apiSecretName: &apiSecretName {{ .api.mxe.tlsSecretName }}
+
+# The name of a secret which contains a tls for MXE's oauth endpoint
+oauthTlsSecretName: &oauthTlsSecretName {{ .api.oauth.tlsSecretName }}
+
+# If the target environment where MXE is going to be installed is going to use External CA, set the below property to true
+# Setting this property to true enables to mount external CA on the pods where CA is required for authentication.
+isExtCA: &isExtCA {{ .isExtCA }}
+
+# The name of a secret which contains a ca certs for the given iam hostname
+iamCaSecretName: &iamCaSecretName {{ .iam_ca_secret_name }}
+
+# The port on which MXE will be accessible.
+apiPort: &apiPort 443
+
+# IngressClass Name of Cluster-Wide Ingress Controller
+clusterWideIngressClassName: &clusterWideIngressClassName {{ .cluster_wide_ingress_class_name}}
+
+# Settings to enable service mesh mtls
+enableEncryptionInTransit: &enableEncryptionInTransit {{ .mxe_commons.encryption.enable_in_transit }}
+
+# Requires SIP-TLS ADP generic service
+enableSipTls: &enableSipTls {{ .mxe_commons.encryption.enable_in_transit }}
+
+# Is Minio encryption enabled
+# Assumption is storage class encryption based on Storage Encryption Provider (SEP) enabled by default
+# To avoid multi-layer encrption this is disabled by default
+enableMinioAutoEncryption: &enableMinioAutoEncryption false
+
+# Define the PYPI external server that will be used to fetch python dependencies.
+externalPypiServer: &externalPypiServer {{ .external_pypi_server }}
+
+# ServiceMesh version to be added as annotaion
+serviceMeshVersion: &serviceMeshVersion {{ .mxe_commons.service_mesh.version }}
+
+# The namespace where Service Mesh controller is installed
+serviceMeshNamespace: &serviceMeshNamespace {{ .mxe_commons.service_mesh.namespace }}
+
+# The secret which contains the credentials for the used docker registry
+installerDockerRegistrySecret: &installerDockerRegistrySecret {{ .docker_registry.secret | quote }}
+
+# The secret which contains the ca cert for the used docker registry
+installerDockerRegistryCaSecretName: &installerDockerRegistryCaSecretName {{ .docker_registry.ca_secret_name }}
+
+# Pull secrets
+# If *installerDockerRegistrySecret is not set then set installerDockerRegistrySecrets to
+# installerDockerRegistrySecrets: &installerDockerRegistrySecrets []
+# If *installerDockerRegistrySecret is set then set installerDockerRegistrySecrets to
+# installerDockerRegistrySecrets: &installerDockerRegistrySecrets
+#     - name: *installerDockerRegistrySecret
+{{- if not .docker_registry.secret  }}
+installerDockerRegistrySecrets: &installerDockerRegistrySecrets []
+{{ else }}
+installerDockerRegistrySecrets: &installerDockerRegistrySecrets
+    - name: {{ .docker_registry.secret }}
+{{- end }}
+
+# The docker registry which is used by majority of MXE's components
+installerDockerRegistry: &installerDockerRegistry {{ .docker_registry.host }}
+
+# The docker registry which is used by eric-data-object-storage-mn
+installerMinioDockerRegistry: &installerMinioDockerRegistry {{ .docker_registry.mn_host }}
+
+# The docker registry which is used by Seldon images
+installerSeldonDockerRegistry: &installerSeldonDockerRegistry {{ .docker_registry.host }}/proj-mxe
+
+# The docker registry which is used by Argo images
+installerArgoDockerRegistry: &installerArgoDockerRegistry {{ .docker_registry.host }}/proj-mxe/quay.io/argoproj
+
+# The docker image which is used by Spark Operator
+installerSparkDockerImage: &installerSparkDockerImage {{ .docker_registry.host }}/proj-mxe/spark/spark-operator
+
+# The ingress url format for Spark Operator
+installerSparkUiIngressUrl: &installerSparkUiIngressUrl {{ .api.mxe.host }}/spark/{{`{{$appName}}`}}(/|$)(.*)
+
+# The profile list for mxe-exploration for a single user
+singleUserProfileList: &singleUserProfileList 
+  {{- .mxe_exploration.singleUserProfileList | nindent 2 }}
+singleuserpullpolicy: &singleuserpullpolicy {{ default "IfNotPresent"  .mxe_exploration.singleuser.image.pullPolicy }}
+# User provided credentials in a form of a secret and given by its name for administering the realms in Keycloak. If not CHANGED, then the defaults are going to be used, see the Installation Guide for details.
+# If this value is changed, then the corresponding secret needs to be created beforehand.
+# Mandatory fields in the user provided secret:
+# - kcadminid (for the admin username)
+# - kcpasswd (for the admin user password)
+mxeAdminSecret: &mxeAdminSecret {{ .mxe_commons.mxe_admin_secret}}
+
+# User provided credentials in a form of a secret and given by its name for the initial MXE user If not PROVIDED, then the defaults are going to be used, see the Installation Guide for details.
+# Mandatory fields in the user provided secret:
+# - username (for the initial MXE username)
+# - password (for the initial MXE user password)
+mxeUserSecret: &mxeUserSecret {{ .mxe_commons.mxe_user_secret | quote }}
+
+# Whether OWASP should be enabled for endpoints.
+owasp: &owasp true
+
+# Whether OWASP should be enabled for model-endpoints. This degrades performance noticeably when it's enabled! Takes effect only if owasp is set to true
+modelServiceOwasp: &modelServiceOwasp {{ .mxe_serving.model_service_owasp }}
+
+mxe_serving:
+  seldon_core_operator:
+    image:
+      pullPolicy: &seldonCorepullPolicy {{ default "IfNotPresent"  .mxe_serving.seldon_core_operator.image.pullPolicy }}
+    executor:
+      image:
+        pullPolicy : &seldonCoreExecutorpullPolicy {{ default "IfNotPresent"  .mxe_serving.seldon_core_operator.executor.image.pullPolicy }}
+
+# Size of the container registry volume which is used to store onboarded model and training package images.
+containerRegistryVolumeSize: &containerRegistryVolumeSize {{ .mxe_commons.container_registry_volume_size }}
+
+# Size of the pypiserver volume which is used to store python packages.
+pypiServerVolumeSize: &pypiServerVolumeSize 5Gi
+
+# Legal Warning message to be displayed on the login page of the GUI and after login on the CLI
+legalWarningMessage: &legalWarningMessage |-
+  {{ .mxe_commons.legal_warning_message | nindent 2 }}
+
+# Whether to install gatekeeper with High Availability
+# true (default) - 3 instances of gatekeeper is deployed. Requires 3 nodes
+# false  - 1 instance of gatekeeper is deployed.
+enableGatekeeperHA: &enableGatekeeperHA {{ .mxe_commons.enable_gatekeeper_ha }}
+
+# Choose whether RateLimit needs to be applied for the Model Service 
+rateLimitEnabled : &rateLimitEnabled {{ .mxe_commons.rate_limit_enabled }}
+
+# Lcm container registry password
+lcm-container-registry-password: &lcmContainerRegistryPassword {{ randAscii 10 | b64enc  }}
+
+# BRO Configuration
+# BRO service is used in MXE for backup and restore operations. Currently it is supported only for following the ADP services:
+# eric-data-document-database-pg
+# eric-data-object-storage-mn
+# eric-lcm-container-registry
+broAgentEnable: &broAgentEnable true
+broServiceName: &broServiceName {{ .bro.service_name }}
+broGrpcServicePort: &broGrpcServicePort {{ .bro.service_port }}
+brLabelKey: &brLabelKey {{ .bro.label_key }}
+
+# Seldon core configuration for MXE
+# If the target environment where MXE is going to be installed is AWS EKS, set the below property to true
+# Setting this property to true enables hostNetwork and hostPort in seldon-core-operator
+# enabling Pods in EKS to reach Webhooks which are part of the control plane
+hostNetwork: &hostNetwork {{ .hostNetwork }} 
+
+seldon_metrics_port: &seldon_metrics_port {{ .mxe_serving.seldon_metrics_port }}
+
+seldon_webhook_port: &seldon_webhook_port {{ .mxe_serving.seldon_webhook_port }}
+mxe_workflow:
+  argoexecBuild:
+    images:
+      pullPolicy: &pullPolicy {{ default "IfNotPresent"  .mxe_workflow.argoexecBuild.images.pullPolicy }}
+### DO NOT MODIFY PARAMETERS BELOW THIS LINE! ###
+
+# Whether MXE will be accessible through a default ingress controller already present on the Kubernetes cluster, or a new internal one which will be installed by MXE.
+disableDefaultIngressControllerUse: &disableDefaultIngressControllerUse false
+
+# Whether MXE should be installed as a cluster-wide application or only as a namespace-wide
+# Namespace-wide installations don't contain Seldon. That should be installed separately.
+clusterWidePermissions: &clusterWidePermissions true
+
+enablePrometheusMergeFlag: &enablePrometheusMergeFlag false
+
+# MXE Model Service - Tomcat server connection timeout configuration -
+tomcatConnectionTimeoutInterval: &tomcatConnectionTimeoutInterval 60s
+
+global: &global
+  # To secure MXE's API endpoint, a certificate must be stored in a secret. This secret must be in the mxe namespace.
+  # The name of the secret can be given with the next key.
+  mxeApiTlsSecretName: *apiSecretName
+  # To secure MXE's oauth endpoint, a certificate must be stored in a secret. This secret must be in the mxe namespace.
+  # The name of the secret can be given with the next key.
+  mxeOauthApiTlsSecretName: *oauthTlsSecretName
+  # To secure MXE's API endpoint, a hostname must be defined, through which the endpoint will be reachable.
+  # This hostname can be given with the next key.
+  mxeApiHostname: *apiHostname
+  # The api port of Mxe hostname
+  mxeApiport: *apiPort
+  # To secure MXE's oauth API endpoint, a hostname must be defined, through which the endpoint will be reachable.
+  # This hostname can be given with the next key.
+  mxeOauthApiHostname: *oauthApiHostname
+  # This ca secret for oauth api host
+  mxeIamCaSecretName: *iamCaSecretName
+  # By default, MXE uses a default ingress controller.
+  # To use an internal one change the next setting to false. The behaviour of this ingress controller can be modified under eric-mxe-ingress-controller key.
+  mxeDisableDefaultIngressControllerUse: *disableDefaultIngressControllerUse
+  # The docker registry which will be used by the 2pp components in MXE.
+  pullSecret: *installerDockerRegistrySecret
+  # The docker registry which will be used by the majority of containers in MXE.
+  registry:
+    url: *installerDockerRegistry
+    # The secret which contains the credentials for the used docker registry
+    pullSecret: *installerDockerRegistrySecret
+  security:
+    tls:
+      enabled: *enableSipTls
+  # New serviceMesh, alternative to enableEncryptionInTransit
+  serviceMesh:
+    enabled: *enableEncryptionInTransit
+    annotations:
+      # This is used to annotate pods with sidecars, so they are automatically
+      # restarted and reinjected with the correct proxy version on SM upgrades
+      serviceMesh: *serviceMeshVersion
+  internalRegistry:
+    password: *lcmContainerRegistryPassword
+  hostNetwork: *hostNetwork
+
+# Set appropriate Seccomp Profile supported by the cluster node.
+seccompProfile:
+  type: *seccompProfile
+  localhostProfile:
+
+### MXE-Commons config ###
+config:
+  ratelimit:
+    enabled: *rateLimitEnabled
+appArmorProfile:
+  type: *appArmorProfile
+seccompProfile:
+  type: *seccompProfile
+
+eric-mxe-gatekeeper:
+  ingress:
+    clusterWideIngressClass: *clusterWideIngressClassName
+  highAvailability: *enableGatekeeperHA
+  service:
+    # The port where gatekeeper, MXE's main endpoint will be exposed
+    httpsPort: *apiPort
+  keycloak:
+    realm:
+      master:
+        secret:
+          secretName: *mxeAdminSecret
+      mxe:
+        secret:
+          secretName: *mxeUserSecret
+          temporalUser: {{ default "true" .mxe_commons.mxe_gatekeeper.keycloak.temporal_user  }}
+  isExtCA: *isExtCA
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile
+
+eric-sec-access-mgmt:
+  statefulset:
+    adminSecret: *mxeAdminSecret
+  ingress:
+    # The host where MXE's user handling service will be exposed
+    hostname: *apiHostname
+    enabled: *disableDefaultIngressControllerUse
+    clusterWideIngressClass: *clusterWideIngressClassName
+    tls:
+      # This setting defines whether https communication will be used for user handling.
+      # It must be only enabled when there is no default ingress controller.
+      enabled: *disableDefaultIngressControllerUse
+      # The certificate for https communication when it is enabled.
+      existingSecret: *apiSecretName
+  persistence:
+    tls:
+      enabled: *enableSipTls
+  service:
+    tls:
+      enabled: *enableSipTls
+  tls:
+    client:
+      ldap:
+        enabled: *enableSipTls
+      pg:
+        enabled: *enableSipTls
+    clientCA:
+      enabled: *enableSipTls
+  http:
+    hostValidation:
+      allowedHosts: {{ (printf "%s,%s" .api.oauth.host .api.mxe.host) | quote }}
+  appArmorProfile:
+    iam:
+      type: *appArmorProfile
+    iam-init:
+      type: *appArmorProfile
+  seccompProfile:
+    iam:
+      type: *seccompProfile
+    iam-init:
+      type: *seccompProfile
+
+keycloak:
+  ingress:
+    clusterWideIngressClass: *clusterWideIngressClassName
+
+eric-mxe-default-backend:
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile
+    
+eric-mxe-meshgw-ingress:
+  ingress:
+    owasp:
+      enabled: *owasp
+    modelServiceOwasp:
+      enabled: *modelServiceOwasp
+
+internal-container-registry:
+  ingress:
+    tls:
+      # For ingress, https is forced by default. This means that the registry will work as a secure registry.
+      # For insecure registry, the next line should be uncommented.
+      enabled: *disableDefaultIngressControllerUse
+      # The certificate for https must be stored in a kubernetes tls secret.
+      # In the next line, the name of the secret must be given, if tls is enabled.
+      secretName: *apiSecretName
+
+eric-mesh-ingressgateway:
+  global:
+    istioNamespace: *serviceMeshNamespace
+  enabled: true
+  service:
+    type: ClusterIP
+  {{- if .mxe_commons.encryption.enable_in_transit }}
+  secretVolumes:
+  - name: ingressgateway-certs
+    secretName: istio-ingressgateway-certs
+    mountPath: /etc/istio/ingressgateway-certs
+  - name: ingressgateway-ca-certs
+    secretName: istio-ingressgateway-ca-certs
+    mountPath: /etc/istio/ingressgateway-ca-certs
+  - name: egress-secret
+    secretName: eric-sec-access-mgmt-iam-int-client-cert
+    mountPath: /etc/istio/egress-certs
+  - name: egress-pm-secret
+    secretName: eric-pm-server-query-cert
+    mountPath: /etc/istio/pm/egress-certs
+  - name: egress-lcm-secret
+    secretName: eric-lcm-container-registry-client-cert
+    mountPath: /etc/istio/lcm/egress-certs
+  - name: egress-ca-secret
+    secretName: eric-sec-sip-tls-trusted-root-cert
+    mountPath: /etc/istio/egress-ca-certs
+  {{- end }}
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile
+
+eric-pm-server:
+  server:
+    persistentVolume:
+      storageClass: *storageClass
+  {{- if .mxe_commons.encryption.enable_in_transit }}
+    extraEmptyDirVolumeMounts:
+    - name: istio-certs
+      mountPath: /etc/istio-certs/
+      readOnly: true
+    podAnnotations:
+      sidecar.istio.io/inject: "true"
+      traffic.sidecar.istio.io/includeInboundPorts: ""   # do not intercept any inbound ports
+      traffic.sidecar.istio.io/includeOutboundIPRanges: ""  # do not intercept any outbound traffic
+      proxy.istio.io/config: |  # configure an env variable `OUTPUT_CERTS` to write certificates to the given folder
+        proxyMetadata:
+          OUTPUT_CERTS: /etc/istio-certs
+      sidecar.istio.io/userVolumeMount: '[{"name": "istio-certs", "mountPath": "/etc/istio-certs"}]' # mount the shared volume at sidecar proxy
+  {{- end }}
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile    
+
+eric-mxe-prometheus:
+  ingress:
+    owasp:
+      enabled: *owasp
+  rbac:
+    clusterWide: *clusterWidePermissions
+
+eric-mxe-gui:
+  imageCredentials:
+    registry:
+      url: *installerDockerRegistry
+  ingress:
+    owasp:
+      enabled: *owasp
+  legalWarningMessage: *legalWarningMessage
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile
+
+eric-mxe-upgrade-jobs:
+  preupgrade-cleanup:
+    keycloakAdminSecretNameOverride: *mxeAdminSecret
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile
+
+eric-mxe-pypiserver:
+  persistence: 
+    persistentVolumeClaim:
+      storageClassName: *storageClass
+      size: *pypiServerVolumeSize
+  ingress:
+    owasp:
+      enabled: *owasp
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile
+
+# Documentation of Document Database PG's options: http://calstore.internal.ericsson.com/elex?LI=EN/LZN7020476/2R*&FN=1_1531-CAV10116_2Uen.*.html&HT=id_sjxl
+eric-data-document-database-pg:
+  global:
+    adpBR:
+      broServiceName: *broServiceName
+      broGrpcServicePort: *broGrpcServicePort
+      brLabelKey: *brLabelKey
+  persistentVolumeClaim:
+    # Either the value of the parameters "storageClass" or "encryptedStorageClass" must be provided.
+    # "encryptedStorageClass" is provisioned by Storage Encryption Provider (SEP).
+    # By default, the encrypted storage class is provided to encrypt the data at rest.
+    storageClassName: *encryptedStorageClass
+  security:
+    postgres:
+      tls:
+        enable: *enableSipTls
+  brAgent:
+    enabled: *broAgentEnable
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile
+
+documentDatabasePG:
+  customObject:
+    resources:
+      persistentStorage:
+        documentDatabasePGVolume:
+          persistentVolumeClaim:
+            storageClassName: *encryptedStorageClass
+
+# Documentation of Docker registry's options: http://calstore.internal.ericsson.com/elex?LI=EN/LZN7020497/1R*&FN=1_1531-CAV10168_1Uen.*.html&HT=id_775u
+eric-lcm-container-registry:
+  global:
+    adpBR:
+      broServiceName: *broServiceName
+      broGrpcServicePort: *broGrpcServicePort
+      brLabelKey: *brLabelKey
+  ingress:
+    # It's mandatory to give a hostname, by which the Docker container will be accessible to nodes in the cluster
+    host: *apiHostname
+    hostname: *apiHostname
+    tls:
+      # For ingress, https is forced by default. This means that the registry will work as a secure registry.
+      # For insecure registry, the next line should be uncommented.
+      enabled: *disableDefaultIngressControllerUse
+      # The certificate for https must be stored in a kubernetes tls secret.
+      # In the next line, the name of the secret must be given, if tls is enabled.
+      secretName: *apiSecretName
+  persistence:
+    persistentVolumeClaim:
+      # Either the value of the parameters "storageClass" or "encryptedStorageClass" must be provided.
+      # "encryptedStorageClass" is provisioned by Storage Encryption Provider (SEP).
+      # By default, the encrypted storage class is provided to encrypt the data at rest.
+      storageClassName: *encryptedStorageClass
+      # The size of the persistent volume. Depending on the storage class type the volume may not be resized after install.
+      size: *containerRegistryVolumeSize
+  brAgent:
+    enabled: *broAgentEnable
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile
+
+# Documentation of Object Storage http://calstore.internal.ericsson.com/elex?LI=EN/LZN7830042*&FN=1_1531-APR20147_1Uen.*.html
+eric-data-object-storage-mn:
+  appArmorProfile:
+    type: *appArmorProfile
+    manager:
+      type: *appArmorProfile
+    logshipper:
+      type: *appArmorProfile
+    kms-config:
+      type: *appArmorProfile
+    eric-data-object-storage-mn:
+      type: *appArmorProfile
+    eric-data-object-storage-mn-bra:
+      type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile
+    manager:
+      type: *seccompProfile
+    logshipper:
+      type: *seccompProfile
+    kms-config:
+      type: *seccompProfile
+    eric-data-object-storage-mn:
+      type: *seccompProfile
+    eric-data-object-storage-mn-bra:
+      type: *seccompProfile
+  global:
+    serviceNames:
+      ctrl:
+        bro: *broServiceName
+    servicePorts:
+      ctrl:
+        bro: *broGrpcServicePort
+  imageCredentials:
+    osmn:
+      registry:
+        url: *installerMinioDockerRegistry
+    init:
+      registry:
+        url: *installerMinioDockerRegistry
+    bra:
+      registry:
+        url: *installerMinioDockerRegistry
+    kes:
+      registry:
+        url: *installerMinioDockerRegistry
+    logshipper:
+      registry:
+        url: *installerMinioDockerRegistry
+    hookjob:
+      registry:
+        url: *installerMinioDockerRegistry
+  persistentVolumeClaim:
+    # Either the value of the parameters "storageClass" or "encryptedStorageClass" must be provided.
+    # "encryptedStorageClass" is provisioned by Storage Encryption Provider (SEP).
+    # By default, the encrypted storage class is provided to encrypt the data at rest.
+    storageClassName: *encryptedStorageClass
+  tls:
+    enabled: *enableSipTls
+  autoEncryption:
+    enabled: *enableMinioAutoEncryption
+  brAgent:
+    enabled: *broAgentEnable
+    brLabelKey: *brLabelKey
+
+eric-mxe-author-service:
+  imageCredentials:
+    registry:
+      url: *installerDockerRegistry
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile
+
+eric-mxe-ingress-controller:
+  imageCredentials:
+    registry:
+      url: *installerDockerRegistry
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile
+
+### MXE-Commons config - end ###
+
+### MXE-Training Config ###
+
+eric-mxe-model-training-service:
+  images:
+    packager:
+      registry: *installerSeldonDockerRegistry
+      pullPolicy: Always
+    modelBase:
+      # The docker repository where model's base image is stored
+      registry: *installerSeldonDockerRegistry
+  dockerRegistry:
+    # The host name of the internal Docker registry. This will be used by the used Kubernetes cluster to start stored training jobs
+    externalHostname: *apiHostname
+    # The port of the internal Docker registry. If the default ingress controller is disabled, then this will be the same as the internal ingress controller's port
+    externalPort: *apiPort
+  installerDockerRegistry:
+    # This CA will be used during training package onboarding to pull training base image from registry.
+    caSecretName: *installerDockerRegistryCaSecretName
+  ingress:
+    owasp:
+      enabled: *owasp
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile  
+
+### MXE-Training Config end ###
+
+### MXE Workflow Config ###
+
+argoexecBuild:
+  images:
+    argoRegistry: *installerArgoDockerRegistry
+  installerDockerRegistry:
+    # This CA will be used during argoexec image build to pull argoexec base image from registry.
+    caSecretName: *installerDockerRegistryCaSecretName
+    pullPolicy: *pullPolicy
+
+argo-workflows:
+  enabled: true
+
+  images:
+    pullSecrets: *installerDockerRegistrySecrets
+
+  controller:
+    image:
+      registry: *installerArgoDockerRegistry
+    {{- if .mxe_commons.encryption.enable_in_transit }}
+    podAnnotations:
+      sidecar.istio.io/inject: "true"
+      sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      sidecar.istio.io/userVolume: '{"egress-secret":{"secret":{"secretName":"eric-sec-access-mgmt-iam-int-client-cert","optional":true}},"egress-pm-secret":{"secret":{"secretName":"eric-pm-server-query-cert","optional":true}},"egress-lcm-secret":{"secret":{"secretName":"eric-lcm-container-registry-client-cert","optional":true}},"egress-ca-secret":{"secret":{"secretName":"eric-sec-sip-tls-trusted-root-cert"}}}'
+      sidecar.istio.io/userVolumeMount: '{"egress-secret":{"mountPath":"/etc/istio/egress-certs/","readOnly":true},"egress-pm-secret":{"mountPath":"/etc/istio/pm/egress-certs/","readOnly":true},"egress-lcm-secret":{"mountPath":"/etc/istio/lcm/egress-certs/","readOnly":true},"egress-ca-secret":{"mountPath":"/etc/istio/egress-ca-certs/","readOnly":true}}'
+    {{- end }}
+  server:
+    image:
+      registry: *installerArgoDockerRegistry
+    {{- if .mxe_commons.encryption.enable_in_transit }}
+    podAnnotations:
+      sidecar.istio.io/inject: "true"
+      sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      traffic.sidecar.istio.io/excludeOutboundPorts: "9000"
+      proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      sidecar.istio.io/userVolume: '{"egress-secret":{"secret":{"secretName":"eric-sec-access-mgmt-iam-int-client-cert","optional":true}},"egress-pm-secret":{"secret":{"secretName":"eric-pm-server-query-cert","optional":true}},"egress-lcm-secret":{"secret":{"secretName":"eric-lcm-container-registry-client-cert","optional":true}},"egress-ca-secret":{"secret":{"secretName":"eric-sec-sip-tls-trusted-root-cert"}}}'
+      sidecar.istio.io/userVolumeMount: '{"egress-secret":{"mountPath":"/etc/istio/egress-certs/","readOnly":true},"egress-pm-secret":{"mountPath":"/etc/istio/pm/egress-certs/","readOnly":true},"egress-lcm-secret":{"mountPath":"/etc/istio/lcm/egress-certs/","readOnly":true},"egress-ca-secret":{"mountPath":"/etc/istio/egress-ca-certs/","readOnly":true}}'
+    volumes:
+      - name: certs-volume 
+        projected:
+          sources:
+            - secret:
+                name: eric-sec-sip-tls-trusted-root-cert
+                items:
+                  - key: cacertbundle.pem
+                    path: sip-tls-cacertbundle.pem 
+    volumeMounts:
+      - name: certs-volume
+        mountPath: /run/ca-certs/
+        readOnly: true
+    extraEnv:
+    - name: SSL_CERT_DIR
+      value: /run/ca-certs/:/etc/ssl/certs/
+    {{- end }}
+  executor:
+    image:
+      {{- if .mxe_commons.encryption.enable_in_transit }}
+      registry: {{ .api.mxe.host }}
+      repository: argoexec
+      tag: 1.0.0
+      {{- else }}
+      registry: *installerArgoDockerRegistry
+      {{- end }}
+  artifactRepository:
+    s3:
+    {{- if .mxe_commons.encryption.enable_in_transit }}
+      insecure: false
+    {{- else }}
+       insecure: true
+    {{- end }}
+spark-operator:
+  enabled: true
+  image:
+    repository: *installerSparkDockerImage
+    pullPolicy: Always
+  {{- if .mxe_commons.encryption.enable_in_transit }}
+  podAnnotations:
+    sidecar.istio.io/inject: "true"
+    sidecar.istio.io/rewriteAppHTTPProbers: "true"
+    traffic.sidecar.istio.io/excludeInboundPorts: "8080"
+    proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+    sidecar.istio.io/userVolume: '{"egress-secret":{"secret":{"secretName":"eric-sec-access-mgmt-iam-int-client-cert","optional":true}},"egress-pm-secret":{"secret":{"secretName":"eric-pm-server-query-cert","optional":true}},"egress-lcm-secret":{"secret":{"secretName":"eric-lcm-container-registry-client-cert","optional":true}},"egress-ca-secret":{"secret":{"secretName":"eric-sec-sip-tls-trusted-root-cert"}}}'
+    sidecar.istio.io/userVolumeMount: '{"egress-secret":{"mountPath":"/etc/istio/egress-certs/","readOnly":true},"egress-pm-secret":{"mountPath":"/etc/istio/pm/egress-certs/","readOnly":true},"egress-lcm-secret":{"mountPath":"/etc/istio/lcm/egress-certs/","readOnly":true},"egress-ca-secret":{"mountPath":"/etc/istio/egress-ca-certs/","readOnly":true}}'
+  {{- end }}
+  metrics:
+    enable: true
+  imagePullSecrets: *installerDockerRegistrySecrets
+  ingressUrlFormat: *installerSparkUiIngressUrl
+  resources:
+    requests:
+      cpu: 100m
+      memory: 200Mi
+      ephemeral-storage: 100Mi
+    limits:
+      cpu: 200m
+      memory: 1Gi
+      ephemeral-storage: 500Mi
+
+eric-mxe-argo:
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile
+
+eric-mxe-spark:
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile
+
+### MXE Workflow Config - End ###
+
+### MXE Exploration Config ###
+
+eric-mxe-jupyterhub:
+  hub:
+    db:
+      pvc:
+        # By default it uses the default storage class. If there is no default storage class, and it's not specified, then pod creation will fail.
+        storageClassName: *storageClass
+    {{- if .mxe_commons.encryption.enable_in_transit }}
+    extraConfig:
+      mxeConfig: |
+        from mxeauth.mxeauth import JSONWebTokenAuthenticator
+        c.JupyterHub.admin_access = True
+        c.Authenticator.admin_users = {'admin'}
+        c.Authenticator.auto_login = True
+        c.Spawner.default_url = '/lab'
+        c.Spawner.cmd = ['jupyter-labhub']
+        c.Spawner.env_keep = ['PIP_INDEX_URL', 'PIP_TRUSTED_HOST', 'PIP_USER']
+        c.JupyterHub.authenticator_class = JSONWebTokenAuthenticator
+        c.JSONWebTokenAuthenticator.signing_certificate_url = 'http://eric-sec-access-mgmt-http:8443/auth/realms/mxe/protocol/openid-connect/certs'
+        c.JSONWebTokenAuthenticator.username_claim_field = 'preferred_username'
+        c.JSONWebTokenAuthenticator.expected_audience = 'mxe-client'
+        c.JSONWebTokenAuthenticator.external_logout_url = '/oauth/logout?redirect=/'
+    {{- end }}
+  singleuser:
+    {{- if .docker_registry.secret  }}
+    image:
+      pullSecrets:
+        - {{ .docker_registry.secret }}
+      pullPolicy: *singleuserpullpolicy
+    {{- end }}
+    profileList: *singleUserProfileList
+    storage:
+      dynamic:
+        storageClass: *storageClass
+    {{- if .mxe_commons.encryption.enable_in_transit }}
+    extraAnnotations: 
+      sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      traffic.sidecar.istio.io/excludeInboundPorts: "8888"
+      sidecar.istio.io/userVolume: '{{`{{"egress-secret":{{"secret":{{"secretName":"eric-sec-access-mgmt-iam-int-client-cert","optional":true}}}},"egress-pm-secret":{{"secret":{{"secretName":"eric-pm-server-query-cert","optional":true}}}},"egress-lcm-secret":{{"secret":{{"secretName":"eric-lcm-container-registry-client-cert","optional":true}}}},"egress-ca-secret":{{"secret":{{"secretName":"eric-sec-sip-tls-trusted-root-cert"}}}}}}`}}'
+      sidecar.istio.io/userVolumeMount: '{{`{{"egress-secret":{{"mountPath":"/etc/istio/egress-certs/","readOnly":true}},"egress-pm-secret":{{"mountPath":"/etc/istio/pm/egress-certs/","readOnly":true}},"egress-lcm-secret":{{"mountPath":"/etc/istio/lcm/egress-certs/","readOnly":true}},"egress-ca-secret":{{"mountPath":"/etc/istio/egress-ca-certs/","readOnly":true}}}}`}}'
+    extraPodConfig: 
+      automountServiceAccountToken: true
+    extraLabels:
+      sidecar.istio.io/inject: "true"
+    {{- end }}
+  ingress:
+    owasp:
+      enabled: *owasp
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile
+  pypiServer:
+    external: *externalPypiServer
+
+### MXE Exploration Config - End ###
+
+### MXE Serving Config ###
+
+# The model service which starts models in the cluster
+eric-mxe-model-service:
+  isExtCA: *isExtCA
+  dockerRegistry:
+    # The host name of the internal Docker registry. This will be used by the used Kubernetes cluster to start stored models
+    externalHostname: *apiHostname
+    # The port of the internal Docker registry. If the default ingress controller is disabled, then this will be the same as the internal ingress controller's port
+    externalPort: *apiPort
+  ingress:
+    owasp:
+      enabled: *owasp
+  tomcat:
+    connectionTimeout: *tomcatConnectionTimeoutInterval
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile  
+
+# The model catalogue service
+eric-mxe-model-catalogue-service:
+  isExtCA: *isExtCA
+  images:
+    packager:
+      pullPolicy: Always
+      registry: *installerSeldonDockerRegistry
+    modelBase:
+      # The docker repository where model's base image is stored
+      registry: *installerSeldonDockerRegistry
+  dockerRegistry:
+    # The host name of the internal Docker registry. This will be used by the used Kubernetes cluster to do model onboarding
+    externalHostname: *apiHostname
+    # The port of the internal Docker registry. If the default ingress controller is disabled, then this will be the same as the internal ingress controller's port
+    externalPort: *apiPort
+  installerDockerRegistry:
+    # This CA will be used during model onboarding to pull model onboarding base image from registry.
+    caSecretName: *installerDockerRegistryCaSecretName
+
+  ingress:
+    owasp:
+      enabled: *owasp
+  appArmorProfile:
+    type: *appArmorProfile
+  pypiServer:
+    external: *externalPypiServer
+
+  seccompProfile:
+    type: *seccompProfile  
+  
+# Documentation of Seldon core's options: https://github.com/SeldonIO/seldon-core/blob/v1.0.1/helm-charts/seldon-core-operator/values.yaml
+seldon-core-operator:
+  enabled: *clusterWidePermissions
+  hostNetwork: *hostNetwork
+  webhook:
+    port: *seldon_webhook_port
+  metrics:
+    port: *seldon_metrics_port
+  image:
+    # The docker repository where Seldon operator's image can be found
+    registry: *installerSeldonDockerRegistry
+    pullPolicy: *seldonCorepullPolicy
+  executor:
+    image:
+      # The docker repository where Seldon's sidecar image can be found
+      registry: *installerSeldonDockerRegistry
+      pullPolicy: *seldonCoreExecutorpullPolicy
+  {{- if .mxe_commons.encryption.enable_in_transit }}
+  istio:
+    tlsMode: ISTIO_MUTUAL
+  {{- end }}
+
+eric-mxe-serving-upgrade-jobs:
+  preupgrade-cleanup:
+    keycloakAdminSecretNameOverride: *mxeAdminSecret
+  appArmorProfile:
+    type: *appArmorProfile
+  seccompProfile:
+    type: *seccompProfile  
+### MXE Serving Config - end ###

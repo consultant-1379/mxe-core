@@ -1,0 +1,81 @@
+nmapConfig:
+  services:
+## MXE Deployer
+    - name: "argocd-application-controller"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "argocd-applicationset-controller"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "argocd-notifications-controller"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "argocd-repo-server"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "argocd-server"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "mxe-deployer-gitea"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "mxe-deployer-redis-ha-haproxy"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "mxe-deployer-redis-ha-server"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+    - name: "eric-mxe-deployer-service"
+      protocol:
+        - "tcp"
+        - "udp"
+      additionalParams:
+        - "-v"
+        - "-p U:0,T:0-65535,S:0-65535"
+        - "--stats-every 30"
+  enableUnicornscan:
+    additionalParams:
+      - "-r300"
+      - "-v"
+  reportDir : ".bob/va-reports/nmap/"
+  enableServiceVersionDetection: true

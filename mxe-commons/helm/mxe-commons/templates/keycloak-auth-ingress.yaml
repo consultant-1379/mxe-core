@@ -1,0 +1,29 @@
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: {{ include "mxe-commons.keycloak-auth-ingress.name" . | quote }}
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "eric-sec-access-mgmt"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-commons.keycloak-auth-ingress.name" . | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    mxe.nginx.ingress.kubernetes.io/upstream-vhost: {{ .Values.keycloak.service.name }}
+    {{- include "mxe-commons.ingress.auth.annotations" . | nindent 4 }}
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+spec:
+  ingressClassName: {{ index .Values "keycloak" "ingress" "class" | quote }}
+  rules:
+    - host: {{ include "mxe-commons.api-host" . | quote }}
+      http:
+        paths:
+          - path: {{ index .Values "keycloak" "ingress" "auth" "path" | quote }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.keycloak.service.name }}
+                port:
+                  number: {{ include "mxe-commons.iam-port" . }}

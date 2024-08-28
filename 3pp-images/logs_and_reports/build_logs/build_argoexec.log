@@ -1,0 +1,1316 @@
++ case "$(uname -s)" in
+++ uname -s
+++ readlink -f /mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/argo-workflows/build_alpine_image.sh
++ SCRIPT=/mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/argo-workflows/build_alpine_image.sh
+++ dirname /mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/argo-workflows/build_alpine_image.sh
++ BASEDIR=/mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/argo-workflows
+++ dirname /mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/argo-workflows
++ MODULEROOT=/mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images
+++ dirname /mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/argo-workflows
++ MODULEROOT=/mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images
++ source /mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/base_image.sh
+++ export LATEST_DATE_TAG=20230412
+++ LATEST_DATE_TAG=20230412
+++ export BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:focal-20230412
+++ BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:focal-20230412
+++ export MINICONDA_VERSION=py38_4.12.0
+++ MINICONDA_VERSION=py38_4.12.0
+++ export S2I_MINICONDA_DOWNLOAD_VERSION=4.13.0
+++ S2I_MINICONDA_DOWNLOAD_VERSION=4.13.0
+++ export MINICONDA_UBUNTU_IMAGE=armdocker.rnd.ericsson.se/proj-mxe/continuumio/miniconda3:py38_4.12.0-ubuntu-20230412
+++ MINICONDA_UBUNTU_IMAGE=armdocker.rnd.ericsson.se/proj-mxe/continuumio/miniconda3:py38_4.12.0-ubuntu-20230412
+++ export SELDON_JAVA_RUNTIME_IMAGE_SOURCE=openjdk
+++ SELDON_JAVA_RUNTIME_IMAGE_SOURCE=openjdk
+++ export SELDON_JAVA_RUNTIME_IMAGE_VERSION=13.0.1-jdk-buster
+++ SELDON_JAVA_RUNTIME_IMAGE_VERSION=13.0.1-jdk-buster
+++ export SELDON_JAVA_BUILD_IMAGE_SOURCE=seldonio/core-builder
+++ SELDON_JAVA_BUILD_IMAGE_SOURCE=seldonio/core-builder
+++ export SELDON_JAVA_BUILD_IMAGE_VERSION=0.19
+++ SELDON_JAVA_BUILD_IMAGE_VERSION=0.19
+++ export LATEST_ALPINE_TAG=3.17.3
+++ LATEST_ALPINE_TAG=3.17.3
+++ export PYTHON_ALPINE_TAG=3.9.16-alpine3.17
+++ PYTHON_ALPINE_TAG=3.9.16-alpine3.17
+++ export ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
+++ ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
++ echo 'Latest alpine image tag is  3.17.3'
+Latest alpine image tag is  3.17.3
++ REPO_URL=https://github.com/argoproj/argo-workflows.git
++ RELEASE_TAG=v3.3.8
++ IMAGE=armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argoexec:v3.3.8-alpine-3.17.3
++ MAKEFILE_EXEC_TARGET=argoexec-image
++ ALPINE_SOURCE_VERSION=3
++ ALPINE_TARGET_VERSION=3.17.3
++ cleanup
++ [[ -d /mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/argo-workflows/argo-workflows ]]
++ rm -rf /mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/argo-workflows/argo-workflows
++ git clone -b v3.3.8 https://github.com/argoproj/argo-workflows.git /mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/argo-workflows/argo-workflows
+Cloning into '/mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/argo-workflows/argo-workflows'...
+Note: switching to '621b0d1a8e09634666ebe403ee7b8fc29db1dc4e'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
++ cd /mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/argo-workflows/argo-workflows
++ echo /mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/argo-workflows/argo-workflows
+/mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/argo-workflows/argo-workflows
++ sed -i 's#docker buildx build#docker buildx build --load#g' Makefile
++ sed -i s#alpine:3#armdockerhub.rnd.ericsson.se/alpine:3.17.3#g Dockerfile
++ sed -i s#golang:1.17#armdockerhub.rnd.ericsson.se/golang:1.19.7#g Dockerfile
++ mkdir dist/
++ export DOCKER_BUILDKIT=1
++ DOCKER_BUILDKIT=1
++ make argoexec-image
+GIT_COMMIT=621b0d1a8e09634666ebe403ee7b8fc29db1dc4e GIT_BRANCH=HEAD GIT_TAG=v3.3.8 GIT_TREE_STATE=dirty RELEASE_TAG=true DEV_BRANCH=false VERSION=v3.3.8
+KUBECTX=cech030 DOCKER_DESKTOP=false K3D=false DOCKER_PUSH=false
+RUN_MODE=local PROFILE=minimal AUTH_MODE=hybrid SECURE=false STATIC_FILES=true ALWAYS_OFFLOAD_NODE_STATUS=false UPPERIO_DB_DEBUG=0 LOG_LEVEL=debug NAMESPACED=true
+[ ! -e dist/argoexec ] || mv dist/argoexec .
+docker build \
+	-t quay.io/argoproj/argoexec:v3.3.8 \
+	--target argoexec \
+	 .
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 5.30kB done
+#1 DONE 0.1s
+
+#2 [internal] load .dockerignore
+#2 transferring context: 367B done
+#2 DONE 0.1s
+
+#3 resolve image config for docker.io/docker/dockerfile:1.2
+#3 DONE 0.7s
+
+#4 docker-image://docker.io/docker/dockerfile:1.2@sha256:e2a8561e419ab1ba6b2fe6cbdf49fd92b95912df1cf7d313c3e2230a333fdbcc
+#4 CACHED
+
+#5 [internal] load .dockerignore
+#5 DONE 0.0s
+
+#6 [internal] load build definition from Dockerfile
+#6 DONE 0.0s
+
+#7 [internal] load metadata for armdockerhub.rnd.ericsson.se/alpine:3.17.3
+#7 DONE 0.2s
+
+#8 [internal] load metadata for armdockerhub.rnd.ericsson.se/golang:1.19.7
+#8 DONE 5.8s
+
+#9 [internal] load build context
+#9 DONE 0.0s
+
+#10 [builder 1/8] FROM armdockerhub.rnd.ericsson.se/golang:1.19.7@sha256:d2078d2176fcc81c7df4dbd5c5859147474a5e46bd9263460f05b820019e5fcc
+#10 resolve armdockerhub.rnd.ericsson.se/golang:1.19.7@sha256:d2078d2176fcc81c7df4dbd5c5859147474a5e46bd9263460f05b820019e5fcc
+#10 resolve armdockerhub.rnd.ericsson.se/golang:1.19.7@sha256:d2078d2176fcc81c7df4dbd5c5859147474a5e46bd9263460f05b820019e5fcc 0.2s done
+#10 ...
+
+#11 [argoexec-base 1/8] FROM armdockerhub.rnd.ericsson.se/alpine:3.17.3@sha256:124c7d2707904eea7431fffe91522a01e5a861a624ee31d03372cc1d138a3126
+#11 resolve armdockerhub.rnd.ericsson.se/alpine:3.17.3@sha256:124c7d2707904eea7431fffe91522a01e5a861a624ee31d03372cc1d138a3126 0.2s done
+#11 DONE 0.4s
+
+#10 [builder 1/8] FROM armdockerhub.rnd.ericsson.se/golang:1.19.7@sha256:d2078d2176fcc81c7df4dbd5c5859147474a5e46bd9263460f05b820019e5fcc
+#10 sha256:d2078d2176fcc81c7df4dbd5c5859147474a5e46bd9263460f05b820019e5fcc 2.36kB / 2.36kB done
+#10 sha256:7a8fb82f707b04e934ce1dea380924422b4942bb06f27ad4710fd63d711316ff 1.80kB / 1.80kB done
+#10 sha256:3e440a7045683e27f8e2fa04000e0e078d8dfac0c971358ae0f8c65c13321c8e 0B / 55.05MB 0.1s
+#10 sha256:ee6a422e97e04eb76a44b4515fb3e6f7189786c0f32ed705fc54974409df4ed3 7.11kB / 7.11kB done
+#10 sha256:3e440a7045683e27f8e2fa04000e0e078d8dfac0c971358ae0f8c65c13321c8e 26.21MB / 55.05MB 0.3s
+#10 sha256:68a71c865a2c34678c6dea55e4b0928f751ee3c0ca91cace6e4e0578c534d6cf 3.15MB / 5.17MB 0.3s
+#10 sha256:670730c27c2eacf07897a6e94fe55423ea50b884d9c28161a283bbbf064d1124 4.51MB / 10.88MB 0.3s
+#10 sha256:3e440a7045683e27f8e2fa04000e0e078d8dfac0c971358ae0f8c65c13321c8e 40.89MB / 55.05MB 0.4s
+#10 sha256:68a71c865a2c34678c6dea55e4b0928f751ee3c0ca91cace6e4e0578c534d6cf 5.17MB / 5.17MB 0.4s
+#10 sha256:670730c27c2eacf07897a6e94fe55423ea50b884d9c28161a283bbbf064d1124 10.88MB / 10.88MB 0.4s
+#10 sha256:3e440a7045683e27f8e2fa04000e0e078d8dfac0c971358ae0f8c65c13321c8e 55.05MB / 55.05MB 0.5s
+#10 sha256:68a71c865a2c34678c6dea55e4b0928f751ee3c0ca91cace6e4e0578c534d6cf 5.17MB / 5.17MB 0.4s done
+#10 sha256:670730c27c2eacf07897a6e94fe55423ea50b884d9c28161a283bbbf064d1124 10.88MB / 10.88MB 0.5s done
+#10 sha256:5a7a2c95f0f8b221d776ccf35911b68eec2cf9414a44d216205a6f03e381d3d7 7.34MB / 54.58MB 0.7s
+#10 sha256:5a7a2c95f0f8b221d776ccf35911b68eec2cf9414a44d216205a6f03e381d3d7 29.36MB / 54.58MB 0.8s
+#10 sha256:3e440a7045683e27f8e2fa04000e0e078d8dfac0c971358ae0f8c65c13321c8e 55.05MB / 55.05MB 0.8s done
+#10 sha256:5a7a2c95f0f8b221d776ccf35911b68eec2cf9414a44d216205a6f03e381d3d7 47.17MB / 54.58MB 0.9s
+#10 extracting sha256:3e440a7045683e27f8e2fa04000e0e078d8dfac0c971358ae0f8c65c13321c8e
+#10 sha256:450bec6ed48f4520b9e956f431a2010d5cb760089a31073355968851c34daf05 0B / 149.01MB 0.9s
+#10 sha256:db119aaf144b2bc25823dcfc08c6e276826608564a4fb7e50c46d6fc8b8dea14 0B / 85.99MB 0.9s
+#10 sha256:5a7a2c95f0f8b221d776ccf35911b68eec2cf9414a44d216205a6f03e381d3d7 54.58MB / 54.58MB 1.0s
+#10 sha256:db119aaf144b2bc25823dcfc08c6e276826608564a4fb7e50c46d6fc8b8dea14 7.34MB / 85.99MB 1.0s
+#10 sha256:450bec6ed48f4520b9e956f431a2010d5cb760089a31073355968851c34daf05 22.02MB / 149.01MB 1.1s
+#10 sha256:db119aaf144b2bc25823dcfc08c6e276826608564a4fb7e50c46d6fc8b8dea14 29.23MB / 85.99MB 1.1s
+#10 ...
+
+#9 [internal] load build context
+#9 transferring context: 125.41MB 0.9s done
+#9 DONE 1.4s
+
+#10 [builder 1/8] FROM armdockerhub.rnd.ericsson.se/golang:1.19.7@sha256:d2078d2176fcc81c7df4dbd5c5859147474a5e46bd9263460f05b820019e5fcc
+#10 sha256:5a7a2c95f0f8b221d776ccf35911b68eec2cf9414a44d216205a6f03e381d3d7 54.58MB / 54.58MB 1.1s done
+#10 sha256:450bec6ed48f4520b9e956f431a2010d5cb760089a31073355968851c34daf05 59.77MB / 149.01MB 1.3s
+#10 sha256:db119aaf144b2bc25823dcfc08c6e276826608564a4fb7e50c46d6fc8b8dea14 65.01MB / 85.99MB 1.3s
+#10 sha256:52d0c385f5c34cdca9159d0cdc76df392c6d742c026e16126e3c365d28b00065 155B / 155B 1.3s
+#10 sha256:450bec6ed48f4520b9e956f431a2010d5cb760089a31073355968851c34daf05 81.79MB / 149.01MB 1.4s
+#10 sha256:db119aaf144b2bc25823dcfc08c6e276826608564a4fb7e50c46d6fc8b8dea14 85.99MB / 85.99MB 1.4s
+#10 sha256:52d0c385f5c34cdca9159d0cdc76df392c6d742c026e16126e3c365d28b00065 155B / 155B 1.3s done
+#10 sha256:450bec6ed48f4520b9e956f431a2010d5cb760089a31073355968851c34daf05 100.66MB / 149.01MB 1.5s
+#10 sha256:450bec6ed48f4520b9e956f431a2010d5cb760089a31073355968851c34daf05 122.68MB / 149.01MB 1.6s
+#10 sha256:450bec6ed48f4520b9e956f431a2010d5cb760089a31073355968851c34daf05 149.01MB / 149.01MB 1.8s
+#10 sha256:db119aaf144b2bc25823dcfc08c6e276826608564a4fb7e50c46d6fc8b8dea14 85.99MB / 85.99MB 1.6s done
+#10 extracting sha256:3e440a7045683e27f8e2fa04000e0e078d8dfac0c971358ae0f8c65c13321c8e 1.4s done
+#10 sha256:450bec6ed48f4520b9e956f431a2010d5cb760089a31073355968851c34daf05 149.01MB / 149.01MB 2.5s done
+#10 extracting sha256:68a71c865a2c34678c6dea55e4b0928f751ee3c0ca91cace6e4e0578c534d6cf
+#10 extracting sha256:68a71c865a2c34678c6dea55e4b0928f751ee3c0ca91cace6e4e0578c534d6cf 0.1s done
+#10 extracting sha256:670730c27c2eacf07897a6e94fe55423ea50b884d9c28161a283bbbf064d1124
+#10 extracting sha256:670730c27c2eacf07897a6e94fe55423ea50b884d9c28161a283bbbf064d1124 0.2s done
+#10 ...
+
+#12 [argoexec-base 2/8] RUN apk --no-cache add curl procps git tar libcap jq
+#0 0.542 fetch https://dl-cdn.alpinelinux.org/alpine/v3.17/main/x86_64/APKINDEX.tar.gz
+#0 0.730 fetch https://dl-cdn.alpinelinux.org/alpine/v3.17/community/x86_64/APKINDEX.tar.gz
+#0 1.056 (1/20) Installing ca-certificates (20220614-r4)
+#0 1.082 (2/20) Installing brotli-libs (1.0.9-r9)
+#0 1.105 (3/20) Installing nghttp2-libs (1.51.0-r0)
+#0 1.115 (4/20) Installing libcurl (8.0.1-r0)
+#0 1.133 (5/20) Installing curl (8.0.1-r0)
+#0 1.146 (6/20) Installing libexpat (2.5.0-r0)
+#0 1.156 (7/20) Installing pcre2 (10.42-r0)
+#0 1.175 (8/20) Installing git (2.38.5-r0)
+#0 1.292 (9/20) Installing oniguruma (6.9.8-r0)
+#0 1.305 (10/20) Installing jq (1.6-r2)
+#0 1.320 (11/20) Installing libcap2 (2.66-r0)
+#0 1.329 (12/20) Installing libcap-utils (2.66-r0)
+#0 1.340 (13/20) Installing libcap (2.66-r0)
+#0 1.352 (14/20) Installing libintl (0.21.1-r1)
+#0 1.367 (15/20) Installing ncurses-terminfo-base (6.3_p20221119-r0)
+#0 1.381 (16/20) Installing ncurses-libs (6.3_p20221119-r0)
+#0 1.396 (17/20) Installing libproc (3.3.17-r2)
+#0 1.405 (18/20) Installing procps (3.3.17-r2)
+#0 1.420 (19/20) Installing libacl (2.3.1-r1)
+#0 1.428 (20/20) Installing tar (1.34-r2)
+#0 1.442 Executing busybox-1.35.0-r29.trigger
+#0 1.448 Executing ca-certificates-20220614-r4.trigger
+#0 1.559 OK: 19 MiB in 35 packages
+#12 DONE 3.6s
+
+#10 [builder 1/8] FROM armdockerhub.rnd.ericsson.se/golang:1.19.7@sha256:d2078d2176fcc81c7df4dbd5c5859147474a5e46bd9263460f05b820019e5fcc
+#10 extracting sha256:5a7a2c95f0f8b221d776ccf35911b68eec2cf9414a44d216205a6f03e381d3d7
+#10 ...
+
+#13 [argoexec-base 3/8] COPY hack/arch.sh hack/os.sh /bin/
+#13 DONE 0.4s
+
+#10 [builder 1/8] FROM armdockerhub.rnd.ericsson.se/golang:1.19.7@sha256:d2078d2176fcc81c7df4dbd5c5859147474a5e46bd9263460f05b820019e5fcc
+#10 extracting sha256:5a7a2c95f0f8b221d776ccf35911b68eec2cf9414a44d216205a6f03e381d3d7 1.4s done
+#10 extracting sha256:db119aaf144b2bc25823dcfc08c6e276826608564a4fb7e50c46d6fc8b8dea14
+#10 extracting sha256:db119aaf144b2bc25823dcfc08c6e276826608564a4fb7e50c46d6fc8b8dea14 1.5s done
+#10 extracting sha256:450bec6ed48f4520b9e956f431a2010d5cb760089a31073355968851c34daf05
+#10 ...
+
+#14 [argoexec-base 4/8] RUN if [ $(arch.sh) = ppc64le ] || [ $(arch.sh) = s390x ]; then         curl -o docker.tgz https://download.docker.com/$(os.sh)/static/stable/$(uname -m)/docker-18.06.3-ce.tgz;     else         curl -o docker.tgz https://download.docker.com/$(os.sh)/static/stable/$(uname -m)/docker-20.10.14.tgz;     fi &&     tar --extract --file docker.tgz --strip-components 1 --directory /usr/local/bin/ &&     rm docker.tgz
+#0 0.515   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+#0 0.515                                  Dload  Upload   Total   Spent    Left  Speed
+#0 0.515   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0 58 61.2M   58 35.7M    0     0  33.8M      0  0:00:01  0:00:01 --:--:-- 33.8M100 61.2M  100 61.2M    0     0  45.5M      0  0:00:01  0:00:01 --:--:-- 45.5M
+#14 DONE 5.8s
+
+#10 [builder 1/8] FROM armdockerhub.rnd.ericsson.se/golang:1.19.7@sha256:d2078d2176fcc81c7df4dbd5c5859147474a5e46bd9263460f05b820019e5fcc
+#10 ...
+
+#15 [argoexec-base 5/8] RUN curl -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.22.3/bin/$(os.sh)/$(arch.sh)/kubectl &&     chmod +x /usr/local/bin/kubectl
+#15 0.478   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+#15 0.478                                  Dload  Upload   Total   Spent    Left  Speed
+#15 0.478   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0 44.7M    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+#15 ...
+
+#10 [builder 1/8] FROM armdockerhub.rnd.ericsson.se/golang:1.19.7@sha256:d2078d2176fcc81c7df4dbd5c5859147474a5e46bd9263460f05b820019e5fcc
+#10 extracting sha256:450bec6ed48f4520b9e956f431a2010d5cb760089a31073355968851c34daf05 3.5s done
+#10 extracting sha256:52d0c385f5c34cdca9159d0cdc76df392c6d742c026e16126e3c365d28b00065 done
+#10 DONE 12.0s
+
+#15 [argoexec-base 5/8] RUN curl -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.22.3/bin/$(os.sh)/$(arch.sh)/kubectl &&     chmod +x /usr/local/bin/kubectl
+#15 0.478   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0 44.7M    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0 80 44.7M   80 35.9M    0     0  27.6M      0  0:00:01  0:00:01 --:--:-- 27.6M100 44.7M  100 44.7M    0     0  32.4M      0  0:00:01  0:00:01 --:--:-- 32.4M
+#15 DONE 2.5s
+
+#16 [argoexec-base 6/8] RUN rm /bin/arch.sh /bin/os.sh
+#16 DONE 0.9s
+
+#17 [builder 2/8] RUN apt-get update && apt-get --no-install-recommends install -y     git     make     apt-utils     apt-transport-https     ca-certificates     wget     gcc     libcap2-bin     zip &&     apt-get clean     && rm -rf         /var/lib/apt/lists/*         /tmp/*         /var/tmp/*         /usr/share/man         /usr/share/doc         /usr/share/doc-base
+#0 0.963 Get:1 http://deb.debian.org/debian bullseye InRelease [116 kB]
+#0 0.983 Get:2 http://deb.debian.org/debian-security bullseye-security InRelease [48.4 kB]
+#0 0.991 Get:3 http://deb.debian.org/debian bullseye-updates InRelease [44.1 kB]
+#0 1.104 Get:4 http://deb.debian.org/debian bullseye/main amd64 Packages [8183 kB]
+#0 1.202 Get:5 http://deb.debian.org/debian-security bullseye-security/main amd64 Packages [237 kB]
+#0 1.316 Get:6 http://deb.debian.org/debian bullseye-updates/main amd64 Packages [14.6 kB]
+#17 ...
+
+#18 [argoexec-base 7/8] COPY hack/ssh_known_hosts /etc/ssh/
+#18 DONE 0.4s
+
+#19 [argoexec-base 8/8] COPY hack/nsswitch.conf /etc/
+#19 DONE 0.2s
+
+#17 [builder 2/8] RUN apt-get update && apt-get --no-install-recommends install -y     git     make     apt-utils     apt-transport-https     ca-certificates     wget     gcc     libcap2-bin     zip &&     apt-get clean     && rm -rf         /var/lib/apt/lists/*         /tmp/*         /var/tmp/*         /usr/share/man         /usr/share/doc         /usr/share/doc-base
+#17 2.457 Fetched 8643 kB in 2s (5595 kB/s)
+#17 2.457 Reading package lists...
+#17 2.988 Reading package lists...
+#17 3.491 Building dependency tree...
+#17 3.604 Reading state information...
+#17 3.722 ca-certificates is already the newest version (20210119).
+#17 3.722 gcc is already the newest version (4:10.2.1-1).
+#17 3.722 make is already the newest version (4.3-4.1).
+#17 3.722 wget is already the newest version (1.21-1+deb11u1).
+#17 3.722 git is already the newest version (1:2.30.2-1+deb11u2).
+#17 3.722 The following additional packages will be installed:
+#17 3.722   libcap2
+#17 3.723 Recommended packages:
+#17 3.723   libpam-cap unzip
+#17 3.762 The following NEW packages will be installed:
+#17 3.763   apt-transport-https apt-utils libcap2 libcap2-bin zip
+#17 3.795 0 upgraded, 5 newly installed, 0 to remove and 1 not upgraded.
+#17 3.795 Need to get 887 kB of archives.
+#17 3.795 After this operation, 2181 kB of additional disk space will be used.
+#17 3.795 Get:1 http://deb.debian.org/debian bullseye/main amd64 apt-utils amd64 2.2.4 [439 kB]
+#17 3.823 Get:2 http://deb.debian.org/debian bullseye/main amd64 apt-transport-https all 2.2.4 [160 kB]
+#17 3.825 Get:3 http://deb.debian.org/debian bullseye/main amd64 libcap2 amd64 1:2.44-1 [23.6 kB]
+#17 3.825 Get:4 http://deb.debian.org/debian bullseye/main amd64 libcap2-bin amd64 1:2.44-1 [32.6 kB]
+#17 3.826 Get:5 http://deb.debian.org/debian bullseye/main amd64 zip amd64 3.0-12 [232 kB]
+#17 3.972 debconf: delaying package configuration, since apt-utils is not installed
+#17 4.052 Fetched 887 kB in 0s (14.6 MB/s)
+#17 4.092 Selecting previously unselected package apt-utils.
+#17 4.092 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 15719 files and directories currently installed.)
+#17 4.103 Preparing to unpack .../apt-utils_2.2.4_amd64.deb ...
+#17 4.113 Unpacking apt-utils (2.2.4) ...
+#17 4.224 Selecting previously unselected package apt-transport-https.
+#17 4.226 Preparing to unpack .../apt-transport-https_2.2.4_all.deb ...
+#17 4.238 Unpacking apt-transport-https (2.2.4) ...
+#17 4.340 Selecting previously unselected package libcap2:amd64.
+#17 4.342 Preparing to unpack .../libcap2_1%3a2.44-1_amd64.deb ...
+#17 4.364 Unpacking libcap2:amd64 (1:2.44-1) ...
+#17 4.456 Selecting previously unselected package libcap2-bin.
+#17 4.458 Preparing to unpack .../libcap2-bin_1%3a2.44-1_amd64.deb ...
+#17 4.471 Unpacking libcap2-bin (1:2.44-1) ...
+#17 4.547 Selecting previously unselected package zip.
+#17 4.549 Preparing to unpack .../archives/zip_3.0-12_amd64.deb ...
+#17 4.562 Unpacking zip (3.0-12) ...
+#17 4.685 Setting up apt-utils (2.2.4) ...
+#17 4.729 Setting up apt-transport-https (2.2.4) ...
+#17 4.775 Setting up libcap2:amd64 (1:2.44-1) ...
+#17 4.815 Setting up libcap2-bin (1:2.44-1) ...
+#17 4.887 Setting up zip (3.0-12) ...
+#17 4.968 Processing triggers for libc-bin (2.31-13+deb11u5) ...
+#17 DONE 5.3s
+
+#20 [builder 3/8] WORKDIR /tmp
+#20 DONE 0.2s
+
+#21 [builder 4/8] WORKDIR /go/src/github.com/argoproj/argo-workflows
+#21 DONE 0.2s
+
+#22 [builder 5/8] COPY go.mod .
+#22 DONE 0.2s
+
+#23 [builder 6/8] COPY go.sum .
+#23 DONE 0.2s
+
+#24 [builder 7/8] RUN go mod download
+#24 DONE 14.7s
+
+#25 [builder 8/8] COPY . .
+#25 DONE 0.7s
+
+#26 [argoexec-build 1/4] RUN cat .dockerignore >> .gitignore
+#26 DONE 0.5s
+
+#27 [argoexec-build 2/4] RUN git status --porcelain | cut -c4- | xargs git update-index --skip-worktree
+#27 DONE 0.7s
+
+#28 [argoexec-build 3/4] RUN --mount=type=cache,target=/root/.cache/go-build make dist/argoexec
+#28 0.529 GIT_COMMIT=621b0d1a8e09634666ebe403ee7b8fc29db1dc4e GIT_BRANCH=HEAD GIT_TAG=v3.3.8 GIT_TREE_STATE=clean RELEASE_TAG=true DEV_BRANCH=false VERSION=v3.3.8
+#28 0.529 KUBECTX=none DOCKER_DESKTOP=false K3D=false DOCKER_PUSH=false
+#28 0.530 RUN_MODE=local PROFILE=minimal AUTH_MODE=hybrid SECURE=false STATIC_FILES=true ALWAYS_OFFLOAD_NODE_STATUS=false UPPERIO_DB_DEBUG=0 LOG_LEVEL=debug NAMESPACED=true
+#28 2.160 find: 'manifests/base/crds': No such file or directory
+#28 2.328 find: 'examples': No such file or directory
+#28 2.328 CGO_ENABLED=0 go build -v -ldflags '-X github.com/argoproj/argo-workflows/v3.version=v3.3.8 -X github.com/argoproj/argo-workflows/v3.buildDate=2023-04-28T06:52:09Z -X github.com/argoproj/argo-workflows/v3.gitCommit=621b0d1a8e09634666ebe403ee7b8fc29db1dc4e -X github.com/argoproj/argo-workflows/v3.gitTreeState=clean -X github.com/argoproj/argo-workflows/v3.gitTag=v3.3.8 -extldflags -static' -o dist/argoexec ./cmd/argoexec
+#28 2.670 k8s.io/apimachinery/pkg/selection
+#28 2.675 github.com/google/go-cmp/cmp/internal/flags
+#28 2.676 golang.org/x/sys/internal/unsafeheader
+#28 2.676 k8s.io/utils/integer
+#28 2.676 k8s.io/apimachinery/pkg/types
+#28 2.676 google.golang.org/protobuf/internal/flags
+#28 2.678 google.golang.org/protobuf/internal/set
+#28 2.678 github.com/argoproj/argo-workflows/v3/util/slice
+#28 2.685 google.golang.org/grpc/attributes
+#28 2.697 crypto/sha1
+#28 2.699 github.com/argoproj/argo-workflows/v3/errors
+#28 2.705 net
+#28 2.721 golang.org/x/text/transform
+#28 2.722 golang.org/x/text/unicode/bidi
+#28 2.724 golang.org/x/net/http2/hpack
+#28 2.725 github.com/gogo/protobuf/sortkeys
+#28 2.727 github.com/gogo/protobuf/proto
+#28 2.733 github.com/google/gofuzz/bytesource
+#28 2.780 golang.org/x/text/unicode/norm
+#28 2.815 gopkg.in/inf.v0
+#28 2.824 k8s.io/apimachinery/third_party/forked/golang/reflect
+#28 2.838 k8s.io/apimachinery/pkg/fields
+#28 2.841 github.com/google/gofuzz
+#28 2.928 k8s.io/apimachinery/pkg/conversion
+#28 2.945 github.com/google/go-cmp/cmp/internal/diff
+#28 2.951 github.com/google/go-cmp/cmp/internal/function
+#28 3.007 golang.org/x/text/secure/bidirule
+#28 3.014 github.com/google/go-cmp/cmp/internal/value
+#28 3.024 k8s.io/apimachinery/pkg/util/sets
+#28 3.030 github.com/go-logr/logr
+#28 3.045 os/user
+#28 3.076 k8s.io/apimachinery/pkg/conversion/queryparams
+#28 3.105 sigs.k8s.io/json/internal/golang/encoding/json
+#28 3.190 github.com/google/go-cmp/cmp
+#28 3.198 k8s.io/klog/v2
+#28 3.211 k8s.io/apimachinery/pkg/util/naming
+#28 3.288 github.com/modern-go/concurrent
+#28 3.290 golang.org/x/net/idna
+#28 3.320 k8s.io/apimachinery/pkg/util/errors
+#28 3.367 github.com/modern-go/reflect2
+#28 3.432 k8s.io/apimachinery/pkg/util/validation/field
+#28 3.500 gopkg.in/yaml.v2
+#28 3.593 k8s.io/apimachinery/pkg/version
+#28 3.704 k8s.io/client-go/pkg/version
+#28 3.745 github.com/davecgh/go-spew/spew
+#28 3.752 sigs.k8s.io/json
+#28 3.846 k8s.io/apimachinery/pkg/util/framer
+#28 3.860 k8s.io/apimachinery/pkg/util/json
+#28 3.862 golang.org/x/sys/unix
+#28 3.867 crypto/x509
+#28 3.968 vendor/golang.org/x/net/http/httpproxy
+#28 3.972 net/textproto
+#28 4.084 k8s.io/utils/internal/third_party/forked/golang/net
+#28 4.100 k8s.io/client-go/tools/metrics
+#28 4.174 k8s.io/utils/net
+#28 4.183 golang.org/x/net/http/httpguts
+#28 4.219 vendor/golang.org/x/net/http/httpguts
+#28 4.281 mime/multipart
+#28 4.338 k8s.io/apimachinery/pkg/util/validation
+#28 4.360 k8s.io/utils/clock
+#28 4.378 sigs.k8s.io/yaml
+#28 4.410 k8s.io/apimachinery/pkg/api/resource
+#28 4.418 k8s.io/apimachinery/pkg/runtime/schema
+#28 4.424 github.com/json-iterator/go
+#28 4.485 k8s.io/apimachinery/pkg/util/intstr
+#28 4.533 crypto/tls
+#28 4.536 k8s.io/client-go/util/connrotation
+#28 4.554 k8s.io/apimachinery/pkg/util/yaml
+#28 4.560 k8s.io/apimachinery/pkg/labels
+#28 4.614 golang.org/x/time/rate
+#28 4.625 k8s.io/client-go/util/keyutil
+#28 4.654 k8s.io/utils/clock/testing
+#28 4.707 google.golang.org/protobuf/internal/detrand
+#28 4.707 google.golang.org/protobuf/internal/pragma
+#28 4.729 google.golang.org/protobuf/internal/version
+#28 4.731 github.com/grpc-ecosystem/grpc-gateway/utilities
+#28 4.740 google.golang.org/grpc/codes
+#28 4.742 k8s.io/client-go/util/flowcontrol
+#28 4.748 golang.org/x/term
+#28 4.763 google.golang.org/grpc/internal/grpclog
+#28 4.772 google.golang.org/protobuf/internal/errors
+#28 4.788 google.golang.org/grpc/metadata
+#28 4.792 github.com/emicklei/go-restful/log
+#28 4.812 google.golang.org/grpc/grpclog
+#28 4.820 google.golang.org/protobuf/encoding/protowire
+#28 4.834 github.com/PuerkitoBio/urlesc
+#28 4.857 golang.org/x/text/width
+#28 4.868 github.com/josharian/intern
+#28 4.890 github.com/mailru/easyjson/buffer
+#28 4.907 gopkg.in/yaml.v3
+#28 4.953 github.com/mailru/easyjson/jlexer
+#28 4.959 google.golang.org/protobuf/reflect/protoreflect
+#28 5.030 github.com/PuerkitoBio/purell
+#28 5.051 github.com/sirupsen/logrus
+#28 5.092 github.com/mailru/easyjson/jwriter
+#28 5.153 sigs.k8s.io/structured-merge-diff/v4/schema
+#28 5.212 archive/tar
+#28 5.219 github.com/spf13/pflag
+#28 5.293 golang.org/x/net/context
+#28 5.353 golang.org/x/net/internal/timeseries
+#28 5.406 google.golang.org/protobuf/internal/encoding/messageset
+#28 5.483 google.golang.org/protobuf/internal/strs
+#28 5.505 google.golang.org/protobuf/internal/genid
+#28 5.508 sigs.k8s.io/structured-merge-diff/v4/value
+#28 5.560 google.golang.org/protobuf/internal/order
+#28 5.565 google.golang.org/protobuf/reflect/protoregistry
+#28 5.646 google.golang.org/protobuf/internal/encoding/text
+#28 5.664 google.golang.org/protobuf/runtime/protoiface
+#28 5.674 net/http/httptrace
+#28 5.688 k8s.io/client-go/util/cert
+#28 5.728 google.golang.org/protobuf/internal/descfmt
+#28 5.784 google.golang.org/protobuf/proto
+#28 5.843 net/http
+#28 5.930 google.golang.org/protobuf/internal/descopts
+#28 5.957 google.golang.org/protobuf/internal/encoding/json
+#28 5.978 google.golang.org/protobuf/internal/encoding/defval
+#28 5.993 github.com/argoproj/argo-workflows/v3/util/env
+#28 6.022 github.com/spf13/cobra
+#28 6.042 sigs.k8s.io/structured-merge-diff/v4/fieldpath
+#28 6.042 github.com/googleapis/gnostic/jsonschema
+#28 6.044 google.golang.org/grpc/backoff
+#28 6.063 google.golang.org/grpc/connectivity
+#28 6.118 google.golang.org/grpc/internal/credentials
+#28 6.129 google.golang.org/grpc/serviceconfig
+#28 6.130 google.golang.org/grpc/internal/grpcrand
+#28 6.157 google.golang.org/protobuf/encoding/prototext
+#28 6.167 google.golang.org/protobuf/internal/filedesc
+#28 6.173 google.golang.org/grpc/encoding
+#28 6.236 google.golang.org/grpc/internal/backoff
+#28 6.239 google.golang.org/grpc/internal/balancerload
+#28 6.293 google.golang.org/grpc/internal/grpcutil
+#28 6.307 google.golang.org/grpc/internal/buffer
+#28 6.310 google.golang.org/grpc/internal/grpcsync
+#28 6.320 sigs.k8s.io/structured-merge-diff/v4/typed
+#28 6.330 google.golang.org/grpc/internal/envconfig
+#28 6.346 google.golang.org/grpc/internal/syscall
+#28 6.362 google.golang.org/grpc/keepalive
+#28 6.368 google.golang.org/grpc/stats
+#28 6.369 google.golang.org/grpc/tap
+#28 6.393 github.com/argoproj/argo-events/pkg/apis/eventsource
+#28 6.410 github.com/pkg/errors
+#28 6.432 github.com/argoproj/argo-events/pkg/apis/sensor
+#28 6.438 github.com/go-jose/go-jose/v3/cipher
+#28 6.440 golang.org/x/crypto/pbkdf2
+#28 6.440 github.com/go-jose/go-jose/v3/json
+#28 6.465 github.com/argoproj/argo-workflows/v3/server/auth/rbac
+#28 6.497 github.com/argoproj/pkg/rand
+#28 6.506 golang.org/x/crypto/ed25519
+#28 6.507 gopkg.in/square/go-jose.v2/cipher
+#28 6.529 gopkg.in/square/go-jose.v2/json
+#28 6.534 k8s.io/apimachinery/pkg/util/cache
+#28 6.550 k8s.io/apimachinery/pkg/util/diff
+#28 6.600 k8s.io/utils/buffer
+#28 6.646 k8s.io/utils/trace
+#28 6.649 github.com/antonmedv/expr/file
+#28 6.651 github.com/imdario/mergo
+#28 6.652 google.golang.org/protobuf/internal/encoding/tag
+#28 6.655 google.golang.org/protobuf/encoding/protojson
+#28 6.729 k8s.io/client-go/applyconfigurations/internal
+#28 6.735 github.com/antonmedv/expr/ast
+#28 6.780 google.golang.org/protobuf/internal/impl
+#28 6.818 github.com/go-jose/go-jose/v3
+#28 6.889 github.com/antonmedv/expr/vm
+#28 6.900 github.com/antonmedv/expr/parser/lexer
+#28 6.913 k8s.io/client-go/util/homedir
+#28 6.914 gopkg.in/square/go-jose.v2
+#28 6.989 github.com/Masterminds/goutils
+#28 7.012 github.com/antonmedv/expr/parser
+#28 7.065 github.com/Masterminds/semver/v3
+#28 7.111 github.com/google/uuid
+#28 7.257 github.com/huandu/xstrings
+#28 7.264 github.com/mitchellh/reflectwalk
+#28 7.351 github.com/shopspring/decimal
+#28 7.354 github.com/mitchellh/copystructure
+#28 7.515 github.com/spf13/cast
+#28 7.551 golang.org/x/crypto/blowfish
+#28 7.551 github.com/go-jose/go-jose/v3/jwt
+#28 7.576 golang.org/x/crypto/scrypt
+#28 7.698 golang.org/x/crypto/bcrypt
+#28 7.779 github.com/doublerebel/bellows
+#28 7.785 github.com/antonmedv/expr/conf
+#28 7.791 github.com/valyala/bytebufferpool
+#28 7.794 github.com/oliveagle/jsonpath
+#28 7.806 github.com/argoproj/pkg/json
+#28 7.814 github.com/argoproj/argo-workflows/v3/util/expand
+#28 7.817 github.com/Masterminds/sprig/v3
+#28 7.829 k8s.io/apimachinery/third_party/forked/golang/netutil
+#28 7.847 k8s.io/client-go/util/exec
+#28 7.861 github.com/valyala/fasttemplate
+#28 7.869 google.golang.org/api/internal/third_party/uritemplates
+#28 7.870 cloud.google.com/go/internal/optional
+#28 7.916 github.com/antonmedv/expr/checker
+#28 7.939 github.com/antonmedv/expr/compiler
+#28 7.940 github.com/antonmedv/expr/optimizer
+#28 7.960 github.com/argoproj/pkg/expr
+#28 7.962 github.com/golang/groupcache/lru
+#28 8.032 go.opencensus.io
+#28 8.062 go.opencensus.io/trace/internal
+#28 8.077 go.opencensus.io/trace/tracestate
+#28 8.089 go.opencensus.io/internal
+#28 8.109 golang.org/x/net/http2
+#28 8.112 k8s.io/apimachinery/pkg/util/runtime
+#28 8.117 golang.org/x/net/context/ctxhttp
+#28 8.121 github.com/emicklei/go-restful
+#28 8.132 github.com/go-openapi/swag
+#28 8.167 github.com/felixge/httpsnoop
+#28 8.186 k8s.io/apimachinery/pkg/runtime
+#28 8.206 golang.org/x/oauth2/internal
+#28 8.231 k8s.io/apimachinery/pkg/util/wait
+#28 8.309 golang.org/x/oauth2
+#28 8.394 k8s.io/client-go/util/workqueue
+#28 8.431 github.com/go-openapi/jsonpointer
+#28 8.474 github.com/argoproj/argo-workflows/v3/util/retry
+#28 8.483 google.golang.org/protobuf/internal/filetype
+#28 8.531 github.com/argoproj/argo-workflows/v3/util/wait
+#28 8.532 golang.org/x/net/trace
+#28 8.605 net/http/httputil
+#28 8.610 github.com/go-openapi/jsonreference
+#28 8.612 github.com/argoproj/argo-workflows/v3/server/auth/types
+#28 8.625 google.golang.org/protobuf/runtime/protoimpl
+#28 8.666 github.com/coreos/go-oidc/v3/oidc
+#28 8.709 k8s.io/kube-openapi/pkg/validation/spec
+#28 8.711 google.golang.org/protobuf/types/known/anypb
+#28 8.711 google.golang.org/protobuf/types/descriptorpb
+#28 8.782 k8s.io/apimachinery/pkg/runtime/serializer/streaming
+#28 8.863 k8s.io/apimachinery/pkg/runtime/serializer/recognizer
+#28 8.871 k8s.io/client-go/tools/clientcmd/api
+#28 8.874 github.com/golang/protobuf/ptypes/any
+#28 8.887 google.golang.org/protobuf/types/known/durationpb
+#28 8.901 k8s.io/apimachinery/pkg/runtime/serializer/json
+#28 8.925 google.golang.org/protobuf/types/known/timestamppb
+#28 8.974 google.golang.org/protobuf/types/known/wrapperspb
+#28 8.990 google.golang.org/genproto/googleapis/api/httpbody
+#28 8.994 google.golang.org/protobuf/types/known/fieldmaskpb
+#28 9.008 github.com/golang/protobuf/ptypes/duration
+#28 9.014 google.golang.org/genproto/googleapis/rpc/status
+#28 9.036 github.com/golang/protobuf/ptypes/timestamp
+#28 9.052 k8s.io/kube-openapi/pkg/common
+#28 9.064 github.com/antonmedv/expr
+#28 9.066 google.golang.org/protobuf/reflect/protodesc
+#28 9.084 github.com/golang/protobuf/protoc-gen-go/descriptor
+#28 9.091 github.com/golang/protobuf/ptypes/wrappers
+#28 9.100 google.golang.org/genproto/protobuf/field_mask
+#28 9.105 google.golang.org/genproto/googleapis/api/annotations
+#28 9.120 github.com/argoproj/argo-workflows/v3/util/expr/argoexpr
+#28 9.124 k8s.io/client-go/tools/clientcmd/api/v1
+#28 9.130 k8s.io/apimachinery/pkg/util/net
+#28 9.140 github.com/argoproj/argo-workflows/v3/util/expr/env
+#28 9.143 github.com/gorilla/websocket
+#28 9.144 k8s.io/apimachinery/pkg/util/httpstream
+#28 9.153 github.com/moby/spdystream/spdy
+#28 9.162 github.com/argoproj/argo-workflows/v3/util/k8s
+#28 9.212 cloud.google.com/go/compute/metadata
+#28 9.228 google.golang.org/genproto/googleapis/rpc/code
+#28 9.273 google.golang.org/api/googleapi
+#28 9.316 github.com/googleapis/gax-go/v2/apierror/internal/proto
+#28 9.318 google.golang.org/genproto/googleapis/rpc/errdetails
+#28 9.325 github.com/moby/spdystream
+#28 9.381 google.golang.org/genproto/googleapis/type/expr
+#28 9.385 k8s.io/apimachinery/pkg/watch
+#28 9.416 k8s.io/client-go/transport
+#28 9.424 github.com/golang/protobuf/proto
+#28 9.435 go.opencensus.io/trace
+#28 9.442 golang.org/x/xerrors/internal
+#28 9.457 cloud.google.com/go/internal/version
+#28 9.483 google.golang.org/api/iterator
+#28 9.485 golang.org/x/oauth2/authhandler
+#28 9.512 golang.org/x/xerrors
+#28 9.515 golang.org/x/oauth2/google/internal/externalaccount
+#28 9.527 k8s.io/apimachinery/pkg/apis/meta/v1
+#28 9.533 golang.org/x/oauth2/jws
+#28 9.556 google.golang.org/api/internal/impersonate
+#28 9.621 golang.org/x/oauth2/jwt
+#28 9.625 go.opencensus.io/resource
+#28 9.642 go.opencensus.io/tag
+#28 9.648 go.opencensus.io/internal/tagencoding
+#28 9.649 go.opencensus.io/trace/propagation
+#28 9.702 go.opencensus.io/metric/metricdata
+#28 9.719 google.golang.org/api/transport/cert
+#28 9.736 google.golang.org/grpc/internal/googlecloud
+#28 9.738 go.opencensus.io/metric/metricproducer
+#28 9.739 google.golang.org/genproto/googleapis/type/date
+#28 9.759 golang.org/x/oauth2/google
+#28 9.766 google.golang.org/protobuf/types/known/emptypb
+#28 9.792 go.opencensus.io/plugin/ochttp/propagation/b3
+#28 9.828 go.opencensus.io/stats/internal
+#28 9.843 google.golang.org/api/googleapi/transport
+#28 9.849 github.com/golang/protobuf/descriptor
+#28 9.852 github.com/golang/protobuf/jsonpb
+#28 9.853 github.com/grpc-ecosystem/grpc-gateway/internal
+#28 9.857 github.com/golang/protobuf/ptypes
+#28 9.869 google.golang.org/grpc/credentials
+#28 9.894 google.golang.org/grpc/encoding/proto
+#28 9.914 google.golang.org/grpc/binarylog/grpc_binarylog_v1
+#28 9.935 go.opencensus.io/stats
+#28 9.946 google.golang.org/api/transport/http/internal/propagation
+#28 9.985 github.com/argoproj/pkg/file
+#28 10.02 go.opencensus.io/stats/view
+#28 10.05 google.golang.org/grpc/internal/status
+#28 10.05 github.com/googleapis/gnostic/extensions
+#28 10.05 github.com/ProtonMail/go-crypto/openpgp/errors
+#28 10.08 google.golang.org/grpc/resolver
+#28 10.10 google.golang.org/grpc/status
+#28 10.10 google.golang.org/grpc/credentials/insecure
+#28 10.14 google.golang.org/grpc/internal/channelz
+#28 10.15 google.golang.org/grpc/peer
+#28 10.18 github.com/grpc-ecosystem/grpc-gateway/runtime
+#28 10.18 github.com/googleapis/gnostic/compiler
+#28 10.19 google.golang.org/grpc/internal
+#28 10.20 google.golang.org/grpc/internal/binarylog
+#28 10.20 google.golang.org/grpc/balancer/grpclb/state
+#28 10.24 google.golang.org/grpc/balancer
+#28 10.26 google.golang.org/grpc/internal/resolver/passthrough
+#28 10.27 google.golang.org/grpc/internal/resolver/dns
+#28 10.31 google.golang.org/grpc/balancer/base
+#28 10.33 google.golang.org/grpc/internal/serviceconfig
+#28 10.37 github.com/googleapis/gnostic/openapiv2
+#28 10.42 google.golang.org/grpc/balancer/roundrobin
+#28 10.43 google.golang.org/grpc/internal/transport/networktype
+#28 10.45 google.golang.org/grpc/internal/resolver
+#28 10.47 google.golang.org/grpc/internal/metadata
+#28 10.48 github.com/googleapis/gax-go/v2/apierror
+#28 10.49 google.golang.org/grpc/internal/resolver/unix
+#28 10.51 cloud.google.com/go/internal/trace
+#28 10.52 go.opencensus.io/plugin/ocgrpc
+#28 10.52 google.golang.org/grpc/internal/transport
+#28 10.58 google.golang.org/grpc/credentials/alts/internal
+#28 10.61 google.golang.org/grpc/credentials/oauth
+#28 10.64 go.opencensus.io/plugin/ochttp
+#28 10.67 google.golang.org/grpc/credentials/alts/internal/conn
+#28 10.70 github.com/ProtonMail/go-crypto/openpgp/armor
+#28 10.71 github.com/ProtonMail/go-crypto/openpgp/aes/keywrap
+#28 10.75 github.com/argoproj/argo-workflows/v3/util/json
+#28 10.76 github.com/argoproj/pkg/grpc/http
+#28 10.79 github.com/ProtonMail/go-crypto/internal/byteutil
+#28 10.80 golang.org/x/crypto/cast5
+#28 10.83 github.com/argoproj/argo-workflows/v3/util/template
+#28 10.83 github.com/ProtonMail/go-crypto/eax
+#28 10.89 github.com/ProtonMail/go-crypto/ocb
+#28 10.93 github.com/ProtonMail/go-crypto/bitcurves
+#28 10.95 github.com/ProtonMail/go-crypto/brainpool
+#28 10.97 github.com/ProtonMail/go-crypto/openpgp/internal/encoding
+#28 10.98 k8s.io/apimachinery/pkg/api/errors
+#28 11.03 k8s.io/client-go/pkg/apis/clientauthentication
+#28 11.04 k8s.io/apimachinery/pkg/runtime/serializer/protobuf
+#28 11.04 k8s.io/apimachinery/pkg/apis/meta/v1/unstructured
+#28 11.04 k8s.io/client-go/rest/watch
+#28 11.07 k8s.io/api/core/v1
+#28 11.15 k8s.io/client-go/pkg/apis/clientauthentication/v1
+#28 11.20 k8s.io/client-go/pkg/apis/clientauthentication/v1alpha1
+#28 11.20 k8s.io/client-go/pkg/apis/clientauthentication/v1beta1
+#28 11.21 k8s.io/api/admissionregistration/v1
+#28 11.28 k8s.io/api/admissionregistration/v1beta1
+#28 11.31 k8s.io/api/apiserverinternal/v1alpha1
+#28 11.32 k8s.io/api/authentication/v1
+#28 11.34 k8s.io/client-go/pkg/apis/clientauthentication/install
+#28 11.36 k8s.io/apimachinery/pkg/runtime/serializer/versioning
+#28 11.40 k8s.io/api/authentication/v1beta1
+#28 11.47 k8s.io/apimachinery/pkg/runtime/serializer
+#28 11.67 k8s.io/client-go/plugin/pkg/client/auth/exec
+#28 11.73 k8s.io/api/authorization/v1
+#28 11.75 k8s.io/api/authorization/v1beta1
+#28 11.80 k8s.io/api/coordination/v1
+#28 11.83 k8s.io/api/coordination/v1beta1
+#28 11.85 k8s.io/api/flowcontrol/v1alpha1
+#28 11.92 k8s.io/client-go/rest
+#28 12.00 k8s.io/api/flowcontrol/v1beta1
+#28 12.15 k8s.io/api/flowcontrol/v1beta2
+#28 12.33 k8s.io/api/policy/v1
+#28 12.34 github.com/argoproj/argo-workflows/v3/pkg/apis/workflow
+#28 12.36 k8s.io/api/rbac/v1
+#28 12.41 k8s.io/api/rbac/v1alpha1
+#28 12.41 k8s.io/api/rbac/v1beta1
+#28 12.60 github.com/argoproj/argo-workflows/v3/util/errors
+#28 12.65 k8s.io/apimachinery/pkg/api/meta
+#28 12.70 k8s.io/kube-openapi/pkg/util/proto
+#28 12.71 google.golang.org/grpc
+#28 12.94 k8s.io/kube-openapi/pkg/schemaconv
+#28 12.95 github.com/argoproj/argo-workflows/v3/server/auth/serviceaccount
+#28 12.95 k8s.io/apimachinery/pkg/apis/meta/v1beta1
+#28 12.97 k8s.io/client-go/tools/auth
+#28 12.97 k8s.io/client-go/tools/clientcmd/api/latest
+#28 13.01 k8s.io/apimachinery/pkg/util/remotecommand
+#28 13.05 k8s.io/apimachinery/pkg/util/httpstream/spdy
+#28 13.05 github.com/ProtonMail/go-crypto/openpgp/internal/algorithm
+#28 13.08 k8s.io/client-go/tools/clientcmd
+#28 13.11 github.com/ProtonMail/go-crypto/openpgp/internal/ecc
+#28 13.14 k8s.io/apimachinery/pkg/apis/meta/internalversion
+#28 13.14 k8s.io/apimachinery/pkg/util/managedfields
+#28 13.15 k8s.io/client-go/dynamic
+#28 13.20 golang.org/x/crypto/curve25519/internal/field
+#28 13.22 k8s.io/client-go/transport/spdy
+#28 13.28 github.com/ProtonMail/go-crypto/openpgp/elgamal
+#28 13.30 k8s.io/client-go/tools/pager
+#28 13.31 github.com/ProtonMail/go-crypto/openpgp/s2k
+#28 13.37 github.com/go-git/go-billy/v5
+#28 13.37 github.com/go-git/go-git/v5/internal/url
+#28 13.39 k8s.io/client-go/tools/cache
+#28 13.40 golang.org/x/crypto/curve25519
+#28 13.41 github.com/go-git/go-git/v5/plumbing
+#28 13.41 github.com/go-git/gcfg/token
+#28 13.43 github.com/go-git/go-billy/v5/helper/polyfill
+#28 13.44 github.com/googleapis/gax-go/v2
+#28 13.45 github.com/argoproj/argo-workflows/v3/util/kubeconfig
+#28 13.46 google.golang.org/genproto/googleapis/iam/v1
+#28 13.49 google.golang.org/api/internal
+#28 13.54 google.golang.org/grpc/balancer/grpclb/grpc_lb_v1
+#28 13.54 google.golang.org/grpc/credentials/alts/internal/proto/grpc_gcp
+#28 13.57 cloud.google.com/go/internal
+#28 13.59 google.golang.org/grpc/credentials/alts/internal/handshaker/service
+#28 13.64 google.golang.org/api/option
+#28 13.65 google.golang.org/api/transport/internal/dca
+#28 13.65 cloud.google.com/go/iam
+#28 13.70 google.golang.org/grpc/balancer/grpclb
+#28 13.70 google.golang.org/genproto/googleapis/storage/v2
+#28 13.82 google.golang.org/api/internal/gensupport
+#28 13.85 github.com/ProtonMail/go-crypto/openpgp/ecdh
+#28 13.86 google.golang.org/api/option/internaloption
+#28 13.87 google.golang.org/grpc/credentials/alts/internal/authinfo
+#28 13.97 k8s.io/client-go/listers/admissionregistration/v1
+#28 13.98 k8s.io/client-go/listers/admissionregistration/v1beta1
+#28 14.01 k8s.io/client-go/listers/apiserverinternal/v1alpha1
+#28 14.03 k8s.io/client-go/listers/coordination/v1
+#28 14.05 k8s.io/client-go/listers/coordination/v1beta1
+#28 14.06 k8s.io/client-go/listers/flowcontrol/v1alpha1
+#28 14.09 k8s.io/client-go/listers/flowcontrol/v1beta1
+#28 14.12 k8s.io/client-go/listers/flowcontrol/v1beta2
+#28 14.12 k8s.io/client-go/listers/rbac/v1
+#28 14.14 k8s.io/client-go/listers/rbac/v1alpha1
+#28 14.15 k8s.io/client-go/listers/rbac/v1beta1
+#28 14.20 google.golang.org/grpc/credentials/alts/internal/handshaker
+#28 14.20 google.golang.org/api/transport/http
+#28 14.21 github.com/ProtonMail/go-crypto/openpgp/packet
+#28 14.24 github.com/go-git/go-billy/v5/helper/chroot
+#28 14.26 github.com/go-git/go-billy/v5/util
+#28 14.29 github.com/go-git/gcfg/scanner
+#28 14.37 github.com/go-git/go-billy/v5/osfs
+#28 14.37 google.golang.org/grpc/credentials/alts
+#28 14.40 github.com/go-git/gcfg/types
+#28 14.40 gopkg.in/warnings.v0
+#28 14.41 google.golang.org/api/iamcredentials/v1
+#28 14.48 google.golang.org/api/storage/v1
+#28 14.51 google.golang.org/grpc/credentials/google
+#28 14.53 github.com/go-git/gcfg
+#28 14.60 github.com/mitchellh/go-homedir
+#28 14.65 github.com/go-git/go-git/v5/internal/revision
+#28 14.66 google.golang.org/api/transport/grpc
+#28 14.70 github.com/go-git/go-git/v5/plumbing/cache
+#28 14.71 github.com/go-git/go-git/v5/plumbing/filemode
+#28 14.79 github.com/go-git/go-git/v5/plumbing/format/config
+#28 14.80 github.com/jbenet/go-context/io
+#28 14.82 github.com/go-git/go-git/v5/utils/binary
+#28 14.86 github.com/emirpasic/gods/utils
+#28 14.87 github.com/go-git/go-git/v5/utils/ioutil
+#28 15.00 github.com/go-git/go-git/v5/plumbing/format/index
+#28 15.00 github.com/go-git/go-git/v5/plumbing/format/idxfile
+#28 15.00 github.com/go-git/go-git/v5/config
+#28 15.01 github.com/go-git/go-git/v5/plumbing/format/gitignore
+#28 15.02 github.com/ProtonMail/go-crypto/openpgp
+#28 15.06 cloud.google.com/go/storage/internal/apiv2
+#28 15.19 google.golang.org/api/transport
+#28 15.25 github.com/emirpasic/gods/containers
+#28 15.27 github.com/go-git/go-git/v5/plumbing/color
+#28 15.29 github.com/go-git/go-git/v5/plumbing/storer
+#28 15.32 github.com/emirpasic/gods/lists
+#28 15.38 github.com/emirpasic/gods/trees
+#28 15.39 github.com/go-git/go-git/v5/plumbing/format/diff
+#28 15.39 github.com/emirpasic/gods/lists/arraylist
+#28 15.42 github.com/go-git/go-git/v5/plumbing/format/packfile
+#28 15.43 github.com/go-git/go-git/v5/storage
+#28 15.52 github.com/sergi/go-diff/diffmatchpatch
+#28 15.54 github.com/go-git/go-git/v5/utils/merkletrie/noder
+#28 15.55 github.com/emirpasic/gods/trees/binaryheap
+#28 15.55 github.com/go-git/go-git/v5/plumbing/format/pktline
+#28 15.57 github.com/go-git/go-git/v5/plumbing/protocol/packp/capability
+#28 15.64 github.com/go-git/go-git/v5/utils/merkletrie/internal/frame
+#28 15.66 cloud.google.com/go/storage
+#28 15.67 github.com/go-git/go-git/v5/plumbing/protocol/packp/sideband
+#28 15.72 github.com/go-git/go-git/v5/storage/memory
+#28 15.75 github.com/go-git/go-git/v5/utils/merkletrie
+#28 15.78 golang.org/x/sys/execabs
+#28 15.80 github.com/kevinburke/ssh_config
+#28 15.86 golang.org/x/crypto/internal/subtle
+#28 15.88 golang.org/x/crypto/internal/poly1305
+#28 15.88 github.com/go-git/go-git/v5/plumbing/protocol/packp
+#28 15.89 golang.org/x/crypto/chacha20
+#28 15.89 github.com/go-git/go-git/v5/utils/diff
+#28 15.90 github.com/go-git/go-git/v5/plumbing/format/objfile
+#28 15.93 github.com/go-git/go-git/v5/plumbing/object
+#28 15.98 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
+#28 15.99 github.com/go-git/go-git/v5/storage/filesystem/dotgit
+#28 16.02 golang.org/x/net/internal/socks
+#28 16.03 github.com/go-git/go-git/v5/utils/merkletrie/filesystem
+#28 16.04 golang.org/x/crypto/ssh
+#28 16.12 github.com/go-git/go-git/v5/plumbing/transport
+#28 16.12 github.com/go-git/go-git/v5/utils/merkletrie/index
+#28 16.16 golang.org/x/net/proxy
+#28 16.17 github.com/whilp/git-urls
+#28 16.20 github.com/go-git/go-git/v5/plumbing/transport/internal/common
+#28 16.24 github.com/go-git/go-git/v5/storage/filesystem
+#28 16.27 github.com/argoproj/argo-workflows/v3/workflow/artifacts/resource
+#28 16.29 github.com/colinmarc/hdfs/protocol/hadoop_common
+#28 16.32 github.com/go-git/go-git/v5/plumbing/transport/git
+#28 16.32 github.com/go-git/go-git/v5/plumbing/transport/http
+#28 16.41 github.com/jcmturner/gofork/encoding/asn1
+#28 16.44 github.com/go-git/go-git/v5/plumbing/revlist
+#28 16.45 gopkg.in/jcmturner/dnsutils.v1
+#28 16.47 gopkg.in/jcmturner/gokrb5.v5/iana/etypeID
+#28 16.51 github.com/hashicorp/go-uuid
+#28 16.52 gopkg.in/jcmturner/gokrb5.v5/iana/nametype
+#28 16.53 gopkg.in/jcmturner/gokrb5.v5/iana
+#28 16.54 gopkg.in/jcmturner/gokrb5.v5/iana/addrtype
+#28 16.56 gopkg.in/jcmturner/gokrb5.v5/iana/asnAppTag
+#28 16.56 github.com/colinmarc/hdfs/protocol/hadoop_hdfs
+#28 16.57 gopkg.in/jcmturner/gokrb5.v5/iana/patype
+#28 16.58 github.com/go-git/go-git/v5/plumbing/transport/server
+#28 16.59 golang.org/x/crypto/md4
+#28 16.60 gopkg.in/jcmturner/gokrb5.v5/crypto/etype
+#28 16.61 github.com/jcmturner/gofork/x/crypto/pbkdf2
+#28 16.62 gopkg.in/jcmturner/gokrb5.v5/config
+#28 16.66 gopkg.in/jcmturner/gokrb5.v5/asn1tools
+#28 16.66 gopkg.in/jcmturner/aescts.v1
+#28 16.67 gopkg.in/jcmturner/gokrb5.v5/crypto/common
+#28 16.67 k8s.io/api/policy/v1beta1
+#28 16.69 k8s.io/api/apps/v1
+#28 16.72 k8s.io/api/apps/v1beta1
+#28 16.73 k8s.io/api/apps/v1beta2
+#28 16.77 k8s.io/api/autoscaling/v1
+#28 16.83 k8s.io/api/autoscaling/v2
+#28 17.08 k8s.io/api/autoscaling/v2beta1
+#28 17.54 github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1
+#28 17.66 k8s.io/api/autoscaling/v2beta2
+#28 17.75 k8s.io/api/batch/v1
+#28 17.76 k8s.io/api/certificates/v1
+#28 17.84 k8s.io/api/certificates/v1beta1
+#28 17.94 k8s.io/api/discovery/v1
+#28 17.94 k8s.io/api/discovery/v1beta1
+#28 18.16 k8s.io/api/events/v1
+#28 18.17 k8s.io/api/events/v1beta1
+#28 18.22 k8s.io/api/extensions/v1beta1
+#28 18.34 k8s.io/api/networking/v1
+#28 18.38 k8s.io/api/networking/v1beta1
+#28 18.42 k8s.io/api/batch/v1beta1
+#28 18.45 k8s.io/api/node/v1
+#28 18.49 k8s.io/api/node/v1alpha1
+#28 18.51 k8s.io/api/node/v1beta1
+#28 18.72 k8s.io/api/scheduling/v1
+#28 18.75 k8s.io/api/scheduling/v1alpha1
+#28 18.80 k8s.io/api/scheduling/v1beta1
+#28 18.88 k8s.io/api/storage/v1
+#28 18.90 k8s.io/api/storage/v1alpha1
+#28 18.90 k8s.io/api/storage/v1beta1
+#28 19.00 k8s.io/client-go/tools/reference
+#28 19.00 github.com/argoproj/argo-events/pkg/apis/common
+#28 19.06 k8s.io/client-go/listers/apps/v1
+#28 19.12 k8s.io/client-go/listers/apps/v1beta1
+#28 19.27 k8s.io/client-go/listers/apps/v1beta2
+#28 19.38 k8s.io/client-go/listers/autoscaling/v1
+#28 19.58 k8s.io/client-go/listers/autoscaling/v2
+#28 19.61 k8s.io/client-go/listers/autoscaling/v2beta1
+#28 19.61 k8s.io/client-go/listers/autoscaling/v2beta2
+#28 19.69 k8s.io/client-go/listers/batch/v1
+#28 19.74 k8s.io/client-go/listers/batch/v1beta1
+#28 19.78 k8s.io/client-go/listers/certificates/v1
+#28 19.80 github.com/argoproj/argo-events/pkg/apis/sensor/v1alpha1
+#28 19.80 github.com/argoproj/argo-events/pkg/apis/eventsource/v1alpha1
+#28 19.82 k8s.io/client-go/listers/certificates/v1beta1
+#28 19.86 k8s.io/client-go/listers/core/v1
+#28 19.91 k8s.io/client-go/listers/discovery/v1
+#28 19.92 k8s.io/client-go/listers/discovery/v1beta1
+#28 19.98 k8s.io/client-go/listers/events/v1
+#28 20.02 k8s.io/client-go/listers/events/v1beta1
+#28 20.04 k8s.io/client-go/kubernetes/scheme
+#28 20.06 k8s.io/client-go/listers/extensions/v1beta1
+#28 20.09 k8s.io/client-go/listers/networking/v1
+#28 20.11 k8s.io/client-go/listers/networking/v1beta1
+#28 20.28 k8s.io/client-go/listers/node/v1
+#28 20.30 k8s.io/client-go/discovery
+#28 20.33 k8s.io/client-go/kubernetes/typed/authentication/v1
+#28 20.38 k8s.io/client-go/kubernetes/typed/authentication/v1beta1
+#28 20.41 k8s.io/client-go/kubernetes/typed/authorization/v1
+#28 20.43 k8s.io/client-go/kubernetes/typed/authorization/v1beta1
+#28 20.49 k8s.io/client-go/listers/node/v1alpha1
+#28 20.53 k8s.io/client-go/applyconfigurations/meta/v1
+#28 20.57 k8s.io/client-go/listers/node/v1beta1
+#28 20.57 k8s.io/client-go/listers/policy/v1
+#28 20.59 k8s.io/client-go/listers/policy/v1beta1
+#28 20.61 k8s.io/client-go/listers/scheduling/v1
+#28 20.73 k8s.io/client-go/listers/scheduling/v1alpha1
+#28 20.74 k8s.io/client-go/listers/scheduling/v1beta1
+#28 20.75 k8s.io/client-go/listers/storage/v1
+#28 20.79 k8s.io/client-go/applyconfigurations/admissionregistration/v1
+#28 20.85 k8s.io/client-go/applyconfigurations/admissionregistration/v1beta1
+#28 20.85 k8s.io/client-go/applyconfigurations/apiserverinternal/v1alpha1
+#28 20.91 k8s.io/client-go/applyconfigurations/core/v1
+#28 20.96 k8s.io/client-go/applyconfigurations/autoscaling/v1
+#28 21.04 k8s.io/client-go/kubernetes/typed/apiserverinternal/v1alpha1
+#28 21.04 k8s.io/client-go/kubernetes/typed/admissionregistration/v1
+#28 21.11 k8s.io/client-go/kubernetes/typed/admissionregistration/v1beta1
+#28 21.16 k8s.io/client-go/kubernetes/typed/autoscaling/v1
+#28 21.20 k8s.io/client-go/applyconfigurations/autoscaling/v2
+#28 21.34 k8s.io/client-go/applyconfigurations/autoscaling/v2beta1
+#28 21.36 k8s.io/client-go/applyconfigurations/autoscaling/v2beta2
+#28 21.38 k8s.io/client-go/applyconfigurations/certificates/v1
+#28 21.52 k8s.io/client-go/kubernetes/typed/autoscaling/v2
+#28 21.60 k8s.io/client-go/kubernetes/typed/autoscaling/v2beta1
+#28 21.61 k8s.io/client-go/kubernetes/typed/certificates/v1
+#28 21.65 k8s.io/client-go/kubernetes/typed/autoscaling/v2beta2
+#28 21.71 k8s.io/client-go/applyconfigurations/certificates/v1beta1
+#28 21.72 k8s.io/client-go/applyconfigurations/coordination/v1
+#28 21.74 k8s.io/client-go/applyconfigurations/coordination/v1beta1
+#28 21.78 k8s.io/client-go/applyconfigurations/flowcontrol/v1alpha1
+#28 21.86 k8s.io/client-go/applyconfigurations/flowcontrol/v1beta1
+#28 21.89 k8s.io/client-go/kubernetes/typed/coordination/v1
+#28 21.91 github.com/argoproj/argo-workflows/v3
+#28 21.96 github.com/argoproj/argo-workflows/v3/pkg/client/clientset/versioned/scheme
+#28 21.97 github.com/argoproj/argo-workflows/v3/pkg/plugins/executor
+#28 21.98 k8s.io/client-go/kubernetes/typed/certificates/v1beta1
+#28 21.99 k8s.io/client-go/kubernetes/typed/coordination/v1beta1
+#28 22.07 github.com/argoproj/argo-workflows/v3/pkg/client/clientset/versioned/typed/workflow/v1alpha1
+#28 22.08 k8s.io/client-go/kubernetes/typed/flowcontrol/v1alpha1
+#28 22.08 k8s.io/client-go/kubernetes/typed/flowcontrol/v1beta1
+#28 22.22 k8s.io/client-go/applyconfigurations/flowcontrol/v1beta2
+#28 22.24 k8s.io/client-go/applyconfigurations/policy/v1
+#28 22.25 k8s.io/client-go/applyconfigurations/rbac/v1
+#28 22.28 k8s.io/client-go/applyconfigurations/rbac/v1alpha1
+#28 22.28 k8s.io/client-go/applyconfigurations/rbac/v1beta1
+#28 22.30 k8s.io/client-go/applyconfigurations/apps/v1
+#28 22.38 k8s.io/client-go/applyconfigurations/apps/v1beta1
+#28 22.42 k8s.io/client-go/applyconfigurations/apps/v1beta2
+#28 22.42 k8s.io/client-go/applyconfigurations/batch/v1
+#28 22.52 k8s.io/client-go/kubernetes/typed/core/v1
+#28 22.53 github.com/argoproj/argo-workflows/v3/pkg/client/clientset/versioned
+#28 22.54 k8s.io/client-go/applyconfigurations/discovery/v1
+#28 22.58 k8s.io/client-go/applyconfigurations/discovery/v1beta1
+#28 22.70 k8s.io/client-go/kubernetes/typed/apps/v1beta1
+#28 22.71 k8s.io/client-go/kubernetes/typed/batch/v1
+#28 22.72 k8s.io/client-go/kubernetes/typed/apps/v1
+#28 22.73 k8s.io/client-go/applyconfigurations/batch/v1beta1
+#28 22.77 k8s.io/client-go/kubernetes/typed/discovery/v1
+#28 22.83 k8s.io/client-go/kubernetes/typed/discovery/v1beta1
+#28 22.83 k8s.io/client-go/kubernetes/typed/apps/v1beta2
+#28 22.87 k8s.io/client-go/applyconfigurations/events/v1
+#28 22.89 k8s.io/client-go/applyconfigurations/events/v1beta1
+#28 22.99 k8s.io/client-go/applyconfigurations/extensions/v1beta1
+#28 22.99 k8s.io/client-go/kubernetes/typed/batch/v1beta1
+#28 23.02 k8s.io/client-go/kubernetes/typed/events/v1
+#28 23.05 k8s.io/client-go/kubernetes/typed/flowcontrol/v1beta2
+#28 23.10 k8s.io/client-go/kubernetes/typed/events/v1beta1
+#28 23.10 k8s.io/client-go/applyconfigurations/networking/v1
+#28 23.19 k8s.io/client-go/applyconfigurations/networking/v1beta1
+#28 23.20 k8s.io/client-go/applyconfigurations/node/v1
+#28 23.23 k8s.io/client-go/applyconfigurations/node/v1alpha1
+#28 23.24 k8s.io/client-go/applyconfigurations/node/v1beta1
+#28 23.24 k8s.io/client-go/kubernetes/typed/policy/v1
+#28 23.30 k8s.io/client-go/applyconfigurations/policy/v1beta1
+#28 23.31 k8s.io/client-go/kubernetes/typed/networking/v1
+#28 23.35 k8s.io/client-go/kubernetes/typed/node/v1alpha1
+#28 23.38 k8s.io/client-go/kubernetes/typed/networking/v1beta1
+#28 23.39 k8s.io/client-go/kubernetes/typed/node/v1
+#28 23.41 k8s.io/client-go/kubernetes/typed/extensions/v1beta1
+#28 23.44 k8s.io/client-go/kubernetes/typed/node/v1beta1
+#28 23.46 k8s.io/client-go/kubernetes/typed/rbac/v1
+#28 23.50 k8s.io/client-go/kubernetes/typed/rbac/v1alpha1
+#28 23.50 k8s.io/client-go/kubernetes/typed/policy/v1beta1
+#28 23.53 k8s.io/client-go/applyconfigurations/scheduling/v1
+#28 23.53 k8s.io/client-go/kubernetes/typed/rbac/v1beta1
+#28 23.54 k8s.io/client-go/applyconfigurations/scheduling/v1alpha1
+#28 23.58 k8s.io/client-go/applyconfigurations/scheduling/v1beta1
+#28 23.66 k8s.io/client-go/applyconfigurations/storage/v1
+#28 23.67 k8s.io/client-go/kubernetes/typed/scheduling/v1
+#28 23.72 k8s.io/client-go/applyconfigurations/storage/v1alpha1
+#28 23.72 k8s.io/client-go/kubernetes/typed/scheduling/v1beta1
+#28 23.73 k8s.io/client-go/applyconfigurations/storage/v1beta1
+#28 23.74 k8s.io/client-go/kubernetes/typed/scheduling/v1alpha1
+#28 23.74 github.com/argoproj/argo-workflows/v3/util/cmd
+#28 23.77 github.com/argoproj/argo-workflows/v3/pkg/apiclient/workflow
+#28 23.78 github.com/argoproj/argo-events/pkg/client/eventsource/clientset/versioned/scheme
+#28 23.82 github.com/argoproj/argo-events/pkg/client/sensor/clientset/versioned/scheme
+#28 23.85 github.com/argoproj/argo-workflows/v3/server/auth/sso
+#28 23.88 github.com/argoproj/argo-events/pkg/client/eventsource/clientset/versioned/typed/eventsource/v1alpha1
+#28 23.88 k8s.io/client-go/listers/storage/v1alpha1
+#28 23.89 k8s.io/client-go/kubernetes/typed/storage/v1
+#28 23.91 github.com/argoproj/argo-events/pkg/client/sensor/clientset/versioned/typed/sensor/v1alpha1
+#28 23.93 k8s.io/client-go/kubernetes/typed/storage/v1alpha1
+#28 23.95 k8s.io/client-go/kubernetes/typed/storage/v1beta1
+#28 23.99 k8s.io/client-go/listers/storage/v1beta1
+#28 24.07 k8s.io/client-go/tools/remotecommand
+#28 24.10 github.com/argoproj/argo-events/pkg/client/eventsource/clientset/versioned
+#28 24.10 github.com/argoproj/argo-workflows/v3/workflow/artifacts/common
+#28 24.12 github.com/go-git/go-git/v5/plumbing/transport/file
+#28 24.12 golang.org/x/crypto/ssh/agent
+#28 24.14 github.com/argoproj/argo-events/pkg/client/sensor/clientset/versioned
+#28 24.19 github.com/argoproj/argo-workflows/v3/workflow/artifacts/artifactory
+#28 24.23 github.com/argoproj/argo-workflows/v3/workflow/artifacts/gcs
+#28 24.23 golang.org/x/crypto/ssh/knownhosts
+#28 24.25 k8s.io/client-go/kubernetes
+#28 24.28 gopkg.in/jcmturner/gokrb5.v5/types
+#28 24.33 gopkg.in/jcmturner/gokrb5.v5/crypto/rfc3961
+#28 24.35 gopkg.in/jcmturner/gokrb5.v5/crypto/rfc3962
+#28 24.41 github.com/xanzy/ssh-agent
+#28 24.42 gopkg.in/jcmturner/gokrb5.v5/crypto/rfc4757
+#28 24.42 gopkg.in/jcmturner/gokrb5.v5/crypto/rfc8009
+#28 24.44 gopkg.in/jcmturner/gokrb5.v5/iana/chksumtype
+#28 24.45 gopkg.in/jcmturner/gokrb5.v5/iana/keyusage
+#28 24.46 gopkg.in/jcmturner/gokrb5.v5/keytab
+#28 24.47 github.com/go-git/go-git/v5/plumbing/transport/ssh
+#28 24.48 gopkg.in/jcmturner/gokrb5.v5/krberror
+#28 24.49 gopkg.in/jcmturner/gokrb5.v5/iana/adtype
+#28 24.54 gopkg.in/jcmturner/gokrb5.v5/iana/errorcode
+#28 24.55 gopkg.in/jcmturner/gokrb5.v5/crypto
+#28 24.55 gopkg.in/jcmturner/gokrb5.v5/iana/flags
+#28 24.55 gopkg.in/jcmturner/gokrb5.v5/iana/msgtype
+#28 24.57 gopkg.in/jcmturner/gokrb5.v5/credentials
+#28 24.57 gopkg.in/jcmturner/rpc.v0/ndr
+#28 24.57 github.com/argoproj/argo-workflows/v3/workflow/artifacts/http
+#28 24.59 github.com/aliyun/aliyun-oss-go-sdk/oss
+#28 24.62 github.com/go-git/go-git/v5/plumbing/transport/client
+#28 24.63 gopkg.in/jcmturner/gokrb5.v5/mstypes
+#28 24.68 k8s.io/utils/pointer
+#28 24.69 github.com/go-git/go-git/v5
+#28 24.69 github.com/argoproj/argo-workflows/v3/workflow/artifacts/raw
+#28 24.73 github.com/argoproj/argo-workflows/v3/workflow/executor/retry
+#28 24.74 github.com/aws/aws-sdk-go/aws/awserr
+#28 24.76 github.com/aws/aws-sdk-go/internal/shareddefaults
+#28 24.77 gopkg.in/jcmturner/gokrb5.v5/pac
+#28 24.79 github.com/aws/aws-sdk-go/internal/sync/singleflight
+#28 24.79 github.com/aws/aws-sdk-go/internal/sdkio
+#28 24.80 github.com/aws/aws-sdk-go/aws/client/metadata
+#28 24.81 github.com/jmespath/go-jmespath
+#28 24.83 github.com/aws/aws-sdk-go/internal/sdkrand
+#28 24.83 github.com/aws/aws-sdk-go/internal/ini
+#28 24.84 github.com/aws/aws-sdk-go/aws/endpoints
+#28 24.87 github.com/aws/aws-sdk-go/internal/strings
+#28 24.89 gopkg.in/jcmturner/gokrb5.v5/messages
+#28 24.93 github.com/aws/aws-sdk-go/internal/sdkmath
+#28 25.00 github.com/aws/aws-sdk-go/internal/sdkuri
+#28 25.12 github.com/aws/aws-sdk-go/aws/credentials
+#28 25.13 github.com/klauspost/compress/s2
+#28 25.16 github.com/aws/aws-sdk-go/aws/awsutil
+#28 25.21 gopkg.in/jcmturner/gokrb5.v5/gssapi
+#28 25.25 github.com/argoproj/argo-workflows/v3/util
+#28 25.32 k8s.io/client-go/informers/internalinterfaces
+#28 25.35 github.com/argoproj/argo-workflows/v3/server/types
+#28 25.36 github.com/argoproj/argo-workflows/v3/util/auth
+#28 25.59 github.com/argoproj/argo-workflows/v3/workflow/artifacts/git
+#28 25.80 gopkg.in/jcmturner/gokrb5.v5/kadmin
+#28 25.86 github.com/aws/aws-sdk-go/aws/credentials/processcreds
+#28 25.88 gopkg.in/jcmturner/gokrb5.v5/client
+#28 25.89 k8s.io/client-go/informers/admissionregistration/v1
+#28 25.91 github.com/argoproj/argo-workflows/v3/util/archive
+#28 25.91 k8s.io/client-go/informers/admissionregistration/v1beta1
+#28 25.93 k8s.io/client-go/informers/apiserverinternal/v1alpha1
+#28 26.02 k8s.io/client-go/informers/apps/v1
+#28 26.05 k8s.io/client-go/informers/apps/v1beta1
+#28 26.09 k8s.io/client-go/informers/apps/v1beta2
+#28 26.21 k8s.io/client-go/informers/autoscaling/v1
+#28 26.43 k8s.io/client-go/informers/autoscaling/v2
+#28 26.43 k8s.io/client-go/informers/apiserverinternal
+#28 26.43 k8s.io/client-go/informers/admissionregistration
+#28 26.51 k8s.io/client-go/informers/autoscaling/v2beta1
+#28 26.56 k8s.io/client-go/informers/autoscaling/v2beta2
+#28 26.71 k8s.io/client-go/informers/batch/v1
+#28 26.73 k8s.io/client-go/informers/apps
+#28 26.89 k8s.io/client-go/informers/batch/v1beta1
+#28 26.96 k8s.io/client-go/informers/certificates/v1
+#28 26.96 k8s.io/client-go/informers/certificates/v1beta1
+#28 26.98 k8s.io/client-go/informers/coordination/v1
+#28 27.18 k8s.io/client-go/informers/autoscaling
+#28 27.30 k8s.io/client-go/informers/coordination/v1beta1
+#28 27.32 k8s.io/client-go/informers/core/v1
+#28 27.38 k8s.io/client-go/informers/discovery/v1
+#28 27.39 k8s.io/client-go/informers/batch
+#28 27.47 k8s.io/client-go/informers/certificates
+#28 27.50 k8s.io/client-go/informers/discovery/v1beta1
+#28 27.74 k8s.io/client-go/informers/events/v1
+#28 27.74 k8s.io/client-go/informers/events/v1beta1
+#28 27.78 k8s.io/client-go/informers/coordination
+#28 27.88 k8s.io/client-go/informers/extensions/v1beta1
+#28 27.96 k8s.io/client-go/informers/core
+#28 27.98 k8s.io/client-go/informers/flowcontrol/v1alpha1
+#28 27.99 k8s.io/client-go/informers/flowcontrol/v1beta1
+#28 28.05 k8s.io/client-go/informers/discovery
+#28 28.20 k8s.io/client-go/informers/flowcontrol/v1beta2
+#28 28.24 k8s.io/client-go/informers/networking/v1
+#28 28.29 k8s.io/client-go/informers/events
+#28 28.45 k8s.io/client-go/informers/extensions
+#28 28.45 k8s.io/client-go/informers/networking/v1beta1
+#28 28.49 k8s.io/client-go/informers/node/v1
+#28 28.53 k8s.io/client-go/informers/node/v1alpha1
+#28 28.56 k8s.io/client-go/informers/node/v1beta1
+#28 28.68 k8s.io/client-go/informers/flowcontrol
+#28 28.78 k8s.io/client-go/informers/policy/v1
+#28 28.78 k8s.io/client-go/informers/policy/v1beta1
+#28 28.94 k8s.io/client-go/informers/networking
+#28 28.98 k8s.io/client-go/informers/rbac/v1
+#28 29.02 k8s.io/client-go/informers/rbac/v1alpha1
+#28 29.03 k8s.io/client-go/informers/rbac/v1beta1
+#28 29.13 k8s.io/client-go/informers/node
+#28 29.16 k8s.io/client-go/informers/scheduling/v1
+#28 29.32 k8s.io/client-go/informers/scheduling/v1alpha1
+#28 29.33 k8s.io/client-go/informers/policy
+#28 29.43 k8s.io/client-go/informers/scheduling/v1beta1
+#28 29.50 k8s.io/client-go/informers/storage/v1
+#28 29.55 k8s.io/client-go/informers/storage/v1alpha1
+#28 29.57 k8s.io/client-go/informers/rbac
+#28 29.57 k8s.io/client-go/informers/storage/v1beta1
+#28 29.68 github.com/argoproj/argo-workflows/v3/workflow/common
+#28 29.75 github.com/colinmarc/hdfs/rpc
+#28 29.84 github.com/aws/aws-sdk-go/aws
+#28 29.94 k8s.io/client-go/informers/scheduling
+#28 30.05 github.com/klauspost/cpuid
+#28 30.08 github.com/colinmarc/hdfs
+#28 30.12 github.com/aws/aws-sdk-go/aws/request
+#28 30.20 github.com/minio/minio-go/v7/pkg/s3utils
+#28 30.20 github.com/minio/sha256-simd
+#28 30.29 gopkg.in/ini.v1
+#28 30.31 k8s.io/client-go/informers/storage
+#28 30.36 github.com/minio/md5-simd
+#28 30.38 github.com/argoproj/argo-workflows/v3/workflow/artifacts/hdfs
+#28 30.47 github.com/aws/aws-sdk-go/aws/client
+#28 30.50 github.com/aws/aws-sdk-go/private/protocol
+#28 30.50 github.com/argoproj/argo-workflows/v3/workflow/artifacts/oss
+#28 30.56 github.com/aws/aws-sdk-go/aws/corehandlers
+#28 30.61 github.com/aws/aws-sdk-go/aws/csm
+#28 30.62 github.com/minio/minio-go/v7/pkg/signer
+#28 30.65 golang.org/x/sys/cpu
+#28 30.67 github.com/aws/aws-sdk-go/private/protocol/rest
+#28 30.68 github.com/aws/aws-sdk-go/private/protocol/query/queryutil
+#28 30.69 github.com/aws/aws-sdk-go/private/protocol/xml/xmlutil
+#28 30.77 github.com/aws/aws-sdk-go/private/protocol/json/jsonutil
+#28 30.80 github.com/aws/aws-sdk-go/aws/ec2metadata
+#28 30.81 github.com/minio/minio-go/v7/pkg/credentials
+#28 30.82 golang.org/x/crypto/blake2b
+#28 30.84 github.com/minio/minio-go/v7/pkg/lifecycle
+#28 30.86 github.com/aws/aws-sdk-go/aws/signer/v4
+#28 30.88 k8s.io/client-go/informers
+#28 30.91 github.com/aws/aws-sdk-go/private/protocol/query
+#28 30.95 github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds
+#28 30.98 github.com/minio/minio-go/v7/pkg/set
+#28 30.99 github.com/rs/xid
+#28 30.99 github.com/aws/aws-sdk-go/private/protocol/jsonrpc
+#28 31.03 github.com/aws/aws-sdk-go/service/sts
+#28 31.05 github.com/aws/aws-sdk-go/aws/credentials/endpointcreds
+#28 31.05 github.com/minio/minio-go/v7/pkg/notification
+#28 31.06 golang.org/x/crypto/argon2
+#28 31.08 github.com/minio/minio-go/v7/pkg/replication
+#28 31.08 github.com/aws/aws-sdk-go/private/protocol/restjson
+#28 31.09 github.com/minio/minio-go/v7/pkg/sse
+#28 31.13 github.com/aws/aws-sdk-go/aws/defaults
+#28 31.14 github.com/minio/minio-go/v7/pkg/tags
+#28 31.16 github.com/aws/aws-sdk-go/service/sso
+#28 31.18 net/http/cookiejar
+#28 31.20 github.com/argoproj/argo-workflows/v3/workflow/data
+#28 31.20 github.com/minio/minio-go/v7/pkg/encrypt
+#28 31.22 github.com/tidwall/match
+#28 31.24 github.com/tidwall/pretty
+#28 31.27 github.com/aws/aws-sdk-go/service/sts/stsiface
+#28 31.28 golang.org/x/net/publicsuffix
+#28 31.29 k8s.io/client-go/util/retry
+#28 31.29 github.com/klauspost/compress/flate
+#28 31.30 k8s.io/utils/env
+#28 31.33 github.com/argoproj/argo-workflows/v3/workflow/executor/os-specific
+#28 31.33 github.com/aws/aws-sdk-go/service/sso/ssoiface
+#28 31.34 github.com/argoproj/argo-workflows/v3/workflow/executor/common
+#28 31.35 github.com/aws/aws-sdk-go/aws/credentials/stscreds
+#28 31.37 github.com/tidwall/gjson
+#28 31.38 github.com/argoproj/argo-workflows/v3/pkg/plugins/spec
+#28 31.38 github.com/minio/minio-go/v7
+#28 31.40 github.com/aws/aws-sdk-go/aws/credentials/ssocreds
+#28 31.43 github.com/argoproj/pkg/exec
+#28 31.51 github.com/argoproj/argo-workflows/v3/workflow/util/plugins
+#28 31.52 github.com/mitchellh/go-ps
+#28 31.52 github.com/aws/aws-sdk-go/aws/session
+#28 31.53 github.com/argoproj/argo-workflows/v3/workflow/executor/k8sapi
+#28 31.59 github.com/argoproj/argo-workflows/v3/workflow/executor/kubelet
+#28 31.71 github.com/argoproj/pkg/errors
+#28 31.74 github.com/argoproj/argo-workflows/v3/workflow/executor/plugins/rpc
+#28 31.85 github.com/argoproj/pkg/cli
+#28 31.85 github.com/klauspost/pgzip
+#28 31.86 github.com/argoproj/pkg/kube/cli
+#28 31.89 github.com/argoproj/pkg/stats
+#28 31.89 k8s.io/apimachinery/pkg/util/rand
+#28 31.92 github.com/Azure/go-autorest/autorest/date
+#28 31.97 github.com/Azure/go-autorest/logger
+#28 32.00 github.com/Azure/go-autorest/tracing
+#28 32.01 github.com/argoproj/argo-workflows/v3/util/file
+#28 32.01 github.com/form3tech-oss/jwt-go
+#28 32.06 golang.org/x/crypto/pkcs12/internal/rc2
+#28 32.08 github.com/argoproj/argo-workflows/v3/workflow/executor/docker
+#28 32.09 k8s.io/client-go/third_party/forked/golang/template
+#28 32.10 github.com/argoproj/argo-workflows/v3/workflow/executor/pns
+#28 32.15 golang.org/x/crypto/pkcs12
+#28 32.19 github.com/argoproj/argo-workflows/v3/server/cache
+#28 32.21 k8s.io/client-go/plugin/pkg/client/auth/oidc
+#28 32.26 k8s.io/client-go/plugin/pkg/client/auth/openstack
+#28 32.31 k8s.io/client-go/util/jsonpath
+#28 32.35 github.com/Azure/go-autorest/autorest/adal
+#28 32.49 k8s.io/client-go/plugin/pkg/client/auth/gcp
+#28 32.51 github.com/argoproj/pkg/s3
+#28 32.59 github.com/Azure/go-autorest/autorest
+#28 32.60 github.com/argoproj/argo-workflows/v3/server/auth
+#28 32.61 github.com/argoproj/argo-workflows/v3/workflow/artifacts/s3
+#28 32.71 github.com/argoproj/argo-workflows/v3/workflow/artifacts
+#28 32.79 github.com/Azure/go-autorest/autorest/azure
+#28 32.80 github.com/argoproj/argo-workflows/v3/workflow/executor
+#28 32.97 k8s.io/client-go/plugin/pkg/client/auth/azure
+#28 33.03 k8s.io/client-go/plugin/pkg/client/auth
+#28 33.22 github.com/argoproj/argo-workflows/v3/util/logs
+#28 33.48 github.com/argoproj/argo-workflows/v3/workflow/executor/emissary
+#28 33.61 github.com/argoproj/argo-workflows/v3/cmd/argoexec/commands
+#28 33.93 github.com/argoproj/argo-workflows/v3/cmd/argoexec
+#28 DONE 38.4s
+
+#29 [argoexec-build 4/4] RUN setcap CAP_SYS_PTRACE,CAP_SYS_CHROOT+ei dist/argoexec
+#29 DONE 1.4s
+
+#30 [argoexec 1/2] COPY --from=argoexec-build /go/src/github.com/argoproj/argo-workflows/dist/argoexec /usr/local/bin/
+#30 DONE 0.5s
+
+#31 [argoexec 2/2] COPY --from=argoexec-build /etc/mime.types /etc/mime.types
+#31 DONE 0.3s
+
+#32 exporting to image
+#32 exporting layers
+#32 exporting layers 1.4s done
+#32 writing image sha256:23d44c15c32413cd43d1b3f60abda21592b5d95b1a37cadaf3ad6e3b1be98179 done
+#32 naming to quay.io/argoproj/argoexec:v3.3.8 done
+#32 DONE 1.4s
+[ ! -e argoexec ] || mv argoexec dist/
+docker run --rm -t quay.io/argoproj/argoexec:v3.3.8 version
+argoexec: v3.3.8
+  BuildDate: 2023-04-28T06:52:09Z
+  GitCommit: 621b0d1a8e09634666ebe403ee7b8fc29db1dc4e
+  GitTreeState: clean
+  GitTag: v3.3.8
+  GoVersion: go1.19.7
+  Compiler: gc
+  Platform: linux/amd64
+if [ false = true ]; then k3d image import -c k3s-default quay.io/argoproj/argoexec:v3.3.8; fi
+if [ false = true ] && [ quay.io/argoproj != argoproj ] ; then docker push quay.io/argoproj/argoexec:v3.3.8 ; fi
++ docker tag quay.io/argoproj/argoexec:v3.3.8 armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argoexec:v3.3.8-alpine-3.17.3
++ buildStatus=0
++ [[ 0 == 0 ]]
++ docker push armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argoexec:v3.3.8-alpine-3.17.3
+The push refers to repository [armdocker.rnd.ericsson.se/proj-mxe/quay.io/argoproj/argoexec]
+d3844c2bfb58: Preparing
+da149b75d8e6: Preparing
+338b3e6a7ce4: Preparing
+381f33c3ad89: Preparing
+d605bcebf1d6: Preparing
+143f989fbc8f: Preparing
+acf91401f6ee: Preparing
+8808a3717920: Preparing
+eeda4670c1a6: Preparing
+f1417ff83b31: Preparing
+143f989fbc8f: Waiting
+acf91401f6ee: Waiting
+8808a3717920: Waiting
+eeda4670c1a6: Waiting
+f1417ff83b31: Waiting
+381f33c3ad89: Pushed
+d605bcebf1d6: Pushed
+338b3e6a7ce4: Pushed
+d3844c2bfb58: Pushed
+8808a3717920: Pushed
+f1417ff83b31: Layer already exists
+eeda4670c1a6: Pushed
+143f989fbc8f: Pushed
+da149b75d8e6: Pushed
+acf91401f6ee: Pushed
+v3.3.8-alpine-3.17.3: digest: sha256:86584d1322953c257e98803929343584a76f6149578422b76afa6171aaced555 size: 2413
++ pushed=0
++ [[ 0 == 0 ]]
++ cleanup
++ [[ -d /mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/argo-workflows/argo-workflows ]]
++ rm -rf /mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift/3pp-images/argo-workflows/argo-workflows
++ cd /mnt/disk0/enxxram/home/enxxram/workspace/mee/2.5/mxe-core-argocd-uplift

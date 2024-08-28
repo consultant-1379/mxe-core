@@ -1,0 +1,23 @@
+{
+  "script": "model-services/ModelServices",
+  "title": "MODEL_SERVICES_TITLE",
+  "route": "model-services",
+  "menu": {
+    "id": "MODEL_SERVICES",
+    "data": {
+      "path": "model-services"
+    }
+  },
+  "dependencies": {
+    "@eui/component": "^0.9.0",
+    "@eui/lit-component": "^0.9.0",
+    "@eui/app": "^0.9.1"
+  },
+  "children": {
+    "model-service-detail": {
+      "script": "model-service-detail/ModelServiceDetail",
+      "title": "MODEL_SERVICE_DETAIL",
+      "route": "model-services/model-service-detail"
+    }
+  }
+}

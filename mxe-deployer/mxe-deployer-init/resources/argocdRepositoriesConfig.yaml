@@ -1,0 +1,29 @@
+mxeHelmRepo:
+    type: helm
+    url: https://armdocker.rnd.ericsson.se/artifactory/proj-mxe-dev-helm/
+    name: helm-repo
+    userNameSecret:
+      name: helmcreds
+      key: username
+    passwordSecret:
+      name: helmcreds
+      key: password 
+mxeGitopsRepo:
+  repo:
+    url: https://gitea.mxe.olah024.rnd.gic.ericsson.se/mxe/mxe-gitops.git
+    userNameSecret:
+      name: gitops-repo-creds
+      key:  username
+    passwordSecret:
+      name: gitops-repo-creds
+      key: password
+  userEmail: olah024User@ericsson.com 
+  shouldCreate: true
+  gitAdminCredentials:
+    userNameSecret: 
+      name: gitea-admin-creds
+      key:  username
+    passwordSecret: 
+      name: gitea-admin-creds
+      key:  password
+url: https://argocd.olah024.rnd.gic.ericsson.se

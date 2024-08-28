@@ -1,0 +1,8 @@
+/* style goes here */
+:host {
+  display: inline-block;
+}
+
+eui-v0-icon:hover {
+  cursor: pointer;
+}

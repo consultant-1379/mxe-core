@@ -1,0 +1,23 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: {{ include "mxe-commons.post-install-hook-authz-deny-oauth-admin-name" . | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "post-install-hook-authz-deny-oauth-admin"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-commons.post-install-hook-authz-deny-oauth-admin-name" . | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "7"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      istio: ingressgateway
+  {{- include "mxe-commons.istio-authz-policy-rules-deny-oauth-admin" . | nindent 2 }}

@@ -1,0 +1,94 @@
+= Data Collection Guide
+:author: Kristóf Nékám
+:signature: EKRINKM
+:department: BDGSJBAK
+:doc-name: OPERATING INSTRUCS
+:doc-no: 2/1543-AVA 901 53
+:revnumber: PC3
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+//Template updated 2018-08-21 (keep to track template history)
+
+[[IntroductiontoDataCollection]]
+== Introduction to Data Collection
+
+This document describes how to perform data collection for MXE for troubleshooting purposes.
+
+[[TargetGroup]]
+=== Target Group
+
+.This document is intended for internal use and external customers raising a Customer Service Request (CSR). Target groups include the following:
+* Support organization personnel
+* Customer Operation and Maintenance (O&M) personnel
+
+[[Prerequisites]]
+=== Prerequisites
+
+.Before proceeding to collect troubleshooting data, ensure the following:
+* Admin rights to access the cluster
+* Enough disk space for processing the collected cluster information
+
+[[DataCollectionWorkflow]]
+== Data Collection Workflow
+
+.The workflow for collecting troubleshooting data is as follows:
+. Collect the data as described in this document.
+. Submit a CSR to the next level of support as described in <<SubmitCSR,Submit CSR>>.
+
+[[DataCollection]]
+== Data Collection
+
+The data needed for troubleshooting a fault is collected by running a series of commands and collecting the logs files.
+
+[[CollectClusterRelatedData]]
+=== Collect Cluster Related Data
+
+. Log on to a node from which the cluster can be accessed using the kubectl command.
+. Run the following commands to collect the output data:
++
+....
+kubectl get nodes
+kubectl get cs
+kubectl get all --all-namespaces
+kubectl get pv --all-namespaces
+kubectl get pvc --all-namespaces
+....
+
+[[CollectApplicationRelatedData]]
+=== Collect Application Related Data
+
+To collect MXE related data, see *Commands to Collect All Logs* in the doc-ref:[Troubleshooting Guide].
+
+[[PackagingCollectedData]]
+=== Packaging Collected Data
+
+Package the collected data into a tar ball for submission to the next level of Support.
+
+[[SplitFilesbeforeAddingtoCSR]]
+== Split Files before Adding to CSR
+
+Before adding the archive file to the CSR as an enclosure, it must be split into smaller pieces according to the appropriate enclosure limits.
+
+. Run the following command:
++
+....
+split -d -b <piece>MB --verbose data_collection_<date>.tar.gz data_collection_<date>.tar.gz.part.
+....
++
+Where `<piece>` is less than the enclosure limit, for example, 500 MB.
++
+. Pieces can be put together with the `cat` command. Add the following information to the CSR:
++
+....
+cat data_collection_<date>.tar.gz.part.* > data_collection_<date>.tar.gz
+....
+
+[[SubmitCSR]]
+== Submit CSR
+
+.Enclose the created archive in a CSR and submit it to the next level of support:
+. Transfer the collected data content `.tar` file out of the system.
+. Submit the file as part of the CSR.

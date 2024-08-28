@@ -1,0 +1,131 @@
+= Dimensioning Guide
+:author: Kristóf Nékám
+:signature: EKRINKM
+:department: BDGSJBAK
+:doc-name: DIMENSIONING RULES
+:doc-no: 1/192 02-AVA 901 53
+:revnumber: PK3
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name: Attila Ulbert
+:approved-by-signature: EATTULB
+:approved-by-department: BDGSBEIP
+
+//Template updated 2018-08-21 (keep to track template history)
+
+[[Introduction]]
+== Introduction
+
+This document provides estimations on the range of HW MXE requires to run models of varying complexity and number of instances. Due to the large possible variety in model complexity it is not possible to give accurate details on the exact HW requirements.
+
+.Factors affecting performance:
+* model complexity
+* number of instances run simultaneously
+* number of new instances launched simultaneously
+
+.Aspects of performance affected:
+* request rate
+* response time
+
+The scalability test was run by using a three node cluster, with the following configuration for each:
+
+.Scalability Test Configuration
+[cols=","]
+|===
+|Kubelet Version |v1.14.1
+|Kube-Proxy Version |v1.14.1
+|OS image |Red Hat Enterprise Linux Server 7.3 (Maipo)
+|OS Kernel |3.10.0-514.51.1.el7.x86_64
+|Memory |32 GB
+|CPU topology |4 cores
+|CPU model |Intel Xeon E5-2698 v4
+|CPU speed |2195 MHz
+|===
+
+[[PerformanceMeasurementResults]]
+== Performance Measurement Results
+
+The following sections contain performance measurements for MXE. A function that simply returns the input data represents an ML model in the first test scenario. The same measurements are then repeated with a complex model, Inception3. For more information, see https://arxiv.org/abs/1512.00567[].
+
+[[RequestRate]]
+=== Request Rate
+
+Average successful request rate with three nodes:
+
+.Average Successful Request Rate
+[cols=",",options="header"]
+|===
+|Number of Instances |Operations / sec
+|1 |177.69
+|2 |177.36
+|4 |175.29
+|===
+
+The same measurement repeated with Inception3:
+
+.Average Successful Request Rate for Inception3
+[cols=",",options="header"]
+|===
+|Number of Instances |Operations / sec
+|1 |3.135
+|2 |5.607
+|4 |8.044
+|===
+
+To calculate the request rate of your model running in MXE, measure the processing time of your model on the same hardware as was used for performance testing, and add 1/177 seconds for MXE overhead. For example, if your model takes 1 second to run, then it will take 1 + 1/177 seconds to run in MXE (without complex data pre- and post-processing). Therefore the request rate of the model in MXE will be 0.994 req/sec.
+
+[[ResponseTime]]
+=== Response Time
+
+Average response time with three nodes:
+
+.Average Response Time
+[cols=",",options="header"]
+|===
+|Number of Instances |Response Time (sec)
+|1 |2.183
+|2 |2.203
+|4 |2.201
+|===
+
+The same measurement repeated with Inception3:
+
+.Average Response Time for Inception3
+[cols=",",options="header"]
+|===
+|Number of Instances |Response Time (sec)
+|1 |3.144
+|2 |1.683
+|4 |1.060
+|===
+
+[[MXEUpgradePerformanceMeasurementResults]]
+== MXE Upgrade Performance Measurement Results
+
+The upgrade test was run by using KaaS on rose001: https://access-rose001.rnd.gic.ericsson.se/c/c-8rrkr/monitoring[].
+
+[cols=","]
+|===
+|Kubelet Version|v1.13.5
+|Kube-Proxy Version|v1.13.5
+|Number of nodes|11 (8 worker)
+|Node OS|RHEL 7.6 3.10.0-957.el7_6.pf.x86_64
+|Memory per node|13.9 GiB
+|CPU topology|4 cores
+|erikube version|2.2.0
+|kaas version|1.13.5-kaas.1
+|===
+
+The upgrade was done with a model running with one instance. MXE 1.5 release is used as upgrade base. During the upgrade there was a total outage on the model endpoint for 8 minutes.
+
+Because of the new authentication introduced in the target MXE version expect full outage on the model endpoints during the upgrade.
+
+[[Recommendations]]
+== Recommendations
+
+The three node setup used during scalability testing is sufficient for the most common user scenarios. In case of high complexity models or models run in a comparably larger number of instances, the number of servers can be doubled to balance the extra load.
+
+NOTE: Increasing the number of instances of a model rapidly, as opposed to gradually, impacts system performance.
+
+=== Recommended Size of Docker Registry
+
+The default size of the docker registry is 10 GB. During installation this can be modified to accomodate the number and size of the docker images to be onboarded.

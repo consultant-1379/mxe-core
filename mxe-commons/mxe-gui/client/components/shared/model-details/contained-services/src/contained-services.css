@@ -1,0 +1,30 @@
+/* style goes here */
+:host {
+  display: block;
+  background: var(--card-color-background, var(--card-color-background, #fafafa));
+  padding: 24px;
+  position: relative;
+}
+
+.top {
+  display: flex;
+  margin-bottom: 24px;
+}
+
+.top .title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--text);
+  margin-right: 16px;
+}
+
+.top .subtitle {
+  font-size: 14px;
+  opacity: 0.8;
+  color: var(--text);
+}
+
+.content {
+  text-align: center;
+}

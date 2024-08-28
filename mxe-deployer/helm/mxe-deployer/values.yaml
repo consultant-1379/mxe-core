@@ -1,0 +1,443 @@
+global:
+  registry:
+    url: armdocker.rnd.ericsson.se
+    pullSecret:
+    imagePullPolicy: IfNotPresent
+    repoPath:
+  mxeDisableDefaultIngressControllerUse: false
+  internalIPFamily:
+  mxeGiteaApiHostname:
+  mxeDeployerApiHostname:
+  mxeArgoCDApiHostname:
+  security:
+    tls:
+      enabled: false
+  serviceMesh:
+    enabled: false
+    annotations:
+      serviceMesh:
+    egress:
+      postgres:
+        serviceName: eric-data-document-database-pg
+        caIssuer: eric-data-document-database-pg-client-ca
+        clientCertificate: clicert.pem
+        privateKey: cliprivkey.pem
+  labels: {}
+  annotations: {}
+  nodeSelector: {}
+  mxePrometheusPath: /actuator/prometheus
+  mxePrometheusPort: '8081'
+  mxePrometheusScrape: 'true'
+  mxePrometheusScrapeRole: pod 
+  mxePrometheusScrapeInterval: 15s
+
+productInfo:
+# R-State of the product. R State should match helm chart version (3.1.0 -> R2A)
+# To automate it when packaging the helm chart rstate can be generated
+# and below value replaced with correct R-State
+  rstate:
+
+imageCredentials:
+  registry:
+    url:
+    pullSecret:
+  repoPath:
+
+argo-cd:
+  enabled: true
+  fullnameOverride: "argocd"
+  # Optional CRD installation for those without Helm hooks
+  installCRDs: false
+
+  global:
+    pullSecret:
+    registry:
+      url: "armdocker.rnd.ericsson.se"
+      pullSecret:
+      
+    mxeDisableDefaultIngressControllerUse: false
+    image:
+      repository: armdocker.rnd.ericsson.se/proj-mxe/argoproj/argocd
+      tag: v2.11.0-ubuntu-20240405
+
+  ## Controller
+  controller:
+    # If changing the number of replicas you must pass the number as ARGOCD_CONTROLLER_REPLICAS as an environment variable
+    replicas: 2
+
+    # Deploy the application as a StatefulSet instead of a Deployment, this is required for HA capability.
+    # This is a feature flag that will become the default in chart version 3.x
+    enableStatefulSet: true
+
+    ## Environment variables to pass to argocd-controller
+    ##
+    env:
+      - name: "ARGOCD_CONTROLLER_REPLICAS"
+        value: "2"
+
+  ## Dex
+  dex:
+    enabled: false
+  ## Redis
+  redis:
+    enabled: false
+    image:
+      repository: armdocker.rnd.ericsson.se/proj-mxe/redis
+      tag: 7.0.9-ubuntu-20240405
+
+
+  # This key configures Redis-HA subchart and when enabled (redis-ha.enabled=true)
+  # the custom redis deployment is omitted
+  redis-ha:
+    enabled: true
+    labels:
+      kubernetes.io/name: 'mxe-redis-ha-server'
+    # Check the redis-ha chart for more properties
+    persistentVolume:
+      enabled: true
+    redis:
+      resources: {}
+    haproxy:
+      labels:
+        kubernetes.io/name: 'mxe-redis-ha-proxy'
+      image:
+        repository: armdocker.rnd.ericsson.se/proj-mxe/haproxy
+        tag: 2.6.9-ubuntu-20240405
+
+    image:
+      repository: armdocker.rnd.ericsson.se/proj-mxe/redis
+      tag: 7.0.9-ubuntu-20240405
+
+    exporter:
+      enabled: false
+    
+  ## Server
+  server:
+    name: server
+    replicas: 2
+    extraArgs:
+      - --insecure
+
+    ## Certificate configuration
+    certificate:
+      enabled: false
+
+    ## Ingress definition from Argo CD helm chart is not used
+    ingress:
+      enabled: false
+  
+    # dedicated ingess for gRPC as documented at
+    # https://argoproj.github.io/argo-cd/operator-manual/ingress/
+    ingressGrpc:
+      ingressClassName: eric-mxe-ingress-controller-class
+      enabled: false
+      annotations:
+        mxe.nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      https: true
+
+    config:
+      # Argo CD's externally facing base URL (optional). Required when configuring SSO
+      url: https://argocd.example.com
+      # Argo CD instance label key
+      application.instanceLabelKey: argocd.argoproj.io/instance
+      resource.customizations: |
+        admissionregistration.k8s.io/MutatingWebhookConfiguration:
+          # List of json pointers in the object to ignore differences
+          ignoreDifferences: |
+            jsonPointers:
+            - /webhooks/0/clientConfig/caBundle
+            - /webhooks/1/clientConfig/caBundle
+            - /webhooks/2/clientConfig/caBundle
+            - /webhooks/3/clientConfig/caBundle
+            - /webhooks/4/clientConfig/caBundle
+            - /webhooks/5/clientConfig/caBundle
+            - /webhooks/6/clientConfig/caBundle
+            - /webhooks/7/clientConfig/caBundle
+        
+        admissionregistration.k8s.io/ValidatingWebhookConfiguration:
+          # List of json pointers in the object to ignore differences
+          ignoreDifferences: |
+            jsonPointers:
+            - /webhooks/0/clientConfig/caBundle
+            - /webhooks/1/clientConfig/caBundle
+            - /webhooks/2/clientConfig/caBundle
+            - /webhooks/3/clientConfig/caBundle
+            - /webhooks/4/clientConfig/caBundle
+            - /webhooks/5/clientConfig/caBundle
+            - /webhooks/6/clientConfig/caBundle
+            - /webhooks/7/clientConfig/caBundle
+            - /webhooks/0/failurePolicy
+            - /webhooks/1/failurePolicy
+            - /webhooks/2/failurePolicy
+            - /webhooks/3/failurePolicy
+            - /webhooks/4/failurePolicy
+            - /webhooks/5/failurePolicy
+            - /webhooks/6/failurePolicy
+            - /webhooks/7/failurePolicy
+
+
+        Secret:
+          ignoreDifferences: |
+            jsonPointers:
+            - /data/gatekeeper.yaml
+            - /data/ca.crt
+            - /data/tls.crt
+            - /data/tls.key
+            - /data/custom-pwd
+        
+        apps/StatefulSet:
+          ignoreDifferences: |
+            jsonPointers:
+            - /metadata/annotations/helm.sh~1created
+
+        networking.k8s.io/Ingress:
+          health.lua: |
+            hs = {}
+            hs.status = "Healthy"
+            return hs
+
+  ## Repo Server
+  repoServer:
+    replicas: 2
+
+  ## use bcrypted password see https://argoproj.github.io/argo-cd/faq/#i-forgot-the-admin-password-how-do-i-reset-it
+  configs:
+    knownHosts:
+      data:
+        ssh_known_hosts: |
+          bitbucket.org ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAubiN81eDcafrgMeLzaFPsw2kNvEcqTKl/VqLat/MaB33pZy0y3rJZtnqwR2qOOvbwKZYKiEO1O6VqNEBxKvJJelCq0dTXWT5pbO2gDXC6h6QDXCaHo6pOHGPUy+YBaGQRGuSusMEASYiWunYN0vCAI8QaXnWMXNMdFP3jHAJH0eDsoiGnLPBlBp4TNm6rYI74nMzgz3B9IikW4WVK+dc8KZJZWYjAuORU3jc1c/NPskD2ASinf8v3xnfXeukU0sJ5N6m5E8VLjObPEO+mN2t/FZTMZLiFqPWc/ALSqnMnnhwrNi2rbfg/rd/IpL8Le3pSBne8+seeFVBoGqzHM9yXw==
+          github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+          gitlab.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFSMqzJeV9rUzU4kWitGjeR4PWSa29SPqJ1fVkhtj3Hw9xjLVXVYrU9QlYWrOLXBpQ6KWjbjTDTdDkoohFzgbEY=
+          gitlab.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAfuCHKVTjquxvt6CM6tdG4SLp1Btn/nOeHHE5UOzRdf
+          gitlab.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsj2bNKTBSpIYDEGk9KxsGh3mySTRgMtXL583qmBpzeQ+jqCMRgBqB98u3z++J1sKlXHWfM9dyhSevkMwSbhoR8XIq/U0tCNyokEi/ueaBMCvbcTHhO7FcwzY92WK4Yt0aGROY5qX2UKSeOvuP4D6TPqKF1onrSzH9bx9XUf2lEdWT/ia1NEKjunUqu1xOB/StKDHMoX4/OKyIzuS0q/T1zOATthvasJFoPrAjkohTyaDUz2LN5JoH839hViyEG82yB+MjcFV5MU3N1l1QL3cVUCh93xSaua1N85qivl+siMkPGbO5xR/En4iEY6K2XPASUEMaieWVNTRCtJ4S8H+9
+          ssh.dev.azure.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hr1oTWqNqOlzGJOfGJ4NakVyIzf1rXYd4d7wo6jBlkLvCA4odBlL0mDUyZ0/QUfTTqeu+tm22gOsv+VrVTMk6vwRU75gY/y9ut5Mb3bR5BV58dKXyq9A9UeB5Cakehn5Zgm6x1mKoVyf+FFn26iYqXJRgzIZZcZ5V6hrE0Qg39kZm4az48o0AUbf6Sp4SLdvnuMa2sVNwHBboS7EJkm57XQPVU3/QpyNLHbWDdzwtrlS+ez30S3AdYhLKEOxAG8weOnyrtLJAUen9mTkol8oII1edf7mWWbWVf0nBmly21+nZcmCTISQBtdcyPaEno7fFQMDD26/s0lfKob4Kw8H
+          vs-ssh.visualstudio.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hr1oTWqNqOlzGJOfGJ4NakVyIzf1rXYd4d7wo6jBlkLvCA4odBlL0mDUyZ0/QUfTTqeu+tm22gOsv+VrVTMk6vwRU75gY/y9ut5Mb3bR5BV58dKXyq9A9UeB5Cakehn5Zgm6x1mKoVyf+FFn26iYqXJRgzIZZcZ5V6hrE0Qg39kZm4az48o0AUbf6Sp4SLdvnuMa2sVNwHBboS7EJkm57XQPVU3/QpyNLHbWDdzwtrlS+ez30S3AdYhLKEOxAG8weOnyrtLJAUen9mTkol8oII1edf7mWWbWVf0nBmly21+nZcmCTISQBtdcyPaEno7fFQMDD26/s0lfKob4Kw8H
+          gitlab.internal.ericsson.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC8+PmCQzJg9mGWw96IjCI+xRR+jnJ4wvq+1FLNRxX+nMMJL2HdEeZJv2a5i4nTqGDunAVtUcL6FHbYCiAR/yUyImWW+Nfrzq77PwHLiZOWI2ATREYQQTJ0T7/2ry0/2XH7oh1ZFOtoNZBti3dmSuFHFGeFO29590uDf/ZZUNc7lHgN52+XnhtO9mtn8fJCcpmmDt+PBgSbxH3OpUuE1hkWGVH7rPAqaU94eCrTQ6g/UwpxFJfeASs56hkibgS6TJM4oSd8AH+m9+bEMoGdmxA4JrKgJ7kHTpSNO0squmecuU8XR8GgI+DeOqwqI4s0lADmZZLTYIwGH5EIv6faP7mj
+          [gerrit.ericsson.se]:29418 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQC86anZpnhX37u8uOKSSM6LN64wBA6N3gWw4ahMQ5YvR0GOTFqbIBzKcw8CbgwIXiHvS0yAI0t7tJiUwE6XjxSzt73NwdIrjywrhqq9vFnlKWkznZQgktfAmyWlp4sYYTpAaiw9NJxvd1I9wN2zW7Bfl7gwz5Lo5EFd/ekhqjgzcQ== 
+    secret:
+      argocdServerAdminPassword: $2a$10$5YbrGwj7jgWU/ZUjSKnFX.A1VJyJpuu3gurOzxg9AnOYSgw0ex1Km
+      argocdServerAdminPasswordMtime: "'$(date -u +%FT%T%Z)'" ##"2021-01-01T10:11:12Z"
+
+mxePostInstallCertificateSideCar:
+  nameOverride:
+  image:
+    name: "mxe/eric-mxe-kubernetes-modifier"
+    tag: "VERSION"
+    pullPolicy:
+    repoPath: "REPO_PATH"
+  sideCarImage:
+    name: "proj-mxe/certificate-sidecar"
+    tag: "ubuntu-20240405"
+    pullPolicy:
+    repoPath: "REPO_PATH"
+  mergedDockerConfigSecretName: mxe-pull-secret
+
+mxePostInstallExtCertificate:
+  nameOverride:
+  image:
+    name: "mxe/eric-mxe-kubernetes-modifier"
+    tag: "VERSION"
+    pullPolicy:
+    repoPath: "REPO_PATH"
+  mergedDockerConfigSecretName: mxe-pull-secret
+
+mxePreInstallMeshgwCertPatch:
+  nameOverride:
+  image:
+    name: "mxe/eric-mxe-kubernetes-modifier"
+    tag: "VERSION"
+    pullPolicy: 
+    repoPath: "REPO_PATH"
+
+mxeGitea:
+  isExtCA: 
+  ingress: 
+    clusterWideIngressClass: null
+  nameOverride:
+  fullnameOverride:
+  giteaPostInstallInit:
+    nameOverride:
+  secret:
+    database:
+      nameOverride:
+  config:
+    pg:
+      custom:
+        password:
+  admin:
+    secret: gitea-admin-creds
+  imageCredentials:
+    registry:
+      url:
+      pullSecret:
+    repoPath: "REPO_PATH"
+  images:
+    kubernetes-modifier:
+      name: "mxe/eric-mxe-kubernetes-modifier"
+      tag: "VERSION"
+      pullPolicy: 
+    gitea-create-user:
+      name: "mxe/eric-mxe-deployer-init"
+      tag: "VERSION"
+      pullPolicy: 
+    gitea-create-repo:
+      name: "mxe/eric-mxe-deployer-init"
+      tag: "VERSION"
+      pullPolicy: 
+  mxeHost:
+  mxeCommonsNamespace: mxe
+  keyCloakServiceName: eric-sec-access-mgmt-http
+  mxeUserSecretName:
+  mxeUserEmail:
+  mxeRealm: mxe
+  giteaIngressHost:
+  giteaApiTls:
+  ingressController:
+    hostOverride:
+    service:
+      httpPort: 80
+      httpsPort: 443
+  mxePostInstallHookIstioAuthzAllowGitea:
+    nameOverride:
+  giteaPostInstallCreateAuthSource:
+    nameOverride:
+  giteaPostInstallWaitForGitea:
+    nameOverride:
+  giteaKeycloakInit:
+    mxeCommonsNamespace: mxe
+    keycloakContainerName: iam
+    keycloakAdminClient: admin-cli
+    mxeKeycloakAdminSecretName: eric-mxe-gatekeeper-keycloak-access-creds-hooked
+    mxeRealm: mxe
+    clientId: gitea
+    clientName: gitea
+    clientSecret: d0b8122f-8dfb-46b7-b68a-f5cc4e25d000
+    clientRedirectUri: https://cluster.local
+    autoDiscoveryUrl:
+    giteaAuthSourceSecret: gitea-auth-source
+    giteaAuthName: keycloak
+    giteaAuthProvider: openidConnect
+  resources:
+    addExternalCa:
+      limits:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+
+gitea:
+  strategy:
+    type: "Recreate"
+  enabled: true
+  image:
+    repository: proj-mxe/gitea/mxe-gitea
+    tag: v1.20.2-ubuntu-20240405
+    pullPolicy: Always
+    rootless: true
+  podSecurityContext:
+    runAsNonRoot: true
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      add:
+        - chown
+        - dac_override
+        - fowner
+        - setgid
+        - setuid
+        - net_bind_service
+      drop:
+       - all    
+    privileged: false
+    readOnlyRootFilesystem: false
+  redis-cluster:
+    enabled: false
+  postgresql-ha:
+    enabled: false
+  postgresql:
+    enabled: false
+  ingress:
+    enabled: true
+    className: eric-mxe-ingress-controller-class
+    annotations:
+      ericsson.com/product-name: mxe-deployer
+      mxe.nginx.ingress.kubernetes.io/backend-protocol: HTTP
+  resources:
+    limits:
+      cpu: 800m
+      memory: 2048Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+terminationGracePeriodSeconds: 30
+
+eric-mxe-deployer-service:
+  resources:
+    deployerService:
+      limits:
+        cpu: 500m
+        memory: 640Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    kubernetesModifier:
+      limits:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+    keycloakDeployerInit:
+      limits:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+    argocdDeployerInit:
+      limits:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        ephemeral-storage: 50Mi
+        memory: 100Mi
+
+tolerations: []
+
+# DR-D1123-127 -  ADP services shall define AppArmor profile
+appArmorProfile:
+  type:
+  localhostProfile:
+# DR-D1123-128 - ADP services shall define Seccomp profile
+seccompProfile:
+  type: RuntimeDefault
+  localhostProfile:
+
+## ArgoCD Ingress.
+## Hostnames must be provided if Ingress is enabled.
+## Secrets must be manually created in the namespace
+argocdIngress:
+  ingressClassName: eric-mxe-ingress-controller-class
+  enabled: false
+  annotations:
+    mxe.nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    mxe.nginx.ingress.kubernetes.io/backend-protocol: HTTP
+  hostName: #argocd.example.com
+  paths: 
+    - /
+  serviceName: argocd-server
+  # -- Ingress TLS configuration
+  tls: []
+    # - secretName: your-certificate-name
+    #   hosts:
+    #     - argocd.example.com

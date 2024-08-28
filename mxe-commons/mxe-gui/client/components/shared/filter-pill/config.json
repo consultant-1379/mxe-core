@@ -1,0 +1,8 @@
+{
+  "script": "filter-pill/FilterPill",
+  "id": "FilterPill",
+  "data": {},
+  "dependencies": {
+    "@eui/lit-component": "^0.9.0"
+  }
+}

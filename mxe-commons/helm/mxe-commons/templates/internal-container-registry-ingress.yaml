@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ template "mxe-commons.internal-container-registry.name" . }}-ingress
+  labels:
+    app: {{ template "mxe-commons.internal-container-registry.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/name: {{ include "mxe-commons.internal-container-registry.name" . }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: {{ template "mxe-commons.internal-container-registry.name" . }}
+  annotations:
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+    {{- include "mxe-commons.internal-container-registry.ingress.annotations" . | trim | nindent 4 }}
+spec:
+  ingressClassName: {{ index .Values "internal-container-registry" "ingress" "ingressClass" }}
+  {{- if index .Values "internal-container-registry" "ingress" "tls" "enabled" }}
+  tls:
+    - hosts:
+        - {{ include "mxe-commons.api-host" . }}
+      secretName: {{ index .Values "internal-container-registry" "ingress" "tls" "secretName" }}
+  {{ end }}
+  rules:
+    - host: {{ include "mxe-commons.api-host" . }}
+      http:
+        paths:
+          - path: /v2
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "mxe-commons.internal-container-registry.service.name" . }}
+                port:
+                  number: {{ index .Values "internal-container-registry" "ingress" "service" "port" }}
+        {{- if index .Values "internal-container-registry" "ingress" "metrics" "enabled" }}
+          - path: /metrics
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "mxe-commons.internal-container-registry.metrics.service.name" . }}
+                port:
+                  number: {{ index .Values "internal-container-registry" "ingress" "metrics" "service" "port" }}
+        {{- end }}

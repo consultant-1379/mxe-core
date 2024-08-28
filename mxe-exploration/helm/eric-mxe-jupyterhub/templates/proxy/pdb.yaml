@@ -1,0 +1,26 @@
+{{- if .Values.proxy.chp.pdb.enabled -}}
+{{- if .Capabilities.APIVersions.Has "policy/v1" }}
+apiVersion: policy/v1
+{{- else }}
+apiVersion: policy/v1beta1
+{{- end }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "eric-mxe-jupyterhub.proxy-pod-distribution-budget-name" . | quote }}
+  labels:
+    app.kubernetes.io/component: "jupyterhub-proxy-pod-distribution-budget"
+    app.kubernetes.io/name: {{ include "eric-mxe-jupyterhub.proxy-pod-distribution-budget-name" . | quote }}
+    {{- include "jupyterhub.labels" . | nindent 4 }}
+spec:
+  {{- if not (typeIs "<nil>" .Values.proxy.chp.pdb.maxUnavailable) }}
+  maxUnavailable: {{ .Values.proxy.chp.pdb.maxUnavailable }}
+  {{- end }}
+  {{- if not (typeIs "<nil>" .Values.proxy.chp.pdb.minAvailable) }}
+  minAvailable: {{ .Values.proxy.chp.pdb.minAvailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: "mxe"
+      app.kubernetes.io/component: "jupyterhub-proxy"
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+{{- end }}

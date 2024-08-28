@@ -1,0 +1,27 @@
+{{- if .Values.global.security.tls.enabled -}}
+apiVersion: siptls.sec.ericsson.com/v1
+kind: InternalCertificate
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: {{ include "eric-mxe-jupyterhub.proxy-name" . }}-pg-cert
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: jupyterhub-proxy"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-jupyterhub.proxy-name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-jupyterhub.labels" . | fromYaml -}}
+    {{- include "eric-mxe-jupyterhub.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-jupyterhub.mergeAnnotations" . | nindent 4 }}
+spec:
+  kubernetes:
+    generatedSecretName: {{ include "eric-mxe-jupyterhub.proxy-name" . }}-pg-cert
+    certificateName: {{ include "eric-mxe-jupyterhub.pg-client-cert" . }}
+    privateKeyName: {{ include "eric-mxe-jupyterhub.pg-private-key" . }}
+  certificate:
+    subject:
+      cn: {{ include "eric-mxe-jupyterhub.proxy-name" . | replace "-" "" }}
+    issuer:
+      reference: {{  include "eric-mxe-jupyterhub.pg-ca-issuer" . | quote}}
+    extendedKeyUsage:
+      tlsClientAuth: true
+      tlsServerAuth: false
+{{- end -}}

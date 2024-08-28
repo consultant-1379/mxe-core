@@ -1,0 +1,30 @@
+{{- $gitCreds := (index .Values "config" "git" "accessSecret") -}}
+{{- $giteaAdminCreds := (index .Values "config" "git" "internal" "adminAccessSecret") -}}
+{{- $shouldCreate := (index .Values "config" "git" "internal" "enabled") -}}
+{{- $argocdUIURL := (include "eric-mxe-deployer-service.argocdui-url" . ) -}}
+{{- $userEmail := (index .Values "config" "git" "internal" "userEmail") -}}
+mxeGitopsRepo:
+  repo:
+    url: {{ include "eric-mxe-deployer-service.gitOpsRepoURL" . }}
+    {{- if eq (include "eric-mxe-deployer-service.gitOpsRepoConnProtocol" .) "ssh" }}
+    sshPrivateKeySecret:
+      name: {{ $gitCreds }}
+      key: sshPrivateKey
+    {{- else }}
+    userNameSecret:
+      name: {{ $gitCreds }}
+      key:  username
+    passwordSecret:
+      name: {{ $gitCreds }}
+      key: password
+    {{- end }}
+  userEmail: {{ $userEmail }} 
+  shouldCreate: {{ $shouldCreate }}
+  gitAdminCredentials:
+    userNameSecret: 
+      name: {{ $giteaAdminCreds }}
+      key:  username
+    passwordSecret: 
+      name: {{ $giteaAdminCreds }}
+      key:  password
+url: {{ $argocdUIURL }}

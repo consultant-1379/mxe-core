@@ -1,0 +1,12 @@
+/* style goes here */
+:host {
+  display: block;
+}
+
+.index {
+  margin-right: 12px;
+}
+
+.inline {
+  display: inline;
+}

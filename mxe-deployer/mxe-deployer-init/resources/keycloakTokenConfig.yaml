@@ -1,0 +1,10 @@
+hostname: https://mxe.olah015.rnd.gic.ericsson.se/
+realm: master
+client_id: admin-cli
+usernameSecret:
+  name: eric-mxe-gatekeeper-keycloak-access-creds-hooked
+  key: kcadminid
+passwordSecret:
+  name: eric-mxe-gatekeeper-keycloak-access-creds-hooked
+  key: kcpasswd
+grant_type: password

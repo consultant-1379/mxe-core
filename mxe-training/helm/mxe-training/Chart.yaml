@@ -1,0 +1,10 @@
+apiVersion: v2
+appVersion: 1.0.0
+description: A Helm chart for MXE Training
+name: mxe-training
+version: 1.0.0-0
+dependencies:
+  - name: eric-mxe-training-pre-upgrade-job
+    version: MXE_VERSION
+  - name: eric-mxe-model-training-service
+    version: MXE_VERSION

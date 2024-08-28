@@ -1,0 +1,3720 @@
+modelVersion: 2.0
+
+# Import the file containing the versions of external dependencies
+import:
+  dependency: dependencies.yaml
+
+docker-images:
+  - asciidoc-builder: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-asciidocbuilder:latest
+  - doc-builder: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-docbuilder:latest
+  - adp-release-auto: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-adp-release-auto:latest
+  - k8s-test: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-py3kubehelmbuilder:latest
+  - java8-maven-builder: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-javamvnbuilder.minideb:latest
+  - java11-maven-builder: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-java11mvnbuilder:latest
+  - java17-maven-builder: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-java17mvnbuilder:latest
+  - go-builder: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-gobuilder.adp-base-os:latest
+  - nodejs-builder: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/adp-nodejs-lts-builder-image:16.15.0-0
+  - helm-dr-check: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/common-library-adp-helm-dr-check:latest
+  - image-dr-check: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/adp-image-dr-check:latest
+  - selenium-firefox: armdocker.rnd.ericsson.se/selenium/standalone-firefox-debug:latest
+  - selenium-chrome: armdocker.rnd.ericsson.se/selenium/standalone-chrome-debug:latest
+  - robot-framework: armdocker.rnd.ericsson.se/proj-mxe-ci-internal/mxe-test/robot-framework:20240417143827
+  - mxe-toolkit: armdocker.rnd.ericsson.se/proj-mxe-ci-internal/mxe-toolkit:20240425-ubuntu-20240405
+  - skopeo: armdocker.rnd.ericsson.se/proj-mxe-ci-internal/skopeo/stable:v1.7.0
+  - python3-builder: armdocker.rnd.ericsson.se/proj-mlops-drop/tools/jl-ext-builder:latest
+
+properties:
+  - docker-image-registry-server: armdocker.rnd.ericsson.se
+  - docker-image-registry-server-sero: serodocker.sero.gic.ericsson.se
+  - docker-image-repopath-release: proj-mxe-release
+  - docker-image-repopath-drop: proj-mxe
+  - docker-image-repopath-dev: proj-mxe-ci-internal
+  - docker-image-repo-internal: ${docker-image-registry-server}/${docker-image-repopath-dev}
+  - docker-image-repo-public: ${docker-image-registry-server}/${docker-image-repopath-drop}
+  - docker-image-repo-release: ${docker-image-registry-server}/${docker-image-repopath-release}
+  - helm: "helm"
+  - helm-commons-chart-name: mxe-commons
+  - helm-deployer-chart-name: mxe-deployer
+  - helm-serving-chart-name: mxe-serving
+  - helm-training-chart-name: mxe-training
+  - helm-workflow-chart-name: mxe-workflow
+  - helm-exploration-chart-name: mxe-exploration
+  - helm-chart-repository-server: https://armdocker.rnd.ericsson.se/artifactory
+  - helm-chart-repopath-release: proj-mxe-release-helm
+  #- helm-chart-repopath-drop: proj-mxe-drop-helm
+  - helm-chart-repopath-drop: proj-mxe-helm
+  - helm-chart-repopath-dev: proj-mxe-dev-helm
+  - helm-chart-repo-internal: ${helm-chart-repository-server}/${helm-chart-repopath-dev}
+  - helm-chart-repo-public: ${helm-chart-repository-server}/${helm-chart-repopath-drop}
+  - helm-chart-repo-release: ${helm-chart-repository-server}/${helm-chart-repopath-release}
+  - generic-repository-server: https://armdocker.rnd.ericsson.se/artifactory
+  - generic-repopath-release: proj-mxe-release-generic
+  #- generic-repopath-drop: proj-mxe-drop-generic
+  - generic-repopath-drop: proj-mxe-generic
+  - generic-repopath-dev: proj-mxe-dev-generic
+  - generic-repo-internal: ${generic-repository-server}/${generic-repopath-dev}
+  - generic-repo-public: ${generic-repository-server}/${generic-repopath-drop}
+  - generic-repo-release: ${generic-repository-server}/${generic-repopath-release}
+  - generic-repo-deps: ${generic-repository-server}/proj-mxe-deps-generic-local
+  - helm-chart-adp-sm-controller-crd: ${dependency.helm-chart-adp-sm-controller-crd}
+  - helm-chart-eric-sec-sip-tls-crd:  ${dependency.helm-chart-eric-sec-sip-tls-crd}
+  - helm-chart-eric-data-distributed-coordinator-ed:  ${dependency.helm-chart-eric-data-distributed-coordinator-ed}
+  - helm-chart-eric-sec-key-management:  ${dependency.helm-chart-eric-sec-key-management}
+  - helm-chart-eric-sec-sip-tls:  ${dependency.helm-chart-eric-sec-sip-tls}
+  - helm-chart-eric-mesh-controller: ${dependency.helm-chart-eric-mesh-controller}
+  - helm-chart-adp-eric-ctrl-bro: ${dependency.helm-chart-adp-eric-ctrl-bro}
+  - helm-chart-eric-data-document-database-pg-crd: ${dependency.helm-chart-eric-data-document-database-pg-crd}
+  - iam-image-mxe-path: mxe/eric-sec-access-mgmt-image
+  - iam-image-mxe: mxe/eric-sec-access-mgmt-image:${env.dependency.IAM_VERSION}
+  - mxe-commons-docker-images: >
+      mxe/eric-mxe-db-init,
+      mxe/eric-mxe-author-service,
+      mxe/eric-mxe-default-backend,
+      mxe/eric-mxe-gui,
+      mxe/eric-mxe-pre-upgrade-job,
+      mxe/eric-mxe-kubernetes-modifier,
+      mxe/eric-mxe-keycloak-init,
+      mxe/eric-mxe-gatekeeper,
+      mxe/eric-mxe-cli,
+
+  - mxe-deployer-docker-images: >
+      mxe/eric-mxe-deployer-service,
+      mxe/eric-mxe-deployer-init,
+
+  - mxe-serving-docker-images: >
+      mxe/eric-mxe-model-service,
+      mxe/eric-mxe-model-catalogue-service,
+      mxe/eric-mxe-model-packager,
+      mxe/eric-mxe-model-python-base,
+
+  - mxe-workflow-docker-images: >
+      mxe/eric-mxe-kafka-pyconsumer,
+      mxe/eric-mxe-argoexec-packager,
+
+  - mxe-training-docker-images: >
+      mxe/eric-mxe-model-training-service,
+      mxe/eric-mxe-model-training-packager,
+      mxe/eric-mxe-training-python-base,
+
+  - mxe-exploration-docker-images: >
+      mxe/eric-mxe-jupyterhub,
+      mxe/eric-mxe-jupyterlab,
+      mxe/eric-mxe-configurable-http-proxy,
+
+  - docker-images-mxe: >
+      ${mxe-commons-docker-images}
+      ${mxe-deployer-docker-images}
+      ${mxe-serving-docker-images}
+      ${mxe-workflow-docker-images}
+      ${mxe-training-docker-images}
+      ${mxe-exploration-docker-images}
+
+  - mxe-commons-offline-images-archive: mxe-commons-offline-installer-images-${var.offline-packages-version}.tar
+  - mxe-deployer-offline-images-archive: mxe-deployer-offline-installer-images-${var.offline-packages-version}.tar
+  - mxe-serving-offline-images-archive: mxe-serving-offline-installer-images-${var.offline-packages-version}.tar
+  - mxe-workflow-offline-images-archive: mxe-workflow-offline-installer-images-${var.offline-packages-version}.tar
+  - mxe-training-offline-images-archive: mxe-training-offline-installer-images-${var.offline-packages-version}.tar
+  - mxe-exploration-offline-images-archive: mxe-exploration-offline-installer-images-${var.offline-packages-version}.tar
+  - mxe-pre-req-offline-images-archive: mxe-pre-req-offline-installer-images-${var.offline-packages-version}.tar
+  - namespace: ${env.NAMESPACE}
+  - deployer-namespace: ${env.DEPLOYER_NAMESPACE}
+  - release: ${env.RELEASE_NAME}
+  - deployer-release: ${env.DEPLOYER_RELEASE_NAME}
+  - docker-flags-alpine: --volume /etc/localtime:/etc/localtime:ro
+  - docker-flags-debian: --env TZ="$(cat /etc/timezone)"
+  - docker-flags-maven: --volume ${env.MAVEN_REPO_LOCAL}:${env.MAVEN_REPO_LOCAL} ${docker-flags-debian}
+  - docker-flags-go: "--env GOCACHE=${env.GOCACHE} --volume ${env.GOCACHE}:${env.GOCACHE} --env GOPATH=${env.GOPATH}   --volume ${env.GOPATH}:${env.GOPATH} ${docker-flags-alpine}"
+  - docker-flags-kubeconfig: "--env KUBECONFIG=/tmp/admin.conf --volume ${env.KUBECONFIG}:/tmp/admin.conf:ro"
+  - docker-flags-k8ssecrets: "--volume ${env.MXESECRETS}:/tmp/secrets.tar.gz:ro"
+  - docker-flags-registrycerts: "--volume ${env.PRIVATE_REGISTRY_CERTS}:/tmp/registrycerts.tar.gz:ro"
+  - docker-flags-adp-release-auto: "--env HELM_REPO_CREDENTIALS=/tmp/helm_credentials.yaml --volume ${env.HELM_REPO_CREDENTIALS}:/tmp/helm_credentials.yaml:ro"
+  - docker-flags-helm3-enable: "--env ENABLE_HELM_V3=true --env HELM_VERSION=${env.HELM_VERSION}"
+  - docker-flags-helm3: "--env XDG_DATA_HOME=${env.PWD}/.bob/helm/data --env XDG_CACHE_HOME=${env.PWD}/.bob/helm/cache --env XDG_CONFIG_HOME=${env.PWD}/.bob/helm/config --env HELM_VERSION=${env.HELM_VERSION} -w /tmp"
+  - docker-flags-certs: "--volume /etc/ssl/certs:/etc/ssl/certs:ro --volume /usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro --volume /usr/share/ca-certificates:/usr/share/ca-certificates:ro"
+  - docker-flags-mxe-deployer: "--volume ${env.PWD}/.bob/mxe-deployer-config/:/home/helmuser/.mxe-deploy/"
+  - values-generator-config: "${env.PWD}/resources/testenv/${env.SYSTEM}/values/config.yaml"
+  - pre-req-helmfile-state-values: "${env.PWD}/resources/testenv/${env.SYSTEM}/values/pre-requisites-config.yaml"
+
+env:
+  - PWD
+  - USER (default=mxecifunc)
+  - HOME
+  - KUBECONFIG (default=${env.HOME}/.kube/config)
+  - MXESECRETS (default=${env.PWD}/resources/secrets.tar.gz)
+  - PRIVATE_REGISTRY_CERTS (default=${env.PWD}/resources/registrycerts.tar.gz)
+  - HELM_REPO_CREDENTIALS (default=${env.PWD}/resources/helm_credentials.yaml)
+  - API_TOKEN (default=notset)
+  - API_TOKEN_SERO (default=notset)
+  - CHART_NAME (default=notset)
+  - CHART_VERSION (default=notset)
+  - CHART_REPO (default=notset)
+  - GOCACHE (default=${env.HOME}/.cache/go-build)
+  - GOPATH (default=${env.HOME}/go)
+  - MAVEN_REPO_LOCAL (default=${env.HOME}/.m2/repository)
+  - MXE_USER (default=mxe-user)
+  - MXE_PASSWORD (default=password)
+  - SYSTEM (default=hahn081)
+  - TESTMXEENDPOINT (default=https://mxe.hahn081.rnd.gic.ericsson.se)
+  - TESTDEPLOYERENDPOINT (default=https://mxe-deployer.hahn081.rnd.gic.ericsson.se)
+  - TESTDEPLOYERAUTHENDPOINT (default=https://oauth.mxe.hahn081.rnd.gic.ericsson.se)
+  - PRIVATE_DOCKER_REGISTRY_HOST (default=registry.hahn081.rnd.gic.ericsson.se)
+  - ARGOCD_KEYCLOAKADMIN_USER (default=argocd-admin)
+  - ARGOCD_KEYCLOAKADMIN_PASSWORD (default=admin-pass)
+  - TEST_BASE_VERSION (default=null)
+  - TEST_BASE_VALUES_YAML (default=values.yaml)
+  - TEST_BASE_VALUES_DIR (default=values)
+  - TEST_TARGET_VERSION (default=notset)
+  - TEST_SUITES_TO_RUN (default=notset)
+  - UPGRADE (default=false)
+  - RELEASE (default=false)
+  - RELEASE_ARTIFACTS_FOLDER (default=release)
+  - RELEASE_CANDIDATE_VERSION (default=notset)
+  - RELEASE_VERSION (default=notset)
+  - MINIO_MODE (default=standalone) ## Added to run minio in 'standalone' mode for reduced resource usage. Unset for normal/distributed object storage.
+  - NEXT_VERSION_PREFIX (default=notset)
+  - GITOPS_REPO (default=https://gitea.mxe.hahn081.rnd.gic.ericsson.se/mxe/mxe-gitops.git)
+  - VERSION_PREFIX_FILE (default=VERSION_PREFIX)
+  - ROBOT_REPORTS_DIR (default=${env.PWD}/mxe-test-reports)
+  - ROBOT_TESTS_DIR (default=${env.PWD}/mxe-test)
+  - TEST_DATA_DIR (default=${env.PWD}/mxe-test/testdata)
+  - GITHUB_TOKEN (default=notset)
+  - KEYCLOAK_USERNAME (default=admin)
+  - KEYCLOAK_PASSWORD (default=My-super-secret-pw123)
+  - HELM_VERSION(default=3.13.0)
+  - RELEASE_BRANCH (default=notset)
+  - NAMESPACE (default=mxe-ci)
+  - DEPLOYER_NAMESPACE (default=mxe-ci)
+  - RELEASE_NAME (default=mxe-ci)
+  - DEPLOYER_RELEASE_NAME (default=mxe-ci) 
+  - STABLE_MXE_VERSION (default=not-set)   ## Added for storing the last successful MXE build version. Can be used for scenarios like offline test
+  - PRIVATE_REGISTRY_NAMESPACE (default=registry)
+  - OFFLINE_INSTALLATION (default=false)  ## Indicates if MXE should be installed using images from armdocker or not
+  - TLS_ENABLED (default=true)
+  - IAM_VERSION (default=${env.dependency.IAM_VERSION})
+  - SKIP_VALIDATE (default=false)
+  - AUDIT_SCAN(default=false)
+  - DOCKER_NETWORK (default=--network host)
+  - SERO_ARTIFACTORY_REPO_USER
+  - SERO_ARTIFACTORY_REPO_PASS (default=test)
+  - COLLECT_LOGS_SCRIPT_LOCATION (default="https://arm.sero.gic.ericsson.se/artifactory/proj-ADP_GS_Support_FTP-generic-local/collect_ADP_logs")
+  - COLLECT_LOGS_SCRIPT_FILE_NAME (default="collect_ADP_logs.sh")
+  - COLLECT_LOGS_SINCE_RELATIVE_TIME (default="2h")
+  - COLLECT_LOGS_DIR (default=./k8s-logs)
+
+var:
+  - version
+  - chart-version
+  - docker-image-repopath
+  - docker-image-repo
+  - helm-chart-repopath
+  - helm-chart-repo
+  - generic-repo
+  - release-artifacts-folder
+  - release-candidate-version
+  - offline-packages-version
+  - suite
+  - install-version
+  - install-values-yaml
+  - install-helm-chart
+  - jcat-suites-to-run
+  - mesh-controller-crd-version
+  - mxe-deployer-install-helm-chart
+  - mxe-deployer-install-values-yaml
+  - mxe-install-values-yaml
+  - appName
+  - sleepTime
+  - iterations
+  - mxe-deployer-config-dir
+  - pipeline-scripts-dir
+  - robot-include-tag
+  - robot-exclude-tag
+  - robot-test-suite-to-run
+  - robot-test-report-dir
+  - robot-executable
+  - robot-fw-image-date-tag
+  - docker-images-2pp
+  - crd-chart-urls
+  - git-commit-short-hash
+  - mode
+  - script_version
+  - python-model-base-image
+
+rules:
+  # Aggregate for all of the typically used rules
+  all:
+    - rule: clean
+    - rule: init
+    - rule: lint
+    - rule: generate-docs
+    - rule: build
+    - rule: init-dev
+    - rule: image
+    - rule: chart
+
+  # Make sure repo is clean
+  clean:
+    - task: go-clean
+      cmd: rm -rf cli/bin
+    - task: bob
+      cmd: rm -rf .bob/
+    - task: mvnclean
+      cmd: >
+        rm -rf
+        mxe-exploration/image/jupyterhub/build
+        mxe-serving/modelservice/target
+        mxe-commons/default-backend/target
+        mxe-serving/model-catalogue-service/target
+        mxe-training/model-training-service/target
+        mxe-commons/author-service/target
+        mxe-jcat/target
+        mxe-commons/keycloak/init/target
+        mxe-commons/keycloak/keycloak-event-listener/target
+        mxe-commons/backend-services-common/target
+
+  get-mxe-images:
+    - task: save_to_file
+      cmd: bash -c '''
+        while read -r -d, image; do
+        images+=("$image");
+        done <<< "${docker-images-mxe}";
+        printf "%s, " "${images[@]}" > .bob/docker-images-mxe;'''
+  
+  conditions:
+    - task: offline-install
+      cmd: test "${env.OFFLINE_INSTALLATION}" = "true"
+    - task: offline-install-with-tls-disabled
+      cmd: test "${env.OFFLINE_INSTALLATION}" = "true" && test "${env.TLS_ENABLED}" = "false"
+    - task: tls-disabled
+      cmd:  test "${env.TLS_ENABLED}" = "false"
+    - task: is-pra-release 
+      cmd: test "${env.RELEASE}" = "true" && test "${env.RELEASE_VERSION}" != "notset" && test "${env.RELEASE_CANDIDATE_VERSION}" != "notset"
+    - task: is-upgrade
+      cmd: test "${env.UPGRADE}" = "true"
+    - task: is-release
+      cmd: test "${env.RELEASE}" = "true"
+
+  info:
+    - task: printenv
+      cmd: printenv | sort
+
+  # Generate version
+  init:
+    - task: version
+      docker-image: adp-release-auto
+      cmd: generate-version --is-release=${env.RELEASE} -f ${env.VERSION_PREFIX_FILE} --output=version
+    - task: git-commit-hash
+      docker-image: adp-release-auto
+      cmd:
+        - git rev-parse --short=7 HEAD > .bob/var.git-commit-short-hash
+    - rule: set-python-base-image
+
+  init-dev:
+    - task: version
+      cmd:
+        - echo "${var.version}"                > .bob/var.offline-packages-version
+    - task: docker-helm-generic-settings-internal
+      cmd:
+        - echo "${docker-image-repopath-dev}"               > .bob/var.docker-image-repopath
+        - echo "${docker-image-repo-internal}"              > .bob/var.docker-image-repo
+        - echo "${helm-chart-repopath-dev}"                 > .bob/var.helm-chart-repopath
+        - echo "mxe-deployer/${helm-chart-repopath-dev}"    > .bob/var.mxe-deployer.helm-chart-repopath
+        - echo "${helm-chart-repo-internal}"                > .bob/var.helm-chart-repo
+        - echo "${generic-repo-internal}"                   > .bob/var.generic-repo
+        - echo "${env.PWD}/pipeline-scripts"      > .bob/var.pipeline-scripts-dir
+
+  init-drop:
+    - task: version
+      cmd:
+        - echo "${var.version}"                > .bob/var.offline-packages-version
+    - task: docker-helm-generic-settings-public
+      cmd:
+        - echo "${docker-image-repopath-drop}" > .bob/var.docker-image-repopath
+        - echo "${docker-image-repo-public}"   > .bob/var.docker-image-repo
+        - echo "${helm-chart-repopath-drop}"   > .bob/var.helm-chart-repopath
+        - echo "${helm-chart-repo-public}"     > .bob/var.helm-chart-repo
+        - echo "${generic-repo-public}"        > .bob/var.generic-repo
+        - echo "${env.PWD}/pipeline-scripts"   > .bob/var.pipeline-scripts-dir
+
+  init-release:
+    - task: version
+      cmd:
+        - echo "${env.RELEASE_CANDIDATE_VERSION}" > .bob/var.offline-packages-version
+        - echo "${env.RELEASE_VERSION}"           > .bob/var.version
+        - echo "${env.RELEASE_CANDIDATE_VERSION}" > .bob/var.release-candidate-version
+        - echo "${env.RELEASE_ARTIFACTS_FOLDER}"  > .bob/var.release-artifacts-folder
+    - task: docker-helm-generic-settings-release
+      cmd:
+        - echo "${docker-image-repopath-release}" > .bob/var.docker-image-repopath
+        - echo "${docker-image-repo-release}"     > .bob/var.docker-image-repo
+        - echo "${helm-chart-repopath-release}"   > .bob/var.helm-chart-repopath
+        - echo "${helm-chart-repo-release}"       > .bob/var.helm-chart-repo
+        - echo "${generic-repo-release}"          > .bob/var.generic-repo
+        - echo "${env.PWD}/pipeline-scripts"      > .bob/var.pipeline-scripts-dir
+
+  # Lint
+  lint:
+    - task: markdownlint
+      docker-image: doc-builder
+      cmd: markdownlint --config /etc/markdownlint-cli/adp.yaml $(git ls-files -- \*\.[mM][dD] | cat | xargs)
+    - task: helmlint-eric-mxe-spark
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-workflow/helm/eric-mxe-spark --values ./mxe-workflow/helm/mxe-workflow/values.yaml
+    - task: helmlint-model-service
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-serving/helm/eric-mxe-model-service --values ./mxe-serving/helm/mxe-serving/values.yaml
+    - task: helmlint-model-catalogue-service
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-serving/helm/eric-mxe-model-catalogue-service --values ./mxe-serving/helm/mxe-serving/values.yaml
+    - task: helmlint-model-training-service
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-training/helm/eric-mxe-model-training-service --values ./mxe-training/helm/mxe-training/values.yaml
+    - task: helmlint-author-service
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-commons/helm/eric-mxe-author-service --values ./mxe-commons/helm/mxe-commons/values.yaml
+    - task: helmlint-default-backend
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-commons/helm/eric-mxe-default-backend --values ./mxe-commons/helm/mxe-commons/values.yaml
+    - task: helmlint-integration-chart
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-commons/helm/mxe-commons
+    - task: helmlint-gui
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-commons/helm/eric-mxe-gui --values ./mxe-commons/helm/mxe-commons/values.yaml
+    - task: helmlint-meshgw-ingress
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-commons/helm/eric-mxe-meshgw-ingress --values ./mxe-commons/helm/mxe-commons/values.yaml
+    - task: helmlint-argo
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-workflow/helm/eric-mxe-argo --values ./mxe-workflow/helm/mxe-workflow/values.yaml
+    - task: helmlint-prometheus
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-commons/helm/eric-mxe-prometheus --values ./mxe-commons/helm/mxe-commons/values.yaml
+    - task: helmlint-mxe-commons-upgrade-jobs
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-commons/helm/eric-mxe-upgrade-jobs --values ./mxe-commons/helm/mxe-commons/values.yaml
+    - task: helmlint-mxe-serving-upgrade-jobs
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-serving/helm/eric-mxe-serving-upgrade-jobs --values ./mxe-serving/helm/mxe-serving/values.yaml
+    - task: helmlint-serving-pre-upgrade-job
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-serving/helm/eric-mxe-serving-pre-upgrade-job --values ./mxe-serving/helm/mxe-serving/values.yaml
+    - task: helmlint-training-pre-upgrade-job
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-training/helm/eric-mxe-training-pre-upgrade-job --values ./mxe-training/helm/mxe-training/values.yaml
+    - task: helmlint-commons-pre-upgrade-job
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-commons/helm/eric-mxe-commons-pre-upgrade-job --values ./mxe-commons/helm/mxe-commons/values.yaml
+    - task: helmlint-gatekeeper
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-commons/helm/eric-mxe-gatekeeper --values ./mxe-commons/helm/mxe-commons/values.yaml
+    - task: helmlint-seldon-service-account
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-serving/helm/eric-mxe-seldon-service-account --values ./mxe-serving/helm/mxe-serving/values.yaml
+    - task: helmlint-pypiserver
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-commons/helm/eric-mxe-pypiserver --values ./mxe-commons/helm/mxe-commons/values.yaml
+    - task: helmlint-dm-server
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-deployer/helm/eric-mxe-deployer-service --values ./mxe-deployer/helm/mxe-deployer/values.yaml
+    - task: helmlint-dm-integration-chart
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-deployer/helm/mxe-deployer
+    - task: helmlint-mxe-training
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-training/helm/mxe-training
+    - task: helmlint-mxe-workflow
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-workflow/helm/mxe-workflow
+    - task: helmlint-mxe-exploration
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-exploration/helm/mxe-exploration
+    - task: helmlint-mxe-serving
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: ${helm} lint ./mxe-serving/helm/mxe-serving
+    - task: npmlint-gui
+      docker-image: nodejs-builder
+      cmd: bash -c '
+        export HOME=/tmp/mxe;
+        mkdir -p ~/.npm-global;
+        export NPM_CONFIG_PREFIX=~/.npm-global;
+        npm --prefix ./mxe-commons/mxe-gui install && npm --prefix ./mxe-commons/mxe-gui run lint && npm --prefix ./mxe-commons/mxe-gui run lint:prettier && npm --prefix ./mxe-commons/mxe-gui run lint:style'
+
+  codeformat:
+    - task: backend-services
+      docker-image: java11-maven-builder
+      docker-flags:
+        - "${docker-flags-maven}"
+      cmd: mvn -Duser.home=. -Drevision=${var.version} -s settings.xml -Dmaven.repo.local=${env.MAVEN_REPO_LOCAL} -f mxe-commons/backend-services formatter:format
+    - task: mxe-jcat
+      docker-image: java8-maven-builder
+      docker-flags:
+        - "${docker-flags-maven}"
+      cmd: mvn -Duser.home=. -Drevision=${var.version} -s mxe-jcat/settings.xml -Dmaven.repo.local=${env.MAVEN_REPO_LOCAL} -f mxe-jcat formatter:format
+    - task: keycloak-event-listener
+      docker-image: java8-maven-builder
+      docker-flags:
+        - "${docker-flags-maven}"
+      cmd: mvn -Duser.home=. -Drevision=${var.version} -s settings.xml -Dmaven.repo.local=${env.MAVEN_REPO_LOCAL} -f mxe-commons/keycloak/keycloak-event-listener formatter:format
+
+  # Generate documents: cpi sdifs
+  generate-docs:
+    - task: asciidoc-to-sdif
+      docker-image: asciidoc-builder
+      cmd: /adp_build_doc.sh --project-dir=${env.PWD} --build-dir=${env.PWD}/build
+
+  go-linux-build-mxe-generate:
+    - task: make-binary
+      cmd:
+        - DOCKER_BUILDKIT=1 docker build --no-cache
+          --build-arg VERSION=${var.version}
+          -f values-file-generator/clibuild/Dockerfile
+          --target bin
+          --output values-file-generator/bin/
+          --platform linux
+          values-file-generator  --progress=plain
+
+    - task: inspect
+      cmd: bash -c "
+        echo -e '\n______ Inspecting Linux binary; ______\n';
+        file values-file-generator/bin/linux/mxe-generate;
+        echo -e '\n\n'"
+
+    - task: copy-to-essentials
+      cmd:
+        - chmod +x values-file-generator/bin/linux/mxe-generate
+        - cp values-file-generator/bin/linux/mxe-generate essentials/mxe-generate-linux
+
+  generate-values-using-mxe-generate-linux:   
+    - task: update-tls-flags-in-config-file
+      condition: conditions:offline-install-with-tls-disabled OR conditions:tls-disabled
+      docker-image: mxe-toolkit
+      cmd: pipeline-scripts/update_tls_flags.sh ${pre-req-helmfile-state-values} ${values-generator-config} ${env.TLS_ENABLED}
+
+    - task: generate-values-files-for-ci
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - --env ERIC_MESH_CONTROLLER_VERSION=${dependency.eric-mesh-controller-version}
+        - --env namespace=${namespace}
+      cmd: bash -c '
+        set -ex;
+        rm -f ${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR}/mxe-*.yaml;
+
+        if [[ "${env.AUDIT_SCAN}" != "true" ]];then
+          mesh_version=$( kubectl get pod -n ${namespace} --selector "app.kubernetes.io/instance=eric-mesh-controller" -o jsonpath="{.items[0].metadata.labels.app\.kubernetes\.io/version}"|awk -F[_+-] '\''{print $1}'\''|tr -d "\n");
+          sed -i "s/SERVICE_MESH_VERSION/$mesh_version/g"  ${values-generator-config} ;
+        fi
+
+        if [[ "${env.SKIP_VALIDATE}" == "true" ]];then
+            ${env.PWD}/essentials/mxe-generate-linux values --cfg-file ${values-generator-config} --output-dir ${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR} --namespace ${namespace} --skipValidate;
+        else
+            ${env.PWD}/essentials/mxe-generate-linux values --cfg-file ${values-generator-config} --output-dir ${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR} --namespace ${namespace};
+        fi;
+        if [[ "${env.MINIO_MODE}" == "standalone" ]]; then
+          wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O ${env.PWD}/yq && chmod +x ${env.PWD}/yq;
+          ${env.PWD}/yq -i ".eric-data-object-storage-mn.mode = \"standalone\"" ${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR}/mxe-values.yaml;
+          ${env.PWD}/yq -i ".eric-data-object-storage-mn.replicas = 1" ${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR}/mxe-values.yaml;
+        fi; '
+        
+  go-linux-build:
+    - task: make-binary
+      cmd:
+        - DOCKER_BUILDKIT=1 docker build
+          --build-arg VERSION=${var.version}
+          --build-arg MODULE=mxe-deploy
+          --build-arg BUILDDIR=./dmcli
+          --build-arg GOVERSION=${env.dependency.GOVERSION}
+          -f mxe-deployer/mxe-deployer-service/clibuild/Dockerfile
+          --target bin
+          --output cli/bin/
+          --platform linux
+          mxe-deployer/mxe-deployer-service  --progress=plain
+
+        - DOCKER_BUILDKIT=1 docker build
+          --build-arg VERSION=${var.version}
+          --build-arg PYTHON_BASE_IMAGE=${var.python-model-base-image}
+          --build-arg MODULE=cli
+          --build-arg BUILDDIR=./...
+          --build-arg GOVERSION=${env.dependency.GOVERSION}
+          -f cli/build/Dockerfile
+          --target bin
+          --output cli/bin/
+          --platform linux
+          cli/  --progress=plain
+
+        - cp cli/bin/linux/mxe-*  cli/
+
+        - ./cli/build/scripts/make-archive.sh cli/bin/linux linux ${var.version}
+
+    - task: test
+      cmd: DOCKER_BUILDKIT=1 docker build
+        --build-arg VERSION=${var.version}
+        --build-arg MODULE=cli
+        --build-arg BUILDDIR=./...
+        --build-arg GOVERSION=${env.dependency.GOVERSION}
+        -f cli/build/Dockerfile
+        --target linux-test
+        --output cli/test-output
+        --platform linux
+        cli/  --progress=plain
+    # Separating this into a new task is partially a workaround too
+    # since there seems to be some sort of a delay when writing the
+    # binary onto the filesystem, but the exiting container flushes
+    - task: inspect
+      cmd: bash -c "
+        echo -e '\n______ Inspecting Linux binary; ______\n';
+        ls -lah cli/bin/linux/mxe-model;
+        ldd cli/bin/linux/mxe-model;
+        file cli/bin/linux/mxe-model;
+        echo -e '\n\n';"
+
+  go-windows-build:
+    - task: make-binary
+      cmd:
+        - DOCKER_BUILDKIT=1 docker build
+          --build-arg VERSION=${var.version}
+          --build-arg MODULE=mxe-deploy
+          --build-arg BUILDDIR=./dmcli
+          --build-arg GOVERSION=${env.dependency.GOVERSION}
+          -f mxe-deployer/mxe-deployer-service/clibuild/Dockerfile
+          --target bin
+          --output cli/bin/
+          --platform windows
+          mxe-deployer/mxe-deployer-service  --progress=plain
+
+        - DOCKER_BUILDKIT=1 docker build
+          --build-arg VERSION=${var.version}
+          --build-arg PYTHON_BASE_IMAGE=${var.python-model-base-image}
+          --build-arg MODULE=cli
+          --build-arg BUILDDIR=./...
+          --build-arg GOVERSION=${env.dependency.GOVERSION}
+          -f cli/build/Dockerfile
+          --target bin
+          --output cli/bin/
+          --platform windows
+          cli/  --progress=plain
+
+        - ./cli/build/scripts/make-archive.sh cli/bin/windows windows ${var.version}
+        # For the windows build the -ldflags '-s -w' flags
+        # don't seem to make any difference, as the DWARF
+        # format is not used so no DWARF symbol table to omit and
+        # the debug info is separated from the PE32+ file anyway.
+    - task: inspect
+      cmd: bash -c "
+        echo -e '\n______ Inspecting Windows binary; ______\n';
+        file cli/bin/windows/mxe-model.exe;
+        echo -e '\n\n'"
+
+  go-macos-build:
+    - task: make-binary
+      cmd:
+        - DOCKER_BUILDKIT=1 docker build
+          --build-arg VERSION=${var.version}
+          --build-arg MODULE=mxe-deploy
+          --build-arg BUILDDIR=./dmcli
+          --build-arg GOVERSION=${env.dependency.GOVERSION}
+          -f mxe-deployer/mxe-deployer-service/clibuild/Dockerfile
+          --target bin
+          --output cli/bin/
+          --platform darwin
+          mxe-deployer/mxe-deployer-service  --progress=plain
+
+        - DOCKER_BUILDKIT=1 docker build
+          --build-arg VERSION=${var.version}
+          --build-arg PYTHON_BASE_IMAGE=${var.python-model-base-image}
+          --build-arg MODULE=cli
+          --build-arg BUILDDIR=./...
+          --build-arg GOVERSION=${env.dependency.GOVERSION}
+          -f cli/build/Dockerfile
+          --target bin
+          --output cli/bin/
+          --platform darwin
+          cli/  --progress=plain
+
+        - ./cli/build/scripts/make-archive.sh cli/bin/darwin darwin ${var.version}
+
+  build:
+    # Java services
+    - task: backend-services
+      docker-image: java17-maven-builder
+      docker-flags:
+        - "${docker-flags-maven}"
+      cmd: mvn -Duser.home=. -Drevision=${var.version} -s settings.xml -Dmaven.repo.local=${env.MAVEN_REPO_LOCAL} -f mxe-commons/backend-services clean install
+    - task: keycloak-event-listener
+      docker-image: java17-maven-builder
+      docker-flags:
+        - "${docker-flags-maven}"
+      cmd: bash -c '
+        mvn -Duser.home=. -Drevision=${var.version} -s settings.xml -Dmaven.repo.local=${env.MAVEN_REPO_LOCAL} -f mxe-commons/keycloak/keycloak-event-listener clean package;
+        cp mxe-commons/keycloak/keycloak-event-listener/target/keycloak-event-listener-jar-with-dependencies.jar mxe-commons/keycloak/docker/keycloak-event-listener.jar'
+    - task: keycloak-themes
+      docker-image: java11-maven-builder
+      cmd: bash -c '
+        cd mxe-commons/keycloak/themes;
+        export CURRENT_YEAR=`date +"%Y"`;
+        sed -i -e "s/<<CURRENT_YEAR>>/$CURRENT_YEAR/" ./theme/mxe/login/template.ftl;
+        jar cvf ../../keycloak/docker/theme.jar ./*;'
+    - task: keycloak-gatekeeper
+      docker-image: go-builder
+      docker-flags:
+        - "${docker-flags-go}"
+      cmd: bash -c '
+        go version;
+        go env | sort;
+        cd ${env.PWD}/mxe-commons/keycloak/gatekeeper/keycloak-gatekeeper;
+        export LFLAGS="-X main.gitsha=d58b9c4 -X main.compiled=$(date "+%s")";
+        CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -a -tags netgo -modcacherw -ldflags "-w $LFLAGS" -o ../docker/target/keycloak-gatekeeper;
+        ls -lah ../docker/target/keycloak-gatekeeper;
+        ldd     ../docker/target/keycloak-gatekeeper;
+        file    ../docker/target/keycloak-gatekeeper;'
+    # GUI
+    - task: gui
+      docker-image: nodejs-builder
+      cmd: bash -c '
+        export HOME=/tmp/mxe;
+        sed -i -e "s/export const APP_VERSION =.*$/export const APP_VERSION = '\'${var.version}\'';/" ./mxe-commons/mxe-gui/client/utils/Config.js;
+        mkdir -p ~/.npm-global;
+        export NPM_CONFIG_PREFIX=~/.npm-global;
+        HUSKY_SKIP_INSTALL=1 npm --prefix ./mxe-commons/mxe-gui install && npm --prefix ./mxe-commons/mxe-gui run build;'
+    - task: mxe-jupyter-hub-extension
+      docker-image: python3-builder
+      docker-flags:
+              - "--volume ${env.PWD}:${env.PWD}"
+              - "--workdir ${env.PWD}"
+      cmd: jl-ext-builder build -o mxe-exploration/image/jupyterhub/build -s mxe-exploration/image/jupyterhub/extensions
+    # CLI
+    - task: mxe-jcat
+      docker-image: java8-maven-builder
+      docker-flags:
+        - "${docker-flags-maven}"
+      cmd: mvn -Duser.home=. -Drevision=${var.version} -s mxe-jcat/settings.xml -Dmaven.repo.local=${env.MAVEN_REPO_LOCAL} -f mxe-jcat clean install -Dmaven.install.skip=true
+    - task: make-essentials-zip
+      cmd: bash -c '
+        set -e;
+        cd essentials/;
+        zip -r ${env.PWD}/essentials/mxe-essentials-${var.version}.zip *;'
+
+  # Shortcut for Java projects
+  build-java-backend:
+    - task: build:backend-services
+
+  # Docker images
+  image:
+    - task: modelservice
+      cmd: docker build ./mxe-serving/modelservice/target/
+        -f ./docker/Dockerfile
+        --no-cache
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg PKG_NAME=modelservice-${var.version}.jar
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --label version=${var.version}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-model-service:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-model-service:${var.version}
+    - task: model-catalogue-service
+      cmd: docker build ./mxe-serving/model-catalogue-service/target/
+        -f ./docker/Dockerfile
+        --no-cache
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg PKG_NAME=modelcatalogueservice-${var.version}.jar
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --label version=${var.version}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-model-catalogue-service:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-model-catalogue-service:${var.version}
+    - task: model-training-service
+      cmd: docker build ./mxe-training/model-training-service/target/
+        -f ./docker/Dockerfile
+        --no-cache
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg PKG_NAME=modeltrainingservice-${var.version}.jar
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --label version=${var.version}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-model-training-service:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-model-training-service:${var.version}
+    - task: author-service
+      cmd: docker build ./mxe-commons/author-service/target/
+        -f ./docker/Dockerfile
+        --no-cache
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg PKG_NAME=authorservice-${var.version}.jar
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --label version=${var.version}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-author-service:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-author-service:${var.version}
+    - task: default-backend
+      cmd: docker build ./mxe-commons/default-backend/target/
+        -f ./docker/unprivileged/Dockerfile
+        --no-cache
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg PKG_NAME=eric-mxe-default-backend-${var.version}.jar
+        --build-arg USER_ID=297174
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --label version=${var.version}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-default-backend:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-default-backend:${var.version}
+    - task: db-init
+      cmd: docker build ./mxe-commons/db-init/
+        -f ./mxe-commons/db-init/Dockerfile
+        --no-cache
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --label version=${var.version}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-db-init:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-db-init:${var.version}
+    - task: gui
+      cmd: docker build ./mxe-commons/mxe-gui/
+        -f ./mxe-commons/mxe-gui/Dockerfile
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg NODE_VERSION=${env.dependency.NODE_VERSION}
+        --build-arg NPM_VERSION=${env.dependency.NPM_VERSION}
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --label version=${var.version}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-gui:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-gui:${var.version}
+    - task: eric-mxe-jupyterlab
+      cmd: docker build ./mxe-exploration/image/jupyterlab/
+        -f ./mxe-exploration/image/jupyterlab/Dockerfile
+        --build-arg CBOS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg APP_VERSION=${var.version}
+        --build-arg COMMIT=${var.git-commit-short-hash}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-jupyterlab:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-jupyterlab:${var.version}
+    - task: eric-mxe-jupyterhub
+      cmd: DOCKER_BUILDKIT=1 docker build ./mxe-exploration/image/jupyterhub/
+        -f ./mxe-exploration/image/jupyterhub/Dockerfile
+        --build-arg CBOS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg APP_VERSION=${var.version}
+        --build-arg COMMIT=${var.git-commit-short-hash}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-jupyterhub:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-jupyterhub:${var.version}
+    - task: eric-mxe-chp
+      cmd: docker build ./mxe-exploration/image/configurable-http-proxy/
+        -f ./mxe-exploration/image/configurable-http-proxy/Dockerfile
+        --build-arg CBOS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg APP_VERSION=${var.version}
+        --build-arg COMMIT=${var.git-commit-short-hash}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-configurable-http-proxy:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-configurable-http-proxy:${var.version}
+    - task: kubernetes-modifier
+      cmd: docker build ./mxe-commons/upgrade-jobs/kubernetes-modifier/
+        -f ./mxe-commons/upgrade-jobs/kubernetes-modifier/Dockerfile
+        --no-cache
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg KUBECTL_VERSION=${env.dependency.KUBECTL_VERSION}
+        --build-arg USER_ID=241323
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --label version=${var.version}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-kubernetes-modifier:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-kubernetes-modifier:${var.version}
+    - task: pre-upgrade-job
+      cmd: DOCKER_BUILDKIT=1 docker build ./mxe-pre-upgrade-job/pre-upgrade-job/
+        -f ./mxe-pre-upgrade-job/pre-upgrade-job/Dockerfile
+        --build-arg DEVEL_VERSION=${env.dependency.CBO_DEVEL_VERSION}
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg GOVERSION=${env.dependency.GOVERSION}
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --label version=${var.version}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-pre-upgrade-job:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-pre-upgrade-job:${var.version}
+        --progress=plain
+    - task: keycloak-init
+      cmd: docker build ./mxe-commons/keycloak/init/target/
+        -f ./docker/unprivileged/Dockerfile
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg PKG_NAME=keycloak-init-${var.version}.jar
+        --build-arg USER_ID=275211
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --label version=${var.version}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-keycloak-init:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-keycloak-init:${var.version}
+    - task: keycloak-gatekeeper
+      cmd: docker build ./mxe-commons/keycloak/gatekeeper/docker
+        -f ./mxe-commons/keycloak/gatekeeper/docker/Dockerfile
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg USER_ID=227629
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --label version=${var.version}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-gatekeeper:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-gatekeeper:${var.version}
+    - task: kafka-pyconsumer
+      cmd: docker build ./mxe-workflow/argo-components/kafka/pyconsumer
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        -f ./mxe-workflow/argo-components/kafka/pyconsumer/Dockerfile
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-kafka-pyconsumer:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-kafka-pyconsumer:${var.version}
+    - task: deployment-manager
+      cmd: DOCKER_BUILDKIT=1 docker build ./mxe-deployer/mxe-deployer-service
+        -f ./mxe-deployer/mxe-deployer-service/Dockerfile
+        --build-arg DEVEL_VERSION=${env.dependency.CBO_DEVEL_VERSION}
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg GOVERSION=${env.dependency.GOVERSION}
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --target dm-server
+        --label version=${var.version}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-deployer-service:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-deployer-service:${var.version}
+        --progress=plain
+    - task: mxe-deployer-init
+      cmd: DOCKER_BUILDKIT=1 docker build ./mxe-deployer/mxe-deployer-init
+        -f ./mxe-deployer/mxe-deployer-init/Dockerfile
+        --build-arg DEVEL_VERSION=${env.dependency.CBO_DEVEL_VERSION}
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg GOVERSION=${env.dependency.GOVERSION}
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --label version=${var.version}
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-deployer-init:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-deployer-init:${var.version}
+        --progress=plain
+    - task: build-packager
+      cmd:
+        - rm -rf "mxe-base-images/model-packager/kaniko" && git clone "https://github.com/GoogleContainerTools/kaniko.git" -b "${env.dependency.KANIKO_VERSION}" "mxe-base-images/model-packager/kaniko"
+        - DOCKER_BUILDKIT=1 docker build mxe-base-images/model-packager
+          -t ${docker-image-repo-internal}/mxe/eric-mxe-model-packager:${var.version}
+          -t ${docker-image-repo-public}/mxe/eric-mxe-model-packager:${var.version}
+          -f mxe-base-images/model-packager/Dockerfile
+          --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+          --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          --build-arg=DEVEL_VERSION=${env.dependency.CBO_DEVEL_VERSION}
+          --build-arg KANIKO_VERSION=${env.dependency.KANIKO_VERSION}
+          --build-arg CRANE_VERSION=${env.dependency.CRANE_VERSION}
+          --build-arg RELEASE_VERSION=${var.version}
+          --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        - mkdir "mxe-base-images/argoexec-packager/kaniko"
+        - cp -R "mxe-base-images/model-packager/kaniko" "mxe-base-images/argoexec-packager"
+        - rm -rf "mxe-base-images/model-packager/kaniko"
+        - DOCKER_BUILDKIT=1 docker build mxe-base-images/argoexec-packager
+          -t ${docker-image-repo-internal}/mxe/eric-mxe-argoexec-packager:${var.version}
+          -t ${docker-image-repo-public}/mxe/eric-mxe-argoexec-packager:${var.version}
+          -f mxe-base-images/argoexec-packager/Dockerfile
+          --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+          --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          --build-arg=DEVEL_VERSION=${env.dependency.CBO_DEVEL_VERSION}
+          --build-arg KANIKO_VERSION=${env.dependency.KANIKO_VERSION}
+          --build-arg RELEASE_VERSION=${var.version}
+          --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        - rm -rf "mxe-base-images/argoexec-packager/kaniko"   
+        - DOCKER_BUILDKIT=1 docker build mxe-base-images/training-packager
+          -t ${docker-image-repo-internal}/mxe/eric-mxe-model-training-packager:${var.version}
+          -t ${docker-image-repo-public}/mxe/eric-mxe-model-training-packager:${var.version}
+          -f mxe-base-images/training-packager/Dockerfile
+          --build-arg BASE_IMAGE_NAME=${docker-image-repo-internal}/mxe/eric-mxe-model-packager
+          --build-arg BASE_IMAGE_TAG=${var.version}
+          --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          --build-arg RELEASE_VERSION=${var.version}
+          --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+    - task: build-model-base
+      cmd:
+      - DOCKER_BUILDKIT=1 docker build mxe-base-images/python-model-base-image
+        -t ${docker-image-repo-internal}/mxe/eric-mxe-training-python-base:${var.version}
+        -t ${docker-image-repo-public}/mxe/eric-mxe-training-python-base:${var.version}
+        --target training-runtime
+        -f mxe-base-images/python-model-base-image/Dockerfile
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --build-arg DEVEL_VERSION=${env.dependency.CBO_DEVEL_VERSION}
+        --build-arg RELEASE_VERSION=${var.version}
+      - DOCKER_BUILDKIT=1 docker build mxe-base-images/python-model-base-image
+        -t ${docker-image-repo-internal}/mxe/eric-mxe-model-python-base:${var.version}
+        -t ${docker-image-repo-public}/mxe/eric-mxe-model-python-base:${var.version}
+        --target model-runtime
+        -f mxe-base-images/python-model-base-image/Dockerfile
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg DEVEL_VERSION=${env.dependency.CBO_DEVEL_VERSION}
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --build-arg SELDON_CORE_VERSION=${env.dependency.SELDON_CORE_VERSION}
+    - task: build-mxe-cli-image
+      cmd: docker build cli
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg DEVEL_VERSION=${env.dependency.CBO_DEVEL_VERSION}
+        --build-arg CLI_VERSION=${var.version}
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_VERSION=${var.version}
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        -f cli/Dockerfile
+        --tag ${docker-image-repo-internal}/mxe/eric-mxe-cli:${var.version}
+        --tag ${docker-image-repo-public}/mxe/eric-mxe-cli:${var.version}
+
+  ## run manually once whenever there is a seldon or python uplift
+  generate-python-model-base-constraints:
+    - task: generate-python-base 
+      cmd: 
+      - DOCKER_BUILDKIT=1 docker build mxe-base-images/python-model-base-image
+        -t python-base-image:${var.version}
+        --target base
+        -f mxe-base-images/python-model-base-image/Dockerfile
+        --build-arg COMMON_BASE_OS_VERSION=${env.dependency.COMMON_BASE_OS_VERSION}
+        --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        --build-arg RELEASE_REVISION=${var.git-commit-short-hash}
+        --build-arg DEVEL_VERSION=${env.dependency.CBO_DEVEL_VERSION}
+        --build-arg RELEASE_VERSION=${var.version}
+      - DOCKER_BUILDKIT=1 docker build
+          --build-arg BASE_IMAGE=python-base-image:${var.version}
+          --build-arg SELDON_CORE_VERSION=${env.dependency.SELDON_CORE_VERSION}
+          -f mxe-base-images/python-model-base-image/constraints.Dockerfile
+          --output mxe-base-images/python-model-base-image/
+          --platform linux
+          mxe-base-images/python-model-base-image/  --progress=plain
+        
+
+  set-python-base-image:
+    - task: for-patch
+      condition: NOT conditions:is-release 
+      cmd: echo "${docker-image-repo-internal}/mxe/eric-mxe-model-python-base:${var.version}" > .bob/var.python-model-base-image
+    - task: for-release
+      condition: conditions:is-release 
+      cmd: echo "${docker-image-repo-public}/mxe/eric-mxe-model-python-base:${var.version}" > .bob/var.python-model-base-image
+
+  ## This will not be referenced from pipeline
+  ## Meant for manual usage to build and upload the image whenever underlying robot framework image needs updates
+  robot-framework-image:
+    - task: build
+      cmd:
+        - TZ=CET echo "${docker-image-repo-internal}/mxe-test/robot-framework:$(date +%Y%m%d%H%M%S)" > .bob/var.robot-fw-image-date-tag
+        - DOCKER_BUILDKIT=1 docker build ./mxe-test
+          --build-arg GITHUB_TOKEN=${env.GITHUB_TOKEN}
+          -f "mxe-test/Dockerfile"
+          -t "${docker-image-repo-internal}/mxe-test/robot-framework:latest"
+          -t "${var.robot-fw-image-date-tag}"
+          --progress plain
+    - task: push
+      cmd:
+        - docker push "${docker-image-repo-internal}/mxe-test/robot-framework:latest"
+        - docker push "${var.robot-fw-image-date-tag}"
+  
+  offline-install-prep:
+    - task: set-offline-packages-version
+      cmd:
+        - echo "${env.STABLE_MXE_VERSION}"     > .bob/var.offline-packages-version
+    - task: get-essentials
+      cmd: bash -c '''
+        set -e;
+        set -x;
+        mkdir -p .bob/mxe-essentials;
+        curl -k --header "X-JFrog-Art-Api:${env.API_TOKEN}" --fail -o .bob/mxe-essentials-${env.STABLE_MXE_VERSION}.zip ${var.generic-repo}/mxe-essentials-${env.STABLE_MXE_VERSION}.zip;
+        unzip .bob/mxe-essentials-${env.STABLE_MXE_VERSION}.zip -d .bob/mxe-essentials;
+        rm -f .bob/mxe-essentials-${env.STABLE_MXE_VERSION}.zip;
+        rm -rf ${env.PWD}/essentials;
+        mv .bob/mxe-essentials ${env.PWD}/essentials;'''
+    - task: get-cli 
+      cmd: bash -c '''
+        set -ex; 
+        curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --fail ${var.generic-repo}/mxe-cli-linux-${env.STABLE_MXE_VERSION}.tgz --output .bob/mxe-cli-linux-${env.STABLE_MXE_VERSION}.tgz;
+        tar xvzf .bob/mxe-cli-linux-${env.STABLE_MXE_VERSION}.tgz  -C ${env.PWD}/cli/;
+        rm -f .bob/mxe-cli-linux-${env.STABLE_MXE_VERSION}.tgz;'''
+    - task: private-registry-setup
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-registrycerts}"
+      cmd: bash -c '''
+        set -ex;
+        helm delete private-container-registry -n ${env.PRIVATE_REGISTRY_NAMESPACE} || true;
+        kubectl delete ns ${env.PRIVATE_REGISTRY_NAMESPACE} || true;
+        kubectl create ns ${env.PRIVATE_REGISTRY_NAMESPACE};
+        mkdir -p .cache;
+        tar xvzf /tmp/registrycerts.tar.gz -C .cache/;
+        kubectl create secret tls registry-api-tls --key .cache/registry-api-tls.key --cert .cache/registry-api-tls.cer --namespace ${env.PRIVATE_REGISTRY_NAMESPACE};
+        kubectl apply -f .cache/armdocker-creds.yaml --namespace ${env.PRIVATE_REGISTRY_NAMESPACE};
+        kubectl create secret generic private-container-registry --from-file=htpasswd=.cache/htpasswd --namespace ${env.PRIVATE_REGISTRY_NAMESPACE};
+        rm -rf .cache;
+        helm install private-container-registry eric-lcm-container-registry --repo ${dependency.adp-gs-released-repo} --namespace ${env.PRIVATE_REGISTRY_NAMESPACE} --atomic --values "${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR}/private_container_registry.yaml" --debug --wait;
+        kubectl rollout status deployment eric-lcm-container-registry-registry -n ${env.PRIVATE_REGISTRY_NAMESPACE};'''
+
+  # Input parameters: var.docker-image-repo, var.offline-packages-version
+  package-offline-images:
+    - task: create-crane-docker-reg
+      cmd:  mkdir -p ${env.PWD}/.bob/crane-docker
+    - task: generate-pre-req-images-dev
+      docker-image: mxe-toolkit
+      condition: NOT conditions:is-pra-release
+      docker-flags:
+        - --env USER
+        - --env EGADROOTCA_LOCATION=/usr/local/share/ca-certificates/EGADRootCA.crt
+        - --env MXE_NAMESPACE=${namespace}
+        - --user root 
+        - --env RELEASE=${env.RELEASE}
+        - --env API_TOKEN
+        - --env API_TOKEN_SERO
+        - --volume ${env.PWD}/.bob/crane-docker:/.docker
+      cmd: bash -c '''
+        set -ex; 
+        crane auth login ${docker-image-registry-server} --username $USER --password $API_TOKEN;
+        crane auth login ${docker-image-registry-server-sero} --username $USER --password $API_TOKEN_SERO;
+        ${env.PWD}/pipeline-scripts/get_pre_req_images.sh .bob/${mxe-pre-req-offline-images-archive};'''
+    - task: generate-pre-req-images-release
+      docker-image: mxe-toolkit
+      condition: conditions:is-pra-release
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - --user root
+        - --env EGADROOTCA_LOCATION=/usr/local/share/ca-certificates/EGADRootCA.crt
+        - --env MXE_NAMESPACE=${namespace}
+        - --env ERIC_SEC_SIP_TLS_CRD_VERSION=${dependency.eric-sec-sip-tls-crd-version}
+        - --env ERIC_DATA_DISTRIBUTED_COORDINATOR_ED_VERSION=${dependency.eric-data-distributed-coordinator-ed-version}
+        - --env ERIC_SEC_KEY_MANAGEMENT_VERSION=${dependency.eric-sec-key-management-version}
+        - --env ERIC_SEC_SIP_TLS=${dependency.eric-sec-sip-tls-version}
+        - --env ERIC_MESH_CONTROLLER_CRD_VERSION=${dependency.eric-mesh-controller-crd-version}
+        - --env ERIC_MESH_CONTROLLER_VERSION=${dependency.eric-mesh-controller-version}
+        - --env ERIC_CTRL_BRO_VERSION=${dependency.eric-ctrl-bro-version}
+        - --env RELEASE=${env.RELEASE}
+        - --env API_TOKEN
+        - --env API_TOKEN_SERO
+        - --env USER
+        - --volume ${env.PWD}/.bob/crane-docker:/.docker
+      cmd: bash -c '''
+        set -ex;
+        crane auth login ${docker-image-registry-server} --username $USER --password $API_TOKEN;
+        crane auth login ${docker-image-registry-server-sero} --username $USER --password $API_TOKEN_SERO;
+        ${env.PWD}/pipeline-scripts/get_pre_req_images.sh .bob/${mxe-pre-req-offline-images-archive};'''
+    # In 2.4 we decided not to package pre-req images. hence var .bob/var.crd-chart-urls is stubbed out
+    # However Script expects it so we are now passing an empty file
+    - task: generate-2pp-images-list
+      docker-image: mxe-toolkit
+      docker-flags:
+        - --env API_TOKEN
+        - --env API_TOKEN_SERO
+        - --env USER
+      cmd: bash -c '
+        set -ex;
+        touch .bob/var.crd-chart-urls;
+        pipeline-scripts/get_2pp_images.sh ".bob/var.crd-chart-urls" ".bob/product_info/" ".bob/var.docker-images-2pp"'
+    # The section for 2pp image images in the collect images task retrieves images from docker-images-2pp variable
+    # Except eric-sec-access-mgmt all images are pulled as-is
+    # Override of ADP's eric-sec-access-mgmt-image with MXE's version will be removed in future
+    # at that moment, the if condition to override the image version using iam-image-mxe can be removed
+    - task: collect-mxe-commons-images
+      docker-image: mxe-toolkit
+      docker-flags: &docker_flags_mxe_toolkit
+        - --env API_TOKEN
+        - --env API_TOKEN_SERO
+        - --env USER
+        - --volume ${env.PWD}/.bob/crane-docker:/.docker
+      cmd: bash -c '
+        declare -a images;
+        echo "Adding homegrown images";
+        while read -r -d, image; do
+        image="${var.docker-image-repo}/$image:${var.offline-packages-version}";
+        images+=("$image");
+        echo "Adding image $image";
+        done <<< "${mxe-commons-docker-images}";
+
+        echo "Adding 3pp images";
+        while read -r -d, image; do
+        image="${docker-image-repo-public}/$image";
+        images+=("$image");
+        echo "Adding image $image";
+        done <<< "${dependency.mxe-commons-docker-images-3pp}";
+
+        echo "Adding 2pp images";
+        while read -r -d, image; do
+        if [[ $image = *"eric-sec-access-mgmt-image"* ]];
+        then image="${var.docker-image-repo}/${iam-image-mxe}";
+        fi;
+        images+=("$image");
+        echo "Adding image $image";
+        done <<< "${var.docker-images-2pp}";
+
+        echo "Saving docker images in the file ${mxe-commons-offline-images-archive} ...";
+        crane auth login ${docker-image-registry-server} --username $USER --password $API_TOKEN;
+        crane auth login ${docker-image-registry-server-sero} --username $USER --password $API_TOKEN_SERO;
+        crane pull "${images[@]}" .bob/${mxe-commons-offline-images-archive};'
+    - task: collect-mxe-deployer-images
+      docker-image: mxe-toolkit
+      docker-flags: *docker_flags_mxe_toolkit
+      cmd: bash -c '
+        declare -a images;
+        echo "Adding homegrown images";
+        while read -r -d, image; do
+        image="${var.docker-image-repo}/$image:${var.offline-packages-version}";
+        images+=("$image");
+        echo "Adding image $image";
+        done <<< "${mxe-deployer-docker-images}";
+
+        echo "Adding 3pp images";
+        while read -r -d, image; do
+        image="${docker-image-repo-public}/$image";
+        images+=("$image");
+        echo "Adding image $image";
+        done <<< "${dependency.mxe-deployer-docker-images-3pp}";
+
+        echo "MXE Deployer has no 2pp images";
+
+        echo "Saving docker images in the file ${mxe-deployer-offline-images-archive} ...";
+        crane auth login ${docker-image-registry-server} --username $USER --password $API_TOKEN;
+        crane pull "${images[@]}" .bob/${mxe-deployer-offline-images-archive};'
+    - task: collect-mxe-serving-images
+      docker-image: mxe-toolkit
+      docker-flags: *docker_flags_mxe_toolkit
+      cmd: bash -c '
+        declare -a images;
+        echo "Adding homegrown images";
+        while read -r -d, image; do
+        image="${var.docker-image-repo}/$image:${var.offline-packages-version}";
+        images+=("$image");
+        echo "Adding image $image";
+        done <<< "${mxe-serving-docker-images}";
+
+        echo "Adding 3pp images";
+        while read -r -d, image; do
+        image="${docker-image-repo-public}/$image";
+        images+=("$image");
+        echo "Adding image $image";
+        done <<< "${dependency.mxe-serving-docker-images-3pp}";
+
+        echo "MXE Serving has no 2pp images";
+
+        echo "Saving docker images in the file ${mxe-serving-offline-images-archive} ...";
+        crane auth login ${docker-image-registry-server} --username $USER --password $API_TOKEN;
+        crane pull "${images[@]}" .bob/${mxe-serving-offline-images-archive};'
+    - task: collect-mxe-workflow-images
+      docker-image: mxe-toolkit
+      docker-flags: *docker_flags_mxe_toolkit
+      cmd: bash -c '
+        declare -a images;
+        echo "Adding homegrown images";
+        while read -r -d, image; do
+        image="${var.docker-image-repo}/$image:${var.offline-packages-version}";
+        images+=("$image");
+        echo "Adding image $image";
+        done <<< "${mxe-workflow-docker-images}";
+
+        echo "Adding 3pp images";
+        while read -r -d, image; do
+        image="${docker-image-repo-public}/$image";
+        images+=("$image");
+        echo "Adding image $image";
+        done <<< "${dependency.mxe-workflow-docker-images-3pp}";
+
+        echo "MXE Workflow has no 2pp images";
+
+        echo "Saving docker images in the file ${mxe-workflow-offline-images-archive} ...";
+        crane auth login ${docker-image-registry-server} --username $USER --password $API_TOKEN;
+        crane pull "${images[@]}" .bob/${mxe-workflow-offline-images-archive};'
+    - task: collect-mxe-training-images
+      docker-image: mxe-toolkit
+      docker-flags: *docker_flags_mxe_toolkit
+      cmd: bash -c '
+        declare -a images;
+        echo "Adding homegrown images";
+        while read -r -d, image; do
+        image="${var.docker-image-repo}/$image:${var.offline-packages-version}";
+        images+=("$image");
+        echo "Adding image $image";
+        done <<< "${mxe-training-docker-images}";
+
+        echo "Adding 3pp images";
+        while read -r -d, image; do
+        image="${docker-image-repo-public}/$image";
+        images+=("$image");
+        echo "Adding image $image";
+        done <<< "${dependency.mxe-training-docker-images-3pp}";
+
+        echo "MXE Training has no 2pp images";
+
+        echo "Saving docker images in the file ${mxe-training-offline-images-archive} ...";
+        crane auth login ${docker-image-registry-server} --username $USER --password $API_TOKEN;
+        crane pull "${images[@]}" .bob/${mxe-training-offline-images-archive};'
+    - task: collect-mxe-exploration-images
+      docker-image: mxe-toolkit
+      docker-flags: *docker_flags_mxe_toolkit
+      cmd: bash -c '
+        declare -a images;
+        echo "Adding homegrown images";
+        while read -r -d, image; do
+        image="${var.docker-image-repo}/$image:${var.offline-packages-version}";
+        images+=("$image");
+        echo "Adding image $image";
+        done <<< "${mxe-exploration-docker-images}";
+
+        echo "Adding 3pp images";
+        while read -r -d, image; do
+        image="${docker-image-repo-public}/$image";
+        images+=("$image");
+        echo "Adding image $image";
+        done <<< "${dependency.mxe-exploration-docker-images-3pp}";
+
+        echo "MXE Exploration has no 2pp images";
+
+        echo "Saving docker images in the file ${mxe-exploration-offline-images-archive} ...";
+        crane auth login ${docker-image-registry-server} --username $USER --password $API_TOKEN;
+        crane pull "${images[@]}" .bob/${mxe-exploration-offline-images-archive};'
+
+  list-tags-in-offline-tar:
+    - task: list-tags
+      docker-image: skopeo
+      docker-flags: 
+        - --entrypoint bash
+      cmd: pipeline-scripts/list_tags_in_offline_tars.sh 
+            "list-tags-in-offline-tar"
+            ${mxe-commons-offline-images-archive} 
+            ${mxe-deployer-offline-images-archive} 
+            ${mxe-serving-offline-images-archive} 
+            ${mxe-workflow-offline-images-archive} 
+            ${mxe-training-offline-images-archive} 
+            ${mxe-exploration-offline-images-archive}
+            ${mxe-pre-req-offline-images-archive}
+    - task: json-to-text
+      docker-image: mxe-toolkit
+      cmd: pipeline-scripts/list_tags_in_offline_tars.sh 
+            "generate-text" 
+            ${mxe-commons-offline-images-archive} 
+            ${mxe-deployer-offline-images-archive} 
+            ${mxe-serving-offline-images-archive} 
+            ${mxe-workflow-offline-images-archive} 
+            ${mxe-training-offline-images-archive} 
+            ${mxe-exploration-offline-images-archive}
+            ${mxe-pre-req-offline-images-archive}
+  push-offline-images-to-private-registry:
+    - task: mxe-pre-req 
+      cmd: pipeline-scripts/push_offline_images_to_private_registry.sh ${docker-image-registry-server} ${docker-image-registry-server-sero} ${env.PRIVATE_DOCKER_REGISTRY_HOST} .bob/${mxe-pre-req-offline-images-archive}
+    - task: mxe-commons 
+      cmd: pipeline-scripts/push_offline_images_to_private_registry.sh ${docker-image-registry-server} ${docker-image-registry-server-sero} ${env.PRIVATE_DOCKER_REGISTRY_HOST} .bob/${mxe-commons-offline-images-archive} 
+    - task: mxe-deployer 
+      cmd: pipeline-scripts/push_offline_images_to_private_registry.sh ${docker-image-registry-server} ${docker-image-registry-server-sero} ${env.PRIVATE_DOCKER_REGISTRY_HOST} .bob/${mxe-deployer-offline-images-archive} 
+    - task: mxe-serving 
+      cmd: pipeline-scripts/push_offline_images_to_private_registry.sh ${docker-image-registry-server} ${docker-image-registry-server-sero} ${env.PRIVATE_DOCKER_REGISTRY_HOST} .bob/${mxe-serving-offline-images-archive} 
+    - task: mxe-workflow 
+      cmd: pipeline-scripts/push_offline_images_to_private_registry.sh ${docker-image-registry-server} ${docker-image-registry-server-sero} ${env.PRIVATE_DOCKER_REGISTRY_HOST} .bob/${mxe-workflow-offline-images-archive} 
+    - task: mxe-training 
+      cmd: pipeline-scripts/push_offline_images_to_private_registry.sh ${docker-image-registry-server} ${docker-image-registry-server-sero} ${env.PRIVATE_DOCKER_REGISTRY_HOST} .bob/${mxe-training-offline-images-archive} 
+    - task: mxe-exploration 
+      cmd: pipeline-scripts/push_offline_images_to_private_registry.sh ${docker-image-registry-server} ${docker-image-registry-server-sero} ${env.PRIVATE_DOCKER_REGISTRY_HOST} .bob/${mxe-exploration-offline-images-archive} 
+
+
+
+  # Create MXE helm charts.
+  # Input parameters: var.helm-chart-repopath, var.docker-image-repopath
+  chart:
+    - task: clean
+      cmd:
+        - rm -rf .bob/mxe-commons/${var.helm-chart-repopath}/charts/* || true
+        - rm -rf .bob/mxe-deployer/${var.helm-chart-repopath}/charts/* || true
+        - rm -rf .bob/mxe-serving/${var.helm-chart-repopath}/charts/* || true
+        - rm -rf .bob/mxe-training/${var.helm-chart-repopath}/charts/* || true
+        - rm -rf .bob/mxe-workflow/${var.helm-chart-repopath}/charts/* || true
+        - rm -rf .bob/mxe-exploration/${var.helm-chart-repopath}/charts/* || true
+
+    - task: package-eric-mxe-spark
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: helm-package
+        --folder ./mxe-workflow/helm/eric-mxe-spark
+        --workdir .bob/mxe-workflow/${var.helm-chart-repopath}
+        --output .bob/mxe-workflow/${var.helm-chart-repopath}/charts
+        --version ${var.version}
+        --app-version ${var.version}
+        --replace VERSION=${var.version}
+        --replace REPO_PATH=${var.docker-image-repopath}
+        --replace eric-product-info.yaml:REPO_PATH=${var.docker-image-repopath}
+        --replace eric-product-info.yaml:VERSION=${var.version}
+    - task: package-serving-pre-upgrade-job
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: helm-package
+        --folder ./mxe-serving/helm/eric-mxe-serving-pre-upgrade-job
+        --workdir .bob/mxe-serving/${var.helm-chart-repopath}
+        --output .bob/mxe-serving/${var.helm-chart-repopath}/charts
+        --version ${var.version}
+        --app-version ${var.version}
+        --replace VERSION=${var.version}
+        --replace REPO_PATH=${var.docker-image-repopath}
+    - task: package-training-pre-upgrade-job
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: helm-package
+        --folder ./mxe-training/helm/eric-mxe-training-pre-upgrade-job
+        --workdir .bob/mxe-training/${var.helm-chart-repopath}
+        --output .bob/mxe-training/${var.helm-chart-repopath}/charts
+        --version ${var.version}
+        --app-version ${var.version}
+        --replace VERSION=${var.version}
+        --replace REPO_PATH=${var.docker-image-repopath}
+    - task: package-commons-pre-upgrade-job
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: helm-package
+        --folder ./mxe-commons/helm/eric-mxe-commons-pre-upgrade-job
+        --workdir .bob/mxe-commons/${var.helm-chart-repopath}
+        --output .bob/mxe-commons/${var.helm-chart-repopath}/charts
+        --version ${var.version}
+        --app-version ${var.version}
+        --replace VERSION=${var.version}
+        --replace REPO_PATH=${var.docker-image-repopath}
+    - task: package-model-service
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - helm-package
+          --folder ./mxe-serving/helm/eric-mxe-model-service
+          --workdir .bob/mxe-serving/${var.helm-chart-repopath}
+          --output .bob/mxe-serving/${var.helm-chart-repopath}/charts
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace VERSION=${var.version}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:VERSION=${var.version}
+    - task: package-model-catalogue-service
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - helm-package
+          --folder ./mxe-serving/helm/eric-mxe-model-catalogue-service
+          --workdir .bob/mxe-serving/${var.helm-chart-repopath}
+          --output .bob/mxe-serving/${var.helm-chart-repopath}/charts
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace VERSION=${var.version}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:VERSION=${var.version}
+    - task: package-model-training-service
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - helm-package
+          --folder ./mxe-training/helm/eric-mxe-model-training-service
+          --workdir .bob/mxe-training/${var.helm-chart-repopath}
+          --output .bob/mxe-training/${var.helm-chart-repopath}/charts
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace VERSION=${var.version}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:VERSION=${var.version}
+    - task: package-author-service
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - helm-package
+          --folder ./mxe-commons/helm/eric-mxe-author-service
+          --workdir .bob/mxe-commons/${var.helm-chart-repopath}
+          --output .bob/mxe-commons/${var.helm-chart-repopath}/charts
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace VERSION=${var.version}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:VERSION=${var.version}
+    - task: package-default-backend
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - helm-package
+          --folder ./mxe-commons/helm/eric-mxe-default-backend
+          --workdir .bob/mxe-commons/${var.helm-chart-repopath}
+          --output .bob/mxe-commons/${var.helm-chart-repopath}/charts
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace VERSION=${var.version}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:VERSION=${var.version}
+    - task: package-ingress-controller
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - helm-package
+          --folder ./mxe-commons/helm/eric-mxe-ingress-controller
+          --workdir .bob/mxe-commons/${var.helm-chart-repopath}
+          --output .bob/mxe-commons/${var.helm-chart-repopath}/charts
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace VERSION=${var.version}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:VERSION=${var.version}
+    - task: package-gui
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - helm-package
+          --folder ./mxe-commons/helm/eric-mxe-gui
+          --workdir .bob/mxe-commons/${var.helm-chart-repopath}
+          --output .bob/mxe-commons/${var.helm-chart-repopath}/charts
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace VERSION=${var.version}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:VERSION=${var.version}
+    - task: package-meshgw-ingress
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: helm-package
+        --folder ./mxe-commons/helm/eric-mxe-meshgw-ingress
+        --workdir .bob/mxe-commons/${var.helm-chart-repopath}
+        --output .bob/mxe-commons/${var.helm-chart-repopath}/charts
+        --version ${var.version}
+        --app-version ${var.version}
+    - task: package-argo
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: helm-package
+        --folder ./mxe-workflow/helm/eric-mxe-argo
+        --workdir .bob/mxe-workflow/${var.helm-chart-repopath}
+        --output .bob/mxe-workflow/${var.helm-chart-repopath}/charts
+        --version ${var.version}
+        --app-version ${var.version}
+    - task: package-prometheus
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: helm-package
+        --folder ./mxe-commons/helm/eric-mxe-prometheus
+        --workdir .bob/mxe-commons/${var.helm-chart-repopath}
+        --output .bob/mxe-commons/${var.helm-chart-repopath}/charts
+        --version ${var.version}
+        --app-version ${var.version}
+    - task: package-mxe-commons-upgrade-jobs
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: helm-package
+        --folder ./mxe-commons/helm/eric-mxe-upgrade-jobs
+        --workdir .bob/mxe-commons/${var.helm-chart-repopath}
+        --output .bob/mxe-commons/${var.helm-chart-repopath}/charts
+        --version ${var.version}
+        --app-version ${var.version}
+        --replace VERSION=${var.version}
+        --replace REPO_PATH=${var.docker-image-repopath}
+        --replace eric-product-info.yaml:REPO_PATH=${var.docker-image-repopath}
+        --replace eric-product-info.yaml:VERSION=${var.version}
+    - task: package-mxe-serving-upgrade-jobs
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: helm-package
+        --folder ./mxe-serving/helm/eric-mxe-serving-upgrade-jobs
+        --workdir .bob/mxe-serving/${var.helm-chart-repopath}
+        --output .bob/mxe-serving/${var.helm-chart-repopath}/charts
+        --version ${var.version}
+        --app-version ${var.version}
+        --replace VERSION=${var.version}
+        --replace REPO_PATH=${var.docker-image-repopath}
+        --replace eric-product-info.yaml:REPO_PATH=${var.docker-image-repopath}
+        --replace eric-product-info.yaml:VERSION=${var.version}
+    - task: package-mxe-gatekeeper
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - helm-package
+          --folder ./mxe-commons/helm/eric-mxe-gatekeeper
+          --workdir .bob/mxe-commons/${var.helm-chart-repopath}
+          --output .bob/mxe-commons/${var.helm-chart-repopath}/charts
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace VERSION=${var.version}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:VERSION=${var.version}
+    - task: package-mxe-seldon-service-account
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd: helm-package
+        --folder ./mxe-serving/helm/eric-mxe-seldon-service-account
+        --workdir .bob/mxe-serving/${var.helm-chart-repopath}
+        --output .bob/mxe-serving/${var.helm-chart-repopath}/charts
+        --version ${var.version}
+        --app-version ${var.version}
+    - task: package-jupyterhub
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - helm-package
+          --folder ./mxe-exploration/helm/eric-mxe-jupyterhub
+          --workdir .bob/mxe-exploration/${var.helm-chart-repopath}
+          --output .bob/mxe-exploration/${var.helm-chart-repopath}/charts
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace VERSION=${var.version}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:VERSION=${var.version}
+    - task: package-pypiserver
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - helm-package
+          --folder ./mxe-commons/helm/eric-mxe-pypiserver
+          --workdir .bob/mxe-commons/${var.helm-chart-repopath}
+          --output .bob/mxe-commons/${var.helm-chart-repopath}/charts
+          --version ${var.version}
+          --app-version ${env.dependency.PYPISERVER_VERSION}
+          --replace VERSION=${env.dependency.PYPISERVER_VERSION}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:VERSION=${var.version}
+    - task: package-commons-integration-chart
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-adp-release-auto}"
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - rm -r ./mxe-commons/helm/mxe-commons/charts/ || true
+        - mkdir -p ./mxe-commons/helm/mxe-commons/charts/
+        - bash -c '''
+          set -ex;
+          for tarFile in .bob/mxe-commons/${var.helm-chart-repopath}/charts/*-${var.version}.tgz; do
+          tar -C ./mxe-commons/helm/mxe-commons/charts/ -xvzf $tarFile; done;'''
+        - helm-package
+          --helm-credentials=/tmp/helm_credentials.yaml
+          --folder ./mxe-commons/helm/mxe-commons
+          --workdir .bob/mxe-commons/${var.helm-chart-repopath}
+          --output .bob/mxe-commons/${var.helm-chart-repopath}/integration-chart
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace VERSION=${var.version}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace Chart.yaml:MXE_VERSION=${var.version}
+    - task: package-dm-server-chart
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - helm-package
+          --folder ./mxe-deployer/helm/eric-mxe-deployer-service
+          --workdir .bob/mxe-deployer/${var.helm-chart-repopath}/
+          --output .bob/mxe-deployer/${var.helm-chart-repopath}/charts/
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace VERSION=${var.version}
+          --replace eric-product-info.yaml:REPO_PATH=${var.docker-image-repopath}
+          --replace eric-product-info.yaml:VERSION=${var.version}
+    - task: package-dm-integration-chart
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-adp-release-auto}"
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - rm -r ./mxe-deployer/helm/mxe-deployer/charts/ || true
+        - mkdir -p ./mxe-deployer/helm/mxe-deployer/charts/
+        - bash -c '''
+          set -ex;
+          for tarFile in .bob/mxe-deployer/${var.helm-chart-repopath}/charts/*-${var.version}.tgz; do
+          tar -C ./mxe-deployer/helm/mxe-deployer/charts/ -xvzf $tarFile; done'''
+        - helm-package
+          --helm-credentials=/tmp/helm_credentials.yaml
+          --folder ./mxe-deployer/helm/mxe-deployer
+          --workdir .bob/mxe-deployer/${var.helm-chart-repopath}/
+          --output .bob/mxe-deployer/${var.helm-chart-repopath}/integration-chart
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace VERSION=${var.version}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace Chart.yaml:MXE_VERSION=${var.version}
+    - task: package-training-integration-chart
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-adp-release-auto}"
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - rm -r ./mxe-training/helm/mxe-training/charts/ || true
+        - mkdir -p ./mxe-training/helm/mxe-training/charts/
+        - bash -c '''
+          set -ex;
+          for tarFile in .bob/mxe-training/${var.helm-chart-repopath}/charts/*-${var.version}.tgz; do
+          tar -C ./mxe-training/helm/mxe-training/charts/ -xvzf $tarFile; done;'''
+        - helm-package
+          --helm-credentials=/tmp/helm_credentials.yaml
+          --folder ./mxe-training/helm/mxe-training
+          --workdir .bob/mxe-training/${var.helm-chart-repopath}/
+          --output .bob/mxe-training/${var.helm-chart-repopath}/integration-chart
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace VERSION=${var.version}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace Chart.yaml:MXE_VERSION=${var.version}
+    - task: package-workflow-integration-chart
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-adp-release-auto}"
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - rm -r ./mxe-workflow/helm/mxe-workflow/charts/ || true
+        - mkdir -p ./mxe-workflow/helm/mxe-workflow/charts/
+        - bash -c '''
+          set -ex;
+          for tarFile in .bob/mxe-workflow/${var.helm-chart-repopath}/charts/*-${var.version}.tgz; do
+          tar -C ./mxe-workflow/helm/mxe-workflow/charts/ -xvzf $tarFile; done'''
+        - helm-package
+          --helm-credentials=/tmp/helm_credentials.yaml
+          --folder ./mxe-workflow/helm/mxe-workflow
+          --workdir .bob/mxe-workflow/${var.helm-chart-repopath}
+          --output .bob/mxe-workflow/${var.helm-chart-repopath}/integration-chart
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace VERSION=${var.version}
+          --replace SPARK_REPOPATH="${var.docker-image-repo}/mxe/spark-operator"
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace Chart.yaml:MXE_VERSION=${var.version}
+    - task: package-exploration-integration-chart
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-adp-release-auto}"
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - rm -r ./mxe-exploration/helm/mxe-exploration/charts/ || true
+        - mkdir -p ./mxe-exploration/helm/mxe-exploration/charts/
+        - bash -c '''
+          set -ex;
+          for tarFile in .bob/mxe-exploration/${var.helm-chart-repopath}/charts/*-${var.version}.tgz; do
+          tar -C ./mxe-exploration/helm/mxe-exploration/charts/ -xvzf $tarFile; done'''
+        - helm-package
+          --folder ./mxe-exploration/helm/mxe-exploration
+          --workdir .bob/mxe-exploration/${var.helm-chart-repopath}
+          --output .bob/mxe-exploration/${var.helm-chart-repopath}/integration-chart
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace VERSION=${var.version}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace Chart.yaml:MXE_VERSION=${var.version}
+    - task: package-serving-integration-chart
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-adp-release-auto}"
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - rm -r ./mxe-serving/helm/mxe-serving/charts/ || true
+        - mkdir -p ./mxe-serving/helm/mxe-serving/charts/
+        - bash -c '''
+          set -ex;
+          for tarFile in .bob/mxe-serving/${var.helm-chart-repopath}/charts/*-${var.version}.tgz; do
+          tar -C ./mxe-serving/helm/mxe-serving/charts/ -xvzf $tarFile; done;'''
+        - helm-package
+          --helm-credentials=/tmp/helm_credentials.yaml
+          --folder ./mxe-serving/helm/mxe-serving
+          --workdir .bob/mxe-serving/${var.helm-chart-repopath}
+          --output .bob/mxe-serving/${var.helm-chart-repopath}/integration-chart
+          --version ${var.version}
+          --app-version ${var.version}
+          --replace VERSION=${var.version}
+          --replace REPO_PATH=${var.docker-image-repopath}
+          --replace Chart.yaml:MXE_VERSION=${var.version}
+
+  # Push Docker images to registry.
+  # Input parameter: var.docker-image-repo
+  push-images:
+    - task: modelservice
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-model-service:${var.version}
+    - task: model-catalogue-service
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-model-catalogue-service:${var.version}
+    - task: model-training-service
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-model-training-service:${var.version}
+    - task: author-service
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-author-service:${var.version}
+    - task: default-backend
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-default-backend:${var.version}
+    - task: db-init
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-db-init:${var.version}
+    - task: gui
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-gui:${var.version}
+    - task: eric-mxe-jupyterlab
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-jupyterlab:${var.version}
+    - task: eric-mxe-jupyterhub
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-jupyterhub:${var.version}
+    - task: mxe/eric-mxe-configurable-http-proxy
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-configurable-http-proxy:${var.version}
+    - task: kubernetes-modifier
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-kubernetes-modifier:${var.version}
+    - task: pre-upgrade-job
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-pre-upgrade-job:${var.version}
+    - task: keycloak-init
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-keycloak-init:${var.version}
+    - task: keycloak-gatekeeper
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-gatekeeper:${var.version}
+    - task: kafka-pyconsumer
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-kafka-pyconsumer:${var.version}
+    - task: deployment-manager
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-deployer-service:${var.version}
+    - task: deployment-manager-init
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-deployer-init:${var.version}
+    - task: model-packager
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-model-packager:${var.version}
+    - task: argoexec-packager
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-argoexec-packager:${var.version}
+    - task: training-packager
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-model-training-packager:${var.version}
+    - task: model-base
+      cmd: 
+      - docker push ${var.docker-image-repo}/mxe/eric-mxe-model-python-base:${var.version}
+      - docker push ${var.docker-image-repo}/mxe/eric-mxe-training-python-base:${var.version}
+    - task: mxe-cli-image
+      cmd: docker push ${var.docker-image-repo}/mxe/eric-mxe-cli:${var.version}
+
+  image-dr-check:
+    - task: output-folder-create
+      cmd: bash -c '
+        set -e;
+        mkdir ${env.PWD}/image-dr-check-results/;'
+    - task: model-service-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-model-service:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-model-service || true
+    - task: model-catalogue-service-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-model-catalogue-service:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-model-catalogue-service || true
+    - task: model-training-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-model-training-service:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-model-training-service || true
+    - task: author-service-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-author-service:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-author-service || true
+    - task: default-backend-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-default-backend:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-default-backend || true
+    - task: db-init-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-db-init:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-db-init || true
+    - task: gui-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-gui:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-gui || true
+    - task: jupyterlab-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-jupyterlab:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-jupyterlab || true
+    - task: jupyterhub-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-jupyterhub:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-jupyterhub || true
+    - task: configurable-http-proxy-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-configurable-http-proxy:${var.version} -o ${env.PWD}/image-dr-check-results/configurable-http-proxy-image-check || true
+    - task: kubernetes-modifier-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-kubernetes-modifier:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-kubernetes-modifier || true
+    - task: pre-upgrade-job-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-pre-upgrade-job:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-pre-upgrade-job || true
+    - task: keycloak-init-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-keycloak-init:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-keycloak-init || true
+    - task: eric-mxe-gatekeeper-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-gatekeeper:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-gatekeeper || true
+    - task: kafka-pyconsumer-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-kafka-pyconsumer:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-kafka-pyconsumer || true
+    - task: eric-mxe-deployer-service-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-deployer-service:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-deployer-service || true
+    - task: mxe-deployer-init-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-deployer-init:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-deployer-init || true
+    - task: model-packager-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-model-packager:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-model-packager || true
+    - task: argoexec-packager-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-argoexec-packager:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-argoexec-packager || true
+    - task: model-training-packager-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-model-training-packager:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-model-training-packager || true
+    - task: model-python-base-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-model-python-base:${var.version} -o ${env.PWD}/image-dr-check-results/model-python-base || true
+    - task: training-python-base-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-training-python-base:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-training-python-base || true
+    - task: cli-image-check
+      docker-image: image-dr-check
+      docker-flags:
+        - "-v /var/run/docker.sock:/var/run/docker.sock"
+        - "-u $(id -u):$(id -g) $(for x in $(id -G); do printf \" --group-add %s\" \"$x\"; done)"
+      cmd: image-dr-check -i ${var.docker-image-repo}/mxe/eric-mxe-cli:${var.version} -o ${env.PWD}/image-dr-check-results/eric-mxe-cli || true
+    - task: make_zip_archive
+      cmd: bash -c '
+        set -e;
+        cd ${env.PWD}/image-dr-check-results/;
+        zip -r ${env.PWD}/image-dr-check-results.zip *;'
+
+  iam:
+    - task: build-iam-image
+      cmd: docker build ./mxe-commons/keycloak/docker/
+        -f ./mxe-commons/keycloak/docker/Dockerfile
+        --build-arg IAM_VERSION=${env.IAM_VERSION}
+        --label version=${var.version}
+        --tag ${docker-image-repo-internal}/${iam-image-mxe-path}:${env.IAM_VERSION}
+    - task: push-iam-image
+      cmd: docker push ${var.docker-image-repo}/${iam-image-mxe-path}:${env.IAM_VERSION}
+
+  iam-publish:
+    - task: tag-iam-image
+      cmd:
+        - docker pull ${docker-image-repo-internal}/${iam-image-mxe}
+        - docker tag ${docker-image-repo-internal}/${iam-image-mxe} ${var.docker-image-repo}/${iam-image-mxe}
+    - task: push-iam-image
+      cmd: docker push ${var.docker-image-repo}/${iam-image-mxe}
+
+  # Push Helm charts to repository.
+  # Input parameters: var.helm-chart-repo, var.helm-chart-repopath
+  push-charts:
+    - task: helm-push-commons-integration-chart
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename=.bob/mxe-commons/${var.helm-chart-repopath}/integration-chart/mxe-commons-${var.version}.tgz
+        --repository=${var.helm-chart-repo}
+        --api-token=${env.API_TOKEN}
+    - task: helm-push-dm-integration-chart
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename=.bob/mxe-deployer/${var.helm-chart-repopath}/integration-chart/mxe-deployer-${var.version}.tgz
+        --repository=${var.helm-chart-repo}
+        --api-token=${env.API_TOKEN}
+    - task: helm-push-mxe-training-integration-chart
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename=.bob/mxe-training/${var.helm-chart-repopath}/integration-chart/mxe-training-${var.version}.tgz
+        --repository=${var.helm-chart-repo}
+        --api-token=${env.API_TOKEN}
+    - task: helm-push-mxe-workflow-integration-chart
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename=.bob/mxe-workflow/${var.helm-chart-repopath}/integration-chart/mxe-workflow-${var.version}.tgz
+        --repository=${var.helm-chart-repo}
+        --api-token=${env.API_TOKEN}
+    - task: helm-push-mxe-exploration-integration-chart
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename=.bob/mxe-exploration/${var.helm-chart-repopath}/integration-chart/mxe-exploration-${var.version}.tgz
+        --repository=${var.helm-chart-repo}
+        --api-token=${env.API_TOKEN}
+    - task: helm-push-mxe-serving-integration-chart
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename=.bob/mxe-serving/${var.helm-chart-repopath}/integration-chart/mxe-serving-${var.version}.tgz
+        --repository=${var.helm-chart-repo}
+        --api-token=${env.API_TOKEN}
+
+  # Push CLI linux and windows version to repository.
+  # Input parameters: var.generic-repo
+  push-cli:
+    - task: push-cli-linux
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename=cli/bin/linux/mxe-cli-linux-${var.version}.tgz
+        --repository=${var.generic-repo}
+        --api-token=${env.API_TOKEN}
+    - task: push-cli-windows
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename=cli/bin/windows/mxe-cli-windows-${var.version}.zip
+        --repository=${var.generic-repo}
+        --api-token=${env.API_TOKEN}
+    - task: push-cli-macos
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename=cli/bin/darwin/mxe-cli-macos-${var.version}.zip
+        --repository=${var.generic-repo}
+        --api-token=${env.API_TOKEN}
+
+  push-artifacts:
+    - task: push-essentials
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename=essentials/mxe-essentials-${var.version}.zip
+        --repository=${var.generic-repo}
+        --api-token=${env.API_TOKEN}
+
+  # Publish cli, installer, docker images and helm charts to internal repository.
+  publish-local:
+    - rule: init-dev
+    - rule: push-cli
+    - rule: push-artifacts
+    - rule: chart
+    - rule: push-charts
+    - rule: push-images
+
+  all-image-dr-check:
+    - rule: image-dr-check
+
+  publish-drop:
+    - rule: init-drop
+    - rule: push-cli
+    - rule: push-artifacts
+    - rule: chart
+    - rule: push-charts
+    - rule: push-images
+    - rule: iam-publish
+
+  # Publish cli, installer, docker images and helm charts to public repository.
+  # Call publish only when merged to master
+  publish:
+    - rule: publish-drop
+    - task: git-tag
+      cmd:
+        - git tag -a ${var.version} -m "Release ${var.version}"
+        - git push origin ${var.version}
+    - rule: publish-cleanup
+
+  publish-cleanup:
+    - task: cleanup
+      cmd: rm -f ./.bob/var.docker-image-repopath ./.bob/var.docker-image-repo ./.bob/var.helm-chart-repopath ./.bob/var.mxe-deployer.helm-chart-repopath ./.bob/var.helm-chart-repo ./.bob/var.generic-repo
+
+  helm-dr-check-deprecated:
+    - task: helmdrcheck-integration-chart
+      docker-image: helm-dr-check
+      cmd: helm-dr-check --helm-v3 -output .bob/ --helm-chart ${env.PWD}/helm/mxe
+    - task: helmdrcheck-meshgw-ingress
+      docker-image: helm-dr-check
+      cmd: helm-dr-check --helm-v3 -output .bob/ --helm-chart ${env.PWD}/helm/eric-mxe-meshgw-ingress
+    - task: helmdrcheck-argo
+      docker-image: helm-dr-check
+      cmd: helm-dr-check --helm-v3 -output .bob/ --helm-chart ${env.PWD}/helm/eric-mxe-argo
+    - task: helmdrcheck-pre-upgrade-job
+      docker-image: helm-dr-check
+      cmd: helm-dr-check --helm-v3 -output .bob/ --helm-chart ${env.PWD}/helm/eric-mxe-pre-upgrade-job
+    - task: helmdrcheck-upgrade-jobs
+      docker-image: helm-dr-check
+      cmd: helm-dr-check --helm-v3 -output .bob/ --helm-chart ${env.PWD}/helm/eric-mxe-upgrade-jobs
+    - task: helmdrcheck-gatekeeper
+      docker-image: helm-dr-check
+      cmd: helm-dr-check --helm-v3 -output .bob/ --helm-chart ${env.PWD}/helm/eric-mxe-gatekeeper
+    - task: helmdrcheck-seldon-service-account
+      docker-image: helm-dr-check
+      cmd: helm-dr-check --helm-v3 -output .bob/ --helm-chart ${env.PWD}/helm/eric-mxe-seldon-service-account
+    - task: helmdrcheck-prometheus
+      docker-image: helm-dr-check
+      cmd: helm-dr-check --helm-v3 -output .bob/ --helm-chart ${env.PWD}/helm/eric-mxe-prometheus
+    - task: helmdrcheck-jupyterhub
+      docker-image: helm-dr-check
+      cmd: helm-dr-check --helm-v3 -output .bob/ --helm-chart ${env.PWD}/helm/eric-mxe-jupyterhub
+    - task: helmdrcheck-pypiserver
+      docker-image: helm-dr-check
+      cmd: helm-dr-check --helm-v3 -output .bob/ --helm-chart ${env.PWD}/helm/eric-mxe-pypiserver
+
+  helm-dr-check:
+    - task: mxe-commons
+      docker-image: helm-dr-check
+      cmd: pipeline-scripts/helm-dr-check/run-checks.sh "mxe-commons"
+    - task: mxe-deployer
+      docker-image: helm-dr-check
+      cmd: pipeline-scripts/helm-dr-check/run-checks.sh "mxe-deployer"
+    - task: mxe-serving
+      docker-image: helm-dr-check
+      cmd: pipeline-scripts/helm-dr-check/run-checks.sh "mxe-serving"
+    - task: mxe-training
+      docker-image: helm-dr-check
+      cmd: pipeline-scripts/helm-dr-check/run-checks.sh "mxe-training"
+    - task: mxe-exploration
+      docker-image: helm-dr-check
+      cmd: pipeline-scripts/helm-dr-check/run-checks.sh "mxe-exploration"
+    - task: mxe-workflow
+      docker-image: helm-dr-check
+      cmd: pipeline-scripts/helm-dr-check/run-checks.sh "mxe-workflow"
+    - task: make_zip_archive
+      cmd: bash -c '
+        set -e;
+        cd ${env.PWD}/dr-check-results/;
+        zip -r ${env.PWD}/dr-check-results.zip *;'
+    - task: check_dr_status
+      cmd: pipeline-scripts/helm-dr-check/check-dr-results.sh
+
+  mxe-install-using-deployer:
+    - task: add-delay
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd:
+        - sleep 60s
+    - task: deployer-login
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd: ${var.pipeline-scripts-dir}/deployer_login.sh ${env.TESTDEPLOYERENDPOINT} ${env.TESTDEPLOYERAUTHENDPOINT} ${env.ARGOCD_KEYCLOAKADMIN_USER} ${env.ARGOCD_KEYCLOAKADMIN_PASSWORD};
+    - task: install-mxe-serving
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd:
+        - ${var.pipeline-scripts-dir}/deploy_package.sh
+          mxe-serving
+          mxe-serving
+          system/mxe-serving
+          master
+          ${namespace}
+          "https://kubernetes.default.svc"
+          ${var.mxe-install-values-yaml}
+          ${env.GITOPS_REPO}
+          60
+          10
+    - task: install-mxe-training
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd:
+        - ${var.pipeline-scripts-dir}/deploy_package.sh
+          mxe-training
+          mxe-training
+          system/mxe-training
+          master
+          ${namespace}
+          "https://kubernetes.default.svc"
+          ${var.mxe-install-values-yaml}
+          ${env.GITOPS_REPO}
+          60
+          10
+    - task: install-mxe-workflow
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd:
+        - ${var.pipeline-scripts-dir}/deploy_package.sh
+          mxe-workflow
+          mxe-workflow
+          system/mxe-workflow
+          master
+          ${namespace}
+          "https://kubernetes.default.svc"
+          ${var.mxe-install-values-yaml}
+          ${env.GITOPS_REPO}
+          60
+          10
+    - task: install-mxe-exploration
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd:
+        - sleep 60s
+        - ${var.pipeline-scripts-dir}/deploy_package.sh
+          mxe-exploration
+          mxe-exploration
+          system/mxe-exploration
+          master
+          ${namespace}
+          "https://kubernetes.default.svc"
+          ${var.mxe-install-values-yaml}
+          ${env.GITOPS_REPO}
+          60
+          10
+
+  mxe-cleanup:
+    - rule: publish-cleanup
+    - task: uninstall_mxe
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd: ${env.PWD}/pipeline-scripts/cleanup.sh ${namespace} ${deployer-namespace}
+    - task: dev_uninstall_prereq
+      docker-image: mxe-toolkit
+      condition: NOT conditions:is-pra-release
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - --volume /usr/local/share/ca-certificates:/tmp/offlinerootcerts
+        - --user root
+        - --env EGADROOTCA_LOCATION=/usr/local/share/ca-certificates/EGADRootCA.crt
+        - --env OFFLINEROOTCA_LOCATION=/tmp/offlinerootcerts/offlinerootCA.pem
+        - --env MXE_NAMESPACE=${namespace}
+      cmd: bash -c '''
+        set -ex;
+        HELM_FILE=${env.PWD}/resources/helmfile/pre-requisites/helmfile.yaml;
+        helmfile --debug --file $HELM_FILE --state-values-file ${pre-req-helmfile-state-values} destroy;
+        kubectl delete ns ${env.NAMESPACE} --ignore-not-found=true;'''
+    - task: pra_uninstall_prereq
+      docker-image: mxe-toolkit
+      condition: conditions:is-pra-release
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - --volume /usr/local/share/ca-certificates:/tmp/offlinerootcerts
+        - --user root
+        - --env EGADROOTCA_LOCATION=/usr/local/share/ca-certificates/EGADRootCA.crt
+        - --env OFFLINEROOTCA_LOCATION=/tmp/offlinerootcerts/offlinerootCA.pem
+        - --env MXE_NAMESPACE=${namespace}
+        - --env ERIC_SEC_SIP_TLS_CRD_VERSION=${dependency.eric-sec-sip-tls-crd-version}
+        - --env ERIC_DATA_DISTRIBUTED_COORDINATOR_ED_VERSION=${dependency.eric-data-distributed-coordinator-ed-version}
+        - --env ERIC_SEC_KEY_MANAGEMENT_VERSION=${dependency.eric-sec-key-management-version}
+        - --env ERIC_SEC_SIP_TLS=${dependency.eric-sec-sip-tls-version}
+        - --env ERIC_MESH_CONTROLLER_CRD_VERSION=${dependency.eric-mesh-controller-crd-version}
+        - --env ERIC_MESH_CONTROLLER_VERSION=${dependency.eric-mesh-controller-version}
+        - --env ERIC_CTRL_BRO_VERSION=${dependency.eric-ctrl-bro-version}
+      cmd: bash -c '''
+        set -ex;
+        HELM_FILE=${env.PWD}/resources/helmfile/pre-requisites/pra_helmfile.yaml;
+        helmfile --debug --file $HELM_FILE --state-values-file ${pre-req-helmfile-state-values} destroy;
+        kubectl delete ns ${env.NAMESPACE} --ignore-not-found=true;'''
+    - task: purge 
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd: bash -c ''' 
+          set -ex; 
+          kubectl delete pods -n ${namespace} --all;
+          kubectl delete pvc -n ${namespace} --all;'''
+    - task: delete-private-registry
+      condition: conditions:offline-install
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd: bash -c ''' set -x;
+           helm delete private-container-registry -n ${env.PRIVATE_REGISTRY_NAMESPACE};
+           kubectl delete ns ${env.PRIVATE_REGISTRY_NAMESPACE} || true;
+           kubectl delete pvc -n ${env.PRIVATE_REGISTRY_NAMESPACE} -l app.kubernetes.io/instance=private-container-registry;
+           exit 0; '''
+    - task: cleanup-va-scan-charts
+      condition: conditions:offline-install
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd: bash -c ''' set -x;
+           helm delete nmap-${namespace} -n ${namespace};
+           helm delete unicorn-${namespace} -n ${namespace};
+           exit 0; '''
+
+  init-install-helm-charts:
+    - task: init-install-vars
+      cmd:
+        #- echo "${env.PWD}/.bob/mxe-commons/${helm-chart-repopath-dev}/integration-chart/mxe-commons-${var.version}.tgz" > .bob/var.install-helm-chart
+        #- echo "${env.PWD}/.bob/mxe-deployer/${helm-chart-repopath-dev}/integration-chart/mxe-deployer-${var.version}.tgz" > .bob/var.mxe-deployer-install-helm-chart
+        - echo "${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR}/mxe-deployer-values.yaml" > .bob/var.mxe-deployer-install-values-yaml
+        - echo "${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR}/mxe-values.yaml" > .bob/var.mxe-install-values-yaml
+        - echo "${var.version}" > .bob/var.chart-version
+        - mkdir -p .bob/mxe-deployer-config/
+    - task: init-install-vars-offline
+      condition: conditions:offline-install
+      cmd:
+       - echo "${env.STABLE_MXE_VERSION}" > .bob/var.chart-version
+       
+  install-prequisite-helm-packages:
+    - task: pre-req
+      docker-image: mxe-toolkit
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-k8ssecrets}"
+        - --user root
+        - --env EGADROOTCA_LOCATION=/usr/local/share/ca-certificates/EGADRootCA.crt
+        - --env MXE_NAMESPACE=${namespace}
+      cmd: bash -c '''
+        set -ex;
+        kubectl delete ns ${env.NAMESPACE} --ignore-not-found=true;
+        kubectl create ns ${env.NAMESPACE};
+        mkdir -p .cache && tar xvzf /tmp/secrets.tar.gz -C .cache/ && kubectl apply -f .cache -n ${env.NAMESPACE} || true && rm -rf .cache'''
+    - task: update-registry-in-config-file
+      condition: conditions:offline-install
+      # Run inside a linux container so that "mac" users can also use this rule
+      docker-image: k8s-test        
+      cmd: 
+      - sed -i "s/${docker-image-registry-server}/${env.PRIVATE_DOCKER_REGISTRY_HOST}/g" ${values-generator-config}
+      - sed -i "s/${docker-image-registry-server-sero}/${env.PRIVATE_DOCKER_REGISTRY_HOST}/g" ${values-generator-config}
+      - sed -i "s/armdocker-creds/private-registry-creds/g" ${values-generator-config}
+      - sed -i "s/${docker-image-registry-server}/${env.PRIVATE_DOCKER_REGISTRY_HOST}/g" ${pre-req-helmfile-state-values}
+      - sed -i "s/armdocker-creds/private-registry-creds/g" ${pre-req-helmfile-state-values}
+      - sed -i "/iam_ca_secret_name:.*/! s/ca_secret_name:.*/ca_secret_name:\ registry-rootca/g" ${values-generator-config}
+      - sed -i "s/isExtCA:.*/isExtCA:\ true/g" ${values-generator-config}
+    - task: registry-rootca-deploy
+      docker-image: mxe-toolkit
+      condition: conditions:offline-install
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-registrycerts}"
+        - --user root
+        - --env MXE_NAMESPACE=${namespace}
+      cmd: bash -c '''
+        set -ex;
+        mkdir -p .cache;
+        tar xvzf /tmp/registrycerts.tar.gz -C .cache/;
+        sed -i "s/EGADROOTCA_LOCATION/OFFLINEROOTCA_LOCATION/g" ${env.PWD}/resources/helmfile/pre-requisites/pra_helmfile.yaml;
+        sed -i "s/EGADROOTCA_LOCATION/OFFLINEROOTCA_LOCATION/g" ${env.PWD}/resources/helmfile/pre-requisites/helmfile.yaml;
+        kubectl create secret generic private-container-registry --from-file=htpasswd=.cache/htpasswd --namespace ${env.NAMESPACE};
+        kubectl create secret generic registry-rootca --from-file=ca.crt=.cache/rootCA.pem --namespace ${env.NAMESPACE} || true;
+        kubectl create secret tls api-tls --key .cache/offlineapicerts-${env.SYSTEM}-key.pem --cert .cache/offlineapicerts-${env.SYSTEM}.pem --namespace ${env.NAMESPACE}  --dry-run=client -o yaml | kubectl apply -f - || true; 
+        kubectl create secret tls deployer-tls --key .cache/offlineapicerts-${env.SYSTEM}-key.pem --cert .cache/offlineapicerts-${env.SYSTEM}.pem --namespace ${env.NAMESPACE}  --dry-run=client -o yaml | kubectl apply -f - || true;
+        kubectl create secret tls oauth-api-tls --key .cache/offlineapicerts-${env.SYSTEM}-key.pem --cert .cache/offlineapicerts-${env.SYSTEM}.pem --namespace ${env.NAMESPACE}  --dry-run=client -o yaml | kubectl apply -f - || true; 
+        kubectl create secret tls argocd-tls --key .cache/offlineapicerts-${env.SYSTEM}-key.pem --cert .cache/offlineapicerts-${env.SYSTEM}.pem --namespace ${env.NAMESPACE}  --dry-run=client -o yaml | kubectl apply -f - || true; 
+        kubectl create secret tls gitea-api-tls --key .cache/offlineapicerts-${env.SYSTEM}-key.pem --cert .cache/offlineapicerts-${env.SYSTEM}.pem --namespace ${env.NAMESPACE}  --dry-run=client -o yaml | kubectl apply -f - || true;
+        kubectl create secret generic iam-ca-cert --from-file=ca.crt=.cache/offlinerootCA.pem --namespace ${env.NAMESPACE} --dry-run=client -o yaml | kubectl apply -f - || true;
+        kubectl create secret docker-registry private-registry-creds --docker-server ${env.PRIVATE_DOCKER_REGISTRY_HOST} --docker-username "admin" --docker-password "admin" --namespace ${env.NAMESPACE} || true;
+        rm -rf .cache;'''
+    - task: dev-deploy
+      docker-image: mxe-toolkit
+      condition: NOT conditions:is-pra-release
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - --volume /usr/local/share/ca-certificates:/tmp/offlinerootcerts
+        - --user root
+        - --env EGADROOTCA_LOCATION=/usr/local/share/ca-certificates/EGADRootCA.crt
+        - --env OFFLINEROOTCA_LOCATION=/tmp/offlinerootcerts/offlinerootCA.pem
+        - --env MXE_NAMESPACE=${namespace}
+      cmd: bash -c '''
+        set -ex;
+        HELM_FILE=${env.PWD}/resources/helmfile/pre-requisites/helmfile.yaml;
+        helmfile --debug --file $HELM_FILE --state-values-file ${pre-req-helmfile-state-values} sync --include-transitive-needs'''
+    - task: pra-deploy
+      docker-image: mxe-toolkit
+      condition: conditions:is-pra-release
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - --volume /usr/local/share/ca-certificates:/tmp/offlinerootcerts
+        - --user root
+        - --env EGADROOTCA_LOCATION=/usr/local/share/ca-certificates/EGADRootCA.crt
+        - --env OFFLINEROOTCA_LOCATION=/tmp/offlinerootcerts/offlinerootCA.pem
+        - --env MXE_NAMESPACE=${namespace}
+        - --env ERIC_SEC_SIP_TLS_CRD_VERSION=${dependency.eric-sec-sip-tls-crd-version}
+        - --env ERIC_DATA_DISTRIBUTED_COORDINATOR_ED_VERSION=${dependency.eric-data-distributed-coordinator-ed-version}
+        - --env ERIC_SEC_KEY_MANAGEMENT_VERSION=${dependency.eric-sec-key-management-version}
+        - --env ERIC_SEC_SIP_TLS=${dependency.eric-sec-sip-tls-version}
+        - --env ERIC_MESH_CONTROLLER_CRD_VERSION=${dependency.eric-mesh-controller-crd-version}
+        - --env ERIC_MESH_CONTROLLER_VERSION=${dependency.eric-mesh-controller-version}
+        - --env ERIC_CTRL_BRO_VERSION=${dependency.eric-ctrl-bro-version}
+        - --env ERIC_DATA_DOCUMENT_DATABASE_PG_CRD_VERSION=${dependency.eric-data-document-database-pg-crd-version}
+      cmd: bash -c '''
+        set -ex;
+        HELM_FILE=${env.PWD}/resources/helmfile/pre-requisites/pra_helmfile.yaml;
+        helmfile --debug --file $HELM_FILE --state-values-file ${pre-req-helmfile-state-values} sync --include-transitive-needs'''
+
+  install-mandatory-base-packages:
+    - task: do-commons-helm-install
+      condition: NOT conditions:is-upgrade
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+      cmd:
+        - ${helm} upgrade --install mxe-commons mxe-commons --version ${var.chart-version}
+          --set global.registry.imagePullPolicy=Always
+          --repo ${var.helm-chart-repo}
+          --debug
+          --wait
+          --timeout=2000s
+          --namespace ${namespace}
+          --values ${var.mxe-install-values-yaml}
+        - kubectl rollout status statefulset/eric-mxe-gatekeeper
+          --watch
+          --namespace=${namespace}
+          --timeout=10m
+    - task: do-commons-helm-upgrade
+      condition: conditions:is-upgrade
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+      cmd:
+        - bash -c '
+          cr_password=$(helm get values mxe-commons --revision=1 --namespace ${namespace} | grep lcm-container-registry-password | awk "{print \$2}");
+          echo $cr_password;
+          ${helm} upgrade --install mxe-commons mxe-commons --version ${var.chart-version} --set global.registry.imagePullPolicy="Always" --repo ${var.helm-chart-repo} --debug --wait --timeout=2000s --namespace ${namespace} --values ${var.mxe-install-values-yaml} --set global.internalRegistry.password=$cr_password;'
+        - kubectl rollout status statefulset/eric-mxe-gatekeeper --watch --namespace=${namespace} --timeout=10m;
+    - task: install-deployer-chart
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd:
+        - ${helm} upgrade --install mxe-deployer mxe-deployer --version ${var.chart-version}
+          --set global.registry.imagePullPolicy="Always"
+          --repo ${var.helm-chart-repo}
+          --debug
+          --wait
+          --timeout=2000s
+          --namespace ${deployer-namespace}
+          --values ${var.mxe-deployer-install-values-yaml}
+    - task: verify-deployer-login
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+        - --volume /usr/local/share/ca-certificates:/usr/share/pki/trust/anchors
+        - --user root
+      cmd: 
+        - bash -c '
+          update-ca-certificates;
+          ${var.pipeline-scripts-dir}/deployer_login.sh ${env.TESTDEPLOYERENDPOINT} ${env.TESTDEPLOYERAUTHENDPOINT} ${env.ARGOCD_KEYCLOAKADMIN_USER} ${env.ARGOCD_KEYCLOAKADMIN_PASSWORD};'
+
+  rollback-mandatory-base-packages:
+    - task: rollback-mxe-commons
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+      cmd: 
+        - ${helm} rollback mxe-commons 1
+          --namespace ${namespace}
+          --timeout=600s
+          --wait
+          --debug
+        - ${helm} list --namespace ${namespace}
+    - task: rollback-mxe-deployer
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd: 
+        - ${helm} rollback mxe-deployer 1
+          --namespace ${deployer-namespace}
+          --timeout=600s
+          --wait
+          --debug
+        - ${helm} list --namespace ${deployer-namespace}
+
+  install-mxe-serving-package:
+    - task: install-mxe-serving
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd:
+        - ${helm} upgrade --install mxe-serving mxe-serving --version ${var.chart-version}
+          --set global.registry.imagePullPolicy="Always"
+          --repo ${var.helm-chart-repo}
+          --debug
+          --wait
+          --timeout=2000s
+          --namespace ${namespace}
+          --values ${var.mxe-install-values-yaml}
+
+  rollback-mxe-serving-package:
+    - task: rollback-mxe-serving
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd: 
+        - ${helm} rollback mxe-serving 1
+          --namespace ${namespace}
+          --timeout=600s
+          --wait
+          --debug
+        - ${helm} list --namespace ${namespace}
+
+  install-optional-packages:
+    - task: mxe-exploration
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd:
+        - ${helm} upgrade --install mxe-exploration mxe-exploration --version ${var.chart-version}
+          --set global.registry.imagePullPolicy="Always"
+          --repo ${var.helm-chart-repo}
+          --debug
+          --wait
+          --timeout=2000s
+          --namespace ${namespace}
+          --values ${var.mxe-install-values-yaml}
+    - task: mxe-workflow
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd:
+        - ${helm} upgrade --install mxe-workflow mxe-workflow --version ${var.chart-version}
+          --set global.registry.imagePullPolicy="Always"
+          --repo ${var.helm-chart-repo}
+          --debug
+          --wait
+          --timeout=2000s
+          --namespace ${namespace}
+          --values ${var.mxe-install-values-yaml}
+    - task: mxe-training
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd:
+        - ${helm} upgrade --install mxe-training mxe-training --version ${var.chart-version}
+          --set global.registry.imagePullPolicy="Always"
+          --repo ${var.helm-chart-repo}
+          --debug
+          --wait
+          --timeout=2000s
+          --namespace ${namespace}
+          --values ${var.mxe-install-values-yaml}
+
+  rollback-optional-packages:
+    - task: rollback-mxe-exploration
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd: 
+        - ${helm} rollback mxe-exploration 1
+          --namespace ${namespace}
+          --timeout=600s
+          --wait
+          --debug
+        - ${helm} list --namespace ${namespace}
+    - task: rollback-mxe-workflow
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd: 
+        - ${helm} rollback mxe-workflow 1
+          --namespace ${namespace}
+          --timeout=600s
+          --wait
+          --debug
+        - ${helm} list --namespace ${namespace}
+    - task: rollback-mxe-training
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - "${docker-flags-mxe-deployer}"
+      cmd: 
+        - ${helm} rollback mxe-training 1
+          --namespace ${namespace}
+          --timeout=600s
+          --wait
+          --debug
+        - ${helm} list --namespace ${namespace}
+
+  install-helm-charts:
+    - rule: init-install-helm-charts
+    - rule: install-prequisite-helm-packages
+    - rule: generate-values-using-mxe-generate-linux
+    - rule: install-mandatory-base-packages
+
+  rollback-helm-charts:
+    - rule: rollback-mandatory-base-packages
+    - rule: rollback-mxe-serving-package
+    - rule: rollback-optional-packages
+
+  validate-images:
+    - task: check-image-repo-for-online-install
+      condition: NOT conditions:offline-install
+      docker-image: mxe-toolkit
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - --user root
+      cmd: ${env.PWD}/pipeline-scripts/validate_images.sh ${namespace}
+    - task: check-image-repo-for-offline-install
+      condition: conditions:offline-install
+      docker-image: mxe-toolkit
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - --user root
+      cmd: ${env.PWD}/pipeline-scripts/validate_images.sh ${namespace} ${env.PRIVATE_DOCKER_REGISTRY_HOST}
+
+  system-test:
+    - rule: jcat-function-test
+    - rule: jcat-access-control-test
+    - rule: mxe-cleanup
+
+  long-system-test:
+    - rule: jcat-function-test
+    - rule: jcat-access-control-test
+    - rule: jcat-long-test
+    - rule: mxe-cleanup
+
+  fetch-logs:
+    - task: do-fetch-logs
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "--network host"
+        - "${docker-flags-mxe-deployer}"
+      cmd: pipeline-scripts/fetch_logs.sh ${namespace} ${deployer-namespace}
+
+  traffic-test:
+    - rule: jcat-model-feed-test
+
+  prepare-baseline-perf-tests:
+    - task: ubclustering-download-model
+      cmd:
+        - mkdir -p models && curl -k --header "X-JFrog-Art-Api:${env.API_TOKEN}" --fail ${generic-repo-internal}/models-ubclustering-1.0.1.tar.gz | tar xvz -C models
+    - task: inception3-download-models-and-images
+      cmd:
+        - mkdir -p models && curl -k --header "X-JFrog-Art-Api:${env.API_TOKEN}" --fail ${generic-repo-internal}/models-inception3-3.0.1.tar.gz | tar xvz -C models
+        - mkdir -p models/images && curl -k --header "X-JFrog-Art-Api:${env.API_TOKEN}" --fail ${generic-repo-internal}/images-n02077923-20191018.tar.gz | tar xvz -C models/images
+
+  ubclustering-perf-test:
+    - task: init-test
+      cmd:
+        - echo "mxePerfTestUBCluster.xml" > .bob/var.suite
+    - rule: jcat-common-test
+
+  ubclustering-baseline-perf-test:
+    - task: init-test
+      cmd:
+        - echo "mxeBaselinePerfTestUBCluster.xml" > .bob/var.suite
+    - rule: jcat-common-test
+
+  inception3-perf-test:
+    - task: init-test
+      cmd:
+        - echo "mxePerfTestInception3.xml" > .bob/var.suite
+    - rule: jcat-common-test
+
+  inception3-baseline-perf-test:
+    - task: init-test
+      cmd:
+        - echo "mxeBaselinePerfTestInception3.xml" > .bob/var.suite
+    - rule: jcat-common-test
+
+  run-jcat-suites:
+    - task: init-install-version-var
+      cmd:
+        - echo "${env.TEST_BASE_VERSION}" > .bob/var.install-version
+        - echo "${env.TEST_BASE_VALUES_YAML}" > .bob/var.install-values-yaml
+        - echo "${env.TEST_SUITES_TO_RUN}" > .bob/var.jcat-suites-to-run
+    - task: merge-suites
+      docker-image: asciidoc-builder
+      cmd:
+        - sh -c '
+          cd mxe-jcat/target/testsuites/ &&
+          cat suite.xml.prefix > merged.xml &&
+          xmllint --xpath //test  ${var.jcat-suites-to-run} >> merged.xml &&
+          echo "</suite>" >> merged.xml &&
+          echo "merged.xml" > .bob/var.suite'
+    - rule: jcat-common-test
+
+  upgrade-test:
+    - task: init-base-install-version-var
+      cmd:
+        - echo "${env.TEST_BASE_VERSION}" > .bob/var.install-version
+        - echo "${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR}/mxe-values.yaml" > .bob/var.mxe-install-values-yaml
+        - echo "${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR}/mxe-deployer-values.yaml" > .bob/var.mxe-deployer-install-values-yaml
+    - task: get-cli
+      cmd:
+        - curl -k --header "X-JFrog-Art-Api:${env.API_TOKEN}" --fail ${generic-repo-public}/mxe-cli-linux-${var.install-version}.tgz | tar xvz -C cli
+        - ls -la cli/
+    - task: do-helm-install
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        # TODO: needed?
+        - "--network host"
+        - "${docker-flags-helm3}"
+      cmd:
+        - ${env.PWD}/pipeline-scripts/helm_install.sh
+          "${helm}" "${namespace}" "2000s" "${env.PWD}/resources/mxe-apps/Chart.tpl" ".bob/mxe-apps-${var.install-version}/"
+          "${var.mxe-install-values-yaml}" "${var.mxe-deployer-install-values-yaml}" "${env.PWD}/resources/mxe-apps/additional-values.yaml"
+          "${helm-chart-eric-sec-sip-tls-crd}" "${helm-chart-eric-data-distributed-coordinator-ed}"
+          "${helm-chart-eric-sec-key-management}" "${helm-chart-eric-sec-sip-tls}" "${helm-chart-adp-sm-controller-crd}" 
+          "${helm-chart-eric-mesh-controller}" "${helm-chart-adp-eric-ctrl-bro}" "${helm-chart-repo-internal}" 
+          "${var.install-version}" "${env.USER}"
+    - rule: jcat-pre-upgrade-test
+    - task: get-cli-target
+      cmd:
+        - curl -k --header "X-JFrog-Art-Api:${env.API_TOKEN}" --fail ${var.generic-repo}/mxe-cli-linux-${env.TEST_TARGET_VERSION}.tgz | tar xvz -C cli
+        - ls -la cli/
+    - task: list-pods
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "--network host"
+      cmd:
+        - bash -c "
+          kubectl get all -n ${namespace};
+          kubectl get deployment -n ${namespace} -l app.kubernetes.io/part-of=mxe;
+          kubectl get service -n ${namespace} -l app.kubernetes.io/part-of=mxe;"
+    - task: init-target-install-version-var
+      cmd:
+        - echo "${env.TEST_TARGET_VERSION}" > .bob/var.install-version
+        - echo "${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR}/mxe-values.yaml" > .bob/var.mxe-install-values-yaml
+        - echo "${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR}/mxe-deployer-values.yaml" > .bob/var.mxe-deployer-install-values-yaml
+    - task: do-helm-upgrade
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "--network host"
+        - "${docker-flags-helm3}"
+      cmd:
+        - bash -c '
+          set -x;
+          sed -i -e "/^####SECRETS####/r ${env.PWD}/essentials/secrets.txt" -e "//d"  ${var.mxe-install-values-yaml};
+          status=$?;
+          if [ $status -eq 0 ]; then
+          echo "Secrets are added successfully into ${var.mxe-install-values-yaml}";
+          fi'
+        - ${env.PWD}/pipeline-scripts/helm_upgrade.sh
+          "${helm}" "${namespace}" "2000s" "${env.PWD}/resources/mxe-apps/Chart.tpl" ".bob/mxe-apps-${var.install-version}/"
+          "${var.mxe-install-values-yaml}" "${var.mxe-deployer-install-values-yaml}" "${env.PWD}/resources/mxe-apps/additional-values.yaml" "${helm-chart-adp-sm-controller-crd}" "${helm-chart-adp-eric-ctrl-bro}"
+          "${helm-chart-repo-internal}" "${var.install-version}" "${env.USER}"
+    - rule: jcat-post-upgrade-test
+    - rule: jcat-function-test
+    - rule: jcat-access-control-test
+    - rule: jcat-long-test
+    #- rule: jcat-performance-test
+    #- rule: jcat-scalability-test
+    #    - rule: gui-test
+    - rule: do-helm-delete
+
+  update-requirements:
+    - task: baseline
+      docker-image: k8s-test
+      cmd: bash -c '
+        set -e;
+
+        cp mxe-commons/helm/mxe-commons/requirements.adp.latest.yaml mxe-commons/helm/mxe-commons/requirements.yaml;
+
+        staging-scripts/update_chart_requirements.py --appChartDir=mxe-commons/helm/mxe-commons
+        --chartName=${env.CHART_NAME}
+        --chartVersion=${env.CHART_VERSION}
+        --chartRepo=${env.CHART_REPO};
+
+        mv mxe-commons/helm/mxe-commons/requirements.yaml mxe-commons/helm/mxe-commons/requirements.adp.latest.yaml;'
+
+  generate-requirements:
+    - task: use-adp-requirements
+      docker-image: k8s-test
+      cmd:
+        - yq m -a -i mxe-commons/helm/mxe-commons/Chart.yaml mxe-commons/helm/mxe-commons/requirements.adp.release.yaml mxe-commons/helm/mxe-commons/requirements.3rdparty.yaml
+        # Use Chart.yaml for dependencies instead of separate requirements file
+        # Inplace update Chart.yaml dependencies block
+        - yq m -a -i mxe-deployer/helm/mxe-deployer/Chart.yaml mxe-deployer/helm/mxe-deployer/requirements.adp.release.yaml mxe-deployer/helm/mxe-deployer/requirements.3rdparty.yaml
+        - yq m -a -i mxe-training/helm/mxe-training/Chart.yaml mxe-training/helm/mxe-training/requirements.adp.release.yaml mxe-training/helm/mxe-training/requirements.3rdparty.yaml
+        - yq m -a -i mxe-workflow/helm/mxe-workflow/Chart.yaml mxe-workflow/helm/mxe-workflow/requirements.adp.release.yaml mxe-workflow/helm/mxe-workflow/requirements.3rdparty.yaml
+        - yq m -a -i mxe-exploration/helm/mxe-exploration/Chart.yaml mxe-exploration/helm/mxe-exploration/requirements.adp.release.yaml mxe-exploration/helm/mxe-exploration/requirements.3rdparty.yaml
+        - yq m -a -i mxe-serving/helm/mxe-serving/Chart.yaml mxe-serving/helm/mxe-serving/requirements.adp.release.yaml mxe-serving/helm/mxe-serving/requirements.3rdparty.yaml
+
+  generate-adp-requirements:
+    - task: use-adp-requirements
+      docker-image: k8s-test
+      cmd:
+        - yq m -a -i mxe-commons/helm/mxe-commons/Chart.yaml mxe-commons/helm/mxe-commons/requirements.adp.latest.yaml mxe-commons/helm/mxe-commons/requirements.3rdparty.yaml
+        - yq m -a -i mxe-deployer/helm/mxe-deployer/Chart.yaml mxe-deployer/helm/mxe-deployer/requirements.adp.release.yaml mxe-deployer/helm/mxe-deployer/requirements.3rdparty.yaml
+        - yq m -a -i mxe-training/helm/mxe-training/Chart.yaml mxe-training/helm/mxe-training/requirements.adp.release.yaml mxe-training/helm/mxe-training/requirements.3rdparty.yaml
+        - yq m -a -i mxe-workflow/helm/mxe-workflow/Chart.yaml mxe-workflow/helm/mxe-workflow/requirements.adp.release.yaml mxe-workflow/helm/mxe-workflow/requirements.3rdparty.yaml
+        - yq m -a -i mxe-exploration/helm/mxe-exploration/Chart.yaml mxe-exploration/helm/mxe-exploration/requirements.adp.release.yaml mxe-exploration/helm/mxe-exploration/requirements.3rdparty.yaml
+        - yq m -a -i mxe-serving/helm/mxe-serving/Chart.yaml mxe-serving/helm/mxe-serving/requirements.adp.release.yaml mxe-serving/helm/mxe-serving/requirements.3rdparty.yaml
+
+  commit-new-requirements:
+    - task: commit
+      cmd:
+        sh -c "if ( ! (git diff --quiet -- ./mxe-commons/helm/mxe-commons/requirements.adp.latest.yaml) && ! ( test '${env.CHART_NAME}' = 'eric-mxe')); then
+        git add ./mxe-commons/helm/mxe-commons/requirements.adp.latest.yaml;
+        git commit -m 'Automatic new version in baseline ${env.CHART_NAME} ${env.CHART_VERSION}';
+        git status;
+        git log -n 5 --oneline --decorate --graph --all;
+        else
+        echo -e '\n\n    Nothing to be committed.\n\n';
+        fi;"
+
+  push-new-requirements:
+    - task: push
+      cmd:
+        sh -c "if ( ! (git diff --quiet HEAD~1 HEAD -- ./mxe-commons/helm/mxe-commons/requirements.adp.latest.yaml) && ! ( test '${env.CHART_NAME}' = 'eric-mxe')); then
+        git checkout -- .;
+        git pull -r origin master;
+        git push origin HEAD:master;
+        else
+        echo -e '\n\n    Nothing to be pushed.\n\n';
+        fi;"
+
+  pra-release:
+    - task: init
+      cmd:
+        - sh -c 'mkdir -p ./${env.RELEASE_ARTIFACTS_FOLDER}'
+    - task: prepare-images
+      cmd: bash -c '
+        while read -r -d, image; do
+        image+=":${var.release-candidate-version}";
+        echo $image;
+        docker pull "${docker-image-repo-public}/$image";
+        docker tag  "${docker-image-repo-public}/$image" "${docker-image-repo-release}/$image";
+        done <<< "${docker-images-mxe}";'
+    - task: prepare-iam-image
+      cmd: bash -c '
+        docker pull "${docker-image-repo-public}/${iam-image-mxe}";
+        docker tag "${docker-image-repo-public}/${iam-image-mxe}" "${docker-image-repo-release}/${iam-image-mxe}";'
+    - task: publish-images
+      cmd: bash -c '
+        while read -r -d, image; do
+        image+=":${var.release-candidate-version}";
+        echo $image;
+        docker push "${docker-image-repo-release}/$image";
+        done <<< "${docker-images-mxe}";'
+    - task: publish-iam-image
+      cmd: docker push ${docker-image-repo-release}/${iam-image-mxe}
+    - task: prepare-commons-chart
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-adp-release-auto}"
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - generate_release_helm_package
+          --repo=${helm-chart-repo-internal}
+          --chart-name=${helm-commons-chart-name}
+          --chart-version=${var.release-candidate-version}
+          --output=${var.release-artifacts-folder}
+          --chart-released-version=${var.version}
+          --helm-credentials=/tmp/helm_credentials.yaml
+        - tar xvzf ${var.release-artifacts-folder}/${helm-commons-chart-name}-${var.version}.tgz --directory ${var.release-artifacts-folder}
+        - rm -rf ${var.release-artifacts-folder}/${helm-commons-chart-name}-${var.version}.tgz
+        - find ${var.release-artifacts-folder}/${helm-commons-chart-name} -type f -name "values.yaml" -print0 | xargs -0 sed -i 's/${docker-image-repopath-dev}/${docker-image-repopath-release}/g'
+        - find ${var.release-artifacts-folder}/${helm-commons-chart-name} -type f -name "eric-product-info.yaml" -print0 | xargs -0 sed -i 's/${docker-image-repopath-dev}/${docker-image-repopath-release}/g'
+        - helm-package
+          --helm-credentials=/tmp/helm_credentials.yaml
+          --folder ${var.release-artifacts-folder}/${helm-commons-chart-name}
+          --version ${var.version}
+          --output ${var.release-artifacts-folder}
+        - rm -rf ${var.release-artifacts-folder}/${helm-commons-chart-name}
+    - task: prepare-deployer-chart
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-adp-release-auto}"
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - generate_release_helm_package
+          --repo=${helm-chart-repo-internal}
+          --chart-name=${helm-deployer-chart-name}
+          --chart-version=${var.release-candidate-version}
+          --output=${var.release-artifacts-folder}
+          --chart-released-version=${var.version}
+          --helm-credentials=/tmp/helm_credentials.yaml
+        - tar xvzf ${var.release-artifacts-folder}/${helm-deployer-chart-name}-${var.version}.tgz --directory ${var.release-artifacts-folder}
+        - rm -rf ${var.release-artifacts-folder}/${helm-deployer-chart-name}-${var.version}.tgz
+        - find ${var.release-artifacts-folder}/${helm-deployer-chart-name} -type f -name "values.yaml" -print0 | xargs -0 sed -i 's/${docker-image-repopath-dev}/${docker-image-repopath-release}/g'
+        - find ${var.release-artifacts-folder}/${helm-deployer-chart-name} -type f -name "eric-product-info.yaml" -print0 | xargs -0 sed -i 's/${docker-image-repopath-dev}/${docker-image-repopath-release}/g'
+        - sh ${var.pipeline-scripts-dir}/deployer_release_update.sh ${var.version} ${var.release-candidate-version} ${var.release-artifacts-folder}/${helm-deployer-chart-name}/charts/eric-mxe-deployer-service/values.yaml
+        - helm-package
+          --helm-credentials=/tmp/helm_credentials.yaml
+          --folder ${var.release-artifacts-folder}/${helm-deployer-chart-name}
+          --version ${var.version}
+          --output ${var.release-artifacts-folder}
+        - rm -rf ${var.release-artifacts-folder}/${helm-deployer-chart-name}
+    - task: prepare-serving-chart
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-adp-release-auto}"
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - generate_release_helm_package
+          --repo=${helm-chart-repo-internal}
+          --chart-name=${helm-serving-chart-name}
+          --chart-version=${var.release-candidate-version}
+          --output=${var.release-artifacts-folder}
+          --chart-released-version=${var.version}
+          --helm-credentials=/tmp/helm_credentials.yaml
+        - tar xvzf ${var.release-artifacts-folder}/${helm-serving-chart-name}-${var.version}.tgz --directory ${var.release-artifacts-folder}
+        - rm -rf ${var.release-artifacts-folder}/${helm-serving-chart-name}-${var.version}.tgz
+        - find ${var.release-artifacts-folder}/${helm-serving-chart-name} -type f -name "values.yaml" -print0 | xargs -0 sed -i 's/${docker-image-repopath-dev}/${docker-image-repopath-release}/g'
+        - find ${var.release-artifacts-folder}/${helm-serving-chart-name} -type f -name "eric-product-info.yaml" -print0 | xargs -0 sed -i 's/${docker-image-repopath-dev}/${docker-image-repopath-release}/g'
+        - helm-package
+          --helm-credentials=/tmp/helm_credentials.yaml
+          --folder ${var.release-artifacts-folder}/${helm-serving-chart-name}
+          --version ${var.version}
+          --output ${var.release-artifacts-folder}
+        - rm -rf ${var.release-artifacts-folder}/${helm-serving-chart-name}
+    - task: prepare-training-chart
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-adp-release-auto}"
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - generate_release_helm_package
+          --repo=${helm-chart-repo-internal}
+          --chart-name=${helm-training-chart-name}
+          --chart-version=${var.release-candidate-version}
+          --output=${var.release-artifacts-folder}
+          --chart-released-version=${var.version}
+          --helm-credentials=/tmp/helm_credentials.yaml
+        - tar xvzf ${var.release-artifacts-folder}/${helm-training-chart-name}-${var.version}.tgz --directory ${var.release-artifacts-folder}
+        - rm -rf ${var.release-artifacts-folder}/${helm-training-chart-name}-${var.version}.tgz
+        - find ${var.release-artifacts-folder}/${helm-training-chart-name} -type f -name "values.yaml" -print0 | xargs -0 sed -i 's/${docker-image-repopath-dev}/${docker-image-repopath-release}/g'
+        - find ${var.release-artifacts-folder}/${helm-training-chart-name} -type f -name "eric-product-info.yaml" -print0 | xargs -0 sed -i 's/${docker-image-repopath-dev}/${docker-image-repopath-release}/g'
+        - helm-package
+          --helm-credentials=/tmp/helm_credentials.yaml
+          --folder ${var.release-artifacts-folder}/${helm-training-chart-name}
+          --version ${var.version}
+          --output ${var.release-artifacts-folder}
+        - rm -rf ${var.release-artifacts-folder}/${helm-training-chart-name}
+    - task: prepare-workflow-chart
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-adp-release-auto}"
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - generate_release_helm_package
+          --repo=${helm-chart-repo-internal}
+          --chart-name=${helm-workflow-chart-name}
+          --chart-version=${var.release-candidate-version}
+          --output=${var.release-artifacts-folder}
+          --chart-released-version=${var.version}
+          --helm-credentials=/tmp/helm_credentials.yaml
+        - tar xvzf ${var.release-artifacts-folder}/${helm-workflow-chart-name}-${var.version}.tgz --directory ${var.release-artifacts-folder}
+        - rm -rf ${var.release-artifacts-folder}/${helm-workflow-chart-name}-${var.version}.tgz
+        - find ${var.release-artifacts-folder}/${helm-workflow-chart-name} -type f -name "values.yaml" -print0 | xargs -0 sed -i 's/${docker-image-repopath-dev}/${docker-image-repopath-release}/g'
+        - find ${var.release-artifacts-folder}/${helm-workflow-chart-name} -type f -name "eric-product-info.yaml" -print0 | xargs -0 sed -i 's/${docker-image-repopath-dev}/${docker-image-repopath-release}/g'
+        - helm-package
+          --helm-credentials=/tmp/helm_credentials.yaml
+          --folder ${var.release-artifacts-folder}/${helm-workflow-chart-name}
+          --version ${var.version}
+          --output ${var.release-artifacts-folder}
+        - rm -rf ${var.release-artifacts-folder}/${helm-workflow-chart-name}
+    - task: prepare-exploration-chart
+      docker-image: adp-release-auto
+      docker-flags:
+        - "${docker-flags-adp-release-auto}"
+        - "${docker-flags-helm3-enable}"
+      cmd:
+        - generate_release_helm_package
+          --repo=${helm-chart-repo-internal}
+          --chart-name=${helm-exploration-chart-name}
+          --chart-version=${var.release-candidate-version}
+          --output=${var.release-artifacts-folder}
+          --chart-released-version=${var.version}
+          --helm-credentials=/tmp/helm_credentials.yaml
+        - tar xvzf ${var.release-artifacts-folder}/${helm-exploration-chart-name}-${var.version}.tgz --directory ${var.release-artifacts-folder}
+        - rm -rf ${var.release-artifacts-folder}/${helm-exploration-chart-name}-${var.version}.tgz
+        - find ${var.release-artifacts-folder}/${helm-exploration-chart-name} -type f -name "values.yaml" -print0 | xargs -0 sed -i 's/${docker-image-repopath-dev}/${docker-image-repopath-release}/g'
+        - find ${var.release-artifacts-folder}/${helm-exploration-chart-name} -type f -name "eric-product-info.yaml" -print0 | xargs -0 sed -i 's/${docker-image-repopath-dev}/${docker-image-repopath-release}/g'
+        - helm-package
+          --helm-credentials=/tmp/helm_credentials.yaml
+          --folder ${var.release-artifacts-folder}/${helm-exploration-chart-name}
+          --version ${var.version}
+          --output ${var.release-artifacts-folder}
+        - rm -rf ${var.release-artifacts-folder}/${helm-exploration-chart-name}
+    - task: publish-commons-chart
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename="${var.release-artifacts-folder}/${helm-commons-chart-name}-${var.version}.tgz"
+        --repository=${var.helm-chart-repo}
+        --api-token=${env.API_TOKEN}
+    - task: publish-deployer-chart
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename="${var.release-artifacts-folder}/${helm-deployer-chart-name}-${var.version}.tgz"
+        --repository=${var.helm-chart-repo}
+        --api-token=${env.API_TOKEN}
+    - task: publish-serving-chart
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename="${var.release-artifacts-folder}/${helm-serving-chart-name}-${var.version}.tgz"
+        --repository=${var.helm-chart-repo}
+        --api-token=${env.API_TOKEN}
+    - task: publish-training-chart
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename="${var.release-artifacts-folder}/${helm-training-chart-name}-${var.version}.tgz"
+        --repository=${var.helm-chart-repo}
+        --api-token=${env.API_TOKEN}
+    - task: publish-workflow-chart
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename="${var.release-artifacts-folder}/${helm-workflow-chart-name}-${var.version}.tgz"
+        --repository=${var.helm-chart-repo}
+        --api-token=${env.API_TOKEN}
+    - task: publish-exploration-chart
+      docker-image: adp-release-auto
+      cmd: upload_file.sh
+        --filename="${var.release-artifacts-folder}/${helm-exploration-chart-name}-${var.version}.tgz"
+        --repository=${var.helm-chart-repo}
+        --api-token=${env.API_TOKEN}
+    - task: prepare-cli
+      cmd:
+        - curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --fail ${generic-repo-public}/mxe-cli-linux-${var.release-candidate-version}.tgz --output ${var.release-artifacts-folder}/mxe-cli-linux-${var.release-candidate-version}.tgz
+        - curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --fail ${generic-repo-public}/mxe-cli-windows-${var.release-candidate-version}.zip --output ${var.release-artifacts-folder}/mxe-cli-windows-${var.release-candidate-version}.zip
+        - curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --fail ${generic-repo-public}/mxe-cli-macos-${var.release-candidate-version}.zip --output ${var.release-artifacts-folder}/mxe-cli-macos-${var.release-candidate-version}.zip
+    - task: prepare-essentials
+      cmd: bash -c '''
+        set -e;
+        set -x;
+        mkdir -p ${var.release-artifacts-folder}/mxe-essentials;
+        curl -k --header "X-JFrog-Art-Api:${env.API_TOKEN}" --fail -o ${var.release-artifacts-folder}/mxe-essentials-${var.release-candidate-version}.zip ${generic-repo-public}/mxe-essentials-${var.release-candidate-version}.zip;
+        unzip ${var.release-artifacts-folder}/mxe-essentials-${var.release-candidate-version}.zip -d ${var.release-artifacts-folder}/mxe-essentials;
+        rm -f ${var.release-artifacts-folder}/mxe-essentials-${var.release-candidate-version}.zip;
+        workdir=${env.PWD};
+        cd ${var.release-artifacts-folder}/mxe-essentials;
+        zip -r $workdir/${var.release-artifacts-folder}/mxe-essentials.zip *;
+        cd $workdir;
+        rm -rf $workdir/essentials;
+        mv ${var.release-artifacts-folder}/mxe-essentials $workdir/essentials;
+        '''
+    - task: publish-essentials
+      docker-image: adp-release-auto
+      cmd:
+        - upload_file.sh
+          --filename=${var.release-artifacts-folder}/mxe-essentials.zip
+          --repository=${var.generic-repo}/${var.release-candidate-version}
+          --api-token=${env.API_TOKEN}
+    - task: publish-cli
+      docker-image: adp-release-auto
+      cmd:
+        - upload_file.sh
+          --filename=${var.release-artifacts-folder}/mxe-cli-linux-${var.release-candidate-version}.tgz
+          --repository=${var.generic-repo}/${var.release-candidate-version}
+          --api-token=${env.API_TOKEN}
+        - upload_file.sh
+          --filename=${var.release-artifacts-folder}/mxe-cli-windows-${var.release-candidate-version}.zip
+          --repository=${var.generic-repo}/${var.release-candidate-version}
+          --api-token=${env.API_TOKEN}
+        - upload_file.sh
+          --filename=${var.release-artifacts-folder}/mxe-cli-macos-${var.release-candidate-version}.zip
+          --repository=${var.generic-repo}/${var.release-candidate-version}
+          --api-token=${env.API_TOKEN}
+    - task: publish-offline-installer
+      docker-image: adp-release-auto
+      cmd: bash -c ''' 
+            set -ex; 
+            packages=( .bob/${mxe-commons-offline-images-archive} 
+                       .bob/${mxe-deployer-offline-images-archive} 
+                       .bob/${mxe-serving-offline-images-archive} 
+                       .bob/${mxe-workflow-offline-images-archive} 
+                       .bob/${mxe-training-offline-images-archive} 
+                       .bob/${mxe-exploration-offline-images-archive});
+            for package in "${packages[@]}"; do 
+              upload_file.sh --filename=$package --repository=${var.generic-repo}/${var.release-candidate-version} --api-token=${env.API_TOKEN};
+            done;'''
+    - task: post-actions
+      cmd:
+        - git checkout -- .
+        - git pull --rebase origin ${env.RELEASE_BRANCH}
+        - git tag --delete ${var.version} || true
+        - git tag --annotate ${var.version} $(git rev-list --max-count=1 ${var.release-candidate-version}) -m "Release ${var.version}"
+        - git push origin ${var.version}
+        - echo ${env.NEXT_VERSION_PREFIX} > VERSION_PREFIX
+        - echo "${env.NEXT_VERSION_PREFIX}-dev" > VERSION_PREFIX_DEV
+        - echo "${env.NEXT_VERSION_PREFIX}-stg" > VERSION_PREFIX_STAGING
+        - echo "${env.NEXT_VERSION_PREFIX}-va" > VERSION_PREFIX_VA
+        - echo "${env.NEXT_VERSION_PREFIX}-weekly" > VERSION_PREFIX_WEEKLY
+        - git add VERSION_PREFIX VERSION_PREFIX_DEV VERSION_PREFIX_STAGING VERSION_PREFIX_VA VERSION_PREFIX_WEEKLY
+        - git commit --message="Next version prefix ${env.NEXT_VERSION_PREFIX}"
+        - git push origin HEAD:${env.RELEASE_BRANCH}
+        - rm -rf ${var.release-artifacts-folder}
+        - rm -f .bob/${mxe-commons-offline-images-archive} .bob/${mxe-deployer-offline-images-archive} .bob/${mxe-serving-offline-images-archive} .bob/${mxe-workflow-offline-images-archive} .bob/${mxe-training-offline-images-archive} .bob/${mxe-exploration-offline-images-archive}
+    - task: revert
+      cmd:
+        - git push origin ":${var.version}" || true
+        - bash -c '
+          curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --request DELETE --location "${var.helm-chart-repo}-local/${helm-commons-chart-name}-${var.version}.tgz" || true;
+          curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --request DELETE --location "${var.helm-chart-repo}-local/${helm-deployer-chart-name}-${var.version}.tgz" || true;
+          curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --request DELETE --location "${var.helm-chart-repo}-local/${helm-serving-chart-name}-${var.version}.tgz" || true;
+          curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --request DELETE --location "${var.helm-chart-repo}-local/${helm-training-chart-name}-${var.version}.tgz" || true;
+          curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --request DELETE --location "${var.helm-chart-repo}-local/${helm-workflow-chart-name}-${var.version}.tgz" || true;
+          curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --request DELETE --location "${var.helm-chart-repo}-local/${helm-exploration-chart-name}-${var.version}.tgz" || true;
+          curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --request DELETE --location "${var.generic-repo}-local/${var.release-candidate-version}/mxe-cli-linux-${var.release-candidate-version}.tgz" || true;
+          curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --request DELETE --location "${var.generic-repo}-local/${var.release-candidate-version}/mxe-cli-windows-${var.release-candidate-version}.zip" || true;
+          curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --request DELETE --location "${var.generic-repo}-local/${var.release-candidate-version}/mxe-cli-macos-${var.release-candidate-version}.zip" || true;
+          while read -r -d, image; do
+          curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --request DELETE --location "${docker-image-registry-server}/artifactory/proj-mxe-release-docker-global/proj-mxe-release/$image/${var.release-candidate-version}" || true;
+          done <<< "${docker-images-mxe}";
+          curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --request DELETE --location "${docker-image-registry-server}/artifactory/proj-mxe-release-docker-global/proj-mxe-release/mxe/eric-sec-access-mgmt-image/${env.dependency.IAM_VERSION}" || true;
+          curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --request DELETE --location "${var.generic-repo}-local/${var.release-candidate-version}" || true;'
+        - rm -rf ${var.release-artifacts-folder}
+        - rm -f .bob/${mxe-commons-offline-images-archive} .bob/${mxe-deployer-offline-images-archive} .bob/${mxe-serving-offline-images-archive} .bob/${mxe-workflow-offline-images-archive} .bob/${mxe-training-offline-images-archive} .bob/${mxe-exploration-offline-images-archive}
+
+  system-test-pra-package:
+    - task: init-install-helm-charts:init-install-vars
+    - task: fetch-cli
+      cmd:
+        - curl --header "X-JFrog-Art-Api:${env.API_TOKEN}" --fail ${generic-repo-release}/${var.release-candidate-version}/mxe-cli-linux-${var.release-candidate-version}.tgz --output cli/mxe-cli-linux-${var.release-candidate-version}.tgz
+        - tar xvzf cli/mxe-cli-linux-${var.release-candidate-version}.tgz --overwrite --directory cli
+        - chmod +x cli/mxe-model cli/mxe-training cli/mxe-service cli/mxe-deploy
+    - rule: install-prequisite-helm-packages
+    - rule: generate-values-using-mxe-generate-linux
+    - rule: install-mandatory-base-packages
+    - rule: install-mxe-serving-package
+    - rule: install-optional-packages 
+    - rule: test-release
+
+  ########################################################################################################################
+  ##############################################  COMMON RULES  ##########################################################
+  ########################################################################################################################
+
+  jcat-function-test:
+    - task: test
+      cmd:
+        - echo "mxeSuite.xml" > .bob/var.suite
+    - rule: jcat-common-test
+
+  jcat-access-control-test:
+    - task: test
+      cmd:
+        - echo "mxeAccessControlTestSuite.xml" > .bob/var.suite
+    - rule: jcat-common-test
+
+  jcat-pre-upgrade-test:
+    - task: test
+      cmd:
+        - echo "mxePreUpgradeSuite.xml" > .bob/var.suite
+    - rule: jcat-common-test
+
+  jcat-post-upgrade-test:
+    - task: test
+      cmd:
+        - echo "mxePostUpgradeSuite.xml" > .bob/var.suite
+    - rule: jcat-common-test
+
+  jcat-long-test:
+    - task: test
+      cmd:
+        - echo "mxeLongSuite.xml" > .bob/var.suite
+        - docker pull armdocker.rnd.ericsson.se/proj-mxe-models/test/seldon.test.python:1.2.3
+        - docker save armdocker.rnd.ericsson.se/proj-mxe-models/test/seldon.test.python:1.2.3 -o seldon.test.python.tar.gz
+        - echo 'invalid model' > invalid-model.dummy
+    - rule: jcat-common-test
+
+  jcat-model-feed-test:
+    - task: test
+      cmd:
+        - echo "mxeModelFeed.xml" > .bob/var.suite
+    - rule: jcat-common-test
+
+  jcat-performance-test:
+    - task: test
+      cmd:
+        - echo "mxePerformanceTestSuite.xml" > .bob/var.suite
+    - rule: jcat-common-test
+
+  jcat-scalability-test:
+    - task: test
+      cmd:
+        - echo "mxeScalabilitySuite.xml" > .bob/var.suite
+    - rule: jcat-common-test
+
+  jcat-common-test:
+    - task: test
+      docker-image: java8-maven-builder
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "--env MXE_USER=${env.MXE_USER}"
+        - "--env MXE_PASSWORD=${env.MXE_PASSWORD}"
+        - "--env HOME=/tmp"
+        - "${docker-flags-debian}"
+        - "${docker-flags-certs}"
+      cmd: bash -c "
+        export PATH=$PWD/cli:$PWD:$PATH;
+        jcatBundlePath=\$(ls -1t mxe-jcat/target/mxe-jcat-bundle*jar | head -1);
+        sed -i
+        -e 's@<parameter name=\"cluster\" value=\".*\" */>@<parameter name=\"cluster\" value=\"${env.SYSTEM}\"/>@g'
+        -e 's@<parameter name=\"flowFile\" value=\".*\" */>@<parameter name=\"flowFile\" value=\"mxe-jcat/target/flows/flow.xml.gz\"/>@g'
+        -e 's@<parameter name=\"modelSourcePath\" value=\".*\" */>@<parameter name=\"modelSourcePath\" value=\"mxe-jcat/target/testmodels/seldon-test-python\"/>@g'
+        -e 's@<parameter name=\"faultyModelSourcePath\" value=\".*\" */>@<parameter name=\"faultyModelSourcePath\" value=\"mxe-jcat/target/testmodels/seldon-test-python-faulty\"/>@g'
+        -e 's@<parameter name=\"trainingPackageSourcePath\" value=\".*\" */>@<parameter name=\"trainingPackageSourcePath\" value=\"mxe-jcat/target/training/tf-mnist-train\"/>@g'
+        -e 's@<parameter name=\"faultyTrainingPackageSourcePath\" value=\".*\" */>@<parameter name=\"faultyTrainingPackageSourcePath\" value=\"mxe-jcat/target/training/tf-mnist-train-faulty\"/>@g'
+        mxe-jcat/target/testsuites/${var.suite};
+        mkdir -p $PWD/cli/data;
+        cp mxe-jcat/target/config/clusters.json $PWD/cli/data;
+        sed -i 's@test-mxe-endpoint@${env.TESTMXEENDPOINT}@g' $PWD/cli/data/clusters.json;
+        java -Djcat.logging=DEBUG -Dlogdir=mxe-jcat-test-log -jar \$jcatBundlePath mxe-jcat/target/testsuites/${var.suite};"
+
+  robot-test-runner:
+    - task: preparations
+      docker-image: k8s-test
+      cmd:
+        - ${env.PWD}/pipeline-scripts/robot/generate-cluster-details.sh
+          "${env.PWD}/mxe-test/variables/mxe_cluster_details.py"
+          ${env.TESTMXEENDPOINT}
+          ${env.MXE_USER}
+          ${env.MXE_PASSWORD}
+          ${env.KEYCLOAK_USERNAME}
+          ${env.KEYCLOAK_PASSWORD}
+          ${namespace}
+          ${env.TESTDEPLOYERAUTHENDPOINT}
+        - sed -i 's@<mxeEndpoint>@${env.TESTMXEENDPOINT}@g' $PWD/cli/data/clusters.json
+    - task: execute
+      condition: NOT conditions:offline-install
+      docker-image: robot-framework
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "--env MXE_USER=${env.MXE_USER}"
+        - "--env MXE_PASSWORD=${env.MXE_PASSWORD}"
+        - "--env HOME=/tmp"
+        - "--env ROBOT_REPORTS_DIR=${env.ROBOT_REPORTS_DIR}"
+        - "--env ROBOT_TESTS_DIR=${env.ROBOT_TESTS_DIR}"
+        - "--env TEST_DATA_DIR=${env.TEST_DATA_DIR}"
+        - "--env PYTHONPATH=${env.ROBOT_TESTS_DIR}"
+        - "${docker-flags-debian}"
+        - "${docker-flags-certs}"
+      cmd: bash -c '''set -ex;
+        echo -n "Testing mxe cli connectivity\n";
+        ${env.PWD}/cli/mxe-model list;
+        echo -n "Running test cases \n";
+        ${env.PWD}/pipeline-scripts/robot/run-test-suite.sh "${var.robot-test-report-dir}" "${var.robot-test-suite-to-run}" "${var.robot-include-tag}" "${var.robot-exclude-tag}" "${var.robot-executable}";'''
+    - task: execute-offline
+      condition: conditions:offline-install
+      docker-image: robot-framework
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "--env MXE_USER=${env.MXE_USER}"
+        - "--env MXE_PASSWORD=${env.MXE_PASSWORD}"
+        - "--env HOME=/tmp"
+        - "--env ROBOT_REPORTS_DIR=${env.ROBOT_REPORTS_DIR}"
+        - "--env ROBOT_TESTS_DIR=${env.ROBOT_TESTS_DIR}"
+        - "--env TEST_DATA_DIR=${env.TEST_DATA_DIR}"
+        - "--env PYTHONPATH=${env.ROBOT_TESTS_DIR}"
+        - "--env SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt"
+        - "--env REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt"
+        - "${docker-flags-debian}"
+        - --volume /usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro --volume /usr/share/ca-certificates:/usr/share/ca-certificates:ro
+        - --volume /etc/passwd:/etc/passwd:ro
+        - --user root
+      cmd: bash -c '''set -ex;
+        update-ca-certificates;
+        echo -n "Testing mxe cli connectivity\n";
+        ${env.PWD}/cli/mxe-model list;
+        echo -n "Running test cases \n";
+        ${env.PWD}/pipeline-scripts/robot/run-test-suite.sh "${var.robot-test-report-dir}" "${var.robot-test-suite-to-run}" "${var.robot-include-tag}" "${var.robot-exclude-tag}" "${var.robot-executable}";
+        chown -R mxecifunc $WORKSPACE/.bob $TEST_DATA_DIR $ROBOT_REPORTS_DIR $ROBOT_TESTS_DIR || true;'''
+
+  robot-functional-completeness-pre-upgrade:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/functional_completeness" > .bob/var.robot-test-suite-to-run
+        - echo "pre-upgrade" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "functional-completeness-preupgrade" > .bob/var.robot-test-report-dir
+        - echo "robot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  robot-functional-completeness-post-upgrade:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/functional_completeness" > .bob/var.robot-test-suite-to-run
+        - echo "post-upgrade" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "functional-completeness-postupgrade" > .bob/var.robot-test-report-dir
+        - echo "robot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  robot-functional-completeness-post-rollback:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/functional_completeness" > .bob/var.robot-test-suite-to-run
+        - echo "post-rollback" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "functional-completeness-postrollback" > .bob/var.robot-test-report-dir
+        - echo "robot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  robot-functional-completeness-dev:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/functional_completeness" > .bob/var.robot-test-suite-to-run
+        - echo "test-dev" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "functional-completeness" > .bob/var.robot-test-report-dir
+        - echo "pabot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  robot-test-local:
+    # This rule is to test locally before in pipeline
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/functional_completeness/model_lcm/ab_model.robot" > .bob/var.robot-test-suite-to-run
+        - echo "tc1 tc4" > .bob/var.robot-include-tag
+        - echo "gui" > .bob/var.robot-exclude-tag
+        - echo "functional-completeness" > .bob/var.robot-test-report-dir
+        - echo "pabot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  robot-security-dev:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/security" > .bob/var.robot-test-suite-to-run
+        - echo "test-dev" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "security" > .bob/var.robot-test-report-dir
+        - echo "robot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  robot-reliability-dev:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/reliability" > .bob/var.robot-test-suite-to-run
+        - echo "test-dev" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "reliability" > .bob/var.robot-test-report-dir
+        - echo "robot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  test-dev:
+    - rule: robot-functional-completeness-dev
+    - rule: robot-security-dev
+    - rule: robot-reliability-dev
+    - rule: mxe-cleanup
+
+  robot-functional-completeness-weekly:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/functional_completeness" > .bob/var.robot-test-suite-to-run
+        - echo "test-weekly" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "functional-completeness" > .bob/var.robot-test-report-dir
+        - echo "pabot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  robot-security-weekly:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/security" > .bob/var.robot-test-suite-to-run
+        - echo "test-weekly" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "security" > .bob/var.robot-test-report-dir
+        - echo "robot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  robot-reliability-weekly:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/reliability" > .bob/var.robot-test-suite-to-run
+        - echo "test-weekly" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "reliability" > .bob/var.robot-test-report-dir
+        - echo "robot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  robot-performance-efficiency-weekly:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/performance_efficiency" > .bob/var.robot-test-suite-to-run
+        - echo "test-weekly" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "performance-efficiency" > .bob/var.robot-test-report-dir
+        - echo "robot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  test-weekly:
+    - rule: robot-functional-completeness-weekly
+    - rule: robot-security-weekly
+    - rule: robot-reliability-weekly
+    - rule: robot-performance-efficiency-weekly
+
+  robot-functional-completeness-master:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/functional_completeness" > .bob/var.robot-test-suite-to-run
+        - echo "test-dev" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "functional-completeness" > .bob/var.robot-test-report-dir
+        - echo "pabot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  robot-security-master:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/security" > .bob/var.robot-test-suite-to-run
+        - echo "test-dev" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "security" > .bob/var.robot-test-report-dir
+        - echo "robot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  robot-reliability-master:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/reliability" > .bob/var.robot-test-suite-to-run
+        - echo "test-dev" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "reliability" > .bob/var.robot-test-report-dir
+        - echo "robot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  test-master:
+    - rule: robot-functional-completeness-master
+    - rule: robot-security-master
+    - rule: robot-reliability-master
+    - rule: mxe-cleanup
+
+  robot-functional-completeness-release:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/functional_completeness" > .bob/var.robot-test-suite-to-run
+        - echo "test-dev" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "functional-completeness" > .bob/var.robot-test-report-dir
+        - echo "pabot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  robot-security-release:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/security" > .bob/var.robot-test-suite-to-run
+        - echo "test-dev" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "security" > .bob/var.robot-test-report-dir
+        - echo "robot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  robot-reliability-release:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/reliability" > .bob/var.robot-test-suite-to-run
+        - echo "test-dev" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "reliability" > .bob/var.robot-test-report-dir
+        - echo "robot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  test-release:
+    - rule: robot-functional-completeness-release
+    - rule: robot-security-release
+    - rule: robot-reliability-release
+    - rule: mxe-cleanup
+
+  robot-functional-completeness-staging:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/functional_completeness" > .bob/var.robot-test-suite-to-run
+        - echo "test-staging" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "functional-completeness" > .bob/var.robot-test-report-dir
+        - echo "pabot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  robot-security-staging:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/security" > .bob/var.robot-test-suite-to-run
+        - echo "test-staging" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "security" > .bob/var.robot-test-report-dir
+        - echo "robot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+  
+  robot-reliability-staging:
+    - task: set-vars
+      cmd:
+        - echo "pqm_characteristics/reliability" > .bob/var.robot-test-suite-to-run
+        - echo "test-staging" > .bob/var.robot-include-tag
+        - echo "none" > .bob/var.robot-exclude-tag
+        - echo "reliability" > .bob/var.robot-test-report-dir
+        - echo "robot" > .bob/var.robot-executable
+    - rule: robot-test-runner
+
+  test-staging:
+    - rule: robot-functional-completeness-staging
+    - rule: robot-security-staging
+    - rule: robot-reliability-staging
+    - rule: mxe-cleanup
+
+  gui-function-test-firefox:
+    - task: test
+      docker-image: selenium-firefox
+      cmd: bash -c "
+        sed -i
+        -e 's@<parameter name=\"cluster\" value=\".*\" */>@<parameter name=\"cluster\" value=\"${env.SYSTEM}\"/>@g'
+        -e 's@<parameter name=\"browserType\" value=\".*\" */>@<parameter name=\"browserType\" value=\"FIREFOX\"/>@g'
+        mxe-jcat/target/testsuites/mxeGuiTestSuite.xml;
+        jcatBundlePath=\$(ls -1t mxe-jcat/target/mxe-jcat-bundle*jar | head -1);
+        java -Djcat.logging=DEBUG -Dlogdir=mxe-jcat-firefox-gui-test-log -jar \$jcatBundlePath mxe-jcat/target/testsuites/mxeGuiTestSuite.xml;"
+
+  gui-function-test-chrome:
+    - task: test
+      docker-image: selenium-chrome
+      cmd: bash -c "
+        sed -i
+        -e 's@<parameter name=\"cluster\" value=\".*\" */>@<parameter name=\"cluster\" value=\"${env.SYSTEM}\"/>@g'
+        -e 's@<parameter name=\"browserType\" value=\".*\" */>@<parameter name=\"browserType\" value=\"CHROME\"/>@g'
+        mxe-jcat/target/testsuites/mxeGuiTestSuite.xml;
+        jcatBundlePath=\$(ls -1t mxe-jcat/target/mxe-jcat-bundle*jar | head -1);
+        java -Djcat.logging=DEBUG -Dlogdir=mxe-jcat-chrome-gui-test-log -jar \$jcatBundlePath mxe-jcat/target/testsuites/mxeGuiTestSuite.xml;"
+
+  gui-test:
+    - task: test
+      cmd:
+        - docker-compose --file mxe-commons/mxe-gui/e2e-ci.yml run -e BASE_URL=${env.TESTMXEENDPOINT} e2e
+    - task: cleanup
+      cmd:
+        - docker-compose --file mxe-commons/mxe-gui/e2e-ci.yml run e2e-cleanup
+        - docker-compose --file mxe-commons/mxe-gui/e2e-ci.yml down
+
+  helm-install:
+    - task: sm-controller-crd
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+      cmd:
+        - ${helm} upgrade --install eric-mesh-controller-crd-${env.USER} ${helm-chart-adp-sm-controller-crd}
+          --wait
+          --timeout=2000s
+          --namespace ${namespace}
+          --values ${var.install-values-yaml}
+    - task: eric-ctrl-bro
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+      cmd:
+        - ${helm} install eric-mesh-controller-crd-${env.USER} ${helm-chart-adp-eric-ctrl-bro}
+          --wait
+          --timeout=2000s
+          --namespace ${namespace}
+          --values ${var.mxe-install-values-yaml}
+    - task: do-helm-install
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+      cmd:
+        - ${helm} install ${release} ${var.install-helm-chart}
+          --debug
+          --wait
+          --timeout=2000s
+          --namespace ${namespace}
+          --values ${var.install-values-yaml}
+        - kubectl rollout status statefulset/eric-mxe-gatekeeper
+          --watch
+          --namespace=${namespace}
+          --timeout=10m
+
+  do-helm-delete:
+    - task: delete
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+      cmd:
+        - ${env.PWD}/pipeline-scripts/helm_cleanup.sh "${namespace}"
+
+  test-cluster:
+    - task: print-info
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+      cmd:
+        - kubectl cluster-info
+        - kubectl version
+        - helm version
+
+  pre-req:
+    - task: apply-pre-req
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+        - --env NAMESPACE=${namespace}
+      cmd: ${env.PWD}/pipeline-scripts/apply_pre_req.sh -m ${var.mode} -e ${var.script_version}  
+
+  collect-k8s-logs:
+    - task: collect-logs-using-script
+      docker-image: k8s-test
+      docker-flags:
+          - ${env.DOCKER_NETWORK}
+          - "${docker-flags-helm3-enable}"
+          - "--env HOME=${env.HOME}"
+          - "--env NAMESPACE=${namespace}"
+          - "${docker-flags-kubeconfig}"
+          - "--env SERO_ARTIFACTORY_REPO_USER=${env.SERO_ARTIFACTORY_REPO_USER}"
+          - "--env SERO_ARTIFACTORY_REPO_PASS=${env.SERO_ARTIFACTORY_REPO_PASS}"
+          - "--env COLLECT_LOGS_SCRIPT_LOCATION"
+          - "--env COLLECT_LOGS_SCRIPT_FILE_NAME"
+          - "--env COLLECT_LOGS_SINCE_RELATIVE_TIME"
+          - "--env COLLECT_LOGS_DIR"
+          - "--env HOME=${env.HOME}"
+          - "--volume ${env.HOME}:${env.HOME}"
+      cmd:
+          - mkdir -pv ${env.COLLECT_LOGS_DIR}
+          - pwd
+          - kubectl config view > ${env.COLLECT_LOGS_DIR}/kubectl.config
+          - kubectl get ns > ${env.COLLECT_LOGS_DIR}/kubectl-get-ns.log
+          - helm ls -Aa > ${env.COLLECT_LOGS_DIR}/helm-ls-Aa.log
+          - printenv | grep -v CREDENTIALS | grep -v ARTIFACTORY > ${env.COLLECT_LOGS_DIR}/printenv.log
+          - curl -u ${env.SERO_ARTIFACTORY_REPO_USER}:${env.SERO_ARTIFACTORY_REPO_PASS} ${env.COLLECT_LOGS_SCRIPT_LOCATION}/${env.COLLECT_LOGS_SCRIPT_FILE_NAME} > ${env.COLLECT_LOGS_DIR}/${env.COLLECT_LOGS_SCRIPT_FILE_NAME}
+          - chmod 777 ${env.COLLECT_LOGS_DIR}/${env.COLLECT_LOGS_SCRIPT_FILE_NAME}
+          - sh -c "cd ${env.COLLECT_LOGS_DIR} && ./${env.COLLECT_LOGS_SCRIPT_FILE_NAME} ${env.NAMESPACE} ${env.COLLECT_LOGS_SINCE_RELATIVE_TIME}"
+
+  install-document-database-crd:
+    - task: document-database-crd-install
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+      cmd:
+        - ${helm} upgrade --install eric-data-document-database-pg-crd  ${helm-chart-eric-data-document-database-pg-crd}
+          --set global.registry.imagePullPolicy=Always
+          --debug
+          --wait
+          --timeout=2m
+          --namespace ${namespace}
+
+  uninstall-document-database-crd:
+    - task: document-database-crd-uninstall
+      docker-image: k8s-test
+      docker-flags:
+        - "${docker-flags-kubeconfig}"
+        - "${docker-flags-helm3}"
+      cmd:
+        - ${helm} delete eric-data-document-database-pg-crd
+          --namespace ${namespace}

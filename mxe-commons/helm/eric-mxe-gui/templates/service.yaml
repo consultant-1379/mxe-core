@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "eric-mxe-gui.fullname" . }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: eric-mxe-gui"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-gui.labels" . | fromYaml -}}
+    {{- $gaslabels := include "eric-mxe-gui.gasLabel" . | fromYaml -}}
+    {{- include "eric-mxe-gui.mergeLabels" (dict "location" .Template.Name "sources" (list $component $gaslabels $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $annotations := include "eric-mxe-gui.annotations" . | fromYaml -}}
+    {{- $gasAnn := include "eric-mxe-gui.gasAnnotation" . | fromYaml -}}
+    {{- include "eric-mxe-gui.mergeAnnotations" (dict "location" .Template.Name "sources" (list $gasAnn $annotations)) | trim | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- if .Values.global }}
+  {{- if .Values.global.internalIPFamily }}
+  ipFamilies: [{{ .Values.global.internalIPFamily | quote }} ]
+  {{- end }}
+  {{- end }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "eric-mxe-gui"
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}

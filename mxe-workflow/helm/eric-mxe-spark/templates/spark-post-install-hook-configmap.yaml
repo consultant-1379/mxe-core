@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "eric-mxe-spark.post-install-hook-configmap" . | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: restart-spark-deployment-configmap"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-spark.post-install-hook-configmap" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-spark.labels" . | fromYaml -}}
+    {{- include "eric-mxe-spark.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-spark.annotations" . | nindent 4 }}
+data:
+  run.sh: |
+    {{- (.Files.Get "files/restart-spark-operator.sh") | nindent 4 }}

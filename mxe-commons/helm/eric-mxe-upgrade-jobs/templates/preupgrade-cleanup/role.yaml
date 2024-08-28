@@ -1,0 +1,68 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "eric-mxe-upgrade-jobs.preupgrade-cleanup-role" . | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: preupgrade-cleanup-role"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-upgrade-jobs.labels" . | fromYaml -}}
+    {{- include "eric-mxe-upgrade-jobs.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $hook := printf "%s" "helm.sh/hook: pre-upgrade"  | fromYaml -}}
+    {{- $hookDeletePolicy := printf "%s" "helm.sh/hook-delete-policy: before-hook-creation"  | fromYaml -}}
+    {{- $hookWeight := include "eric-mxe-upgrade-jobs.hook-weight" 0 | fromYaml -}}
+    {{- $annotations := include "eric-mxe-upgrade-jobs.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-upgrade-jobs.mergeAnnotations" (dict "location" .Template.Name "sources" (list $hook $hookDeletePolicy $hookWeight $annotations)) | trim | nindent 4 }}
+rules:
+  - apiGroups:
+      - machinelearning.seldon.io
+    resources:
+      - seldondeployments
+    verbs:
+      - "list"
+      - "patch"
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - "list"
+      - "delete"
+  - apiGroups:
+      - "extensions"
+    resources:
+      - ingresses
+    verbs:
+      - "list"
+      - "patch"
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - "list"
+      - "create"
+  - apiGroups:
+      - "apps"
+    resources:
+      - deployments
+    verbs:
+      - "list"
+      - "patch"
+      - "deletecollection"
+  - apiGroups:
+      - "apps"
+    resources:
+      - statefulsets
+    verbs:
+      - "list"
+      - "patch"
+  - apiGroups:
+      - "security.istio.io"
+    resources:
+      - authorizationpolicies
+      - requestauthentications
+    verbs:
+      - "list"
+      - "patch"
+      - "deletecollection"

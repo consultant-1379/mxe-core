@@ -1,0 +1,129 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="MxeSuite">
+
+    <listeners>
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGTestListener" />
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGSuiteListener" />
+    </listeners>
+
+    <parameter name="cluster" value="cluster3" />
+
+<!--     <test name="Model Service Verify">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeModelSimpleTest">
+                <parameter name="instanceName" value="com-ericsson-img-inception3" />
+                <parameter name="instance" value="1" />
+                <methods>
+                    <include name="verifyModelServiceIsRunning" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="Model Feed">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxePerformanceTest">
+                <parameter name="modelDeploymentName" value="com-ericsson-img-inception3" />
+                <methods>
+                    <include name="modelFeedTest">
+                        <parameter name="requestPerSec" value="2" />
+                        <parameter name="overallRequestCount" value="40" />
+                    </include>           
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="Create a model service with the previously onboarded model">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeModelSimpleTest">
+                <parameter name="modelVersion" value="0.0.1" />
+                <parameter name="modelName" value="seldon.test.python" />
+                <methods>
+                    <include name="createModelService" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="Verify the recently created model service">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeModelSimpleTest">
+                <parameter name="instanceName" value="seldon-test-python" />
+                <parameter name="instance" value="1" />
+                <methods>
+                    <include name="verifyModelServiceIsRunning" />
+                </methods>
+            </class>
+        </classes>
+    </test> -->
+    <test name="Verify Flow">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeFlowSimpleTest">
+                <methods>
+                    <include name="verifyFlowOnboardAndDeploy">
+                        <parameter name="flowName" value="jcattestflowug" />
+                        <parameter name="flowDeploymentName" value="jcattestflowdeploymentug" />
+                    </include>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="Delete Flow">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeFlowSimpleTest">
+                <methods>
+                    <include name="deleteFlowDeploymentAndFlow">
+                        <parameter name="flowName" value="jcattestflowug" />
+                        <parameter name="flowDeploymentName" value="jcattestflowdeploymentug" />
+                    </include>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+    <!--  <test name="Model Cleanup">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeModelSimpleTest">
+                <methods>
+                    <exclude name="cleanupAllModels" />
+                </methods>
+            </class>
+        </classes>
+    </test> -->
+        <test name="Flow Onboard and deploy after upgrade">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeFlowSimpleTest">
+                <parameter name="flowFile" value="flows/flow.xml.gz" />
+                <methods>
+                    <include name="flowOnboardAndDeploy">
+                        <parameter name="flowName" value="jcattestflowaug" />
+                        <parameter name="flowDeploymentName" value="jcattestflowdeploymentaug" />
+                    </include>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="Verify Flow after upgrade">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeFlowSimpleTest">
+                <methods>
+                    <include name="verifyFlowOnboardAndDeploy">
+                        <parameter name="flowName" value="jcattestflowaug" />
+                        <parameter name="flowDeploymentName" value="jcattestflowdeploymentaug" />
+                    </include>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="Delete Flow after upgrade">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxeFlowSimpleTest">
+                <methods>
+                    <include name="deleteFlowDeploymentAndFlow">
+                        <parameter name="flowName" value="jcattestflowaug" />
+                        <parameter name="flowDeploymentName" value="jcattestflowdeploymentaug" />
+                    </include>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>

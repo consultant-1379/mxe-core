@@ -1,0 +1,373 @@
+modelVersion: 2.0
+
+# Import the file containing the versions of external dependencies
+import:
+  dependency: dependencies.yaml
+
+
+docker-images:
+  - k8s-test: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-py3kubehelmbuilder:latest
+  - anchore-inline-scan: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/va-image-scanning-grype:${env.ANCHORE_TAG}
+  - trivy-inline-scan: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/trivy-inline-scan:${env.TRIVY_TAG}
+  - adp-release-auto: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-adp-release-auto:latest
+  - mxe-sec-utils: armdocker.rnd.ericsson.se/proj-mxe-ci-internal/mxe/mxe-sec-util:latest
+  - mxe-toolkit: armdocker.rnd.ericsson.se/proj-mxe-ci-internal/mxe-toolkit:20240425-ubuntu-20240405
+  - va-scan-kubeaudit: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/va-scan-kubeaudit:latest
+  - ci-toolkit: armdocker.rnd.ericsson.se/proj-mxe-ci-internal/ci-toolkit:${env.CI_TOOLKIT_TAG}
+properties:
+  - internal-repo    : armdocker.rnd.ericsson.se/proj-mxe
+  - 2pp-repo         : armdocker.rnd.ericsson.se
+  - 3pp-repo         : armdocker.rnd.ericsson.se/proj-mxe
+  - docker-flags-for-scan : --entrypoint bash
+  - docker-flags-for-anchore     : -i
+  - docker-flags-for-trivy     : --entrypoint python3
+  - iam-image-mxe    : proj-mxe-ci-internal/mxe/eric-sec-access-mgmt-image:${env.dependency.IAM_VERSION}
+
+var:
+  - docker-images-mxe
+  - docker-images-2pp
+  - version
+  - docker-images-mxe-with-tag
+  - docker-images-2pp-with-tag
+  - docker-images-3pp-with-tag
+  - crd-chart-urls
+
+env:
+  - PWD
+  - DEFAULT (default=84)
+  - BOB_TEST_ENV_VAR (default=unset)
+  - RELEASE (default=false)
+  - SCAN_REPORT_FOLDER (default=.bob/va-reports)
+  - TRIVY_NEW_JSON_SCHEMA (default=true)
+  - STABLE_MXE_VERSION
+  - VERSION_PREFIX_FILE (default=VERSION_PREFIX_VA)
+  - TRIVY_TIMEOUT (default="10m0s")
+  - API_TOKEN
+  - USER
+  - CI_TOOLKIT_TAG (default=latest)
+  - GITHUB_TOKEN
+  - GRYPE_DB_AUTO_UPDATE(default=false)
+  - ANCHORE_TAG (default=latest)
+  - TRIVY_TAG (default=latest)
+  - XRAY_USER
+  - XRAY_APIKEY
+  - HELM_USER (default=mxecifunc)
+  - HELM_TOKEN
+  - HELM_REPOPATH (default=proj-mxe-dev-helm)
+  - SYSTEM (default=hahn081)
+  - TEST_BASE_VALUES_DIR (default=values)
+  - SCAN_REPORTS_DIR
+  - ENABLE_HELM_V3 (default=true)
+  - NAMESPACE (default=mxe-ci)
+  - KUBECONFIG (default=~/.kube/config)
+rules:
+
+  clean:
+    - task: cleanup
+      cmd: rm -rf ${env.PWD}/.bob
+
+  # Initialize folder and pull images
+  init:
+    - task: version
+      docker-image: adp-release-auto
+      cmd: generate-version --is-release=${env.RELEASE} -f ${env.VERSION_PREFIX_FILE} --output=version  | sed 's/.dirty//g'
+    - task: create-folder
+      cmd:
+      - touch .bob/var.docker-images-2pp
+      - mkdir -p ${env.SCAN_REPORT_FOLDER}
+                ${env.SCAN_REPORT_FOLDER}/images
+                ${env.SCAN_REPORT_FOLDER}/trivy
+                ${env.SCAN_REPORT_FOLDER}/anchore
+                ${env.SCAN_REPORT_FOLDER}/xray-reports
+                ${env.SCAN_REPORT_FOLDER}/kube-audit-report
+                ${env.SCAN_REPORT_FOLDER}/nmap || true
+    - task : set-mxe-images-var
+      docker-image: mxe-toolkit
+      cmd: bash -c '''
+          set -ex;
+          if [ ! -f .bob/docker-images-mxe ];
+          then
+            echo "File .bob/docker-images-mxe is missing.";
+            echo "Rule get-mxe-images from ruleset2.0.yaml has not been executed. Aborting.. ";
+            exit 1;
+          fi;
+          cat .bob/docker-images-mxe > .bob/var.docker-images-mxe
+        '''
+    - task: generate-2pp-list
+      docker-image: mxe-toolkit
+      docker-flags:
+        - --env API_TOKEN
+        - --env USER
+      cmd: bash -c '
+        set -ex;
+        echo "${dependency.helm-chart-adp-sm-controller-crd}" > .bob/var.crd-chart-urls;
+        echo "${dependency.helm-chart-adp-eric-ctrl-bro}" >> .bob/var.crd-chart-urls;
+        pipeline-scripts/get_2pp_images.sh ".bob/var.crd-chart-urls" ".bob/product_info/" ".bob/var.docker-images-2pp";'
+    # DB pinning is removed in Grype, so commneting the below task
+    # - task: download_vuln_db
+    #   cmd: pipeline-scripts/va-scan/download_grype_vuln_db.sh
+
+  image-list:
+    - task: collect-mxe-images
+      cmd: bash -c '
+        set -ex;
+        declare -a images;
+        echo "Pulling mxe images";
+        while read -r -d, image; do
+          image="${internal-repo}/$image:${env.STABLE_MXE_VERSION}";
+          mxe_images+=("$image");
+          echo "Pulling image $image";
+          docker pull "$image";
+        done <<< "${var.docker-images-mxe}";
+        printf "%s, " "${mxe_images[@]}" > .bob/var.docker-images-mxe-with-tag;
+        cp .bob/var.docker-images-mxe-with-tag ${env.SCAN_REPORT_FOLDER}/images/internal-images.txt;'
+    - task: collect-3pp-images
+      cmd: bash -c '
+        set -ex;
+        declare -a images;
+        echo "Pulling 3pp images";
+        while read -r -d, image; do
+          image="${3pp-repo}/$image";
+          images+=("$image");
+          echo "Pulling image $image";
+          docker pull "$image";
+        done <<< "${dependency.docker-images-3pp}";
+        printf "%s, " "${images[@]}" > .bob/var.docker-images-3pp-with-tag;
+        cp .bob/var.docker-images-3pp-with-tag ${env.SCAN_REPORT_FOLDER}/images/3pp-images.txt;'
+
+    # This section pulls 2pp image images retrieved from docker-images-2pp variable
+    # Except eric-sec-access-mgmt all images are pulled as-is
+    # Override of ADP's eric-sec-access-mgmt-image with MXE's version will be removed in future
+    # at that moment, the if condition to override the image version using iam-image-mxe can be removed
+    - task: collect-2pp-images
+      cmd: bash -c '
+        set -ex;
+        declare -a images;
+        echo "Pulling 2pp images";
+        while read -r -d, image; do
+          image="$image";
+          if [[ $image = *"eric-sec-access-mgmt-image"* ]];
+            then image="${2pp-repo}/${iam-image-mxe}";
+          fi;
+          images+=("$image");
+          echo "Pulling image $image";
+          docker pull "$image";
+        done <<< "${var.docker-images-2pp}";
+        printf "%s, " "${images[@]}" > .bob/var.docker-images-2pp-with-tag;
+        cp .bob/var.docker-images-2pp-with-tag ${env.SCAN_REPORT_FOLDER}/images/2pp-images.txt;'
+
+  anchore:
+    - task: scan-internal-images
+      docker-image: anchore-inline-scan
+      docker-flags:
+        - ${docker-flags-for-anchore}
+        - --env GITHUB_TOKEN=${env.GITHUB_TOKEN}
+        - --env GRYPE_DB_AUTO_UPDATE=${env.GRYPE_DB_AUTO_UPDATE}
+      docker-in-docker: socket
+      cmd: python3 pipeline-scripts/va-scan/execute_scan.py -i "${var.docker-images-mxe-with-tag}"  -c scan-config/anchore_config.yaml -t anchore
+    - task: scan-3pp-images
+      docker-image: anchore-inline-scan
+      docker-flags:
+        - ${docker-flags-for-anchore}
+        - --env GITHUB_TOKEN=${env.GITHUB_TOKEN}
+        - --env GRYPE_DB_AUTO_UPDATE=${env.GRYPE_DB_AUTO_UPDATE}
+      docker-in-docker: socket
+      cmd: python3 pipeline-scripts/va-scan/execute_scan.py -i "${var.docker-images-3pp-with-tag}"  -c scan-config/anchore_config.yaml -t anchore
+    - task: scan-2pp-images
+      docker-image: anchore-inline-scan
+      docker-flags:
+        - ${docker-flags-for-anchore}
+        - --env GITHUB_TOKEN=${env.GITHUB_TOKEN}
+        - --env GRYPE_DB_AUTO_UPDATE=${env.GRYPE_DB_AUTO_UPDATE}
+      docker-in-docker: socket
+      cmd: python3 pipeline-scripts/va-scan/execute_scan.py -i "${var.docker-images-2pp-with-tag}" -c scan-config/anchore_config.yaml -t anchore
+
+  trivy:
+    - task: scan-internal-images
+      docker-image: trivy-inline-scan
+      docker-flags:
+        - ${docker-flags-for-trivy}
+        - --env TRIVY_NEW_JSON_SCHEMA=${env.TRIVY_NEW_JSON_SCHEMA}
+        - --env TRIVY_TIMEOUT=${env.TRIVY_TIMEOUT}
+        - --env GITHUB_TOKEN=${env.GITHUB_TOKEN}
+      docker-in-docker: socket
+      cmd: pipeline-scripts/va-scan/execute_scan.py -i "${var.docker-images-mxe-with-tag}"   -c scan-config/trivy_config.yaml -t trivy
+    - task: scan-3pp-images
+      docker-image: trivy-inline-scan
+      docker-flags:
+        - ${docker-flags-for-trivy}
+        - --env TRIVY_NEW_JSON_SCHEMA=${env.TRIVY_NEW_JSON_SCHEMA}
+        - --env TRIVY_TIMEOUT=${env.TRIVY_TIMEOUT}
+        - --env GITHUB_TOKEN=${env.GITHUB_TOKEN}
+      docker-in-docker: socket
+      cmd: pipeline-scripts/va-scan/execute_scan.py -i "${var.docker-images-3pp-with-tag}"  -c scan-config/trivy_config.yaml -t trivy
+    - task: scan-2pp-images
+      docker-image: trivy-inline-scan
+      docker-flags:
+        - ${docker-flags-for-trivy}
+        - --env TRIVY_NEW_JSON_SCHEMA=${env.TRIVY_NEW_JSON_SCHEMA}
+        - --env TRIVY_TIMEOUT=${env.TRIVY_TIMEOUT}
+        - --env GITHUB_TOKEN=${env.GITHUB_TOKEN}
+      docker-in-docker: socket
+      cmd: pipeline-scripts/va-scan/execute_scan.py -i "${var.docker-images-2pp-with-tag}"  -c scan-config/trivy_config.yaml -t trivy
+
+  sec-utils:
+    - task: build-image
+      cmd:
+      - docker rmi -f "${internal-repo}/mxe/mxe-sec-util:latest" || true
+      - DOCKER_BUILDKIT=1 docker build --no-cache "${env.PWD}/mxe-sec-utils"
+          --no-cache
+          --label version=${var.version}
+          --tag "${internal-repo}/mxe/mxe-sec-util:latest"
+    - task: publish
+      cmd:  docker push ${internal-repo}/mxe/mxe-sec-util:latest
+
+  analyze:
+    - task: anchore-report
+      docker-image: mxe-sec-utils
+      docker-flags:
+        - --env ANCHORE_SCAN_REPORTS_DIR=${env.SCAN_REPORT_FOLDER}/anchore
+        - --env ANCHORE_ANALYSIS_REPORTS_DIR=${env.SCAN_REPORT_FOLDER}/
+      cmd: bash -c '''
+        set -x;
+        set -e;
+        cd mxe-sec-utils/notebooks/;
+        jupyter nbconvert anchore_reports.ipynb --to script;
+        cd "${env.PWD}";
+        python mxe-sec-utils/notebooks/anchore_reports.py'''
+    - task: os-report
+      docker-image: mxe-sec-utils
+      docker-flags:
+        - --env ANCHORE_SCAN_REPORTS_DIR=${env.SCAN_REPORT_FOLDER}/anchore
+        - --env ANCHORE_ANALYSIS_REPORTS_DIR=${env.SCAN_REPORT_FOLDER}/
+      cmd: bash -c '''
+        set -x;
+        set -e;
+        cd mxe-sec-utils/notebooks/;
+        jupyter nbconvert os_list.ipynb --to script;
+        cd "${env.PWD}";
+        python mxe-sec-utils/notebooks/os_list.py'''
+    - task: trivy-report
+      docker-image: mxe-sec-utils
+      docker-flags:
+        - --env TRIVY_SCAN_REPORTS_DIR=${env.SCAN_REPORT_FOLDER}/trivy
+        - --env TRIVY_ANALYSIS_REPORTS_DIR=${env.SCAN_REPORT_FOLDER}/analysis-reports/trivy
+      cmd: bash -c '''
+        set -x;
+        set -e;
+        cd mxe-sec-utils/notebooks/;
+        jupyter nbconvert trivy_reports.ipynb --to script;
+        cd "${env.PWD}";
+        python mxe-sec-utils/notebooks/trivy_reports.py'''
+
+
+  archive:
+    - task: reports
+      cmd: bash -c '''
+            set -e;
+            set -x;
+            mkdir -p "${env.SCAN_REPORT_FOLDER}/archives";
+            cd "${env.SCAN_REPORT_FOLDER}";
+            zip -r "archives/image-lists.zip" "images";
+            zip -r "archives/analysis-reports.zip" "analysis-reports";
+            zip -r "archives/anchore-scan.zip" "anchore";
+            zip -r "archives/trivy-scan.zip" "trivy";'''
+
+  generate-va-report:
+    - task: generate-report
+      docker-image: adp-release-auto
+      cmd: bash -c '${env.PWD}/pipeline-scripts/va-scan/generate_report.sh ${env.STABLE_MXE_VERSION}'
+  fetch-xray-report:
+    - task: prepare-config
+      docker-image: ci-toolkit
+      docker-flags:
+        - "--volume ${env.PWD}:${env.PWD}"
+      cmd: bash -c '${env.PWD}/pipeline-scripts/va-scan/populate_xray_config.sh proj-mxe-docker-global/proj-mxe'
+
+    - task: fetch-xray-report
+      docker-image: adp-release-auto
+      cmd: bash -c 'fetch-xray
+          --config ${env.PWD}/scan-config/xray_report.config
+          --debug
+          --user ${env.XRAY_USER}
+          --apikey ${env.XRAY_APIKEY}
+          --output ${env.PWD}/.bob/va-reports/xray-reports/xray_report.json
+          --raw-output ${env.PWD}/.bob/va-reports/xray-reports/raw_xray_report.json'
+
+  kube-audit:
+    # Prepare for Kubeaudit
+    - task: prepare-kube-audit
+      cmd: bash -c '
+        set -ex;
+        mkdir -p ${env.SCAN_REPORTS_DIR}/conf;
+        cp ${env.PWD}/scan-config/kubeaudit_config.yaml ${env.SCAN_REPORTS_DIR}/conf/;
+        sed -i "s/REPOPATH/${env.HELM_REPOPATH}/g" ${env.SCAN_REPORTS_DIR}/conf/kubeaudit_config.yaml;
+        sed -i "s/MXE-VERSION/${env.STABLE_MXE_VERSION}/g" ${env.SCAN_REPORTS_DIR}/conf/kubeaudit_config.yaml;
+        cp ${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR}/mxe-values.yaml ${env.SCAN_REPORTS_DIR}/conf/;
+        cp ${env.PWD}/resources/testenv/${env.SYSTEM}/${env.TEST_BASE_VALUES_DIR}/mxe-deployer-values.yaml ${env.SCAN_REPORTS_DIR}/conf/;
+        sed -i "/&global/a\  internalIPFamily:" ${env.SCAN_REPORTS_DIR}/conf/mxe-values.yaml;
+        sed -i "/eric-sec-access-mgmt:/a\  global:\n    internalIPFamily:" ${env.SCAN_REPORTS_DIR}/conf/mxe-values.yaml;'
+    # Run kubeaudit
+    - task: kube-audit
+      docker-image: va-scan-kubeaudit
+      docker-flags:
+        - "--workdir /opt/va-scan-kubeaudit/"
+        - "-v ${env.PWD}/${env.SCAN_REPORTS_DIR}/conf:/opt/va-scan-kubeaudit/conf"
+        - "-v ${env.PWD}/.bob/va-reports/kube-audit-report/:/tmp/reports"
+      cmd: " "
+    - task: init
+      docker-image: k8-test
+      docker-flags:
+        - "--volume ${env.PWD}:${env.PWD}"
+      cmd:
+        - mkdir -p ${env.SCAN_REPORTS_DIR}/nmap
+  # Run Nmap
+  nmap_scan:
+    - task: nmap-port-scan-for-mxe-commons
+      docker-image: k8s-test
+      docker-flags:
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+        - "--volume ${env.PWD}:${env.PWD}"
+      cmd:
+        - /usr/local/bin/helm version
+        - mkdir -p ${env.SCAN_REPORTS_DIR}/nmap
+        - /test.py --helm-v3 --kubernetes-admin-conf=${env.KUBECONFIG}
+           --helm-user=${env.HELM_USER}
+           --arm-api-token=${env.HELM_TOKEN}
+           --kubernetes-namespace=${env.NAMESPACE}
+           --nmap-config-file=scan-config/nmap_config_mxe_commons.yaml
+           --kube-exec-timeout=1800
+           --nmap-test
+    - task: nmap-port-scan-for-mxe-deployer
+      docker-image: k8s-test
+      docker-flags:
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+        - "--volume ${env.PWD}:${env.PWD}"
+      cmd:
+        - /usr/local/bin/helm version
+        - mkdir -p ${env.SCAN_REPORTS_DIR}/nmap
+        - /test.py --helm-v3 --kubernetes-admin-conf=${env.KUBECONFIG}
+           --helm-user=${env.HELM_USER}
+           --arm-api-token=${env.HELM_TOKEN}
+           --kubernetes-namespace=${env.NAMESPACE}
+           --nmap-config-file=scan-config/nmap_config_mxe_deployer.yaml
+           --kube-exec-timeout=1800
+           --nmap-test
+    - task: nmap-port-scan-for-mxe-components
+      docker-image: k8s-test
+      docker-flags:
+        - "--env KUBECONFIG=${env.KUBECONFIG}"
+        - "--volume ${env.KUBECONFIG}:${env.KUBECONFIG}:ro"
+        - "--volume ${env.PWD}:${env.PWD}"
+      cmd:
+        - /usr/local/bin/helm version
+        - mkdir -p ${env.SCAN_REPORTS_DIR}/nmap
+        - /test.py --helm-v3 --kubernetes-admin-conf=${env.KUBECONFIG}
+           --helm-user=${env.HELM_USER}
+           --arm-api-token=${env.HELM_TOKEN}
+           --kubernetes-namespace=${env.NAMESPACE}
+           --nmap-config-file=scan-config/nmap_config_mxe_components.yaml
+           --kube-exec-timeout=1800
+           --nmap-test

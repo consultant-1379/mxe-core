@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration debug="true" scan="true" scanPeriod="30 seconds">
+  <Property name="adpLevel" value="%replace(%replace(%replace(%replace(%replace(%replace(%replace(%replace(%level){'FATAL','critical'}){'ERROR','error'}){'WARN','warning'}){'INFO','info'}){'CONFIG', 'debug'}){'DEBUG', 'debug'}){'TRACE','debug'}){'FINEST','debug'}" />
+  <Property name="defaultLevel" value ="all" />
+  <Property name="serviceId" value="eric-mxe-model-training-service" />
+  <Property name="logSchemaVersion" value="1.2.0" />
+  <Property name="containerName" value="mxe-training-eric-mxe-model-training-service" />
+  <variable name="LOG_LEVEL" value="info" />
+
+
+  <appender name="ADP-Security-Logging" class="ch.qos.logback.core.ConsoleAppender" >
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <pattern>{"version": "${logSchemaVersion}", "timestamp": "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}", "severity": "${adpLevel}", "service_id": "${serviceId}", "metadata" : {"category": "%X{category}", "container_name": "${containerName}"}, "message": "%r [%t] %-5p %C - %msg{JSON}", "facility": "security/authorization messages"}%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- Logs the log events asynchronously. It acts solely as an event dispatcher and must reference another appender. -->
+  <appender name="ASYNC-Security" class="ch.qos.logback.classic.AsyncAppender">
+    <!-- The maximum capacity of the blocking queue. -->
+    <queueSize>8192</queueSize>
+    <includeCallerData>true</includeCallerData>
+    <!-- Set to true and the appender will just drop the message and will not block your application. -->
+    <neverBlock>true</neverBlock>
+    <!-- By default, when the blocking queue has 20% capacity remaining, it will drop events of level TRACE, DEBUG and INFO, keeping only events of level WARN and ERROR. Instruct to drop events once the buffer reaches the max capacity-->
+    <discardingThreshold>10</discardingThreshold>
+    <appender-ref ref="ADP-Security-Logging" />
+  </appender>
+
+  <appender name="ADP-Logging" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <pattern>{"version": "${logSchemaVersion}", "timestamp": "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}", "severity": "${adpLevel}", "service_id": "${serviceId}", "metadata" : {"container_name": "${containerName}"}, "message": "%r [%t] %-5p %c - %msg{JSON}"}%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- Logs the log events asynchronously. It acts solely as an event dispatcher and must reference another appender. -->
+  <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+    <!-- The maximum capacity of the blocking queue. -->
+    <queueSize>8192</queueSize>
+    <includeCallerData>true</includeCallerData>
+    <!-- Set to true and the appender will just drop the message and will not block your application. -->
+    <neverBlock>true</neverBlock>
+    <!-- By default, when the blocking queue has 20% capacity remaining, it will drop events of level TRACE, DEBUG and INFO, keeping only events of level WARN and ERROR. Instruct to drop events once the buffer reaches the max capacity-->
+    <discardingThreshold>10</discardingThreshold>
+    <appender-ref ref="ADP-Logging" />
+  </appender>
+
+  <!-- additivity must be equal to false otherwise as default behaviour of logback will put the log in the ancestor as well -->
+  <logger level="${LOG_LEVEL}" name="ADP-Security-Logger"  additivity="false">
+    <appender-ref ref="ASYNC-Security"/>
+  </logger>
+
+  <!-- Options: OFF, ERROR, WARN, INFO, DEBUG , TRACE-->
+  <root level="${LOG_LEVEL}">
+    <appender-ref ref="ASYNC" />
+  </root>
+
+</configuration>

@@ -1,0 +1,34 @@
+{{- if .Values.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "eric-mxe-meshgw-ingress.name" . | quote }}
+  labels:
+    {{- include "eric-mxe-meshgw-ingress.labels" . | nindent 4 }}
+  annotations:
+    {{- $ingressAnn := include "eric-mxe-meshgw-ingress.ingress-annotations" . | fromYaml -}}
+    {{- $annotations := include "eric-mxe-meshgw-ingress.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-meshgw-ingress.mergeAnnotations" (dict "location" .Template.Name "sources" (list $annotations $ingressAnn)) | trim | nindent 4 }}
+spec:
+  ingressClassName: {{ include "eric-mxe-meshgw-ingress.ingress-class" . | quote }}
+  defaultBackend:
+    service: 
+      name: {{ include "eric-mxe-meshgw-ingress.defaultbackend" . | quote }}
+      port:
+        name: "http"
+  {{- include "eric-mxe-meshgw-ingress.ingress-tls" . | nindent 2 -}}
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: {{ include "eric-mxe-meshgw-ingress.service-name" . | quote }}
+            port:
+              name: "http2"
+        path: /model-endpoints(/|$)(.*)
+        pathType: ImplementationSpecific
+    {{- if or .Values.global.mxeApiHostname .Values.ingress.hostname }}
+    host: {{ default .Values.global.mxeApiHostname .Values.ingress.hostname | quote }}
+    {{- end }}
+{{- end }}
+

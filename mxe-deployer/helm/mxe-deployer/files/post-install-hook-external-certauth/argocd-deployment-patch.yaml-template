@@ -1,0 +1,15 @@
+spec:
+  template:
+    spec:
+      volumes:
+        - name: iam-ca-cert
+          secret:
+            defaultMode: 420
+            secretName: iam-ca-cert
+      containers:
+        - name: ###ARGO_CONTAINER_NAME###
+          volumeMounts:
+            - mountPath: /etc/ssl/certs/ca.crt
+              name: iam-ca-cert
+              subPath: ca.crt
+              readOnly: false

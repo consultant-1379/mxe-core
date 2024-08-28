@@ -1,0 +1,52 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "mxe-commons.post-install-hook-istio-name" . | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "post-install-hook-istio-role"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-commons.post-install-hook-istio-name" . | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-commons.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+    {{- include "mxe-commons.product-info" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "pods"
+      - "namespaces"
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - "*"
+    resources:
+      - "configmaps"
+    verbs:
+      - get
+      - list
+      - patch
+  - apiGroups:
+      - "apps"
+    resources:
+      - "statefulsets"
+      - "deployments"
+    verbs:
+      - get
+      - list
+      - patch
+  - apiGroups:
+      - "networking.k8s.io"
+    resources:
+      - "ingresses"
+    verbs:
+      - get
+      - list
+      - patch

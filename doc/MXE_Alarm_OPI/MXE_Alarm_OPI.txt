@@ -1,0 +1,18 @@
+= MXE Alarm OPI
+:author:
+:doc-name: USER INSTRUCTIONS
+:doc-no: 1/1531-CAV 101 061/1
+:revnumber: PA2
+:revdate: {sys: date +%Y-%m-%d}
+:approved-by-name:
+:approved-by-department:
+
+//Template updated 2018-08-21 (keep to track template history)
+
+== Introduction
+
+
+This document describes the alarm operation instructions. 
+
+
+[bibliography]

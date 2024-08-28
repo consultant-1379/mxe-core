@@ -1,0 +1,4 @@
+report_dir : .bob/va-reports/anchore
+param : '--scope Squashed'
+sbom_opts :  --generate-sbom
+batch_size : 10 

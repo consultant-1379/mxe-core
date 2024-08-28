@@ -1,0 +1,10 @@
+{
+  "children": [
+  ],
+  "endpoint": {
+    "type": "REST"
+  },
+  "name": "model",
+  "type": "MODEL",
+  "implementation": "UNKNOWN_IMPLEMENTATION"
+}

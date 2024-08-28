@@ -1,0 +1,25 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="MxeSuite">
+
+    <listeners>
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGTestListener" />
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGSuiteListener" />
+    </listeners>
+
+    <parameter name="cluster" value="cluster3" />
+    <test name="Model Performance Test for Telco model">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxePerformanceTest">
+                
+                <parameter name="modelSource" value="models/ubclustering" />
+                <parameter name="modelName" value="com.ericsson.eea.ubclustering" />
+                <parameter name="modelVersion" value="1.0.1" />
+                
+                <methods>
+                    <include name="testTelcoModelPerformance" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>

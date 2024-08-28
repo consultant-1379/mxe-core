@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -x
+
+init_path="$(dirname $0)/../../../"
+function check_exit_code(){
+
+	if [ $? -eq 0 ]
+	then
+		echo "INFO : $1"
+	else
+		echo "ERROR: $2"
+	fi
+}
+
+echo "Installing eric-data-document-database-pg-crd"
+$init_path/bob/bob install-document-database-crd
+check_exit_code 'Succesfully installed eric-data-document-database-pg-crd' 'Error while installing eric-data-document-database-pg-crd'

@@ -1,0 +1,511 @@
+{{- $global := fromJson (include "eric-mxe-model-training-service.global" .) -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "eric-mxe-model-training-service.name" . }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: model-training-service"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-model-training-service.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-model-training-service.labels" . | fromYaml -}}
+    {{- include "eric-mxe-model-training-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-model-training-service.annotations" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: "mxe"
+      app.kubernetes.io/component: "model-training-service"
+      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+  {{- include "eric-mxe-model-training-service.update-strategy" . | nindent 2 }}
+  template:
+    metadata:
+      labels:
+        {{- $component := printf "%s" "app.kubernetes.io/component: model-training-service"  | fromYaml -}}
+        {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-model-training-service.name" .)  | fromYaml -}}
+        {{- $istiolabels := include "eric-mxe-model-training-service.istio-sidecar-labels" . | fromYaml -}}
+        {{- $labels := include "eric-mxe-model-training-service.labels" . | fromYaml -}}
+        {{- include "eric-mxe-model-training-service.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $istiolabels $labels )) | trim | nindent 8 }}
+      annotations:
+        {{- $annotations := include "eric-mxe-model-training-service.annotations" . | fromYaml -}}
+        {{- $istioAnn := include "eric-mxe-model-training-service.istio-sidecar-annotations" . | fromYaml -}}
+        {{- $productInfoAnn := include "eric-mxe-model-training-service.product-info" . | fromYaml -}}
+        {{- $prometheusAnn := include "eric-mxe-model-training-service.prometheus-annotations" . | fromYaml -}}
+        {{- $securityAnn := include "eric-mxe-model-training-service.security-annotations" . | fromYaml -}}
+        {{- include "eric-mxe-model-training-service.mergeAnnotations" (dict "location" .Template.Name "sources" (list $annotations $istioAnn $productInfoAnn $prometheusAnn $securityAnn)) | trim | nindent 8 }}
+    spec:
+      {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "eric-mxe-model-training-service.topologySpreadConstraints" . | trim | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "eric-mxe-model-training-service.serviceaccount" . | quote }}
+      {{- if include "eric-mxe-model-training-service.podPriority" . }}
+      priorityClassName: {{- include "eric-mxe-model-training-service.podPriority" . | indent 2 }}
+      {{- end }}
+      initContainers:
+        - name: init-cacerts
+          # Since CBO image does not include java-certs or jdk, author-service image is being pulled in for a copy of system wide java-certs.
+          {{- with .Values.imageCredentials.modelService }}
+          image: "{{ include "eric-mxe-model-training-service.setImageRepo" (list $ .registry.url .repoPath "modelService") }}{{ $.Values.images.modelService.name }}:{{ $.Values.images.modelService.tag }}"
+          {{- end }}
+          imagePullPolicy: "{{ include "eric-mxe-model-training-service.registryImagePullPolicy" (list . (index .Values "images" "modelService" "pullPolicy")) }}"
+          command:
+            - bash
+            - -c
+            - |
+              cp /var/lib/ca-certificates/java-cacerts /cacerts/
+              chmod u+w /cacerts/java-cacerts
+              keytool -noprompt -importcert -alias startssl -keystore /cacerts/java-cacerts -storepass changeit -file /run/secrets/iam-ca-cert/ca.crt
+          {{- include "eric-mxe-model-training-service.init-certs-mtls" . | nindent 14 }}
+          resources:
+            {{- toYaml .Values.resources.initCacerts | trim | nindent 12 }}
+          {{- include "eric-mxe-model-training-service.init-cacerts-security-context" . | nindent 10 }}
+            runAsUser: 1111
+          volumeMounts:
+            - name: cacerts
+              mountPath: /cacerts
+            - name: iam-ca-cert
+              mountPath: /run/secrets/iam-ca-cert
+            - name: tmp
+              mountPath: /tmp
+          {{- include "eric-mxe-model-training-service.init-certs-mtls-volume-mounts" . | nindent 12 }}
+        - name: {{ printf "%s-%s" .Chart.Name "kubectl" | trunc 63 | trimSuffix "-" }}
+          {{- with (index .Values "imageCredentials" "kubernetes-modifier") }}
+          image: "{{ include "eric-mxe-model-training-service.setImageRepo" (list $ .registry.url .repoPath "kubernetes-modifier") }}{{ index $.Values "images" "kubernetes-modifier" "name" }}:{{ index $.Values "images" "kubernetes-modifier" "tag" }}"
+          {{- end }}
+          imagePullPolicy: "{{ include "eric-mxe-model-training-service.registryImagePullPolicy" (list . (index .Values "images" "modelService" "pullPolicy")) }}"
+          env:
+            - name: KEYCLOAK_STATEFULSET_NAME
+              value: {{ .Values.keycloak.statefulset.name | quote }}
+            - name: KEYCLOAK_STATEFULSET_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            {{- toYaml .Values.resources.kubernetesModifier | trim | nindent 12 }}
+          {{- include "eric-mxe-model-training-service.kubectl-security-context" . | nindent 10 }}
+          volumeMounts:
+            - mountPath: "/etc/kubernetes-run-script/"
+              name: wait-for-keycloak-script
+        {{ if .Values.database.create -}}
+        - name: {{ printf "%s-%s" .Chart.Name "init-db" | trunc 63 | trimSuffix "-" }}
+          {{- with .Values.imageCredentials.dbInit }}
+          image: "{{ include "eric-mxe-model-training-service.setImageRepo" (list $ .registry.url .repoPath "dbInit") }}{{ $.Values.images.dbInit.name }}:{{ $.Values.images.dbInit.tag }}"
+          {{- end }}
+          imagePullPolicy: "{{ include "eric-mxe-model-training-service.registryImagePullPolicy" (list . (index .Values "images" "dbInit" "pullPolicy"  )) }}"
+          {{- include "eric-mxe-model-training-service.db-init-args-command" . | nindent 10 }}
+          env:
+            - name: POSTGRESQL_SERVICE
+              value: {{ .Values.database.serviceName | trunc 63 | trimSuffix "-" }}
+            - name: POSTGRESQL_PORT_NAME
+              value: {{ .Values.database.portName }}
+            - name: POSTGRESQL_SUPERUSER_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.superUserSecretName }}
+                  key: {{ .Values.database.superUserIdKey }}
+            - name: POSTGRESQL_SUPERUSER_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.superUserSecretName }}
+                  key: {{ .Values.database.superUserPwdKey }}
+            - name: POSTGRESQL_CREATEDUSER_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.db-custom-user-secret-name" . }}
+                  key: {{ .Values.database.customUserIdKey }}
+            - name: POSTGRESQL_CREATEDUSER_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.db-custom-user-secret-name" . }}
+                  key: {{ .Values.database.customUserPwdKey }}
+            - name: POSTGRESQL_DB
+              value: {{ include "eric-mxe-model-training-service.db-name" . }}
+            {{- if .Values.database.connectionDb }}
+            - name: POSTGRESL_CONNECTION_DB
+              value: {{ .Values.database.connectionDb | quote }}
+            {{- end }}
+            {{- include "eric-mxe-model-training-service.db-init-env" . | nindent 12 -}}
+          {{- include "eric-mxe-model-training-service.db-init-volume-mounts" . | nindent 10 }}
+          resources:
+            {{- toYaml .Values.resources.dbInit | trim | nindent 12 }}
+          {{- include "eric-mxe-model-training-service.dbinit-security-context" . | nindent 10 }}
+        {{ end }}
+        - name: minio-training-job-result-service-config
+          {{- with (index .Values "imageCredentials" "minio-cli") }}
+          image: "{{ include "eric-mxe-model-training-service.setImageRepo" (list $ .registry.url .repoPath "minio-cli") }}{{ index $.Values "images" "minio-cli" "name" }}:{{ index $.Values "images" "minio-cli" "tag" }}"
+          {{- end }}
+          imagePullPolicy: "{{ include "eric-mxe-model-training-service.registryImagePullPolicy" (list . (index .Values "images" "minio-cli" "pullPolicy")) }}"
+          command: ["/bin/sh", "/etc/init-script/init.sh"]
+          volumeMounts:
+          - mountPath: "/etc/init-script/"
+            name: minio-init-script
+          - mountPath: /run/secrets/config
+            name: minio-configuration
+          {{ include "eric-mxe-model-training-service.minio-init-volume-mounts" . | nindent 10 }}
+          env:
+            - name: MINIO_URL
+              value: {{ include "eric-mxe-model-training-service.minio-url" . | quote }}
+            - name: MINIO_CREATE
+              {{- if .Values.minio.userTrainingJobResultServiceSecretName }}
+              value: "false"
+              {{- else }}
+              value: "true"
+            {{- end }}
+            - name: MINIO_USER_ACTIONS
+              value: "[\"s3:ListBucket\",\"s3:DeleteObject\",\"s3:GetBucketLocation\",\"s3:GetObject\"]"
+            - name: MINIO_USER_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-job-result-service-minio-user-secret-name" . | quote }}
+                  key: accesskey
+            - name: MINIO_USER_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-job-result-service-minio-user-secret-name" . | quote }}
+                  key: secretkey
+            - name: MINIO_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-job-result-service-minio-user-secret-name" . | quote }}
+                  key: bucket
+            - name: SERVICE_MESH_MTLS_ENABLED
+              value: {{ .Values.global.serviceMesh.enabled | quote }}
+          resources:
+            {{- toYaml .Values.resources.minioCli | trim | nindent 12 }}
+          {{- include "eric-mxe-model-training-service.minio-security-context" . | nindent 10 }}
+        - name: minio-training-job-result-instance-config
+          {{- with (index .Values "imageCredentials" "minio-cli") }}
+          image: "{{ include "eric-mxe-model-training-service.setImageRepo" (list $ .registry.url .repoPath "minio-cli") }}{{ index $.Values "images" "minio-cli" "name" }}:{{ index $.Values "images" "minio-cli" "tag" }}"
+          {{- end }}
+          imagePullPolicy: "{{ include "eric-mxe-model-training-service.registryImagePullPolicy" (list . (index .Values "images" "minio-cli" "pullPolicy")) }}"
+          command: ["/bin/sh", "/etc/init-script/init.sh"]
+          volumeMounts:
+          - mountPath: "/etc/init-script/"
+            name: minio-init-script
+          - mountPath: /run/secrets/config
+            name: minio-configuration
+          {{ include "eric-mxe-model-training-service.minio-init-volume-mounts" . | nindent 10 }}
+          env:
+            - name: MINIO_URL
+              value: {{ include "eric-mxe-model-training-service.minio-url" . | quote }}
+            - name: MINIO_CREATE
+              {{- if .Values.minio.userTrainingJobResultInstanceSecretName }}
+              value: "false"
+              {{- else }}
+              value: "true"
+            {{- end }}
+            - name: MINIO_USER_ACTIONS
+              value: "[\"s3:PutObject\"]"
+            - name: MINIO_USER_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-job-result-instance-minio-user-secret-name" . | quote }}
+                  key: accesskey
+            - name: MINIO_USER_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-job-result-instance-minio-user-secret-name" . | quote }}
+                  key: secretkey
+            - name: MINIO_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-job-result-service-minio-user-secret-name" . | quote }}
+                  key: bucket
+            - name: SERVICE_MESH_MTLS_ENABLED
+              value: {{ .Values.global.serviceMesh.enabled | quote }}
+          resources:
+            {{- toYaml .Values.resources.minioCli | trim | nindent 12 }}
+          {{- include "eric-mxe-model-training-service.minio-security-context" . | nindent 10 }}
+        - name: minio-training-package-service-config
+          {{- with (index .Values "imageCredentials" "minio-cli") }}
+          image: "{{ include "eric-mxe-model-training-service.setImageRepo" (list $ .registry.url .repoPath "minio-cli") }}{{ index $.Values "images" "minio-cli" "name" }}:{{ index $.Values "images" "minio-cli" "tag" }}"
+          {{- end }}
+          imagePullPolicy: "{{ include "eric-mxe-model-training-service.registryImagePullPolicy" (list . (index .Values "images" "minio-cli" "pullPolicy")) }}"
+          command: ["/bin/sh", "/etc/init-script/init.sh"]
+          volumeMounts:
+          - mountPath: "/etc/init-script/"
+            name: minio-init-script
+          - mountPath: /run/secrets/config
+            name: minio-configuration
+          {{ include "eric-mxe-model-training-service.minio-init-volume-mounts" . | nindent 10 }}
+          env:
+            - name: MINIO_URL
+              value: {{ include "eric-mxe-model-training-service.minio-url" . | quote }}
+            - name: MINIO_CREATE
+              {{- if .Values.minio.userTrainingPackageServiceSecretName }}
+              value: "false"
+              {{- else }}
+              value: "true"
+            {{- end }}
+            - name: MINIO_USER_ACTIONS
+              value: "[\"s3:PutObject\",\"s3:GetBucketLocation\",\"s3:ListBucket\"]"
+            - name: MINIO_USER_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-package-service-minio-user-secret-name" . | quote }}
+                  key: accesskey
+            - name: MINIO_USER_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-package-service-minio-user-secret-name" . | quote }}
+                  key: secretkey
+            - name: MINIO_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-package-service-minio-user-secret-name" . | quote }}
+                  key: bucket
+            - name: SERVICE_MESH_MTLS_ENABLED
+              value: {{ .Values.global.serviceMesh.enabled | quote }}
+          resources:
+            {{- toYaml .Values.resources.minioCli | trim | nindent 12 }}
+          {{- include "eric-mxe-model-training-service.minio-security-context" . | nindent 10 }}
+        - name: minio-training-package-instance-config
+          {{- with (index .Values "imageCredentials" "minio-cli") }}
+          image: "{{ include "eric-mxe-model-training-service.setImageRepo" (list $ .registry.url .repoPath "minio-cli") }}{{ index $.Values "images" "minio-cli" "name" }}:{{ index $.Values "images" "minio-cli" "tag" }}"
+          {{- end }}
+          imagePullPolicy: "{{ include "eric-mxe-model-training-service.registryImagePullPolicy" (list . (index .Values "images" "minio-cli" "pullPolicy")) }}"
+          command: ["/bin/sh", "/etc/init-script/init.sh"]
+          volumeMounts:
+          - mountPath: "/etc/init-script/"
+            name: minio-init-script
+          - mountPath: /run/secrets/config
+            name: minio-configuration
+          {{ include "eric-mxe-model-training-service.minio-init-volume-mounts" . | nindent 10 }}
+          env:
+            - name: MINIO_URL
+              value: {{ include "eric-mxe-model-training-service.minio-url" . | quote }}
+            - name: MINIO_CREATE
+              {{- if .Values.minio.userTrainingPackageInstanceSecretName }}
+              value: "false"
+              {{- else }}
+              value: "true"
+            {{- end }}
+            - name: MINIO_USER_ACTIONS
+              value: "[\"s3:GetObject\",\"s3:ListBucket\"]"
+            - name: MINIO_USER_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-package-instance-minio-user-secret-name" . | quote }}
+                  key: accesskey
+            - name: MINIO_USER_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-package-instance-minio-user-secret-name" . | quote }}
+                  key: secretkey
+            - name: MINIO_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-package-service-minio-user-secret-name" . | quote }}
+                  key: bucket
+            - name: SERVICE_MESH_MTLS_ENABLED
+              value: {{ .Values.global.serviceMesh.enabled | quote }}
+          resources:
+            {{- toYaml .Values.resources.minioCli | trim | nindent 12 }}
+          {{- include "eric-mxe-model-training-service.minio-security-context" . | nindent 10 }}
+      containers:
+        {{ if .Values.global.serviceMesh.enabled -}}
+        - name: {{ printf "%s-%s" .Chart.Name "certificate-sidecar" | trunc 63 | trimSuffix "-" }}
+          {{- with (index .Values "imageCredentials" "certificate-sidecar") }}
+          image: "{{ include "eric-mxe-model-training-service.setImageRepo" (list $ .registry.url .repoPath "certificate-sidecar") }}{{ index $.Values "images" "certificate-sidecar" "name" }}:{{ index $.Values "images" "certificate-sidecar" "tag" }}"
+          {{- end }}
+          imagePullPolicy: "{{ include "eric-mxe-model-training-service.registryImagePullPolicy" (list . (index .Values "images" "modelService" "pullPolicy")) }}"
+          env:
+            - name: SOURCE
+              value: {{ include "eric-mxe-model-training-service.certificate-sidecar-source" . }}
+            - name: DESTINATION
+              value: {{ include "eric-mxe-model-training-service.certificate-sidecar-destination" . }}
+            - name: RUN_COMMAND
+              value: {{ include "eric-mxe-model-training-service.certificate-sidecar-run-command" . }}
+          resources:
+            {{- toYaml .Values.resources.certificateSidecarService | trim | nindent 12 }}
+          {{- include "eric-mxe-model-training-service.usercontainer-security-context" . | nindent 10 }}
+          volumeMounts:
+            - name: kubernetes-run-script
+              mountPath: /etc/kubernetes-run-script
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+            {{- include "eric-mxe-model-training-service.service-mesh-volume-mounts" . | nindent 12 }}
+        {{ end }}
+        - name: {{ .Chart.Name | quote }}
+          {{- with .Values.imageCredentials.modelService }}
+          image: "{{ include "eric-mxe-model-training-service.setImageRepo" (list $ .registry.url .repoPath "modelService") }}{{ $.Values.images.modelService.name }}:{{ $.Values.images.modelService.tag }}"
+          {{- end }}
+          imagePullPolicy: "{{ include "eric-mxe-model-training-service.registryImagePullPolicy" (list . (index .Values "images" "modelService" "pullPolicy")) }}"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: mgmt
+              containerPort: 8081
+              protocol: TCP
+          env:
+            - name: POSTGRESQL_SERVICE
+              value: {{ .Values.database.serviceName | trunc 63 | trimSuffix "-" }}
+            - name: POSTGRESQL_PORT
+              value: {{ .Values.database.portName }}
+            - name: POSTGRESQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.db-custom-user-secret-name" . }}
+                  key: {{ .Values.database.customUserIdKey }}
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.db-custom-user-secret-name" . }}
+                  key: {{ .Values.database.customUserPwdKey }}
+            - name: POSTGRESQL_DB
+              value: {{ include "eric-mxe-model-training-service.db-name" . }}
+            - name: MODEL_DEPLOYMENT_SERVICE_HOST_NAME
+              value: {{ include "eric-mxe-model-training-service.model-service-host" . | quote }}
+            - name: MODEL_DEPLOYMENT_SERVICE_PORT_NAME
+              value: {{ .Values.modelService.port }}
+            - name: AUTHOR_SERVICE_HOST_NAME
+              value: {{ include "eric-mxe-model-training-service.author-service-host" . | quote }}
+            - name: AUTHOR_SERVICE_PORT_NAME
+              value: {{ .Values.authorService.port }}
+            - name: MODEL_TRAINING_SERVICE_NAME
+              value: {{ include "eric-mxe-model-training-service.name" . | quote }}
+            - name: MODEL_TRAINING_SERVICE_INSTANCE_NAME
+              value: {{ .Release.Name | quote }}
+            - name: MODEL_TRAINING_SERVICE_VERSION
+              value: {{ .Chart.AppVersion | quote }}
+            - name: SERVICE_MESH_MTLS_ENABLED
+              value: {{ .Values.global.serviceMesh.enabled | quote }}
+            - name: SERVICE_MESH_USER_VOLUME
+              value: {{ include "eric-mxe-model-training-service.istio-sidecar-annotations-user-volume" . | squote }}
+            - name: SERVICE_MESH_USER_VOLUME_MOUNTS
+              value: {{ include "eric-mxe-model-training-service.istio-sidecar-annotations-volume-mounts" . | squote }}
+            - name: JDBC_PARAMS
+              value: {{ include "eric-mxe-model-training-service.jdbc-params" . | quote }}
+            - name: MODEL_PACKAGER_IMAGE
+              value: "{{ include "eric-mxe-model-training-service.setImageRepo" (list . .Values.imageCredentials.packager.registry.url .Values.imageCredentials.packager.repoPath "packager") }}{{ .Values.images.packager.name }}:{{ .Values.images.packager.tag }}"
+            - name: MODEL_PACKAGER_PULL_POLICY
+              value: {{ .Values.images.packager.pullPolicy | quote }}
+            - name: MODEL_PACKAGER_PULL_SECRET
+              value: {{ include "eric-mxe-model-training-service.image-pull-secret-name" . | quote }}
+            - name: DOCKER_REGISTRY_HOSTNAME
+              value: {{ include "eric-mxe-model-training-service.docker-registry-hostname" . | quote }}
+            {{- include "eric-mxe-model-training-service.installer-docker-registry-casecretname-env" . | nindent 12 }}
+            - name: DOCKER_REGISTRY_EXTERNAL_HOSTNAME
+              value: {{ include "eric-mxe-model-training-service.docker-registry-full-host" . | quote }}
+            - name: DOCKER_REGISTRY_SECRET_NAME
+              value: {{ include "eric-mxe-model-training-service.docker-registry-secret-name" . | quote }}
+            - name: DOCKER_REGISTRY_EXTERNAL_SECRET_NAME
+              value: {{ include "eric-mxe-model-training-service.docker-registry-secret-name" . | quote }}
+            - name: DOCKER_REGISTRY_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.internal-container-registry-secret-name" . | quote }}
+                  key: username
+            - name: DOCKER_REGISTRY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.internal-container-registry-secret-name" . | quote }}
+                  key: password
+            - name: MODEL_TRAINER_PULL_POLICY
+              value: {{ .Values.images.trainer.pullPolicy | quote }}
+            - name: MINIO_URL
+              value: {{ .Values.minio.http.url | quote }}
+            - name: MINIO_TRAINING_PACKAGE_SERVICE_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-package-service-minio-user-secret-name" . | quote }}
+                  key: accesskey
+            - name: MINIO_TRAINING_PACKAGE_SERVICE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-package-service-minio-user-secret-name" . | quote }}
+                  key: secretkey
+            - name: MINIO_TRAINING_PACKAGE_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-package-service-minio-user-secret-name" . | quote }}
+                  key: bucket
+            - name: MINIO_TRAINING_PACKAGE_INSTANCE_SECRET_NAME
+              value: {{ include "eric-mxe-model-training-service.training-package-instance-minio-user-secret-name" . | quote }}
+            - name: MINIO_TRAINING_JOB_RESULT_SERVICE_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-job-result-service-minio-user-secret-name" . | quote }}
+                  key: accesskey
+            - name: MINIO_TRAINING_JOB_RESULT_SERVICE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-job-result-service-minio-user-secret-name" . | quote }}
+                  key: secretkey
+            - name: MINIO_TRAINING_JOB_RESULT_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "eric-mxe-model-training-service.training-job-result-service-minio-user-secret-name" . | quote }}
+                  key: bucket
+            - name: MINIO_TRAINING_JOB_RESULT_INSTANCE_SECRET_NAME
+              value: {{ include "eric-mxe-model-training-service.training-job-result-instance-minio-user-secret-name" . | quote }}
+            - name: PYPISERVICE_HOST
+              value: {{ include "eric-mxe-model-training-service.pypiserver-host" . | quote }}
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI
+              value: "{{ include "eric-mxe-model-training-service.oauth-api-host-path-url" . }}/auth/realms/mxe/protocol/openid-connect/certs"
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              value: "{{ include "eric-mxe-model-training-service.oauth-api-host-path-url" . }}/auth/realms/mxe"
+            - name: MODEL_TRAINING_SERVICE_DOCKERFILE
+              value: {{ include "eric-mxe-model-training-service.training-dockerfile-configmap" .}}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: mgmt
+            initialDelaySeconds: {{ .Values.probes.modeltrainingservice.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.modeltrainingservice.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.probes.modeltrainingservice.livenessProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.probes.modeltrainingservice.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: mgmt
+            initialDelaySeconds: {{ .Values.probes.modeltrainingservice.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.modeltrainingservice.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.probes.modeltrainingservice.readinessProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.probes.modeltrainingservice.readinessProbe.timeoutSeconds }}
+          resources:
+            {{- toYaml .Values.resources.modelService | trim | nindent 12 }}
+          {{- include "eric-mxe-model-training-service.model-training-security-context" . | nindent 10 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: cacerts
+              mountPath: /var/lib/ca-certificates
+            - name: iam-ca-cert
+              mountPath: /run/secrets/iam-ca-cert
+            - name: log-control
+              mountPath: /app/config/logcontrol
+            {{- include "eric-mxe-model-training-service.service-mesh-volume-mounts" . | nindent 12 }}
+      volumes:
+        - name: log-control
+          configMap:
+             name: {{ include "eric-mxe-model-training-service.log-control-configmap" . | quote }}
+        - name: tmp
+          emptyDir: {}
+        - name: cacerts
+          emptyDir:
+            sizeLimit: 512Ki
+        - name: wait-for-keycloak-script
+          configMap:
+             name: {{ include "eric-mxe-model-training-service.wait-for-keycloak-configmap" . | quote }}
+        - name: minio-init-script
+          configMap:
+            name: {{ include "eric-mxe-model-training-service.minio-configmap" . | quote }}
+        - name: minio-configuration
+          secret:
+            secretName: {{ .Values.minio.adminSecretName | quote }}
+        - name: iam-ca-cert
+          secret:
+            secretName: {{ include "eric-mxe-model-training-service.iam-ca-cert-name" . | quote }}
+        {{- include "eric-mxe-model-training-service.service-mesh-volumes" . | nindent 8 }} 
+      securityContext:
+        fsGroup: {{ include "eric-mxe-model-training-service.fsGroup.coordinated" . }}
+      {{- include "eric-mxe-model-training-service.image-pull-secrets" . | nindent 6 }}
+      {{- if (or .Values.nodeSelector $global.nodeSelector) }}
+      nodeSelector: {{- include "eric-mxe-model-training-service.nodeSelector" . | nindent 8 }}
+      {{- end }}
+      affinity:
+        {{- tpl (toYaml .Values.affinity) . | nindent 8 }}
+      tolerations: {{ include "eric-mxe-model-training-service.merge-tolerations" (dict "root" . "podbasename" "eric-mxe-model-training-service") | nindent 8}}

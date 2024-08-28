@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -x
+
+# port forward bro service
+kubectl -n "$NAMESPACE" port-forward service/eric-ctrl-bro 7002:7002 &
+sleep 5
+export BROSERVICE=localhost:7002
+
+# Data encryption in transit (mTLS) is enabled by default and so execute the following to fetch the relevant certificates
+kubectl -n "$NAMESPACE" get secret eric-sec-sip-tls-trusted-root-cert -o json | jq -r '.data."cacertbundle.pem"' | base64 -d > /tmp/cacertbundle.pem
+kubectl -n "$NAMESPACE" get secret eric-data-document-database-pg-bra-cert -o json | jq -r '.data."bra-cert.pem"' | base64 -d > /tmp/clientcert.pem
+kubectl -n "$NAMESPACE" get secret eric-data-document-database-pg-bra-cert -o json | jq -r '.data."bra-privkey.pem"' | base64 -d >  /tmp/clientprivkey.pem
+
+# Back up the whole database cluster in Document Database PG service.
+curl -i -X POST -H "Content-Type:application/json" -d '{ "action": "CREATE_BACKUP", "payload": { "backupName": "mxe_pg_Backup" } }'  https://$BROSERVICE/v1/backup-manager/mxe-pg/action --cacert /tmp/cacertbundle.pem --key /tmp/clientprivkey.pem --cert /tmp/clientcert.pem > /tmp/action_id
+ACTION_ID=`tail -1 /tmp/action_id | awk -F"\"" '{print $4}'`
+
+# Verify the completion of the database backup by using action id
+BACKUP_STATUS="FAILURE"
+for i in {1..20}
+do
+    sleep 5
+    curl -i https://$BROSERVICE/v1/backup-manager/mxe-pg/action/"$ACTION_ID" --cacert /tmp/cacertbundle.pem --key /tmp/clientprivkey.pem --cert /tmp/clientcert.pem > /tmp/backup_result
+    tail -1 /tmp/backup_result | grep FINISHED
+    if [ $? -eq 0 ]; then
+        BACKUP_STATUS="FINISHED"
+        break
+    fi
+done
+if [ ${BACKUP_STATUS} == "FAILURE" ]; then
+    exit 1
+fi
+exit 0

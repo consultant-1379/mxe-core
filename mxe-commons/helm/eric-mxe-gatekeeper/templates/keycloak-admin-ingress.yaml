@@ -1,0 +1,36 @@
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: {{ include "eric-mxe-gatekeeper.ingress-admin" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: gatekeeper-ingress-admin"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-gatekeeper.name" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-gatekeeper.labels" . | fromYaml -}}
+    {{- include "eric-mxe-gatekeeper.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $ingress := include "eric-mxe-gatekeeper.keycloak-admin-ingress" . | fromYaml -}}
+    {{- $annotations := include "eric-mxe-gatekeeper.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-gatekeeper.mergeAnnotations" (dict "location" .Template.Name "sources" (list $ingress $annotations)) | trim | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClass | quote }}
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: {{ .Values.keycloak.service.ingressname }}
+            port:
+              name: {{ include "eric-mxe-gatekeeper.keycloak-ingress-port-name" . | quote }}
+        path: /auth/realms/master
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: {{ .Values.keycloak.service.ingressname }}
+            port:
+              name: {{ include "eric-mxe-gatekeeper.keycloak-ingress-port-name" . | quote }}
+        path: /auth/admin
+        pathType: ImplementationSpecific
+    {{- if or .Values.global.mxeApiHostname .Values.ingress.hostname }}
+    host: {{ default .Values.global.mxeApiHostname .Values.ingress.hostname | quote }}
+    {{- end }}
+

@@ -1,0 +1,32 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: {{ include "mxe-deployer.name" . }}-vs
+  labels:
+    app.kubernetes.io/part-of: "mxe-deployer"
+    app.kubernetes.io/component: "mxe-deployer"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name:  {{ include "mxe-deployer.name" . }}-vs
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-deployer.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- include "mxe-deployer.product-info" . | nindent 4 }}
+spec:
+  hosts:
+  - {{ .Values.global.mxeDeployerApiHostname }}
+  gateways:
+  - {{ include "mxe-deployer.mesh-ingress-gw-name" . }}
+  http:
+  - name: "deployer-ingress-controller"
+    match:
+    - uri:
+        prefix: "/"
+    rewrite:
+      uri: "/"
+    route:
+    - destination:
+        host: eric-mxe-deployer-service
+        port:
+          number: 80

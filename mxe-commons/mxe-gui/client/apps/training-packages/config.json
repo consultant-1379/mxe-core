@@ -1,0 +1,24 @@
+{
+  "script": "training-packages/TrainingPackages",
+  "title": "TRAINING_PACKAGES_TITLE",
+  "route": "training-packages",
+  "menu": {
+    "id": "TRAINING_PACKAGES",
+    "label": "TRAINING_PACKAGES",
+    "data": {
+      "path": "training-packages"
+    }
+  },
+  "dependencies": {
+    "@eui/component": "^0.9.0",
+    "@eui/lit-component": "^0.9.0",
+    "@eui/app": "^0.9.1"
+  },
+  "children": {
+    "training-package-detail": {
+      "script": "training-package-detail/TrainingPackageDetail",
+      "title": "TRAINING_PACKAGE_DETAIL",
+      "route": "training-packages/training-package-detail"
+    }
+  }
+}

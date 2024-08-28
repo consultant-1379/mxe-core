@@ -1,0 +1,32 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  namespace: {{ .Release.Namespace | quote }}
+  name: {{ include "mxe-gitea.name" .}}-gitea-vs
+  labels:
+    app.kubernetes.io/part-of: "mxe-deployer"
+    app.kubernetes.io/component: "mxe-gitea"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name:  {{ include "mxe-gitea.name" .}}-gitea-vs
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-gitea.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    {{- include "mxe-gitea.product-info" . | nindent 4 }}
+spec:
+  hosts:
+  - {{ .Values.global.mxeGiteaApiHostname }}
+  gateways:
+  - {{ include "mxe-gitea.mesh-ingress-gw-name" . }}
+  http:
+  - name: "gitea-ingress-controller"
+    match:
+    - uri:
+        prefix: "/"
+    rewrite:
+      uri: "/"
+    route:
+    - destination:
+        host: mxe-deployer-gitea-http
+        port:
+          number: 3000

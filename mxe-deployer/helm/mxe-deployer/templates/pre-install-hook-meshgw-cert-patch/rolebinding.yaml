@@ -1,0 +1,27 @@
+{{- if .Values.global.serviceMesh.enabled -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "mxe-deployer.pre-install-hook-meshgw-cert-patch-name" . | quote }}
+  labels:
+    app.kubernetes.io/part-of: "mxe"
+    app.kubernetes.io/component: "post-install-hook-certificate-sidecar-rolebinding"
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/name: {{ include "mxe-deployer.pre-install-hook-meshgw-cert-patch-name" . | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    helm.sh/chart: {{ include "mxe-deployer.chart" . | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+  annotations:
+    "helm.sh/hook": "pre-install,pre-upgrade"
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+    {{- include "mxe-deployer.product-info" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "mxe-deployer.pre-install-hook-meshgw-cert-patch-name" . | quote }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "mxe-deployer.pre-install-hook-meshgw-cert-patch-name" . | quote }}
+    namespace: {{ .Release.Namespace | quote }}
+{{- end -}}

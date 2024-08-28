@@ -1,0 +1,41 @@
+---
+apiVersion: "machinelearning.seldon.io/v1"
+kind: "SeldonDeployment"
+metadata:
+  name: "tc10-cli-ab-model-ms"
+spec:
+  predictors:
+  - name: "main"
+    annotations:
+      predictor_version: "v1"
+    replicas: 1
+    graph:
+      name: ab-test
+      endpoint: {}
+      implementation: RANDOM_ABTEST
+      parameters:
+      - name: ratioA
+        value: "0.5"
+        type: FLOAT
+      children:
+      - name: model-1
+        endpoint:
+          type: REST
+        type: MODEL
+        children: []
+      - name: model-2
+        endpoint:
+          type: REST
+        type: MODEL
+        children: []
+    componentSpecs:
+    - spec:
+        containers:
+        - image: "sample.abmodel1.cli.ext:4.1.3"
+          name: "model-1"
+          imagePullPolicy: Always
+    - spec:
+        containers:
+        - image: "sample.abmodel2.cli.ext:4.1.4"
+          name: "model-2"
+          imagePullPolicy: Always

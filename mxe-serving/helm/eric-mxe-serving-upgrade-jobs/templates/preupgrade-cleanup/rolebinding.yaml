@@ -1,0 +1,22 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "eric-mxe-serving-upgrade-jobs.preupgrade-cleanup-role-binding" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: preupgrade-cleanup-role-binding"  | fromYaml -}}
+    {{- $labels := include "eric-mxe-serving-upgrade-jobs.labels" . | fromYaml -}}
+    {{- include "eric-mxe-serving-upgrade-jobs.mergeLabels" (dict "location" .Template.Name "sources" (list $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- $hook := printf "%s" "helm.sh/hook: pre-upgrade"  | fromYaml -}}
+    {{- $hookDeletePolicy := printf "%s" "helm.sh/hook-delete-policy: before-hook-creation"  | fromYaml -}}
+    {{- $hookWeight := include "eric-mxe-serving-upgrade-jobs.hook-weight" 0 | fromYaml -}}
+    {{- $annotations := include "eric-mxe-serving-upgrade-jobs.annotations" . | fromYaml -}}
+    {{- include "eric-mxe-serving-upgrade-jobs.mergeAnnotations" (dict "location" .Template.Name "sources" (list $hook $hookDeletePolicy $hookWeight $annotations)) | trim | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "eric-mxe-serving-upgrade-jobs.preupgrade-cleanup-role" . | quote }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "eric-mxe-serving-upgrade-jobs.preupgrade-cleanup-service-account" . | quote }}
+    namespace: {{ .Release.Namespace | quote }}

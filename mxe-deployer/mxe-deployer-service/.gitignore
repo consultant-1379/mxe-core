@@ -1,0 +1,11 @@
+vendor
+bin/depmanager
+settings.json
+.kube
+main
+depmanager
+__debug_bin
+
+notebooks/archives
+notebooks/helm-examples
+notebooks/cli

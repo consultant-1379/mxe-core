@@ -1,0 +1,44 @@
+:host {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  width: 100%;
+  margin-top: 16px;
+}
+
+svg {
+  width: 150px;
+  height: 150px;
+}
+
+/**
+ * 1. The `reverse` animation direction plays the animation backwards
+ *    which makes it start at the stroke offset 100 which means displaying
+ *    no stroke at all and animating it to the value defined in the SVG
+ *    via the inline `stroke-dashoffset` attribute.
+ * 2. Rotate by -90 degree to make the starting point of the
+ *    stroke the top of the circle.
+ * 3. Using CSS transforms on SVG elements is not supported by Internet Explorer
+ *    and Edge, use the transform attribute directly on the SVG element as a
+ * .  workaround (https://markus.oberlehner.net/blog/pure-css-animated-svg-circle-chart/#part-4-internet-explorer-strikes-back).
+ */
+.circle-chart__circle {
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dasharray 300ms ease-in-out;
+}
+
+@keyframes circle-chart-fill {
+  to {
+    stroke-dasharray: 0, 80;
+  }
+}
+
+@keyframes circle-chart-appear {
+  to {
+    opacity: 1;
+  }
+}

@@ -1,0 +1,31 @@
+{
+    "ericsson_email_address": "raman.n@ericsson.com",
+    "cwd": "/mnt/disk0/enxxram/workspace/mee/mxe-core-develop/utils/certs/olah024/",
+    "namespace": "mxe",
+    "endpoints": [
+        {
+            "domain_address": "argocdui.olah024.rnd.gic.ericsson.se",
+            "app_name": "argocdui"
+        },
+        {
+            "domain_address": "argocd.olah024.rnd.gic.ericsson.se",
+            "app_name": "argocd"
+        },
+        {
+            "domain_address": "mxe-deployer.olah024.rnd.gic.ericsson.se",
+            "app_name": "deployer"
+        },
+        {
+            "domain_address": "mxe.olah024.rnd.gic.ericsson.se",
+            "app_name": "api"
+        },
+        {
+            "domain_address": "oauth.mxe.olah024.rnd.gic.ericsson.se",
+            "app_name": "oauth-api"
+        },
+        {
+            "domain_address": "gitea.mxe.olah024.rnd.gic.ericsson.se",
+            "app_name": "gitea-api"
+        }
+    ]
+}

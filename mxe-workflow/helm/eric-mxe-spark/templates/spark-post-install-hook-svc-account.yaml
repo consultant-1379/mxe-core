@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name:  {{ include "eric-mxe-spark.post-install-hook-service-account" . | quote }}
+  labels:
+    {{- $component := printf "%s" "app.kubernetes.io/component: post-install-hook-service-account"  | fromYaml -}}
+    {{- $name := printf "%s: %s" "app.kubernetes.io/name" (include "eric-mxe-spark.post-install-hook-service-account" .)  | fromYaml -}}
+    {{- $labels := include "eric-mxe-spark.labels" . | fromYaml -}}
+    {{- include "eric-mxe-spark.mergeLabels" (dict "location" .Template.Name "sources" (list $name $component $labels )) | trim | nindent 4 }}
+  annotations:
+    {{- include "eric-mxe-spark.annotations" . | nindent 4 }} 

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exploration</title>
+    <style>
+      body {
+        margin: 8px;
+        padding: 8px;
+        font-size: 14px;
+        font-family: 'Ericsson Hilda', Helvetica, Arial, sans-serif;
+      }
+      /* Apply styles to the iframe to make it fill the entire page */
+      iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none; /* Remove iframe border */
+      }
+    </style>
+  </head>
+  <body onload="authorizeNotebook()">
+    <div id="content"></div>
+    <script type="text/javascript">
+      const content = document.getElementById('content');
+      function authorizeNotebook() {
+        if (window.parent.opener) {
+          const iframe = document.createElement('iframe');
+          iframe.setAttribute('src', '/jupyter/hub/login');
+          iframe.setAttribute('id', 'notebook');
+          content.appendChild(iframe);
+        } else {
+          content.textContent = 'Unauthorized access.';
+        }
+      }
+    </script>
+  </body>
+</html>

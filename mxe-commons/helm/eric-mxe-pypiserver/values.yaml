@@ -1,0 +1,143 @@
+# Default values for eric-mxe-pypiserver.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+enabled: true
+
+replicaCount: 1
+
+images:
+  pypiserver:
+    name: "pypiserver/pypiserver"
+    tag: "VERSION"
+    pullPolicy: 
+
+updateStrategy:
+  type: "RollingUpdate"
+
+imageCredentials:
+  pullSecret: 
+  registry: 
+     url:
+  repoPath:
+  pypiserver:
+    registry:
+      url:
+      pullSecret:
+      imagePullPolicy:
+    repoPath:
+
+# DR-D1121-011 - Present in Top Level Helm Chart Values.yaml
+# global:
+#   pullSecret:
+#   registry:
+#     url: "armdocker.rnd.ericsson.se"
+#     pullSecret:
+#   mxeApiTlsSecretName:
+#   mxeApiHostname:
+#   mxeDisableDefaultIngressControllerUse: false
+#   labels: {}
+#   annotations: {}
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  port: 8080
+
+serviceMesh:
+  enabled: true
+  tlsMode: ISTIO_MUTUAL
+
+productInfo:
+  rstate: "-"
+
+persistence:
+  persistentVolumeClaim:
+    annotations: {}
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: null
+    size: "5Gi"
+
+pypiserver:
+  # for a list of options see: https://github.com/pypiserver/pypiserver
+  extraArgs: []
+    # - --disable-fallback
+    # - --log-conf=/path/to/file
+
+auth:
+  ## comma-separated list of (case-insensitive) actions to authenticate
+  ## Use '.' or '' for empty. Requires to have set the password (option below).
+  ## Available actions are update, download and list
+  actions: update
+  ## Map of username / encoded passwords that will be put to the htpasswd file
+  ## use `htpasswd -n -b username password` to generate them
+  credentials: {}
+
+resources:
+  pypiserver:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+      ephemeral-storage: 25Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+      ephemeral-storage: 256Mi
+
+nodeSelector: {}
+
+tolerations: []
+labels : {}
+annotations: {}
+terminationGracePeriodSeconds: 30
+topologySpreadConstraints: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchExpressions:
+              - key: "app.kubernetes.io/part-of"
+                operator: "In"
+                values:
+                  - "mxe"
+              - key: "app.kubernetes.io/component"
+                operator: "In"
+                values:
+                  - "pypiserver"
+              - key: "app.kubernetes.io/instance"
+                operator: "In"
+                values:
+                  - "{{ .Release.Name }}"
+
+
+probes:
+  pypiserver:
+    livenessProbe:
+      initialDelaySeconds: 30
+      failureThreshold: 6
+      timeoutSeconds: 5
+    readinessProbe:
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 3
+
+podPriority:
+  pypiserver:
+    priorityClassName: 
+
+# DR-D1123-127 -  ADP services shall define AppArmor profile
+appArmorProfile:
+  type:
+  localhostProfile:
+
+# ADP services shall define Seccomp profile
+seccompProfile:
+  type: RuntimeDefault
+  localhostProfile:

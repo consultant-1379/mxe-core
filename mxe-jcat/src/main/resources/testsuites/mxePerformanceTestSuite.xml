@@ -1,0 +1,31 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="MxePerformanceTestSuite">
+
+    <listeners>
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGTestListener" />
+        <listener class-name="se.ericsson.jcat.fw.fixture.testng.JcatNGSuiteListener" />
+    </listeners>
+
+    <parameter name="cluster" value="cluster3" />
+
+    <test name="Performance Test">
+        <classes>
+            <class name="com.ericsson.mxe.jcat.test.MxePerformanceTest">
+                <parameter name="packageName"
+                    value="armdocker.rnd.ericsson.se/proj-mxe-models/image/img_inception3:v0.0.1" />
+                <parameter name="modelName" value="com.ericsson.img.inception3" />
+                <parameter name="modelVersion" value="0.0.1" />
+                <parameter name="instance" value="1" />
+                <parameter name="instanceName" value="notusedyet" />
+                <parameter name="sendRateSteps" value="1" />
+                <parameter name="maxSendRate" value="5" />
+                <parameter name="measurementLength" value="180" />
+                <methods>
+                    <include name="testMxeModelPerformance" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+</suite>

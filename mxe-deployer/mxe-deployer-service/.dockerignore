@@ -1,0 +1,9 @@
+.vscode
+scripts
+bin/
+data/
+scripts/
+LICENSE
+README.md
+resources/
+makefile

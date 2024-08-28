@@ -1,0 +1,114 @@
+++ pwd
++ CWD=/home/evatsiv/gitViews/mxe-core/3pp-images
++ case "$(uname -s)" in
+++ uname -s
+++ readlink -f /home/evatsiv/gitViews/mxe-core/3pp-images/certificate-sidecar/build_ubuntu_image.sh
++ SCRIPT=/home/evatsiv/gitViews/mxe-core/3pp-images/certificate-sidecar/build_ubuntu_image.sh
+++ dirname /home/evatsiv/gitViews/mxe-core/3pp-images/certificate-sidecar/build_ubuntu_image.sh
++ BASEDIR=/home/evatsiv/gitViews/mxe-core/3pp-images/certificate-sidecar
+++ dirname /home/evatsiv/gitViews/mxe-core/3pp-images/certificate-sidecar
++ MODULEROOT=/home/evatsiv/gitViews/mxe-core/3pp-images
++ source /home/evatsiv/gitViews/mxe-core/3pp-images/base_image.sh
+++ export LATEST_DATE_TAG=20240405
+++ LATEST_DATE_TAG=20240405
+++ export BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
+++ BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
+++ export LATEST_ALPINE_TAG=3.19.1
+++ LATEST_ALPINE_TAG=3.19.1
+++ export PYTHON_ALPINE_TAG=3.12.3-alpine3.19
+++ PYTHON_ALPINE_TAG=3.12.3-alpine3.19
+++ export ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
+++ ARMDOCKER_PROXY=armdocker.rnd.ericsson.se/dockerhub-ericsson-remote
++ INOTIFY_VERSION=3.22.1.0-2
++ IMAGE=armdocker.rnd.ericsson.se/proj-mxe/certificate-sidecar:ubuntu-20240405
++ DOCKER_BUILDKIT=1
++ docker build --build-arg BASE_IMAGE=armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405 --build-arg INOTIFY_VERSION=3.22.1.0-2 -t armdocker.rnd.ericsson.se/proj-mxe/certificate-sidecar:ubuntu-20240405 /home/evatsiv/gitViews/mxe-core/3pp-images/certificate-sidecar
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 554B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405
+#2 DONE 6.6s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/3] FROM armdockerhub.rnd.ericsson.se/ubuntu:jammy-20240405@sha256:1b8d8ff4777f36f19bfe73ee4df61e3a0b789caeff29caa019539ec7c9a57f95
+#4 CACHED
+
+#5 [2/3] RUN apt-get update;    apt-get install -y openssl libinotifytools0=3.22.1.0-2 inotify-tools=3.22.1.0-2;    echo "10001:x:10001:10001:An identity for user:/nonexistent:/bin/false" >> /etc/passwd;    echo "10001:!::0:::::" >> /etc/shadow;    mkdir -p /etc/kubernetes-run-script
+#5 5.964 Get:1 http://security.ubuntu.com/ubuntu jammy-security InRelease [110 kB]
+#5 5.972 Get:2 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]
+#5 7.151 Get:3 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [119 kB]
+#5 7.370 Get:4 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [44.7 kB]
+#5 7.412 Get:5 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [109 kB]
+#5 7.661 Get:6 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [1755 kB]
+#5 7.671 Get:7 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1792 kB]
+#5 8.297 Get:8 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
+#5 8.334 Get:9 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]
+#5 8.354 Get:10 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]
+#5 8.761 Get:11 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1077 kB]
+#5 8.945 Get:12 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [2265 kB]
+#5 9.779 Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [2339 kB]
+#5 9.920 Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [51.1 kB]
+#5 9.921 Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1369 kB]
+#5 12.66 Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [2035 kB]
+#5 24.31 Get:17 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [81.0 kB]
+#5 25.73 Get:18 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [31.9 kB]
+#5 25.85 Fetched 31.4 MB in 26s (1228 kB/s)
+#5 25.85 Reading package lists...
+#5 26.51 Reading package lists...
+#5 27.16 Building dependency tree...
+#5 27.30 Reading state information...
+#5 27.45 Suggested packages:
+#5 27.45   ca-certificates
+#5 27.48 The following NEW packages will be installed:
+#5 27.48   inotify-tools libinotifytools0 openssl
+#5 32.82 0 upgraded, 3 newly installed, 0 to remove and 3 not upgraded.
+#5 32.82 Need to get 1240 kB of archives.
+#5 32.82 After this operation, 2336 kB of additional disk space will be used.
+#5 32.82 Get:1 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 openssl amd64 3.0.2-0ubuntu1.15 [1186 kB]
+#5 34.03 Get:2 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libinotifytools0 amd64 3.22.1.0-2 [22.6 kB]
+#5 34.03 Get:3 http://archive.ubuntu.com/ubuntu jammy/universe amd64 inotify-tools amd64 3.22.1.0-2 [32.2 kB]
+#5 34.12 debconf: delaying package configuration, since apt-utils is not installed
+#5 34.15 Fetched 1240 kB in 7s (189 kB/s)
+#5 34.19 Selecting previously unselected package openssl.
+#5 34.19 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 4393 files and directories currently installed.)
+#5 34.20 Preparing to unpack .../openssl_3.0.2-0ubuntu1.15_amd64.deb ...
+#5 34.21 Unpacking openssl (3.0.2-0ubuntu1.15) ...
+#5 34.30 Selecting previously unselected package libinotifytools0:amd64.
+#5 34.30 Preparing to unpack .../libinotifytools0_3.22.1.0-2_amd64.deb ...
+#5 34.36 Unpacking libinotifytools0:amd64 (3.22.1.0-2) ...
+#5 34.44 Selecting previously unselected package inotify-tools.
+#5 34.44 Preparing to unpack .../inotify-tools_3.22.1.0-2_amd64.deb ...
+#5 34.45 Unpacking inotify-tools (3.22.1.0-2) ...
+#5 34.54 Setting up libinotifytools0:amd64 (3.22.1.0-2) ...
+#5 34.58 Setting up inotify-tools (3.22.1.0-2) ...
+#5 34.61 Setting up openssl (3.0.2-0ubuntu1.15) ...
+#5 34.71 Processing triggers for libc-bin (2.35-0ubuntu3.6) ...
+#5 DONE 35.2s
+
+#6 [3/3] WORKDIR /tmp
+#6 DONE 0.1s
+
+#7 exporting to image
+#7 exporting layers
+#7 exporting layers 0.2s done
+#7 writing image sha256:6374282fd3db279659e0333387ec23fe8cadee212781bce20ff7ad4e2541b6c0
+#7 writing image sha256:6374282fd3db279659e0333387ec23fe8cadee212781bce20ff7ad4e2541b6c0 done
+#7 naming to armdocker.rnd.ericsson.se/proj-mxe/certificate-sidecar:ubuntu-20240405 0.0s done
+#7 DONE 0.4s
++ buildStatus=0
++ [[ 0 == 0 ]]
++ docker push armdocker.rnd.ericsson.se/proj-mxe/certificate-sidecar:ubuntu-20240405
+The push refers to repository [armdocker.rnd.ericsson.se/proj-mxe/certificate-sidecar]
+5f70bf18a086: Preparing
+4273b92be55d: Preparing
+e0a9f5911802: Preparing
+5f70bf18a086: Layer already exists
+e0a9f5911802: Layer already exists
+4273b92be55d: Pushed
+ubuntu-20240405: digest: sha256:d129671964247f7efe22baf9b7befb57a982916b0c08e303f62b8ba4214ef462 size: 947

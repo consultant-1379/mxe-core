@@ -1,0 +1,60 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "annotations": {
+            "type": "object"
+        },
+        "engineNameOverride": {
+            "oneOf": [
+                { "type": "string"},
+                { "type": "null" }
+            ]
+        },
+        "imageCredentials": {
+            "type": "object",
+            "properties": {
+                "registry": {
+                    "type": "object",
+                    "properties": {
+                        "pullSecret": {
+                            "oneOf": [
+                                { "type": "string"},
+                                { "type": "null" }
+                            ]
+                        },
+                        "repoPath": {
+                            "oneOf": [
+                                { "type": "string"},
+                                { "type": "null" }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "labels": {
+            "type": "object"
+        },
+        "operatorNameOverride": {
+            "oneOf": [
+                { "type": "string"},
+                { "type": "null" }
+            ]
+        },
+        "productInfo": {
+            "type": "object",
+            "properties": {
+                "rstate": {
+                    "type": "string"
+                }
+            }
+        },
+        "terminationGracePeriodSeconds": {
+            "type": "integer"
+        },
+        "tolerations": {
+            "type": "array"
+        }
+    }
+}

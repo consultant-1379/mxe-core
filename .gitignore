@@ -1,0 +1,148 @@
+### Git ###
+*.orig
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+.metadata
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+/build/
+build/
+
+### Meghanada ###
+**/.meghanada/**
+
+### BOB ###
+.bob
+
+### Maven via BOB ###
+.m2/
+target/
+.flattened-pom.xml
+
+### Staging code via BOB ###
+staging-scripts/__pycache__/
+
+### GO ###
+gocache/
+src/github.com/
+cli/src/github.com/
+src/golang.org/
+bin/
+#pkg/
+vendor/
+#*.tar.gz
+#*.tgz
+#*.zip
+Gopkg.lock
+#go.sum
+
+### GUI ###
+/mxe-gui/node_modules/
+/mxe-gui/target/
+/mxe-gui/deploy/
+/mxe-gui/test/coverage/
+/mxe-gui/test/junit/
+
+### Helm ###
+/*/helm/*/charts/*.tgz
+/*/helm/*/template.yaml
+/*/helm/*/requirements.yaml
+/resources/testenv/*/values.staging.yaml
+
+/mxe-deployer/helm/*/charts/*.tgz
+/mxe-deployer/helm/mxe-deployer/template.yaml
+/mxe-deployer/helm/mxe-deployer/requirements.yaml
+
+### Test ###
+mxe-jcat-test-log/
+test-output/
+
+### Cli ###
+cli/mxe-*
+
+### JAR ###
+*.jar
+
+depmanager/main*.go
+
+/test-dm/
+/test-*
+utils/trivy/vulnerabilities.txt
+
+
+### utils ###
+utils/certs
+
+### vscode config ###
+/cli/src/.vscode
+settings.json
+.vscode/
+
+### essentials zip ###
+essentials/essentials.zip
+
+### Added for Robot test cases ###
+.DS_Store
+__pycache__
+
+temp/
+scp.sh
+
+### Added as part of robot tcs
+
+mxe-test-reports*
+*-mxe-gitops/
+kubectl_logs/
+robot.log
+.pabotsuitenames
+
+# Added for mxe-sec-utils
+mxe-sec-utils/scan-reports/
+mxe-sec-utils/notebooks/*.py
+*.log
+!3pp-images/logs_and_reports/build_logs/*.log
+trivy_metadata.properties
+3pp-images/logs_and_reports/anchore-reports/ 
+3pp-images/logs_and_reports/trivy-reports/
+
+# Added for dr-check
+dr-check-results/
+dr-check-results.zip
+
+# Added for mxe base images
+ mxe-base-images/model-packager/kaniko
+ 
+# Added for values-file-templater
+**/mxe-generate
+essentials/mxe-generate*
+resources/testenv/*/values/mxe-*.yaml
+
+# Added to ignore images/
+images/ 
+
+# ignore zap output
+zap/
+scan_reports/
+scan-reports*
+logs/
+
+# mxe generate downloads yq
+yq
